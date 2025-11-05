@@ -36,6 +36,7 @@ const Admin = () => {
 
   // Upload states
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
+  const [uploadingBookCover, setUploadingBookCover] = useState(false);
 
   useEffect(() => {
     loadAllContent();
@@ -299,6 +300,48 @@ const Admin = () => {
       });
     } finally {
       setUploadingProfileImage(false);
+    }
+  };
+
+  const uploadBookCover = async (file: File) => {
+    try {
+      setUploadingBookCover(true);
+      
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `books/${fileName}`;
+
+      // Upload to storage
+      const { error: uploadError, data } = await supabase.storage
+        .from('profile-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(filePath);
+
+      // Update state with new URL
+      setBookData({ ...bookData, cover_image: publicUrl });
+
+      toast({
+        title: "Upload realizado!",
+        description: "A capa do livro foi enviada com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro no upload",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingBookCover(false);
     }
   };
 
@@ -645,13 +688,65 @@ const Admin = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>URL da Capa do Livro</Label>
-                  <Input
-                    value={bookData.cover_image || ''}
-                    onChange={(e) => setBookData({ ...bookData, cover_image: e.target.value })}
-                    placeholder="https://exemplo.com/capa.jpg"
-                  />
-                  <p className="text-xs text-muted-foreground">Cole a URL completa da imagem da capa</p>
+                  <Label>Capa do Livro</Label>
+                  
+                  {bookData.cover_image && (
+                    <div className="relative w-32 h-48 rounded-lg overflow-hidden border-2 border-primary/20 mb-2">
+                      <img 
+                        src={bookData.cover_image} 
+                        alt="Preview da capa" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <label className="flex-1">
+                      <div className="cursor-pointer">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="w-full"
+                          disabled={uploadingBookCover}
+                          asChild
+                        >
+                          <span>
+                            {uploadingBookCover ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2" />
+                                Enviando...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-4 h-4 mr-2" />
+                                Fazer Upload
+                              </>
+                            )}
+                          </span>
+                        </Button>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadBookCover(file);
+                        }}
+                        disabled={uploadingBookCover}
+                      />
+                    </label>
+                  </div>
+                  
+                  <div className="space-y-2 pt-2">
+                    <Label className="text-xs text-muted-foreground">Ou cole uma URL:</Label>
+                    <Input
+                      value={bookData.cover_image || ''}
+                      onChange={(e) => setBookData({ ...bookData, cover_image: e.target.value })}
+                      placeholder="https://exemplo.com/capa.jpg"
+                      className="text-sm"
+                    />
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
