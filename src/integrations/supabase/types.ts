@@ -18,6 +18,7 @@ export type Database = {
         Row: {
           description: string
           id: string
+          name: string | null
           profile_image: string | null
           read_line: string | null
           title: string
@@ -27,6 +28,7 @@ export type Database = {
         Insert: {
           description: string
           id?: string
+          name?: string | null
           profile_image?: string | null
           read_line?: string | null
           title: string
@@ -36,6 +38,7 @@ export type Database = {
         Update: {
           description?: string
           id?: string
+          name?: string | null
           profile_image?: string | null
           read_line?: string | null
           title?: string

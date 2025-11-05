@@ -487,10 +487,21 @@ const Admin = () => {
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
+                  <Label>Nome Destacado</Label>
+                  <Input
+                    value={aboutData.name || ''}
+                    onChange={(e) => setAboutData({ ...aboutData, name: e.target.value })}
+                    placeholder="JEFFERSON LOBO"
+                  />
+                  <p className="text-xs text-muted-foreground">Nome que aparecerá em destaque no perfil</p>
+                </div>
+
+                <div className="space-y-2">
                   <Label>Título</Label>
                   <Input
                     value={aboutData.title}
                     onChange={(e) => setAboutData({ ...aboutData, title: e.target.value })}
+                    placeholder="Sobre Jefferson Lobo"
                   />
                 </div>
                 

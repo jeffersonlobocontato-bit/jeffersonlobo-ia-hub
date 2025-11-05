@@ -40,10 +40,15 @@ const AboutSection = () => {
 
           {/* About Text */}
           <div className="space-y-6 animate-slide-up">
-            <h2 className="text-4xl md:text-5xl font-bold">
-              <span className="gradient-primary bg-clip-text text-transparent">
-                {aboutData.title}
-              </span>
+            {aboutData.name && (
+              <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
+                <span className="gradient-primary bg-clip-text text-transparent">
+                  {aboutData.name}
+                </span>
+              </h1>
+            )}
+            <h2 className="text-3xl md:text-4xl font-bold">
+              {aboutData.title}
             </h2>
             {aboutData.read_line && (
               <p className="text-xl text-primary font-semibold">
