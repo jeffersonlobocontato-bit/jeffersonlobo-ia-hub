@@ -67,10 +67,8 @@ const ContactSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-primary bg-clip-text text-transparent">
-              Vamos conversar
-            </span>
+          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-foreground">
+            Vamos conversar
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Entre em contato para palestras, cursos ou consultorias
