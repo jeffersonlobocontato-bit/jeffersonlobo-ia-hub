@@ -19,13 +19,21 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <Separator className="bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        <div className="py-12">
+          <Separator className="h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        </div>
         <AboutSection />
-        <Separator className="bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
+        <div className="py-12">
+          <Separator className="h-[2px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
+        </div>
         <BookSection />
-        <Separator className="bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        <div className="py-12">
+          <Separator className="h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        </div>
         <BlogSection />
-        <Separator className="bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
+        <div className="py-12">
+          <Separator className="h-[2px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
+        </div>
         <ContactSection />
       </main>
       <Footer />
