@@ -1,26 +1,10 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import heroBg from '@/assets/hero-bg.jpg';
-import { supabase } from '@/integrations/supabase/client';
+import { useHeroContent } from '@/hooks/useHeroContent';
 
 const HeroSection = () => {
-  const [heroData, setHeroData] = useState<any>(null);
-
-  useEffect(() => {
-    const loadHeroContent = async () => {
-      const { data } = await supabase
-        .from('hero_content')
-        .select('*')
-        .maybeSingle();
-      
-      if (data) {
-        setHeroData(data);
-      }
-    };
-    
-    loadHeroContent();
-  }, []);
+  const { data: heroData, isLoading } = useHeroContent();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -29,7 +13,7 @@ const HeroSection = () => {
     }
   };
 
-  if (!heroData) {
+  if (isLoading || !heroData) {
     return (
       <section id="home" className="relative min-h-screen flex items-center justify-center">
         <div className="text-center">

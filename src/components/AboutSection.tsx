@@ -1,34 +1,13 @@
-import { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import * as LucideIcons from 'lucide-react';
 import profileImg from '@/assets/profile.jpg';
-import { supabase } from '@/integrations/supabase/client';
+import { useAboutContent, useServices } from '@/hooks/useAboutContent';
 
 const AboutSection = () => {
-  const [aboutData, setAboutData] = useState<any>(null);
-  const [services, setServices] = useState<any[]>([]);
+  const { data: aboutData, isLoading: isLoadingAbout } = useAboutContent();
+  const { data: services = [], isLoading: isLoadingServices } = useServices();
 
-  useEffect(() => {
-    const loadContent = async () => {
-      const { data: about } = await supabase
-        .from('about_content')
-        .select('*')
-        .maybeSingle();
-      
-      const { data: servicesData } = await supabase
-        .from('services')
-        .select('*')
-        .eq('active', true)
-        .order('display_order');
-      
-      if (about) setAboutData(about);
-      if (servicesData) setServices(servicesData);
-    };
-    
-    loadContent();
-  }, []);
-
-  if (!aboutData || services.length === 0) {
+  if (isLoadingAbout || isLoadingServices || !aboutData || services.length === 0) {
     return (
       <section id="sobre" className="py-24 bg-muted/30">
         <div className="container mx-auto px-4 text-center">

@@ -1,27 +1,13 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ShoppingCart, Star, BookOpen } from 'lucide-react';
 import bookCover from '@/assets/book-cover.jpg';
-import { supabase } from '@/integrations/supabase/client';
+import { useBookContent } from '@/hooks/useBookContent';
 
 const BookSection = () => {
-  const [bookData, setBookData] = useState<any>(null);
+  const { data: bookData, isLoading } = useBookContent();
 
-  useEffect(() => {
-    const loadBookContent = async () => {
-      const { data } = await supabase
-        .from('book_content')
-        .select('*')
-        .maybeSingle();
-      
-      if (data) setBookData(data);
-    };
-    
-    loadBookContent();
-  }, []);
-
-  if (!bookData) {
+  if (isLoading || !bookData) {
     return (
       <section id="livro" className="py-24 bg-background">
         <div className="container mx-auto px-4 text-center">

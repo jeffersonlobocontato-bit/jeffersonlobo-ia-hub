@@ -1,25 +1,10 @@
-import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ExternalLink, Calendar, ArrowRight } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { useBlogPosts } from '@/hooks/useBlogPosts';
 
 const BlogSection = () => {
-  const [blogPosts, setBlogPosts] = useState<any[]>([]);
-
-  useEffect(() => {
-    const loadBlogPosts = async () => {
-      const { data } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('active', true)
-        .order('date', { ascending: false });
-      
-      if (data) setBlogPosts(data);
-    };
-    
-    loadBlogPosts();
-  }, []);
+  const { data: blogPosts = [] } = useBlogPosts();
 
   return (
     <section id="blog" className="py-24 bg-muted/30">
