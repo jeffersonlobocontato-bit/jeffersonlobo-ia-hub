@@ -34,8 +34,8 @@ const BookSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
-            <div className="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-secondary">
-              <h2 className="text-5xl font-bold text-white">
+            <div className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-primary to-secondary">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
                 Meu livro
               </h2>
             </div>
@@ -46,7 +46,7 @@ const BookSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center max-w-6xl mx-auto">
           {/* Book Cover */}
           <div className="relative animate-fade-in">
             <div className="relative max-w-sm mx-auto">
@@ -113,7 +113,7 @@ const BookSection = () => {
             ))}
 
             {/* CTA Buttons */}
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-4">
               {displayData.purchase_link && displayData.purchase_link !== '#' && (
                 <Button
                   size="lg"

@@ -12,7 +12,7 @@ const Footer = () => {
     <footer className="bg-tech-dark text-white">
       {/* Footer Links */}
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-4 gap-8 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2">
             <h3 className="text-2xl font-bold text-primary drop-shadow-lg mb-4">

@@ -42,13 +42,13 @@ const AboutSection = () => {
           {/* About Text */}
           <div className="space-y-6 animate-slide-up">
             {displayData.name && (
-              <h1 className="text-6xl font-bold tracking-tight">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
                 <span className="gradient-primary bg-clip-text text-transparent">
                   {displayData.name}
                 </span>
               </h1>
             )}
-            <h2 className="text-4xl font-bold">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold">
               {displayData.title}
             </h2>
             {displayData.read_line && (
@@ -72,7 +72,7 @@ const AboutSection = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {services.map((service, index) => {
               const IconComponent = (LucideIcons as any)[service.icon] || LucideIcons.CircleDot;
               return (
