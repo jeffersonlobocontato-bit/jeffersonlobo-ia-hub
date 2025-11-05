@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const useBookFeatures = () => {
   return useQuery({
-    queryKey: ['book_features'],
+    queryKey: ['book_features', Date.now()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('book_features')
@@ -14,16 +14,17 @@ export const useBookFeatures = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: 0, // Sem cache para mobile
-    gcTime: 1000 * 60 * 10,
-    refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 };
 
 export const useBookReviews = () => {
   return useQuery({
-    queryKey: ['book_reviews'],
+    queryKey: ['book_reviews', Date.now()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('book_reviews')
@@ -34,9 +35,10 @@ export const useBookReviews = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: 0, // Sem cache para mobile
-    gcTime: 1000 * 60 * 10,
-    refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 };

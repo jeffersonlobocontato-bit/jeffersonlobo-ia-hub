@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const useAboutContent = () => {
   return useQuery({
-    queryKey: ['about_content'],
+    queryKey: ['about_content', Date.now()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('about_content')
@@ -13,16 +13,17 @@ export const useAboutContent = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 0, // Sem cache para mobile
-    gcTime: 1000 * 60 * 10,
-    refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 };
 
 export const useServices = () => {
   return useQuery({
-    queryKey: ['services'],
+    queryKey: ['services', Date.now()],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('services')
@@ -33,9 +34,10 @@ export const useServices = () => {
       if (error) throw error;
       return data || [];
     },
-    staleTime: 0, // Sem cache para mobile
-    gcTime: 1000 * 60 * 10,
-    refetchOnMount: true,
+    staleTime: 0,
+    gcTime: 0,
+    refetchOnMount: 'always',
     refetchOnWindowFocus: true,
+    refetchOnReconnect: true,
   });
 };
