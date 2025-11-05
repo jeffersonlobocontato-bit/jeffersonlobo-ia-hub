@@ -47,10 +47,10 @@ const Footer = () => {
             <ul className="space-y-2 text-white">
               <li>
                 <a
-                  href="mailto:contato@jeffersonlobo.com"
+                  href="mailto:jeffersonlobocontato@gmail.com"
                   className="hover:text-primary transition-colors"
                 >
-                  contato@jeffersonlobo.com
+                  jeffersonlobocontato@gmail.com
                 </a>
               </li>
               <li>
