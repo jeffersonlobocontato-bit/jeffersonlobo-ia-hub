@@ -33,11 +33,13 @@ const BookSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="gradient-primary bg-clip-text text-transparent">
-              Meu livro
-            </span>
-          </h2>
+          <div className="inline-block mb-4">
+            <div className="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-secondary">
+              <h2 className="text-4xl md:text-5xl font-bold text-white">
+                Meu livro
+              </h2>
+            </div>
+          </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Uma jornada pelos caminhos da inteligência artificial e seu impacto
             no futuro da humanidade
