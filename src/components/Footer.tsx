@@ -55,7 +55,7 @@ const Footer = () => {
               </li>
               <li>
                 <a
-                  href="https://wa.me/5511999999999"
+                  href="https://wa.me/5545999864213"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="hover:text-primary transition-colors"
