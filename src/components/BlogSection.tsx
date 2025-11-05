@@ -10,9 +10,13 @@ const BlogSection = () => {
     <section id="blog" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
-            Blog
-          </h2>
+          <div className="inline-block mb-4">
+            <div className="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-secondary">
+              <h2 className="text-4xl md:text-5xl font-bold text-white">
+                Blog
+              </h2>
+            </div>
+          </div>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Insights sobre tecnologia, inteligência artificial, inovação e o
             futuro digital
