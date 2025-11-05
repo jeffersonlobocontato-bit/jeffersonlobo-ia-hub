@@ -25,7 +25,7 @@ const Footer = () => {
             <h2 className="text-3xl md:text-4xl font-bold text-white">
               Convide Jefferson Lobo para sua
               <br />
-              <span className="gradient-primary bg-clip-text text-transparent">
+              <span className="text-primary drop-shadow-lg">
                 próxima palestra, curso ou consultoria
               </span>
             </h2>
@@ -53,7 +53,7 @@ const Footer = () => {
         <div className="grid md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2">
-            <h3 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent mb-4">
+            <h3 className="text-2xl font-bold text-primary drop-shadow-lg mb-4">
               Jefferson Lobo
             </h3>
             <p className="text-white/70 mb-4">
