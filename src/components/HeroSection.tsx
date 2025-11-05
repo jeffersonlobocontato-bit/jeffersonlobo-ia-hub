@@ -32,7 +32,7 @@ const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
@@ -41,32 +41,32 @@ const HeroSection = () => {
           alt="Jefferson Lobo - AI Expert"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-tech-dark/90 via-tech-dark/70 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-tech-dark/40 via-tech-dark/30 to-background" />
       </div>
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/20 rounded-full blur-3xl animate-pulse-glow" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/20 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-secondary/10 rounded-full blur-3xl animate-pulse-glow" />
       </div>
 
       {/* Content */}
       <div className="container mx-auto px-4 z-10 relative">
         <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-primary/10 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-background/80 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-primary-foreground">
+            <span className="text-sm font-medium text-foreground">
               Explorando o futuro da tecnologia
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight">
-            <span className="gradient-primary bg-clip-text text-transparent">
+          <h1 className="text-5xl md:text-7xl font-bold leading-tight drop-shadow-lg">
+            <span className="gradient-primary bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
               {displayData.headline}
             </span>
           </h1>
 
-          <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-xl md:text-2xl text-foreground/90 max-w-2xl mx-auto drop-shadow-md">
             {displayData.subtitle}
           </p>
 
