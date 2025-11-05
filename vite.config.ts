@@ -15,4 +15,9 @@ export default defineConfig(({ mode }) => ({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  build: {
+    minify: 'esbuild',
+    target: 'es2015',
+    cssMinify: true,
+  },
 }));
