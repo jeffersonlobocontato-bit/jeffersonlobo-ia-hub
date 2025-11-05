@@ -1,9 +1,36 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ShoppingCart, Star, BookOpen } from 'lucide-react';
 import bookCover from '@/assets/book-cover.jpg';
+import { supabase } from '@/integrations/supabase/client';
 
 const BookSection = () => {
+  const [bookData, setBookData] = useState<any>(null);
+
+  useEffect(() => {
+    const loadBookContent = async () => {
+      const { data } = await supabase
+        .from('book_content')
+        .select('*')
+        .maybeSingle();
+      
+      if (data) setBookData(data);
+    };
+    
+    loadBookContent();
+  }, []);
+
+  if (!bookData) {
+    return (
+      <section id="livro" className="py-24 bg-background">
+        <div className="container mx-auto px-4 text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="livro" className="py-24 bg-background relative overflow-hidden">
       {/* Background Elements */}
@@ -42,13 +69,13 @@ const BookSection = () => {
           <div className="space-y-8 animate-slide-up">
             <div>
               <h3 className="text-3xl font-bold mb-4">
-                IA: O Futuro é Agora
+                {bookData.title}
               </h3>
+              {bookData.subtitle && (
+                <h4 className="text-xl text-primary mb-4">{bookData.subtitle}</h4>
+              )}
               <p className="text-lg text-muted-foreground leading-relaxed">
-                Descubra como a inteligência artificial está redefinindo o modo
-                como vivemos, trabalhamos e criamos. Este livro oferece uma
-                visão acessível e inspiradora sobre as tecnologias que estão
-                moldando o amanhã.
+                {bookData.description}
               </p>
             </div>
 
@@ -92,20 +119,26 @@ const BookSection = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
-              >
-                <ShoppingCart className="mr-2 w-5 h-5" />
-                Comprar agora
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-primary/30 hover:bg-primary/10"
-              >
-                Ler amostra grátis
-              </Button>
+              {bookData.purchase_link && (
+                <Button
+                  size="lg"
+                  className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+                  onClick={() => window.open(bookData.purchase_link, '_blank')}
+                >
+                  <ShoppingCart className="mr-2 w-5 h-5" />
+                  Comprar agora
+                </Button>
+              )}
+              {bookData.sample_link && (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="border-primary/30 hover:bg-primary/10"
+                  onClick={() => window.open(bookData.sample_link, '_blank')}
+                >
+                  Ler amostra grátis
+                </Button>
+              )}
             </div>
           </div>
         </div>

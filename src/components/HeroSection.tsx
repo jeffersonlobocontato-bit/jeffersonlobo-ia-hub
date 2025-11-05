@@ -1,14 +1,43 @@
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles } from 'lucide-react';
 import heroBg from '@/assets/hero-bg.jpg';
+import { supabase } from '@/integrations/supabase/client';
 
 const HeroSection = () => {
+  const [heroData, setHeroData] = useState<any>(null);
+
+  useEffect(() => {
+    const loadHeroContent = async () => {
+      const { data } = await supabase
+        .from('hero_content')
+        .select('*')
+        .maybeSingle();
+      
+      if (data) {
+        setHeroData(data);
+      }
+    };
+    
+    loadHeroContent();
+  }, []);
+
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  if (!heroData) {
+    return (
+      <section id="home" className="relative min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section
@@ -43,17 +72,12 @@ const HeroSection = () => {
 
           <h1 className="text-5xl md:text-7xl font-bold leading-tight">
             <span className="gradient-primary bg-clip-text text-transparent">
-              Transformando
-            </span>
-            <br />
-            <span className="text-foreground">
-              o futuro com IA e criatividade humana
+              {heroData.headline}
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-            Palestrante, autor e especialista em inteligência artificial.
-            Conectando tecnologia, inovação e impacto positivo.
+            {heroData.subtitle}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
@@ -62,7 +86,7 @@ const HeroSection = () => {
               onClick={() => scrollToSection('livro')}
               className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity text-lg px-8 py-6"
             >
-              Conheça meu livro
+              {heroData.cta_primary}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button
@@ -71,16 +95,16 @@ const HeroSection = () => {
               onClick={() => scrollToSection('blog')}
               className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/10"
             >
-              Acesse o blog
+              {heroData.cta_secondary}
             </Button>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
             {[
-              { value: '500+', label: 'Palestras realizadas' },
-              { value: '10k+', label: 'Profissionais impactados' },
-              { value: '15+', label: 'Anos de experiência' },
+              { value: heroData.stat1_number, label: heroData.stat1_label },
+              { value: heroData.stat2_number, label: heroData.stat2_label },
+              { value: heroData.stat3_number, label: heroData.stat3_label },
             ].map((stat, index) => (
               <div 
                 key={index} 
