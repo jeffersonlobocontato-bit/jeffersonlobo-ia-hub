@@ -70,7 +70,7 @@ const Footer = () => {
                 <li key={item}>
                   <button
                     onClick={() => scrollToSection(item)}
-                    className="text-white/70 hover:text-primary transition-colors capitalize"
+                    className="text-white hover:text-primary transition-colors capitalize"
                   >
                     {item}
                   </button>
@@ -82,7 +82,7 @@ const Footer = () => {
           {/* Contact Info */}
           <div>
             <h4 className="font-semibold mb-4 text-white">Contato</h4>
-            <ul className="space-y-2 text-white/70">
+            <ul className="space-y-2 text-white">
               <li>
                 <a
                   href="mailto:contato@jeffersonlobo.com"
