@@ -18,6 +18,8 @@ export type Database = {
         Row: {
           description: string
           id: string
+          profile_image: string | null
+          read_line: string | null
           title: string
           updated_at: string | null
           updated_by: string | null
@@ -25,6 +27,8 @@ export type Database = {
         Insert: {
           description: string
           id?: string
+          profile_image?: string | null
+          read_line?: string | null
           title: string
           updated_at?: string | null
           updated_by?: string | null
@@ -32,6 +36,8 @@ export type Database = {
         Update: {
           description?: string
           id?: string
+          profile_image?: string | null
+          read_line?: string | null
           title?: string
           updated_at?: string | null
           updated_by?: string | null
@@ -79,6 +85,7 @@ export type Database = {
       }
       book_content: {
         Row: {
+          cover_image: string | null
           description: string
           id: string
           purchase_link: string | null
@@ -89,6 +96,7 @@ export type Database = {
           updated_by: string | null
         }
         Insert: {
+          cover_image?: string | null
           description: string
           id?: string
           purchase_link?: string | null
@@ -99,6 +107,7 @@ export type Database = {
           updated_by?: string | null
         }
         Update: {
+          cover_image?: string | null
           description?: string
           id?: string
           purchase_link?: string | null
@@ -137,6 +146,39 @@ export type Database = {
           icon?: string
           id?: string
           title?: string
+        }
+        Relationships: []
+      }
+      contact_info: {
+        Row: {
+          email: string
+          id: string
+          instagram_url: string | null
+          linkedin_url: string | null
+          updated_at: string | null
+          updated_by: string | null
+          whatsapp: string
+          youtube_url: string | null
+        }
+        Insert: {
+          email: string
+          id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          whatsapp: string
+          youtube_url?: string | null
+        }
+        Update: {
+          email?: string
+          id?: string
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          updated_at?: string | null
+          updated_by?: string | null
+          whatsapp?: string
+          youtube_url?: string | null
         }
         Relationships: []
       }

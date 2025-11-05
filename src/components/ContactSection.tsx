@@ -5,9 +5,11 @@ import { Textarea } from '@/components/ui/textarea';
 import { Mail, MessageSquare, Send, Linkedin, Instagram, Youtube } from 'lucide-react';
 import { useState } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useContactInfo } from '@/hooks/useContactInfo';
 
 const ContactSection = () => {
   const { toast } = useToast();
+  const { data: contactData } = useContactInfo();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -38,19 +40,19 @@ const ContactSection = () => {
     {
       icon: Linkedin,
       label: 'LinkedIn',
-      url: 'https://linkedin.com',
+      url: contactData?.linkedin_url || 'https://linkedin.com',
       color: 'hover:text-[#0077B5]',
     },
     {
       icon: Instagram,
       label: 'Instagram',
-      url: 'https://instagram.com',
+      url: contactData?.instagram_url || 'https://instagram.com',
       color: 'hover:text-[#E4405F]',
     },
     {
       icon: Youtube,
       label: 'YouTube',
-      url: 'https://youtube.com',
+      url: contactData?.youtube_url || 'https://youtube.com',
       color: 'hover:text-[#FF0000]',
     },
   ];
@@ -100,10 +102,10 @@ const ContactSection = () => {
                     <div>
                       <h4 className="font-semibold mb-1">Email</h4>
                       <a
-                        href="mailto:contato@jeffersonlobo.com"
+                        href={`mailto:${contactData?.email || 'contato@jeffersonlobo.com'}`}
                         className="text-muted-foreground hover:text-primary transition-colors"
                       >
-                        contato@jeffersonlobo.com
+                        {contactData?.email || 'contato@jeffersonlobo.com'}
                       </a>
                     </div>
                   </div>
@@ -115,12 +117,12 @@ const ContactSection = () => {
                     <div>
                       <h4 className="font-semibold mb-1">WhatsApp</h4>
                       <a
-                        href="https://wa.me/5511999999999"
+                        href={`https://wa.me/${(contactData?.whatsapp || '+55 (11) 99999-9999').replace(/[^\d]/g, '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-muted-foreground hover:text-primary transition-colors"
                       >
-                        +55 (11) 99999-9999
+                        {contactData?.whatsapp || '+55 (11) 99999-9999'}
                       </a>
                     </div>
                   </div>

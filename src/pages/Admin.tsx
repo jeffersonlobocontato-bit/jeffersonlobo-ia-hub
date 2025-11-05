@@ -31,6 +31,9 @@ const Admin = () => {
   // Blog Posts
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
 
+  // Contact Info
+  const [contactData, setContactData] = useState<any>(null);
+
   useEffect(() => {
     loadAllContent();
   }, []);
@@ -70,6 +73,13 @@ const Admin = () => {
       .select('*')
       .order('date', { ascending: false });
     setBlogPosts(postsData || []);
+
+    // Load Contact Info
+    const { data: contact } = await supabase
+      .from('contact_info')
+      .select('*')
+      .single();
+    setContactData(contact);
   };
 
   const updateHeroContent = async () => {
@@ -219,12 +229,35 @@ const Admin = () => {
     }
   };
 
+  const updateContactInfo = async () => {
+    const { error } = await supabase
+      .from('contact_info')
+      .update({
+        ...contactData,
+        updated_by: user?.id,
+      })
+      .eq('id', contactData.id);
+
+    if (error) {
+      toast({
+        title: "Erro ao salvar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Salvo com sucesso!",
+        description: "As informações de contato foram atualizadas.",
+      });
+    }
+  };
+
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
   };
 
-  if (!heroData || !aboutData || !bookData) {
+  if (!heroData || !aboutData || !bookData || !contactData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -259,12 +292,13 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="grid w-full grid-cols-5 mb-8">
+          <TabsList className="grid w-full grid-cols-6 mb-8">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">Sobre</TabsTrigger>
             <TabsTrigger value="services">Serviços</TabsTrigger>
             <TabsTrigger value="book">Livro</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
+            <TabsTrigger value="contact">Contato</TabsTrigger>
           </TabsList>
 
           {/* Hero Tab */}
@@ -361,7 +395,7 @@ const Admin = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Conteúdo Sobre</CardTitle>
-                <CardDescription>Edite o título e descrição da seção sobre</CardDescription>
+                <CardDescription>Edite o título, descrição e imagens da seção sobre</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -373,12 +407,31 @@ const Admin = () => {
                 </div>
                 
                 <div className="space-y-2">
+                  <Label>Linha de Destaque (Read Line)</Label>
+                  <Input
+                    value={aboutData.read_line || ''}
+                    onChange={(e) => setAboutData({ ...aboutData, read_line: e.target.value })}
+                    placeholder="Ex: Transformando empresas através da IA"
+                  />
+                </div>
+
+                <div className="space-y-2">
                   <Label>Descrição</Label>
                   <Textarea
                     value={aboutData.description}
                     onChange={(e) => setAboutData({ ...aboutData, description: e.target.value })}
                     rows={6}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>URL da Foto de Perfil</Label>
+                  <Input
+                    value={aboutData.profile_image || ''}
+                    onChange={(e) => setAboutData({ ...aboutData, profile_image: e.target.value })}
+                    placeholder="https://exemplo.com/foto.jpg"
+                  />
+                  <p className="text-xs text-muted-foreground">Cole a URL completa da imagem</p>
                 </div>
 
                 <Button onClick={updateAboutContent} className="w-full">
@@ -466,7 +519,7 @@ const Admin = () => {
             <Card>
               <CardHeader>
                 <CardTitle>Conteúdo do Livro</CardTitle>
-                <CardDescription>Edite as informações do livro</CardDescription>
+                <CardDescription>Edite as informações e capa do livro</CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="space-y-2">
@@ -492,6 +545,16 @@ const Admin = () => {
                     onChange={(e) => setBookData({ ...bookData, description: e.target.value })}
                     rows={6}
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label>URL da Capa do Livro</Label>
+                  <Input
+                    value={bookData.cover_image || ''}
+                    onChange={(e) => setBookData({ ...bookData, cover_image: e.target.value })}
+                    placeholder="https://exemplo.com/capa.jpg"
+                  />
+                  <p className="text-xs text-muted-foreground">Cole a URL completa da imagem da capa</p>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -617,6 +680,71 @@ const Admin = () => {
                 </Card>
               ))}
             </div>
+          </TabsContent>
+
+          {/* Contact Tab */}
+          <TabsContent value="contact">
+            <Card>
+              <CardHeader>
+                <CardTitle>Informações de Contato</CardTitle>
+                <CardDescription>Edite email, WhatsApp e redes sociais</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="space-y-2">
+                  <Label>Email</Label>
+                  <Input
+                    type="email"
+                    value={contactData.email}
+                    onChange={(e) => setContactData({ ...contactData, email: e.target.value })}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label>WhatsApp</Label>
+                  <Input
+                    value={contactData.whatsapp}
+                    onChange={(e) => setContactData({ ...contactData, whatsapp: e.target.value })}
+                    placeholder="+55 (11) 99999-9999"
+                  />
+                </div>
+
+                <div className="space-y-4 pt-4 border-t">
+                  <h4 className="font-semibold">Redes Sociais</h4>
+                  
+                  <div className="space-y-2">
+                    <Label>LinkedIn URL</Label>
+                    <Input
+                      value={contactData.linkedin_url || ''}
+                      onChange={(e) => setContactData({ ...contactData, linkedin_url: e.target.value })}
+                      placeholder="https://linkedin.com/in/seu-perfil"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Instagram URL</Label>
+                    <Input
+                      value={contactData.instagram_url || ''}
+                      onChange={(e) => setContactData({ ...contactData, instagram_url: e.target.value })}
+                      placeholder="https://instagram.com/seu-perfil"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>YouTube URL</Label>
+                    <Input
+                      value={contactData.youtube_url || ''}
+                      onChange={(e) => setContactData({ ...contactData, youtube_url: e.target.value })}
+                      placeholder="https://youtube.com/@seu-canal"
+                    />
+                  </div>
+                </div>
+
+                <Button onClick={updateContactInfo} className="w-full">
+                  <Save className="w-4 h-4 mr-2" />
+                  Salvar Alterações
+                </Button>
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </main>

@@ -7,7 +7,7 @@ const AboutSection = () => {
   const { data: aboutData, isLoading: isLoadingAbout } = useAboutContent();
   const { data: services = [], isLoading: isLoadingServices } = useServices();
 
-  if (isLoadingAbout || isLoadingServices || !aboutData || services.length === 0) {
+  if (isLoadingAbout || isLoadingServices || !aboutData) {
     return (
       <section id="sobre" className="py-24 bg-muted/30">
         <div className="container mx-auto px-4 text-center">
@@ -17,6 +17,8 @@ const AboutSection = () => {
     );
   }
 
+  const profileImage = aboutData.profile_image || profileImg;
+
   return (
     <section id="sobre" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
@@ -25,7 +27,7 @@ const AboutSection = () => {
           <div className="relative animate-fade-in">
             <div className="relative aspect-square max-w-md mx-auto rounded-2xl overflow-hidden">
               <img
-                src={profileImg}
+                src={profileImage}
                 alt="Jefferson Lobo"
                 className="w-full h-full object-cover"
               />
@@ -43,6 +45,11 @@ const AboutSection = () => {
                 {aboutData.title}
               </span>
             </h2>
+            {aboutData.read_line && (
+              <p className="text-xl text-primary font-semibold">
+                {aboutData.read_line}
+              </p>
+            )}
             <div className="space-y-4 text-lg text-muted-foreground whitespace-pre-line">
               {aboutData.description}
             </div>

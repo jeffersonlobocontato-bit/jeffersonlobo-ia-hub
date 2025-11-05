@@ -13,10 +13,12 @@ const BookSection = () => {
     subtitle: "Uma jornada pelos caminhos da inteligência artificial",
     description: "Neste livro, exploro os conceitos fundamentais da inteligência artificial e seu impacto transformador na sociedade moderna. Uma leitura essencial para entender o futuro da tecnologia.",
     purchase_link: "#",
-    sample_link: "#"
+    sample_link: "#",
+    cover_image: bookCover
   };
 
   const displayData = bookData || defaultData;
+  const coverImage = bookData?.cover_image || bookCover;
 
   return (
     <section id="livro" className="py-24 bg-background relative overflow-hidden">
@@ -44,7 +46,7 @@ const BookSection = () => {
           <div className="relative animate-fade-in">
             <div className="relative max-w-sm mx-auto">
               <img
-                src={bookCover}
+                src={coverImage}
                 alt="Capa do Livro"
                 className="w-full rounded-2xl shadow-2xl hover:scale-105 transition-transform duration-500"
               />
