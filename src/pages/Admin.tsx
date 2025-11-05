@@ -10,6 +10,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
 import { LogOut, Save, Plus, Trash2, Upload, Image as ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+import {
+  heroSchema,
+  aboutSchema,
+  bookSchema,
+  serviceSchema,
+  blogPostSchema,
+  contactSchema,
+  bookFeatureSchema,
+  bookReviewSchema
+} from '@/lib/adminValidation';
 
 const Admin = () => {
   const { signOut, user } = useAuth();
@@ -107,90 +118,158 @@ const Admin = () => {
   };
 
   const updateHeroContent = async () => {
-    const { error } = await supabase
-      .from('hero_content')
-      .update({
-        ...heroData,
-        updated_by: user?.id,
-      })
-      .eq('id', heroData.id);
+    try {
+      const validated = heroSchema.parse(heroData);
+      
+      const { error } = await supabase
+        .from('hero_content')
+        .update({
+          ...validated,
+          updated_by: user?.id,
+        })
+        .eq('id', heroData.id);
 
-    if (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Salvo com sucesso!",
-        description: "O conteúdo do Hero foi atualizado.",
-      });
+      if (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Salvo com sucesso!",
+          description: "O conteúdo do Hero foi atualizado.",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao validar dados",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const updateAboutContent = async () => {
-    const { error } = await supabase
-      .from('about_content')
-      .update({
-        ...aboutData,
-        updated_by: user?.id,
-      })
-      .eq('id', aboutData.id);
+    try {
+      const validated = aboutSchema.parse(aboutData);
+      
+      const { error } = await supabase
+        .from('about_content')
+        .update({
+          ...validated,
+          updated_by: user?.id,
+        })
+        .eq('id', aboutData.id);
 
-    if (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Salvo com sucesso!",
-        description: "O conteúdo Sobre foi atualizado.",
-      });
+      if (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Salvo com sucesso!",
+          description: "O conteúdo Sobre foi atualizado.",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao validar dados",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const updateBookContent = async () => {
-    const { error } = await supabase
-      .from('book_content')
-      .update({
-        ...bookData,
-        updated_by: user?.id,
-      })
-      .eq('id', bookData.id);
+    try {
+      const validated = bookSchema.parse(bookData);
+      
+      const { error } = await supabase
+        .from('book_content')
+        .update({
+          ...validated,
+          updated_by: user?.id,
+        })
+        .eq('id', bookData.id);
 
-    if (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Salvo com sucesso!",
-        description: "O conteúdo do Livro foi atualizado.",
-      });
+      if (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Salvo com sucesso!",
+          description: "O conteúdo do Livro foi atualizado.",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao validar dados",
+          variant: "destructive",
+        });
+      }
     }
   };
 
   const updateService = async (service: any) => {
-    const { error } = await supabase
-      .from('services')
-      .update(service)
-      .eq('id', service.id);
+    try {
+      const validated = serviceSchema.parse(service);
+      
+      const { error } = await supabase
+        .from('services')
+        .update(validated)
+        .eq('id', service.id);
 
-    if (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Serviço atualizado!",
-      });
+      if (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Serviço atualizado!",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao validar dados",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -215,21 +294,38 @@ const Admin = () => {
   };
 
   const updateBlogPost = async (post: any) => {
-    const { error } = await supabase
-      .from('blog_posts')
-      .update(post)
-      .eq('id', post.id);
+    try {
+      const validated = blogPostSchema.parse(post);
+      
+      const { error } = await supabase
+        .from('blog_posts')
+        .update(validated)
+        .eq('id', post.id);
 
-    if (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Post atualizado!",
-      });
+      if (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Post atualizado!",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao validar dados",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -254,25 +350,42 @@ const Admin = () => {
   };
 
   const updateContactInfo = async () => {
-    const { error } = await supabase
-      .from('contact_info')
-      .update({
-        ...contactData,
-        updated_by: user?.id,
-      })
-      .eq('id', contactData.id);
+    try {
+      const validated = contactSchema.parse(contactData);
+      
+      const { error } = await supabase
+        .from('contact_info')
+        .update({
+          ...validated,
+          updated_by: user?.id,
+        })
+        .eq('id', contactData.id);
 
-    if (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({
-        title: "Salvo com sucesso!",
-        description: "As informações de contato foram atualizadas.",
-      });
+      if (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Salvo com sucesso!",
+          description: "As informações de contato foram atualizadas.",
+        });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao validar dados",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -305,19 +418,36 @@ const Admin = () => {
   };
 
   const updateBookFeature = async (feature: any) => {
-    const { error } = await supabase
-      .from('book_features')
-      .update(feature)
-      .eq('id', feature.id);
+    try {
+      const validated = bookFeatureSchema.parse(feature);
+      
+      const { error } = await supabase
+        .from('book_features')
+        .update(validated)
+        .eq('id', feature.id);
 
-    if (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({ title: "Feature atualizada!" });
+      if (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({ title: "Feature atualizada!" });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao validar dados",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -369,19 +499,36 @@ const Admin = () => {
   };
 
   const updateBookReview = async (review: any) => {
-    const { error } = await supabase
-      .from('book_reviews')
-      .update(review)
-      .eq('id', review.id);
+    try {
+      const validated = bookReviewSchema.parse(review);
+      
+      const { error } = await supabase
+        .from('book_reviews')
+        .update(validated)
+        .eq('id', review.id);
 
-    if (error) {
-      toast({
-        title: "Erro ao salvar",
-        description: error.message,
-        variant: "destructive",
-      });
-    } else {
-      toast({ title: "Avaliação atualizada!" });
+      if (error) {
+        toast({
+          title: "Erro ao salvar",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({ title: "Avaliação atualizada!" });
+      }
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        toast({
+          title: "Erro de validação",
+          description: error.errors[0].message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Erro ao validar dados",
+          variant: "destructive",
+        });
+      }
     }
   };
 
