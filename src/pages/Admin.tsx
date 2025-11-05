@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { LogOut, Save, Plus, Trash2 } from 'lucide-react';
+import { LogOut, Save, Plus, Trash2, Upload, Image as ImageIcon } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Admin = () => {
@@ -33,6 +33,9 @@ const Admin = () => {
 
   // Contact Info
   const [contactData, setContactData] = useState<any>(null);
+
+  // Upload states
+  const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
 
   useEffect(() => {
     loadAllContent();
@@ -257,6 +260,48 @@ const Admin = () => {
     navigate('/auth');
   };
 
+  const uploadProfileImage = async (file: File) => {
+    try {
+      setUploadingProfileImage(true);
+      
+      // Generate unique filename
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random().toString(36).substring(2)}-${Date.now()}.${fileExt}`;
+      const filePath = `profile/${fileName}`;
+
+      // Upload to storage
+      const { error: uploadError, data } = await supabase.storage
+        .from('profile-images')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: false
+        });
+
+      if (uploadError) throw uploadError;
+
+      // Get public URL
+      const { data: { publicUrl } } = supabase.storage
+        .from('profile-images')
+        .getPublicUrl(filePath);
+
+      // Update state with new URL
+      setAboutData({ ...aboutData, profile_image: publicUrl });
+
+      toast({
+        title: "Upload realizado!",
+        description: "A imagem foi enviada com sucesso.",
+      });
+    } catch (error: any) {
+      toast({
+        title: "Erro no upload",
+        description: error.message,
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingProfileImage(false);
+    }
+  };
+
   if (!heroData || !aboutData || !bookData || !contactData) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -425,13 +470,65 @@ const Admin = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label>URL da Foto de Perfil</Label>
-                  <Input
-                    value={aboutData.profile_image || ''}
-                    onChange={(e) => setAboutData({ ...aboutData, profile_image: e.target.value })}
-                    placeholder="https://exemplo.com/foto.jpg"
-                  />
-                  <p className="text-xs text-muted-foreground">Cole a URL completa da imagem</p>
+                  <Label>Foto de Perfil</Label>
+                  
+                  {aboutData.profile_image && (
+                    <div className="relative w-32 h-32 rounded-lg overflow-hidden border-2 border-primary/20 mb-2">
+                      <img 
+                        src={aboutData.profile_image} 
+                        alt="Preview" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <label className="flex-1">
+                      <div className="cursor-pointer">
+                        <Button 
+                          type="button" 
+                          variant="outline" 
+                          className="w-full"
+                          disabled={uploadingProfileImage}
+                          asChild
+                        >
+                          <span>
+                            {uploadingProfileImage ? (
+                              <>
+                                <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin mr-2" />
+                                Enviando...
+                              </>
+                            ) : (
+                              <>
+                                <Upload className="w-4 h-4 mr-2" />
+                                Fazer Upload
+                              </>
+                            )}
+                          </span>
+                        </Button>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) uploadProfileImage(file);
+                        }}
+                        disabled={uploadingProfileImage}
+                      />
+                    </label>
+                  </div>
+                  
+                  <div className="space-y-2 pt-2">
+                    <Label className="text-xs text-muted-foreground">Ou cole uma URL:</Label>
+                    <Input
+                      value={aboutData.profile_image || ''}
+                      onChange={(e) => setAboutData({ ...aboutData, profile_image: e.target.value })}
+                      placeholder="https://exemplo.com/foto.jpg"
+                      className="text-sm"
+                    />
+                  </div>
                 </div>
 
                 <Button onClick={updateAboutContent} className="w-full">
