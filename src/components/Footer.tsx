@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, MessageCircle } from 'lucide-react';
 
 const Footer = () => {
   const scrollToSection = (id: string) => {
@@ -45,7 +45,9 @@ const Footer = () => {
                   href="https://wa.me/5545999864213"
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="flex items-center gap-2"
                 >
+                  <MessageCircle className="w-5 h-5" />
                   Entrar em contato
                 </a>
               </Button>

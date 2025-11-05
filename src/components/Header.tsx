@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, MessageCircle } from 'lucide-react';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -66,7 +66,9 @@ const Header = () => {
               href="https://wa.me/5545999864213"
               target="_blank"
               rel="noopener noreferrer"
+              className="flex items-center gap-2"
             >
+              <MessageCircle className="w-4 h-4" />
               Contrate para Palestras & Consultoria
             </a>
           </Button>
@@ -100,7 +102,9 @@ const Header = () => {
                 href="https://wa.me/5545999864213"
                 target="_blank"
                 rel="noopener noreferrer"
+                className="flex items-center gap-2"
               >
+                <MessageCircle className="w-4 h-4" />
                 Contrate para Palestras
               </a>
             </Button>
