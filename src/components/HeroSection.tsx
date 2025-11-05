@@ -53,20 +53,18 @@ const HeroSection = () => {
       {/* Content */}
       <div className="container mx-auto px-4 z-10 relative">
         <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-primary/30 bg-background/80 backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-primary" />
-            <span className="text-sm font-medium text-foreground">
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm">
+            <Sparkles className="w-4 h-4 text-white" />
+            <span className="text-sm font-medium text-white">
               Explorando o futuro da tecnologia
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight drop-shadow-lg">
-            <span className="gradient-primary bg-clip-text text-transparent drop-shadow-[0_2px_10px_rgba(0,0,0,0.3)]">
-              {displayData.headline}
-            </span>
+          <h1 className="text-5xl md:text-7xl font-bold leading-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+            {displayData.headline}
           </h1>
 
-          <p className="text-xl md:text-2xl text-foreground/90 max-w-2xl mx-auto drop-shadow-md">
+          <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
             {displayData.subtitle}
           </p>
 
@@ -83,7 +81,7 @@ const HeroSection = () => {
               size="lg"
               variant="outline"
               onClick={() => scrollToSection('blog')}
-              className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/10"
+              className="text-lg px-8 py-6 border-white/30 bg-white/10 text-white hover:bg-white/20"
             >
               {displayData.cta_secondary}
             </Button>
@@ -101,10 +99,10 @@ const HeroSection = () => {
                 className="text-center animate-fade-in"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="text-3xl md:text-4xl font-bold gradient-primary bg-clip-text text-transparent">
+                <div className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
                   {stat.value}
                 </div>
-                <div className="text-sm text-muted-foreground mt-1">
+                <div className="text-sm text-white/80 mt-1 drop-shadow-md">
                   {stat.label}
                 </div>
               </div>
@@ -115,8 +113,8 @@ const HeroSection = () => {
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-        <div className="w-6 h-10 border-2 border-primary/50 rounded-full p-1">
-          <div className="w-1 h-3 bg-primary rounded-full mx-auto animate-pulse" />
+        <div className="w-6 h-10 border-2 border-white/50 rounded-full p-1">
+          <div className="w-1 h-3 bg-white rounded-full mx-auto animate-pulse" />
         </div>
       </div>
     </section>
