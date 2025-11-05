@@ -60,15 +60,15 @@ const HeroSection = () => {
             </span>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold leading-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
+          <h1 className="text-7xl font-bold leading-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
             {displayData.headline}
           </h1>
 
-          <p className="text-xl md:text-2xl text-white max-w-2xl mx-auto drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
+          <p className="text-2xl text-white max-w-2xl mx-auto drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
             {displayData.subtitle}
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          <div className="flex flex-row gap-4 justify-center items-center pt-4">
             <Button
               size="lg"
               onClick={() => scrollToSection('livro')}
@@ -99,7 +99,7 @@ const HeroSection = () => {
                 className="text-center animate-fade-in"
                 style={{ animationDelay: `${index * 150}ms` }}
               >
-                <div className="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
+                <div className="text-4xl font-bold text-white drop-shadow-lg">
                   {stat.value}
                 </div>
                 <div className="text-sm text-white/80 mt-1 drop-shadow-md">

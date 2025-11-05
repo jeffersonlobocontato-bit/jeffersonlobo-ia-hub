@@ -19,19 +19,19 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
-        <div className="py-16 md:py-20">
+        <div className="py-20">
           <Separator className="h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         </div>
         <AboutSection />
-        <div className="py-16 md:py-20">
+        <div className="py-20">
           <Separator className="h-[2px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         </div>
         <BookSection />
-        <div className="py-16 md:py-20">
+        <div className="py-20">
           <Separator className="h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         </div>
         <BlogSection />
-        <div className="py-16 md:py-20">
+        <div className="py-20">
           <Separator className="h-[2px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         </div>
         <ContactSection />

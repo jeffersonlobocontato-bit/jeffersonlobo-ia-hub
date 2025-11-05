@@ -15,13 +15,13 @@ const ContactSection = () => {
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
             <div className="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-secondary">
-              <h2 className="text-4xl md:text-5xl font-bold text-white">
+              <h2 className="text-5xl font-bold text-white">
                 Vamos conversar
               </h2>
             </div>
           </div>
           <div className="max-w-3xl mx-auto space-y-6">
-            <h3 className="text-2xl md:text-3xl font-semibold text-foreground">
+            <h3 className="text-3xl font-semibold text-foreground">
               Convide Jefferson Lobo para sua próxima palestra, curso ou consultoria
             </h3>
             <p className="text-lg text-muted-foreground">

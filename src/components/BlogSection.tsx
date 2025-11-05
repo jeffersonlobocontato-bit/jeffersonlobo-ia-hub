@@ -12,7 +12,7 @@ const BlogSection = () => {
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
             <div className="px-8 py-4 rounded-full bg-gradient-to-r from-primary to-secondary">
-              <h2 className="text-4xl md:text-5xl font-bold text-white">
+              <h2 className="text-5xl font-bold text-white">
                 Blog
               </h2>
             </div>
@@ -23,7 +23,7 @@ const BlogSection = () => {
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-2 gap-8 max-w-6xl mx-auto">
           {blogPosts.map((post, index) => {
             const formattedDate = new Date(post.date).toLocaleDateString('pt-BR', {
               day: 'numeric',
