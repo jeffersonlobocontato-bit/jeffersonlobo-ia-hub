@@ -81,7 +81,7 @@ const BlogSection = () => {
           })}
         </div>
 
-        {/* RSS Feed Section */}
+        {/* Newsletter LinkedIn Section */}
         <div className="mt-16 max-w-3xl mx-auto">
           <Card className="p-8 text-center bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
             <h3 className="text-2xl font-bold mb-4">
@@ -91,12 +91,14 @@ const BlogSection = () => {
               Inscreva-se para receber artigos, novidades e insights direto no
               seu feed
             </p>
-            <Button
-              size="lg"
-              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90"
+            <a
+              href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7216140554995175424"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-[#0A66C2] hover:bg-[#004182] rounded-full transition-colors duration-200"
             >
-              Inscrever-se no Feed RSS
-            </Button>
+              Assinar no LinkedIn
+            </a>
           </Card>
         </div>
       </div>
