@@ -13,15 +13,21 @@ const HeroSection = () => {
     }
   };
 
-  if (isLoading || !heroData) {
-    return (
-      <section id="home" className="relative min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      </section>
-    );
-  }
+  // Fallback data quando banco está vazio
+  const defaultData = {
+    headline: "Jefferson Lobo",
+    subtitle: "Especialista em Inteligência Artificial e Transformação Digital",
+    cta_primary: "Conheça meu livro",
+    cta_secondary: "Ler artigos",
+    stat1_number: "15+",
+    stat1_label: "Anos de experiência",
+    stat2_number: "100+",
+    stat2_label: "Projetos concluídos",
+    stat3_number: "50K+",
+    stat3_label: "Pessoas impactadas"
+  };
+
+  const displayData = heroData || defaultData;
 
   return (
     <section
@@ -56,12 +62,12 @@ const HeroSection = () => {
 
           <h1 className="text-5xl md:text-7xl font-bold leading-tight">
             <span className="gradient-primary bg-clip-text text-transparent">
-              {heroData.headline}
+              {displayData.headline}
             </span>
           </h1>
 
           <p className="text-xl md:text-2xl text-muted-foreground max-w-2xl mx-auto">
-            {heroData.subtitle}
+            {displayData.subtitle}
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
@@ -70,7 +76,7 @@ const HeroSection = () => {
               onClick={() => scrollToSection('livro')}
               className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity text-lg px-8 py-6"
             >
-              {heroData.cta_primary}
+              {displayData.cta_primary}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button
@@ -79,16 +85,16 @@ const HeroSection = () => {
               onClick={() => scrollToSection('blog')}
               className="text-lg px-8 py-6 border-primary/30 hover:bg-primary/10"
             >
-              {heroData.cta_secondary}
+              {displayData.cta_secondary}
             </Button>
           </div>
 
           {/* Stats */}
           <div className="grid grid-cols-3 gap-8 pt-12 max-w-2xl mx-auto">
             {[
-              { value: heroData.stat1_number, label: heroData.stat1_label },
-              { value: heroData.stat2_number, label: heroData.stat2_label },
-              { value: heroData.stat3_number, label: heroData.stat3_label },
+              { value: displayData.stat1_number, label: displayData.stat1_label },
+              { value: displayData.stat2_number, label: displayData.stat2_label },
+              { value: displayData.stat3_number, label: displayData.stat3_label },
             ].map((stat, index) => (
               <div 
                 key={index} 

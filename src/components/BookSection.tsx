@@ -7,15 +7,16 @@ import { useBookContent } from '@/hooks/useBookContent';
 const BookSection = () => {
   const { data: bookData, isLoading } = useBookContent();
 
-  if (isLoading || !bookData) {
-    return (
-      <section id="livro" className="py-24 bg-background">
-        <div className="container mx-auto px-4 text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      </section>
-    );
-  }
+  // Fallback data
+  const defaultData = {
+    title: "Meu Livro sobre IA",
+    subtitle: "Uma jornada pelos caminhos da inteligência artificial",
+    description: "Neste livro, exploro os conceitos fundamentais da inteligência artificial e seu impacto transformador na sociedade moderna. Uma leitura essencial para entender o futuro da tecnologia.",
+    purchase_link: "#",
+    sample_link: "#"
+  };
+
+  const displayData = bookData || defaultData;
 
   return (
     <section id="livro" className="py-24 bg-background relative overflow-hidden">
@@ -55,13 +56,13 @@ const BookSection = () => {
           <div className="space-y-8 animate-slide-up">
             <div>
               <h3 className="text-3xl font-bold mb-4">
-                {bookData.title}
+                {displayData.title}
               </h3>
-              {bookData.subtitle && (
-                <h4 className="text-xl text-primary mb-4">{bookData.subtitle}</h4>
+              {displayData.subtitle && (
+                <h4 className="text-xl text-primary mb-4">{displayData.subtitle}</h4>
               )}
               <p className="text-lg text-muted-foreground leading-relaxed">
-                {bookData.description}
+                {displayData.description}
               </p>
             </div>
 
@@ -105,22 +106,22 @@ const BookSection = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
-              {bookData.purchase_link && (
+              {displayData.purchase_link && displayData.purchase_link !== '#' && (
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
-                  onClick={() => window.open(bookData.purchase_link, '_blank')}
+                  onClick={() => window.open(displayData.purchase_link, '_blank')}
                 >
                   <ShoppingCart className="mr-2 w-5 h-5" />
                   Comprar agora
                 </Button>
               )}
-              {bookData.sample_link && (
+              {displayData.sample_link && displayData.sample_link !== '#' && (
                 <Button
                   size="lg"
                   variant="outline"
                   className="border-primary/30 hover:bg-primary/10"
-                  onClick={() => window.open(bookData.sample_link, '_blank')}
+                  onClick={() => window.open(displayData.sample_link, '_blank')}
                 >
                   Ler amostra grátis
                 </Button>
