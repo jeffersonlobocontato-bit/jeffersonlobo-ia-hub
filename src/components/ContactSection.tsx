@@ -1,40 +1,9 @@
-import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Mail, MessageSquare, Send, Linkedin, Instagram, Youtube } from 'lucide-react';
-import { useState } from 'react';
-import { useToast } from '@/hooks/use-toast';
+import { Mail, MessageSquare, Linkedin, Instagram, Youtube } from 'lucide-react';
 import { useContactInfo } from '@/hooks/useContactInfo';
 
 const ContactSection = () => {
-  const { toast } = useToast();
   const { data: contactData } = useContactInfo();
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    subject: '',
-    message: '',
-  });
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Here you would typically send the form data to your backend
-    toast({
-      title: 'Mensagem enviada!',
-      description: 'Obrigado pelo contato. Retornarei em breve!',
-    });
-    setFormData({ name: '', email: '', subject: '', message: '' });
-  };
-
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  };
 
   const socialLinks = [
     {
@@ -80,8 +49,7 @@ const ContactSection = () => {
           </p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
-          {/* Contact Info */}
+        <div className="max-w-2xl mx-auto">
           <div className="space-y-8 animate-fade-in">
             <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
               <div className="space-y-6">
@@ -149,100 +117,6 @@ const ContactSection = () => {
                   </div>
                 </div>
               </div>
-            </Card>
-          </div>
-
-          {/* Contact Form */}
-          <div className="animate-slide-up">
-            <Card className="p-8 border-primary/20">
-              <form onSubmit={handleSubmit} className="space-y-6">
-                <div className="space-y-4">
-                  <div>
-                    <label
-                      htmlFor="name"
-                      className="block text-sm font-medium mb-2"
-                    >
-                      Nome completo
-                    </label>
-                    <Input
-                      id="name"
-                      name="name"
-                      type="text"
-                      value={formData.name}
-                      onChange={handleChange}
-                      required
-                      placeholder="Seu nome"
-                      className="border-primary/30 focus:border-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="block text-sm font-medium mb-2"
-                    >
-                      Email
-                    </label>
-                    <Input
-                      id="email"
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      required
-                      placeholder="seu@email.com"
-                      className="border-primary/30 focus:border-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="subject"
-                      className="block text-sm font-medium mb-2"
-                    >
-                      Assunto
-                    </label>
-                    <Input
-                      id="subject"
-                      name="subject"
-                      type="text"
-                      value={formData.subject}
-                      onChange={handleChange}
-                      required
-                      placeholder="Como posso ajudar?"
-                      className="border-primary/30 focus:border-primary"
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor="message"
-                      className="block text-sm font-medium mb-2"
-                    >
-                      Mensagem
-                    </label>
-                    <Textarea
-                      id="message"
-                      name="message"
-                      value={formData.message}
-                      onChange={handleChange}
-                      required
-                      placeholder="Conte-me sobre seu projeto ou necessidade..."
-                      rows={6}
-                      className="border-primary/30 focus:border-primary resize-none"
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
-                >
-                  Enviar mensagem
-                  <Send className="ml-2 w-5 h-5" />
-                </Button>
-              </form>
             </Card>
           </div>
         </div>
