@@ -10,17 +10,14 @@ const BookSection = () => {
   const { data: features = [] } = useBookFeatures();
   const { data: reviews = [] } = useBookReviews();
 
-  // Fallback data
-  const defaultData = {
-    title: "Meu Livro sobre IA",
-    subtitle: "Uma jornada pelos caminhos da inteligência artificial",
-    description: "Neste livro, exploro os conceitos fundamentais da inteligência artificial e seu impacto transformador na sociedade moderna. Uma leitura essencial para entender o futuro da tecnologia.",
-    purchase_link: "#",
-    sample_link: "#",
+  const displayData = bookData || {
+    title: "Livro em breve",
+    subtitle: "",
+    description: "Conteúdo em atualização",
+    purchase_link: "",
+    sample_link: "",
     cover_image: bookCover
   };
-
-  const displayData = bookData || defaultData;
   const coverImage = bookData?.cover_image || bookCover;
 
   return (

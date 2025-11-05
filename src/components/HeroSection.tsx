@@ -13,21 +13,18 @@ const HeroSection = () => {
     }
   };
 
-  // Fallback data quando banco está vazio
-  const defaultData = {
+  const displayData = heroData || {
     headline: "Jefferson Lobo",
-    subtitle: "Especialista em Inteligência Artificial e Transformação Digital",
+    subtitle: "Especialista em Inteligência Artificial",
     cta_primary: "Conheça meu livro",
     cta_secondary: "Ler artigos",
-    stat1_number: "15+",
-    stat1_label: "Anos de experiência",
-    stat2_number: "100+",
-    stat2_label: "Projetos concluídos",
-    stat3_number: "50K+",
-    stat3_label: "Pessoas impactadas"
+    stat1_number: "",
+    stat1_label: "",
+    stat2_number: "",
+    stat2_label: "",
+    stat3_number: "",
+    stat3_label: ""
   };
-
-  const displayData = heroData || defaultData;
 
   return (
     <section
@@ -56,7 +53,7 @@ const HeroSection = () => {
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-white" />
             <span className="text-sm font-medium text-white">
-              Explorando o futuro da tecnologia
+              {displayData.headline?.split(' ').slice(0, 4).join(' ') || 'Explorando o futuro da tecnologia'}
             </span>
           </div>
 
@@ -88,26 +85,28 @@ const HeroSection = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-12 max-w-2xl mx-auto">
-            {[
-              { value: displayData.stat1_number, label: displayData.stat1_label },
-              { value: displayData.stat2_number, label: displayData.stat2_label },
-              { value: displayData.stat3_number, label: displayData.stat3_label },
-            ].map((stat, index) => (
-              <div 
-                key={index} 
-                className="text-center animate-fade-in"
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-                  {stat.value}
+          {(displayData.stat1_number || displayData.stat2_number || displayData.stat3_number) && (
+            <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-12 max-w-2xl mx-auto">
+              {[
+                { value: displayData.stat1_number, label: displayData.stat1_label },
+                { value: displayData.stat2_number, label: displayData.stat2_label },
+                { value: displayData.stat3_number, label: displayData.stat3_label },
+              ].filter(stat => stat.value && stat.label).map((stat, index) => (
+                <div 
+                  key={index} 
+                  className="text-center animate-fade-in"
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs sm:text-sm text-white/80 mt-1 drop-shadow-md">
+                    {stat.label}
+                  </div>
                 </div>
-                <div className="text-xs sm:text-sm text-white/80 mt-1 drop-shadow-md">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
