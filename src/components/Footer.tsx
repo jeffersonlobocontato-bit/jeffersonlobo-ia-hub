@@ -12,17 +12,17 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-tech-dark text-foreground">
+    <footer className="bg-tech-dark text-white">
       {/* CTA Section */}
       <div className="border-b border-primary/20">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-4xl mx-auto text-center space-y-6">
             <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/30">
               <Sparkles className="w-4 h-4 text-primary" />
-              <span className="text-sm font-medium">Vamos trabalhar juntos</span>
+              <span className="text-sm font-medium text-white">Vamos trabalhar juntos</span>
             </div>
 
-            <h2 className="text-3xl md:text-4xl font-bold">
+            <h2 className="text-3xl md:text-4xl font-bold text-white">
               Convide Jefferson Lobo para sua
               <br />
               <span className="gradient-primary bg-clip-text text-transparent">
@@ -30,7 +30,7 @@ const Footer = () => {
               </span>
             </h2>
 
-            <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+            <p className="text-white/70 text-lg max-w-2xl mx-auto">
               Transforme sua organização com insights sobre inteligência
               artificial, inovação e o futuro da tecnologia
             </p>
@@ -56,7 +56,7 @@ const Footer = () => {
             <h3 className="text-2xl font-bold gradient-primary bg-clip-text text-transparent mb-4">
               Jefferson Lobo
             </h3>
-            <p className="text-muted-foreground mb-4">
+            <p className="text-white/70 mb-4">
               Palestrante, autor e especialista em inteligência artificial.
               Explorando o futuro da tecnologia com criatividade e impacto.
             </p>
@@ -64,13 +64,13 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4">Navegação</h4>
+            <h4 className="font-semibold mb-4 text-white">Navegação</h4>
             <ul className="space-y-2">
               {['home', 'sobre', 'livro', 'blog', 'contato'].map((item) => (
                 <li key={item}>
                   <button
                     onClick={() => scrollToSection(item)}
-                    className="text-muted-foreground hover:text-primary transition-colors capitalize"
+                    className="text-white/70 hover:text-primary transition-colors capitalize"
                   >
                     {item}
                   </button>
@@ -81,8 +81,8 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-semibold mb-4">Contato</h4>
-            <ul className="space-y-2 text-muted-foreground">
+            <h4 className="font-semibold mb-4 text-white">Contato</h4>
+            <ul className="space-y-2 text-white/70">
               <li>
                 <a
                   href="mailto:contato@jeffersonlobo.com"
@@ -106,7 +106,7 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="pt-8 border-t border-primary/20 text-center text-muted-foreground text-sm">
+        <div className="pt-8 border-t border-primary/20 text-center text-white/60 text-sm">
           <p>
             © {currentYear} Jefferson Lobo. Todos os direitos reservados.
           </p>
