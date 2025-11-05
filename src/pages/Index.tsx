@@ -6,6 +6,7 @@ import BookSection from '@/components/BookSection';
 import BlogSection from '@/components/BlogSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import UpdateNotifier from '@/components/UpdateNotifier';
 import { Separator } from '@/components/ui/separator';
 
 const Index = () => {
@@ -16,6 +17,7 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <UpdateNotifier />
       <Header />
       <main>
         <HeroSection />
