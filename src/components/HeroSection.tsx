@@ -82,7 +82,11 @@ const HeroSection = () => {
               { value: '10k+', label: 'Profissionais impactados' },
               { value: '15+', label: 'Anos de experiência' },
             ].map((stat, index) => (
-              <div key={index} className="text-center animate-slide-up">
+              <div 
+                key={index} 
+                className="text-center animate-fade-in"
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
                 <div className="text-3xl md:text-4xl font-bold gradient-primary bg-clip-text text-transparent">
                   {stat.value}
                 </div>

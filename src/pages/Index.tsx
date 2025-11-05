@@ -6,6 +6,7 @@ import BookSection from '@/components/BookSection';
 import BlogSection from '@/components/BlogSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import { Separator } from '@/components/ui/separator';
 
 const Index = () => {
   useEffect(() => {
@@ -18,9 +19,13 @@ const Index = () => {
       <Header />
       <main>
         <HeroSection />
+        <Separator className="bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <AboutSection />
+        <Separator className="bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         <BookSection />
+        <Separator className="bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <BlogSection />
+        <Separator className="bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
         <ContactSection />
       </main>
       <Footer />
