@@ -38,10 +38,16 @@ const Footer = () => {
             <div className="pt-4">
               <Button
                 size="lg"
-                onClick={() => scrollToSection('contato')}
+                asChild
                 className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity text-lg px-8 py-6"
               >
-                Entrar em contato
+                <a
+                  href="https://wa.me/5545999864213"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Entrar em contato
+                </a>
               </Button>
             </div>
           </div>

@@ -59,10 +59,16 @@ const Header = () => {
 
           {/* CTA Button */}
           <Button
-            onClick={() => scrollToSection('contato')}
+            asChild
             className="hidden md:flex bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
           >
-            Contrate para Palestras & Consultoria
+            <a
+              href="https://wa.me/5545999864213"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Contrate para Palestras & Consultoria
+            </a>
           </Button>
 
           {/* Mobile Menu Button */}
@@ -87,10 +93,16 @@ const Header = () => {
               </button>
             ))}
             <Button
-              onClick={() => scrollToSection('contato')}
+              asChild
               className="w-full bg-gradient-to-r from-primary to-secondary"
             >
-              Contrate para Palestras
+              <a
+                href="https://wa.me/5545999864213"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                Contrate para Palestras
+              </a>
             </Button>
           </div>
         )}
