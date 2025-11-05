@@ -152,6 +152,42 @@ export type Database = {
         }
         Relationships: []
       }
+      book_reviews: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          display_order: number
+          id: string
+          rating: number
+          review_text: string
+          reviewer_name: string
+          reviewer_title: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          display_order: number
+          id?: string
+          rating?: number
+          review_text: string
+          reviewer_name: string
+          reviewer_title: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          rating?: number
+          review_text?: string
+          reviewer_name?: string
+          reviewer_title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       contact_info: {
         Row: {
           email: string

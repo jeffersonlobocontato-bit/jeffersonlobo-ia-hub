@@ -34,6 +34,12 @@ const Admin = () => {
   // Contact Info
   const [contactData, setContactData] = useState<any>(null);
 
+  // Book Features
+  const [bookFeatures, setBookFeatures] = useState<any[]>([]);
+  
+  // Book Reviews
+  const [bookReviews, setBookReviews] = useState<any[]>([]);
+
   // Upload states
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
   const [uploadingBookCover, setUploadingBookCover] = useState(false);
@@ -84,6 +90,20 @@ const Admin = () => {
       .select('*')
       .single();
     setContactData(contact);
+
+    // Load Book Features
+    const { data: featuresData } = await supabase
+      .from('book_features')
+      .select('*')
+      .order('display_order');
+    setBookFeatures(featuresData || []);
+
+    // Load Book Reviews
+    const { data: reviewsData } = await supabase
+      .from('book_reviews')
+      .select('*')
+      .order('display_order');
+    setBookReviews(reviewsData || []);
   };
 
   const updateHeroContent = async () => {
@@ -256,6 +276,133 @@ const Admin = () => {
     }
   };
 
+  // Book Features Management
+  const addBookFeature = async () => {
+    const maxOrder = bookFeatures.length > 0 
+      ? Math.max(...bookFeatures.map(f => f.display_order)) 
+      : 0;
+      
+    const { error } = await supabase
+      .from('book_features')
+      .insert({
+        title: 'Nova Feature',
+        description: 'Descrição da feature',
+        icon: 'BookOpen',
+        display_order: maxOrder + 1,
+        active: true,
+      });
+
+    if (error) {
+      toast({
+        title: "Erro ao adicionar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Feature adicionada!" });
+      loadAllContent();
+    }
+  };
+
+  const updateBookFeature = async (feature: any) => {
+    const { error } = await supabase
+      .from('book_features')
+      .update(feature)
+      .eq('id', feature.id);
+
+    if (error) {
+      toast({
+        title: "Erro ao salvar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Feature atualizada!" });
+    }
+  };
+
+  const deleteBookFeature = async (id: string) => {
+    const { error } = await supabase
+      .from('book_features')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Erro ao deletar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Feature deletada!" });
+      loadAllContent();
+    }
+  };
+
+  // Book Reviews Management
+  const addBookReview = async () => {
+    const maxOrder = bookReviews.length > 0 
+      ? Math.max(...bookReviews.map(r => r.display_order)) 
+      : 0;
+      
+    const { error } = await supabase
+      .from('book_reviews')
+      .insert({
+        rating: 5.0,
+        review_text: 'Nova avaliação',
+        reviewer_name: 'Nome do Avaliador',
+        reviewer_title: 'Cargo',
+        display_order: maxOrder + 1,
+        active: true,
+      });
+
+    if (error) {
+      toast({
+        title: "Erro ao adicionar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Avaliação adicionada!" });
+      loadAllContent();
+    }
+  };
+
+  const updateBookReview = async (review: any) => {
+    const { error } = await supabase
+      .from('book_reviews')
+      .update(review)
+      .eq('id', review.id);
+
+    if (error) {
+      toast({
+        title: "Erro ao salvar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Avaliação atualizada!" });
+    }
+  };
+
+  const deleteBookReview = async (id: string) => {
+    const { error} = await supabase
+      .from('book_reviews')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast({
+        title: "Erro ao deletar",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({ title: "Avaliação deletada!" });
+      loadAllContent();
+    }
+  };
+
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
@@ -380,11 +527,13 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="grid w-full grid-cols-6 mb-8">
+          <TabsList className="grid w-full grid-cols-8 mb-8">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">Sobre</TabsTrigger>
             <TabsTrigger value="services">Serviços</TabsTrigger>
             <TabsTrigger value="book">Livro</TabsTrigger>
+            <TabsTrigger value="features">Features</TabsTrigger>
+            <TabsTrigger value="reviews">Avaliações</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="contact">Contato</TabsTrigger>
           </TabsList>
@@ -946,6 +1095,238 @@ const Admin = () => {
                   <Save className="w-4 h-4 mr-2" />
                   Salvar Alterações
                 </Button>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Book Features Tab */}
+          <TabsContent value="features">
+            <Card>
+              <CardHeader>
+                <CardTitle>Features do Livro</CardTitle>
+                <CardDescription>Gerencie as características destacadas do livro</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Button onClick={addBookFeature} className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar Feature
+                </Button>
+
+                <div className="space-y-4">
+                  {bookFeatures.map((feature, index) => (
+                    <Card key={feature.id} className="p-4">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-semibold">Feature #{index + 1}</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateBookFeature(feature)}
+                            >
+                              <Save className="w-4 h-4 mr-1" />
+                              Salvar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteBookFeature(feature.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="grid gap-4">
+                          <div className="space-y-2">
+                            <Label>Título</Label>
+                            <Input
+                              value={feature.title}
+                              onChange={(e) => {
+                                const updated = bookFeatures.map(f =>
+                                  f.id === feature.id ? { ...f, title: e.target.value } : f
+                                );
+                                setBookFeatures(updated);
+                              }}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label>Ordem</Label>
+                              <Input
+                                type="number"
+                                value={feature.display_order}
+                                onChange={(e) => {
+                                  const updated = bookFeatures.map(f =>
+                                    f.id === feature.id ? { ...f, display_order: parseInt(e.target.value) } : f
+                                  );
+                                  setBookFeatures(updated);
+                                }}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Ativo</Label>
+                              <select
+                                value={feature.active ? 'true' : 'false'}
+                                onChange={(e) => {
+                                  const updated = bookFeatures.map(f =>
+                                    f.id === feature.id ? { ...f, active: e.target.value === 'true' } : f
+                                  );
+                                  setBookFeatures(updated);
+                                }}
+                                className="w-full px-3 py-2 border border-input bg-background rounded-md"
+                              >
+                                <option value="true">Sim</option>
+                                <option value="false">Não</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Book Reviews Tab */}
+          <TabsContent value="reviews">
+            <Card>
+              <CardHeader>
+                <CardTitle>Avaliações do Livro</CardTitle>
+                <CardDescription>Gerencie as avaliações e depoimentos sobre o livro</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-6">
+                <Button onClick={addBookReview} className="w-full">
+                  <Plus className="w-4 h-4 mr-2" />
+                  Adicionar Avaliação
+                </Button>
+
+                <div className="space-y-4">
+                  {bookReviews.map((review, index) => (
+                    <Card key={review.id} className="p-4">
+                      <div className="space-y-4">
+                        <div className="flex justify-between items-center">
+                          <h4 className="font-semibold">Avaliação #{index + 1}</h4>
+                          <div className="flex gap-2">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => updateBookReview(review)}
+                            >
+                              <Save className="w-4 h-4 mr-1" />
+                              Salvar
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="destructive"
+                              onClick={() => deleteBookReview(review.id)}
+                            >
+                              <Trash2 className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        </div>
+
+                        <div className="grid gap-4">
+                          <div className="space-y-2">
+                            <Label>Avaliação</Label>
+                            <Textarea
+                              value={review.review_text}
+                              onChange={(e) => {
+                                const updated = bookReviews.map(r =>
+                                  r.id === review.id ? { ...r, review_text: e.target.value } : r
+                                );
+                                setBookReviews(updated);
+                              }}
+                              rows={3}
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-2">
+                              <Label>Nome do Avaliador</Label>
+                              <Input
+                                value={review.reviewer_name}
+                                onChange={(e) => {
+                                  const updated = bookReviews.map(r =>
+                                    r.id === review.id ? { ...r, reviewer_name: e.target.value } : r
+                                  );
+                                  setBookReviews(updated);
+                                }}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Cargo/Título</Label>
+                              <Input
+                                value={review.reviewer_title}
+                                onChange={(e) => {
+                                  const updated = bookReviews.map(r =>
+                                    r.id === review.id ? { ...r, reviewer_title: e.target.value } : r
+                                  );
+                                  setBookReviews(updated);
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="grid grid-cols-3 gap-4">
+                            <div className="space-y-2">
+                              <Label>Rating</Label>
+                              <Input
+                                type="number"
+                                step="0.1"
+                                min="0"
+                                max="5"
+                                value={review.rating}
+                                onChange={(e) => {
+                                  const updated = bookReviews.map(r =>
+                                    r.id === review.id ? { ...r, rating: parseFloat(e.target.value) } : r
+                                  );
+                                  setBookReviews(updated);
+                                }}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Ordem</Label>
+                              <Input
+                                type="number"
+                                value={review.display_order}
+                                onChange={(e) => {
+                                  const updated = bookReviews.map(r =>
+                                    r.id === review.id ? { ...r, display_order: parseInt(e.target.value) } : r
+                                  );
+                                  setBookReviews(updated);
+                                }}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label>Ativo</Label>
+                              <select
+                                value={review.active ? 'true' : 'false'}
+                                onChange={(e) => {
+                                  const updated = bookReviews.map(r =>
+                                    r.id === review.id ? { ...r, active: e.target.value === 'true' } : r
+                                  );
+                                  setBookReviews(updated);
+                                }}
+                                className="w-full px-3 py-2 border border-input bg-background rounded-md"
+                              >
+                                <option value="true">Sim</option>
+                                <option value="false">Não</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               </CardContent>
             </Card>
           </TabsContent>

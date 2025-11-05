@@ -3,9 +3,12 @@ import { Card } from '@/components/ui/card';
 import { ShoppingCart, Star, BookOpen } from 'lucide-react';
 import bookCover from '@/assets/book-cover.jpg';
 import { useBookContent } from '@/hooks/useBookContent';
+import { useBookFeatures, useBookReviews } from '@/hooks/useBookFeatures';
 
 const BookSection = () => {
   const { data: bookData, isLoading } = useBookContent();
+  const { data: features = [] } = useBookFeatures();
+  const { data: reviews = [] } = useBookReviews();
 
   // Fallback data
   const defaultData = {
@@ -69,42 +72,43 @@ const BookSection = () => {
             </div>
 
             {/* Features */}
-            <div className="space-y-4">
-              {[
-                'Conceitos práticos e aplicáveis',
-                'Casos reais de transformação digital',
-                'Reflexões éticas sobre IA',
-                'Guia para iniciantes e profissionais',
-              ].map((feature, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-4 h-4 text-primary" />
+            {features.length > 0 && (
+              <div className="space-y-4">
+                {features.map((feature) => (
+                  <div key={feature.id} className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="text-foreground">{feature.title}</span>
                   </div>
-                  <span className="text-foreground">{feature}</span>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            )}
 
             {/* Reviews */}
-            <Card className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-              <div className="flex items-center gap-1 mb-3">
-                {[...Array(5)].map((_, i) => (
-                  <Star
-                    key={i}
-                    className="w-5 h-5 fill-primary text-primary"
-                  />
-                ))}
-                <span className="ml-2 font-semibold">4.9/5</span>
-              </div>
-              <p className="text-muted-foreground italic">
-                "Uma leitura essencial para quem deseja entender o futuro da
-                tecnologia. Jefferson consegue tornar temas complexos em algo
-                inspirador e acessível."
-              </p>
-              <p className="text-sm font-semibold mt-2">
-                — Maria Silva, CTO
-              </p>
-            </Card>
+            {reviews.length > 0 && reviews.map((review) => (
+              <Card key={review.id} className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+                <div className="flex items-center gap-1 mb-3">
+                  {[...Array(5)].map((_, i) => (
+                    <Star
+                      key={i}
+                      className={`w-5 h-5 ${
+                        i < Math.floor(review.rating)
+                          ? 'fill-primary text-primary'
+                          : 'text-primary/30'
+                      }`}
+                    />
+                  ))}
+                  <span className="ml-2 font-semibold">{review.rating}/5</span>
+                </div>
+                <p className="text-muted-foreground italic">
+                  "{review.review_text}"
+                </p>
+                <p className="text-sm font-semibold mt-2">
+                  — {review.reviewer_name}, {review.reviewer_title}
+                </p>
+              </Card>
+            ))}
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
