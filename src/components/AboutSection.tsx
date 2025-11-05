@@ -7,17 +7,18 @@ const AboutSection = () => {
   const { data: aboutData, isLoading: isLoadingAbout } = useAboutContent();
   const { data: services = [], isLoading: isLoadingServices } = useServices();
 
-  if (isLoadingAbout || isLoadingServices || !aboutData) {
-    return (
-      <section id="sobre" className="py-24 bg-muted/30">
-        <div className="container mx-auto px-4 text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto" />
-        </div>
-      </section>
-    );
-  }
+  // Fallback data
+  const defaultData = {
+    name: "Jefferson Lobo",
+    title: "Especialista em IA e Inovação",
+    read_line: "Transformando ideias em realidade através da tecnologia",
+    description: "Com vasta experiência em tecnologia e inovação, dedico-me a explorar o potencial da Inteligência Artificial e seu impacto na sociedade.",
+    profile_image: profileImg
+  };
 
-  const profileImage = aboutData.profile_image || profileImg;
+  const displayData = aboutData || defaultData;
+
+  const profileImage = displayData.profile_image;
 
   return (
     <section id="sobre" className="py-24 bg-muted/30">
@@ -40,23 +41,23 @@ const AboutSection = () => {
 
           {/* About Text */}
           <div className="space-y-6 animate-slide-up">
-            {aboutData.name && (
+            {displayData.name && (
               <h1 className="text-5xl md:text-6xl font-bold tracking-tight">
                 <span className="gradient-primary bg-clip-text text-transparent">
-                  {aboutData.name}
+                  {displayData.name}
                 </span>
               </h1>
             )}
             <h2 className="text-3xl md:text-4xl font-bold">
-              {aboutData.title}
+              {displayData.title}
             </h2>
-            {aboutData.read_line && (
+            {displayData.read_line && (
               <p className="text-xl text-primary font-semibold">
-                {aboutData.read_line}
+                {displayData.read_line}
               </p>
             )}
             <div className="space-y-4 text-lg text-muted-foreground whitespace-pre-line">
-              {aboutData.description}
+              {displayData.description}
             </div>
           </div>
         </div>

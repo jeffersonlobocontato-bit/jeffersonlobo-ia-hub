@@ -13,7 +13,9 @@ export const useHeroContent = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 1000 * 60 * 5, // Cache por 5 minutos
-    gcTime: 1000 * 60 * 10, // Manter em cache por 10 minutos
+    staleTime: 0, // Sem cache para mobile
+    gcTime: 1000 * 60 * 10,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 };

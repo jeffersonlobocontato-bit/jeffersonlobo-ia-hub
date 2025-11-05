@@ -13,7 +13,9 @@ export const useBookContent = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 1000 * 60 * 5,
+    staleTime: 0, // Sem cache para mobile
     gcTime: 1000 * 60 * 10,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 };
