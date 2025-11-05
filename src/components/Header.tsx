@@ -33,7 +33,11 @@ const Header = () => {
           {/* Logo */}
           <button
             onClick={() => scrollToSection('home')}
-            className="text-2xl font-bold gradient-primary bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+            className={`text-2xl font-bold hover:opacity-80 transition-opacity ${
+              isScrolled 
+                ? 'gradient-primary bg-clip-text text-transparent' 
+                : 'text-white drop-shadow-lg'
+            }`}
           >
             Jefferson Lobo
           </button>
@@ -44,7 +48,9 @@ const Header = () => {
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
-                className="text-foreground hover:text-primary transition-colors capitalize font-medium"
+                className={`hover:text-primary transition-colors capitalize font-medium ${
+                  isScrolled ? 'text-foreground' : 'text-white drop-shadow-md'
+                }`}
               >
                 {item}
               </button>
@@ -62,7 +68,7 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-foreground"
+            className={`md:hidden ${isScrolled ? 'text-foreground' : 'text-white drop-shadow-lg'}`}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
