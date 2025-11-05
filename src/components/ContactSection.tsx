@@ -1,3 +1,6 @@
+import { Button } from '@/components/ui/button';
+import { MessageCircle } from 'lucide-react';
+
 const ContactSection = () => {
 
   return (
@@ -17,10 +20,31 @@ const ContactSection = () => {
               </h2>
             </div>
           </div>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Entre em contato para palestras, cursos ou consultorias
-            personalizadas
-          </p>
+          <div className="max-w-3xl mx-auto space-y-6">
+            <h3 className="text-2xl md:text-3xl font-semibold text-foreground">
+              Convide Jefferson Lobo para sua próxima palestra, curso ou consultoria
+            </h3>
+            <p className="text-lg text-muted-foreground">
+              Transforme sua organização com insights sobre inteligência artificial, inovação e o futuro da tecnologia
+            </p>
+            <div className="flex justify-center pt-4">
+              <Button
+                size="lg"
+                className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+                asChild
+              >
+                <a
+                  href="https://wa.me/5545999864213"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2"
+                >
+                  <MessageCircle className="w-5 h-5" />
+                  Entrar em contato
+                </a>
+              </Button>
+            </div>
+          </div>
         </div>
       </div>
     </section>
