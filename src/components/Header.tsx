@@ -70,7 +70,7 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-6 space-y-4 animate-fade-in">
+          <div className="md:hidden py-6 space-y-4 animate-fade-in bg-background border-t border-border">
             {['home', 'sobre', 'livro', 'blog', 'contato'].map((item) => (
               <button
                 key={item}
