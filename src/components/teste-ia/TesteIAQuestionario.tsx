@@ -101,16 +101,25 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
         };
       });
 
-      // Calcular scores
-      const scoreBasico =
-        respostasArray.filter((r) => r.nivel === "BASICO").reduce((acc, r) => acc + r.resposta, 0) / 8;
-      const scoreIntermediario =
-        respostasArray.filter((r) => r.nivel === "INTERMEDIARIO").reduce((acc, r) => acc + r.resposta, 0) / 8;
-      const scoreAvancado =
-        respostasArray.filter((r) => r.nivel === "AVANCADO").reduce((acc, r) => acc + r.resposta, 0) / 8;
+      // Calcular scores por nível (média dinâmica baseada no número real de perguntas)
+      const respostasBasico = respostasArray.filter((r) => r.nivel === "BASICO");
+      const scoreBasico = respostasBasico.length > 0 
+        ? respostasBasico.reduce((acc, r) => acc + r.resposta, 0) / respostasBasico.length
+        : 0;
+      
+      const respostasIntermediario = respostasArray.filter((r) => r.nivel === "INTERMEDIARIO");
+      const scoreIntermediario = respostasIntermediario.length > 0
+        ? respostasIntermediario.reduce((acc, r) => acc + r.resposta, 0) / respostasIntermediario.length
+        : 0;
+      
+      const respostasAvancado = respostasArray.filter((r) => r.nivel === "AVANCADO");
+      const scoreAvancado = respostasAvancado.length > 0
+        ? respostasAvancado.reduce((acc, r) => acc + r.resposta, 0) / respostasAvancado.length
+        : 0;
+      
       const scoreGeral = (scoreBasico + scoreIntermediario + scoreAvancado) / 3;
 
-      // Calcular competências
+      // Calcular competências (média dinâmica baseada no número real de perguntas por competência)
       const competenciasTemp: Record<string, number[]> = {};
       respostasArray.forEach((r) => {
         if (!competenciasTemp[r.competencia!]) competenciasTemp[r.competencia!] = [];
@@ -120,7 +129,9 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
       const competencias: Record<string, number> = {};
       Object.keys(competenciasTemp).forEach((comp) => {
         const valores = competenciasTemp[comp];
-        competencias[comp] = valores.reduce((a, b) => a + b, 0) / valores.length;
+        competencias[comp] = valores.length > 0 
+          ? valores.reduce((a, b) => a + b, 0) / valores.length 
+          : 0;
       });
 
       // Determinar nível de maturidade
