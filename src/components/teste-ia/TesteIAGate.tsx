@@ -37,10 +37,20 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
   };
 
   const handleSubmit = async () => {
-    if (!isFormValid()) return;
+    if (!isFormValid()) {
+      toast.error("Por favor, preencha todos os campos corretamente.");
+      return;
+    }
 
     setLoading(true);
     try {
+      console.log("Tentando criar lead com dados:", {
+        nome,
+        email,
+        whatsapp: whatsapp.replace(/\D/g, ""),
+        finalidade,
+      });
+
       const { data, error } = await supabase
         .from("ia_maturity_leads")
         .insert({
@@ -52,13 +62,33 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
         .select()
         .single();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro do Supabase:", error);
+        throw error;
+      }
 
+      if (!data) {
+        throw new Error("Nenhum dado retornado após inserção");
+      }
+
+      console.log("Lead criado com sucesso:", data);
       toast.success("Cadastro realizado! Vamos começar o teste.");
       onComplete(data.id, finalidade);
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao criar lead:", error);
-      toast.error("Erro ao iniciar o teste. Tente novamente.");
+      
+      // Mensagens de erro mais específicas
+      let errorMessage = "Erro ao iniciar o teste. Tente novamente.";
+      
+      if (error?.message?.includes("duplicate")) {
+        errorMessage = "Este e-mail ou WhatsApp já está cadastrado.";
+      } else if (error?.code === "23505") {
+        errorMessage = "Você já iniciou este teste anteriormente.";
+      } else if (error?.message) {
+        errorMessage = `Erro: ${error.message}`;
+      }
+      
+      toast.error(errorMessage);
     } finally {
       setLoading(false);
     }
