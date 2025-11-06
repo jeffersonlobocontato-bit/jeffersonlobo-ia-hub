@@ -21,6 +21,7 @@ const ChatBot = () => {
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [threadId, setThreadId] = useState<string>('');
   const scrollRef = useRef<HTMLDivElement>(null);
   const { toast } = useToast();
 
@@ -40,14 +41,22 @@ const ChatBot = () => {
 
     try {
       const { data, error } = await supabase.functions.invoke('chat-assistant', {
-        body: { messages: [...messages, userMessage] }
+        body: { 
+          messages: [...messages, userMessage],
+          threadId: threadId || undefined
+        }
       });
 
       if (error) throw error;
 
+      // Armazenar threadId para manter o contexto da conversa
+      if (data.threadId && !threadId) {
+        setThreadId(data.threadId);
+      }
+
       const assistantMessage: Message = {
         role: 'assistant',
-        content: data.choices[0].message.content
+        content: data.content
       };
 
       setMessages(prev => [...prev, assistantMessage]);

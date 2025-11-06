@@ -6,13 +6,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const ASSISTANT_ID = 'asst_Al7CbMOQtnWjVzxy2hDLzJdq';
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, threadId } = await req.json();
     const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
 
     if (!openAIApiKey) {
@@ -21,82 +23,122 @@ serve(async (req) => {
 
     console.log('💬 Recebendo mensagem do chat:', messages[messages.length - 1]);
 
-    const systemPrompt = `Você é um assistente virtual especializado em consultoria de Inteligência Artificial e comunicação, representando Jefferson Lobo.
+    const headers = {
+      'Authorization': `Bearer ${openAIApiKey}`,
+      'Content-Type': 'application/json',
+      'OpenAI-Beta': 'assistants=v2'
+    };
 
-SOBRE JEFFERSON LOBO:
-Jefferson Lobo é um profissional com mais de 30 anos de experiência em comunicação, dedicando sua carreira a desvendar as possibilidades da Inteligência Artificial e seu impacto na sociedade. Como autor, palestrante e consultor, trabalha para tornar a IA acessível e compreensível, explorando tanto suas oportunidades quanto seus desafios éticos.
+    // Criar ou usar thread existente
+    let currentThreadId = threadId;
+    if (!currentThreadId) {
+      console.log('🧵 Criando nova thread...');
+      const threadResponse = await fetch('https://api.openai.com/v1/threads', {
+        method: 'POST',
+        headers,
+      });
 
-SERVIÇOS OFERECIDOS:
+      if (!threadResponse.ok) {
+        const error = await threadResponse.text();
+        console.error('❌ Erro ao criar thread:', error);
+        throw new Error(`Erro ao criar thread: ${threadResponse.status}`);
+      }
 
-1. **Consultoria em IA**
-   - Análise estratégica e implementação de soluções de IA personalizadas para seu negócio
-   - Diagnóstico de oportunidades e desafios
-   - Implementação prática e acompanhamento
+      const threadData = await threadResponse.json();
+      currentThreadId = threadData.id;
+      console.log('✅ Thread criada:', currentThreadId);
+    }
 
-2. **Treinamentos**
-   - Capacitação de equipes em prompts estratégicos
-   - Ferramentas de IA aplicadas ao negócio
-   - Workshops práticos e hands-on
-
-3. **Consultoria Estratégica**
-   - Assessoria especializada em implementação de IA
-   - Estratégia de inovação
-   - Planejamento de longo prazo
-
-4. **Comunicação e Marketing**
-   - Agentes especializados de atendimento
-   - Planejamento e brainstorming
-   - UX, neuromarketing, SEO/GEO
-   - Criação de conteúdo otimizado
-
-5. **Palestras**
-   - Apresentações inspiradoras sobre o futuro da IA
-   - Como se preparar para a transformação digital
-   - Cases de sucesso e tendências
-
-MÉTODO DEL:
-O Método DEL é uma abordagem estruturada criada por Jefferson Lobo que engloba:
-- **D**iagnóstico: Análise profunda de cenário e identificação de oportunidades
-- **E**stratégia: Planejamento estruturado e definição de objetivos
-- **L**ançamento: Implementação prática e transformação digital
-
-Este método é aplicado em todas as consultorias e garante resultados mensuráveis e sustentáveis.
-
-INSTRUÇÕES:
-- Seja cordial, profissional e prestativo
-- Explique os serviços de forma clara e objetiva
-- Destaque o Método DEL quando relevante
-- Incentive o contato para agendamento de consultoria
-- Use linguagem acessível, evitando jargões técnicos excessivos
-- Mostre entusiasmo sobre as possibilidades da IA`;
-
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    // Adicionar mensagem do usuário à thread
+    const userMessage = messages[messages.length - 1];
+    console.log('📝 Adicionando mensagem à thread...');
+    
+    const messageResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages`, {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${openAIApiKey}`,
-        'Content-Type': 'application/json',
-      },
+      headers,
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          ...messages
-        ],
-        temperature: 0.7,
-        max_tokens: 500,
+        role: 'user',
+        content: userMessage.content
       }),
     });
 
-    if (!response.ok) {
-      const error = await response.text();
-      console.error('❌ Erro da OpenAI:', error);
-      throw new Error(`OpenAI API error: ${response.status}`);
+    if (!messageResponse.ok) {
+      const error = await messageResponse.text();
+      console.error('❌ Erro ao adicionar mensagem:', error);
+      throw new Error(`Erro ao adicionar mensagem: ${messageResponse.status}`);
     }
 
-    const data = await response.json();
+    // Executar o assistente
+    console.log('🤖 Executando assistente...');
+    const runResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs`, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({
+        assistant_id: ASSISTANT_ID,
+      }),
+    });
+
+    if (!runResponse.ok) {
+      const error = await runResponse.text();
+      console.error('❌ Erro ao executar assistente:', error);
+      throw new Error(`Erro ao executar assistente: ${runResponse.status}`);
+    }
+
+    const runData = await runResponse.json();
+    const runId = runData.id;
+    console.log('✅ Run iniciado:', runId);
+
+    // Aguardar conclusão da execução
+    let runStatus = 'queued';
+    let attempts = 0;
+    const maxAttempts = 30;
+
+    while (runStatus !== 'completed' && attempts < maxAttempts) {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const statusResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/runs/${runId}`, {
+        headers,
+      });
+
+      if (!statusResponse.ok) {
+        throw new Error(`Erro ao verificar status: ${statusResponse.status}`);
+      }
+
+      const statusData = await statusResponse.json();
+      runStatus = statusData.status;
+      console.log(`⏳ Status da execução: ${runStatus}`);
+
+      if (runStatus === 'failed' || runStatus === 'cancelled' || runStatus === 'expired') {
+        throw new Error(`Execução falhou com status: ${runStatus}`);
+      }
+
+      attempts++;
+    }
+
+    if (runStatus !== 'completed') {
+      throw new Error('Timeout aguardando resposta do assistente');
+    }
+
+    // Buscar mensagens da thread
+    console.log('📥 Buscando resposta...');
+    const messagesResponse = await fetch(`https://api.openai.com/v1/threads/${currentThreadId}/messages?limit=1`, {
+      headers,
+    });
+
+    if (!messagesResponse.ok) {
+      throw new Error(`Erro ao buscar mensagens: ${messagesResponse.status}`);
+    }
+
+    const messagesData = await messagesResponse.json();
+    const assistantMessage = messagesData.data[0];
+    const content = assistantMessage.content[0].text.value;
+
     console.log('✅ Resposta gerada com sucesso');
 
-    return new Response(JSON.stringify(data), {
+    return new Response(JSON.stringify({ 
+      content,
+      threadId: currentThreadId 
+    }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
