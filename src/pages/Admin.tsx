@@ -16,7 +16,7 @@ import { AdminFeaturesTab } from '@/components/admin/AdminFeaturesTab';
 import { AdminReviewsTab } from '@/components/admin/AdminReviewsTab';
 
 const Admin = () => {
-  const { signOut, user } = useAuth();
+  const { signOut, user, isAdmin } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -301,6 +301,12 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Debug Auth Info */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-blue-500/90 text-white text-xs py-1 px-4 text-center font-mono">
+          Admin Panel - User: {user?.email} | Admin: {isAdmin ? '✅' : '❌'} | User ID: {user?.id?.substring(0, 8)}...
+        </div>
+      )}
       <header className="border-b border-primary/20 bg-background/95 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>

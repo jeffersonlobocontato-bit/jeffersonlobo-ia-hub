@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, MessageCircle, Shield, LogOut } from 'lucide-react';
+import { Menu, X, MessageCircle, Shield, LogOut, User, UserCheck } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
+import { Badge } from '@/components/ui/badge';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -31,6 +32,25 @@ const Header = () => {
         isScrolled ? 'bg-background/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
       }`}
     >
+      {/* Debug Auth Status - Remove in production */}
+      {process.env.NODE_ENV === 'development' && (
+        <div className="bg-yellow-500/90 text-black text-xs py-1 px-4 text-center font-mono">
+          Auth Status: {user ? (
+            <>
+              <User className="w-3 h-3 inline mr-1" />
+              Logado: {user.email?.substring(0, 20)}...
+              {isAdmin && (
+                <Badge variant="default" className="ml-2 bg-green-600 text-white">
+                  <Shield className="w-3 h-3 mr-1" />
+                  ADMIN
+                </Badge>
+              )}
+            </>
+          ) : (
+            <>❌ Não logado</>
+          )}
+        </div>
+      )}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
