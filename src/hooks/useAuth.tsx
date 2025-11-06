@@ -26,36 +26,77 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
+    let adminCheckComplete = false;
 
-    // Set up auth state listener FIRST
+    const checkAndSetAdmin = async (userId: string) => {
+      console.log('🔍 Checking admin status for userId:', userId);
+      
+      try {
+        const { data, error } = await supabase
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', userId)
+          .single();
+        
+        console.log('📊 Admin check result:', { data, error, userId });
+        
+        if (mounted) {
+          if (!error && data && data.role === 'admin') {
+            console.log('✅ User IS admin');
+            setIsAdmin(true);
+          } else {
+            console.log('❌ User is NOT admin', { error, data });
+            setIsAdmin(false);
+          }
+          adminCheckComplete = true;
+        }
+      } catch (err) {
+        console.error('❌ Error checking admin status:', err);
+        if (mounted) {
+          setIsAdmin(false);
+          adminCheckComplete = true;
+        }
+      }
+    };
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
+        
+        console.log('🔐 Auth state changed:', event, session?.user?.email);
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await checkAdminStatus(session.user.id);
+          await checkAndSetAdmin(session.user.id);
         } else {
           setIsAdmin(false);
+          adminCheckComplete = true;
         }
         
-        setLoading(false);
+        if (adminCheckComplete) {
+          setLoading(false);
+        }
       }
     );
 
-    // THEN check for existing session
+    // Check for existing session
     const initAuth = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!mounted) return;
       
+      console.log('🚀 Initial session:', session?.user?.email);
+      
       setSession(session);
       setUser(session?.user ?? null);
       
       if (session?.user) {
-        await checkAdminStatus(session.user.id);
+        await checkAndSetAdmin(session.user.id);
+      } else {
+        adminCheckComplete = true;
       }
       
       setLoading(false);
@@ -70,8 +111,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const checkAdminStatus = async (userId: string) => {
-    console.log('🔍 Checking admin status for userId:', userId);
-    
     try {
       const { data, error } = await supabase
         .from('user_roles')
@@ -79,17 +118,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         .eq('user_id', userId)
         .single();
       
-      console.log('📊 Admin check result:', { data, error, userId });
-      
       if (!error && data && data.role === 'admin') {
-        console.log('✅ User IS admin');
         setIsAdmin(true);
       } else {
-        console.log('❌ User is NOT admin', { error, data });
         setIsAdmin(false);
       }
     } catch (err) {
-      console.error('❌ Error checking admin status:', err);
       setIsAdmin(false);
     }
   };
