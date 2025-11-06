@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import AboutSection from '@/components/AboutSection';
+import TesteIASection from '@/components/TesteIASection';
 import BookSection from '@/components/BookSection';
 import BlogSection from '@/components/BlogSection';
 import ContactSection from '@/components/ContactSection';
@@ -26,6 +27,10 @@ const Index = () => {
         <AboutSection />
         <div className="py-12 md:py-16 lg:py-20">
           <Separator className="h-[2px] bg-gradient-to-r from-transparent via-secondary/30 to-transparent" />
+        </div>
+        <TesteIASection />
+        <div className="py-12 md:py-16 lg:py-20">
+          <Separator className="h-[2px] bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         </div>
         <BookSection />
         <div className="py-12 md:py-16 lg:py-20">
