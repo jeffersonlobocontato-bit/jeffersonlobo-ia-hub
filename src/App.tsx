@@ -10,6 +10,7 @@ import Auth from "./pages/Auth";
 import Admin from "./pages/Admin";
 import ResetPassword from "./pages/ResetPassword";
 import TesteIA from "./pages/TesteIA";
+import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -26,6 +27,7 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/teste-ia" element={<TesteIA />} />
+            <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
             <Route
               path="/admin"
               element={
