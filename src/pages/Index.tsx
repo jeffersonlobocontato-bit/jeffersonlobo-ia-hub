@@ -6,6 +6,7 @@ import BookSection from '@/components/BookSection';
 import BlogSection from '@/components/BlogSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
+import ChatBot from '@/components/ChatBot';
 import { Separator } from '@/components/ui/separator';
 
 const Index = () => {
@@ -37,6 +38,7 @@ const Index = () => {
         <ContactSection />
       </main>
       <Footer />
+      <ChatBot />
     </div>
   );
 };
