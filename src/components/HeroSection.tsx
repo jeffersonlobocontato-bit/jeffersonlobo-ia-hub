@@ -78,19 +78,19 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
             <Button
               size="lg"
+              variant="outline"
               onClick={() => scrollToSection('livro')}
-              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity text-lg px-8 py-6"
+              className="text-lg px-8 py-6 border-white/30 bg-white/10 text-white hover:bg-white/20"
             >
               {displayData.cta_primary}
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
             <Button
               size="lg"
-              variant="outline"
               onClick={openChatBot}
-              className="text-lg px-8 py-6 border-white/30 bg-white/10 text-white hover:bg-white/20 hover:scale-105 transition-all group"
+              className="bg-gradient-to-r from-primary via-secondary to-primary hover:opacity-90 transition-all text-lg px-8 py-6 animate-pulse-glow shadow-lg shadow-primary/50 group relative overflow-hidden"
             >
-              <BrainCircuit className="mr-2 w-5 h-5 group-hover:animate-pulse" />
+              <BrainCircuit className="mr-2 w-5 h-5 group-hover:rotate-12 transition-transform" />
               Fale com o Uivo do Lobo
             </Button>
             <Button
