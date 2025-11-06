@@ -14,6 +14,7 @@ import { AdminServicesTab } from '@/components/admin/AdminServicesTab';
 import { AdminBlogTab } from '@/components/admin/AdminBlogTab';
 import { AdminFeaturesTab } from '@/components/admin/AdminFeaturesTab';
 import { AdminReviewsTab } from '@/components/admin/AdminReviewsTab';
+import { AdminLeadsTab } from '@/components/admin/AdminLeadsTab';
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
@@ -329,7 +330,7 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="grid w-full grid-cols-8 mb-8">
+          <TabsList className="grid w-full grid-cols-9 mb-8">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">Sobre</TabsTrigger>
             <TabsTrigger value="services">Serviços</TabsTrigger>
@@ -337,6 +338,7 @@ const Admin = () => {
             <TabsTrigger value="features">Features</TabsTrigger>
             <TabsTrigger value="reviews">Avaliações</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
+            <TabsTrigger value="leads">Leads IA</TabsTrigger>
             <TabsTrigger value="contact">Contato</TabsTrigger>
           </TabsList>
 
@@ -390,6 +392,10 @@ const Admin = () => {
               onDelete={deleteBlogPost}
               onAdd={addBlogPost}
             />
+          </TabsContent>
+
+          <TabsContent value="leads">
+            <AdminLeadsTab />
           </TabsContent>
 
           <TabsContent value="contact">
