@@ -10,6 +10,10 @@ import { AdminHeroTab } from '@/components/admin/AdminHeroTab';
 import { AdminAboutTab } from '@/components/admin/AdminAboutTab';
 import { AdminBookTab } from '@/components/admin/AdminBookTab';
 import { AdminContactTab } from '@/components/admin/AdminContactTab';
+import { AdminServicesTab } from '@/components/admin/AdminServicesTab';
+import { AdminBlogTab } from '@/components/admin/AdminBlogTab';
+import { AdminFeaturesTab } from '@/components/admin/AdminFeaturesTab';
+import { AdminReviewsTab } from '@/components/admin/AdminReviewsTab';
 
 const Admin = () => {
   const { signOut, user } = useAuth();
@@ -20,6 +24,10 @@ const Admin = () => {
   const [aboutData, setAboutData] = useState<any>(null);
   const [bookData, setBookData] = useState<any>(null);
   const [contactData, setContactData] = useState<any>(null);
+  const [services, setServices] = useState<any[]>([]);
+  const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [bookFeatures, setBookFeatures] = useState<any[]>([]);
+  const [bookReviews, setBookReviews] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -32,17 +40,25 @@ const Admin = () => {
     try {
       setLoading(true);
       
-      const [heroRes, aboutRes, bookRes, contactRes] = await Promise.all([
+      const [heroRes, aboutRes, bookRes, contactRes, servicesRes, postsRes, featuresRes, reviewsRes] = await Promise.all([
         supabase.from('hero_content').select('*').maybeSingle(),
         supabase.from('about_content').select('*').maybeSingle(),
         supabase.from('book_content').select('*').maybeSingle(),
         supabase.from('contact_info').select('*').maybeSingle(),
+        supabase.from('services').select('*').order('display_order'),
+        supabase.from('blog_posts').select('*').order('date', { ascending: false }),
+        supabase.from('book_features').select('*').order('display_order'),
+        supabase.from('book_reviews').select('*').order('display_order'),
       ]);
 
       setHeroData(heroRes.data);
       setAboutData(aboutRes.data);
       setBookData(bookRes.data);
       setContactData(contactRes.data);
+      setServices(servicesRes.data || []);
+      setBlogPosts(postsRes.data || []);
+      setBookFeatures(featuresRes.data || []);
+      setBookReviews(reviewsRes.data || []);
     } catch (error) {
       toast({ title: "Erro ao carregar dados", variant: "destructive" });
     } finally {
@@ -122,6 +138,151 @@ const Admin = () => {
     }
   };
 
+  const updateService = async (service: any) => {
+    const { error } = await supabase.from('services').update(service).eq('id', service.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Serviço atualizado!" });
+    }
+  };
+
+  const deleteService = async (id: string) => {
+    const { error } = await supabase.from('services').delete().eq('id', id);
+    if (error) {
+      toast({ title: "Erro ao deletar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Serviço deletado!" });
+      loadAllContent();
+    }
+  };
+
+  const addService = async () => {
+    const maxOrder = services.length > 0 ? Math.max(...services.map((s) => s.display_order)) : 0;
+    const { error } = await supabase.from('services').insert({
+      title: 'Novo Serviço',
+      description: 'Descrição do serviço',
+      icon: 'Briefcase',
+      display_order: maxOrder + 1,
+      active: true,
+    });
+    if (error) {
+      toast({ title: "Erro ao adicionar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Serviço adicionado!" });
+      loadAllContent();
+    }
+  };
+
+  const updateBlogPost = async (post: any) => {
+    const { error } = await supabase.from('blog_posts').update(post).eq('id', post.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Post atualizado!" });
+    }
+  };
+
+  const deleteBlogPost = async (id: string) => {
+    const { error } = await supabase.from('blog_posts').delete().eq('id', id);
+    if (error) {
+      toast({ title: "Erro ao deletar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Post deletado!" });
+      loadAllContent();
+    }
+  };
+
+  const addBlogPost = async () => {
+    const { error } = await supabase.from('blog_posts').insert({
+      title: 'Novo Post',
+      excerpt: 'Resumo do post',
+      category: 'Categoria',
+      date: new Date().toISOString().split('T')[0],
+      linkedin_url: '',
+      active: true,
+    });
+    if (error) {
+      toast({ title: "Erro ao adicionar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Post adicionado!" });
+      loadAllContent();
+    }
+  };
+
+  const updateBookFeature = async (feature: any) => {
+    const { error } = await supabase.from('book_features').update(feature).eq('id', feature.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Feature atualizada!" });
+    }
+  };
+
+  const deleteBookFeature = async (id: string) => {
+    const { error } = await supabase.from('book_features').delete().eq('id', id);
+    if (error) {
+      toast({ title: "Erro ao deletar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Feature deletada!" });
+      loadAllContent();
+    }
+  };
+
+  const addBookFeature = async () => {
+    const maxOrder = bookFeatures.length > 0 ? Math.max(...bookFeatures.map((f) => f.display_order)) : 0;
+    const { error } = await supabase.from('book_features').insert({
+      title: 'Nova Feature',
+      description: 'Descrição da feature',
+      icon: 'BookOpen',
+      display_order: maxOrder + 1,
+      active: true,
+    });
+    if (error) {
+      toast({ title: "Erro ao adicionar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Feature adicionada!" });
+      loadAllContent();
+    }
+  };
+
+  const updateBookReview = async (review: any) => {
+    const { error } = await supabase.from('book_reviews').update(review).eq('id', review.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Avaliação atualizada!" });
+    }
+  };
+
+  const deleteBookReview = async (id: string) => {
+    const { error } = await supabase.from('book_reviews').delete().eq('id', id);
+    if (error) {
+      toast({ title: "Erro ao deletar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Avaliação deletada!" });
+      loadAllContent();
+    }
+  };
+
+  const addBookReview = async () => {
+    const maxOrder = bookReviews.length > 0 ? Math.max(...bookReviews.map((r) => r.display_order)) : 0;
+    const { error } = await supabase.from('book_reviews').insert({
+      rating: 5.0,
+      review_text: 'Nova avaliação',
+      reviewer_name: 'Nome do Avaliador',
+      reviewer_title: 'Cargo',
+      display_order: maxOrder + 1,
+      active: true,
+    });
+    if (error) {
+      toast({ title: "Erro ao adicionar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Avaliação adicionada!" });
+      loadAllContent();
+    }
+  };
+
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
@@ -162,10 +323,14 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8">
+          <TabsList className="grid w-full grid-cols-8 mb-8">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">Sobre</TabsTrigger>
+            <TabsTrigger value="services">Serviços</TabsTrigger>
             <TabsTrigger value="book">Livro</TabsTrigger>
+            <TabsTrigger value="features">Features</TabsTrigger>
+            <TabsTrigger value="reviews">Avaliações</TabsTrigger>
+            <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="contact">Contato</TabsTrigger>
           </TabsList>
 
@@ -177,8 +342,48 @@ const Admin = () => {
             <AdminAboutTab data={aboutData} onUpdate={setAboutData} onSave={updateAbout} />
           </TabsContent>
 
+          <TabsContent value="services">
+            <AdminServicesTab
+              data={services}
+              onUpdate={setServices}
+              onSave={updateService}
+              onDelete={deleteService}
+              onAdd={addService}
+            />
+          </TabsContent>
+
           <TabsContent value="book">
             <AdminBookTab data={bookData} onUpdate={setBookData} onSave={updateBook} />
+          </TabsContent>
+
+          <TabsContent value="features">
+            <AdminFeaturesTab
+              data={bookFeatures}
+              onUpdate={setBookFeatures}
+              onSave={updateBookFeature}
+              onDelete={deleteBookFeature}
+              onAdd={addBookFeature}
+            />
+          </TabsContent>
+
+          <TabsContent value="reviews">
+            <AdminReviewsTab
+              data={bookReviews}
+              onUpdate={setBookReviews}
+              onSave={updateBookReview}
+              onDelete={deleteBookReview}
+              onAdd={addBookReview}
+            />
+          </TabsContent>
+
+          <TabsContent value="blog">
+            <AdminBlogTab
+              data={blogPosts}
+              onUpdate={setBlogPosts}
+              onSave={updateBlogPost}
+              onDelete={deleteBlogPost}
+              onAdd={addBlogPost}
+            />
           </TabsContent>
 
           <TabsContent value="contact">
