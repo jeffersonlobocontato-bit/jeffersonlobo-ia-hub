@@ -29,18 +29,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     const checkAdminRole = async (userId: string) => {
       try {
-        const { data, error } = await supabase
+        const { data } = await supabase
           .from('user_roles')
           .select('role')
           .eq('user_id', userId)
           .maybeSingle();
         
-        if (!mounted) return;
-        
-        if (data?.role === 'admin') {
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
+        if (mounted) {
+          setIsAdmin(data?.role === 'admin');
         }
       } catch (err) {
         if (mounted) setIsAdmin(false);
@@ -61,22 +57,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setIsAdmin(false);
         }
+        
+        setLoading(false);
       } catch (err) {
-        if (mounted) setIsAdmin(false);
-      } finally {
-        if (mounted) setLoading(false);
+        if (mounted) {
+          setIsAdmin(false);
+          setLoading(false);
+        }
       }
     };
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         if (!mounted) return;
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          await checkAdminRole(session.user.id);
+          checkAdminRole(session.user.id);
         } else {
           setIsAdmin(false);
         }
