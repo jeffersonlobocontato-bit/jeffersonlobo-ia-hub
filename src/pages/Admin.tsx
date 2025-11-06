@@ -43,6 +43,7 @@ const Admin = () => {
   // Upload states
   const [uploadingProfileImage, setUploadingProfileImage] = useState(false);
   const [uploadingBookCover, setUploadingBookCover] = useState(false);
+  const [isLoadingData, setIsLoadingData] = useState(true);
 
   useEffect(() => {
     loadAllContent();
@@ -50,6 +51,7 @@ const Admin = () => {
 
   const loadAllContent = async () => {
     console.log('📦 Admin - Carregando conteúdo...');
+    setIsLoadingData(true);
     try {
       // Load Hero
       console.log('🔵 Carregando Hero...');
@@ -126,6 +128,8 @@ const Admin = () => {
       console.log('✅ Admin - Conteúdo carregado com sucesso');
     } catch (error) {
       console.error('❌ Admin - Erro ao carregar:', error);
+    } finally {
+      setIsLoadingData(false);
     }
   };
 
@@ -515,35 +519,18 @@ const Admin = () => {
     }
   };
 
-  // Debug loading state
-  console.log('🔍 Admin render check:', {
-    heroData: !!heroData,
-    aboutData: !!aboutData,
-    bookData: !!bookData,
-    contactData: !!contactData,
-  });
-
-  if (!heroData || !aboutData || !bookData || !contactData) {
-    console.log('⏳ Still loading - Missing data:', {
-      hero: !heroData,
-      about: !aboutData,
-      book: !bookData,
-      contact: !contactData
-    });
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-muted-foreground">Carregando painel...</p>
-        </div>
-      </div>
-    );
-  }
-
-  console.log('✅ All data loaded, rendering admin panel');
+  console.log('🔍 Admin render - Loading:', isLoadingData, 'Data:', { heroData: !!heroData, aboutData: !!aboutData, bookData: !!bookData, contactData: !!contactData });
 
   return (
     <div className="min-h-screen bg-background">
+      {isLoadingData && (
+        <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4" />
+            <p className="text-muted-foreground">Carregando dados...</p>
+          </div>
+        </div>
+      )}
       <header className="border-b border-primary/20 bg-background/95 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
