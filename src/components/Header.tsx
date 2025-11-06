@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, MessageCircle } from 'lucide-react';
+import { Menu, X, MessageCircle, Shield } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { isAdmin } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -57,21 +60,35 @@ const Header = () => {
             ))}
           </nav>
 
-          {/* Desktop CTA Button */}
-          <Button
-            asChild
-            className="hidden md:flex bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
-          >
-            <a
-              href="https://wa.me/5545999864213"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2"
+          {/* Desktop CTA Buttons */}
+          <div className="hidden md:flex items-center gap-4">
+            {isAdmin && (
+              <Button
+                asChild
+                variant="outline"
+                className="border-primary/50 hover:bg-primary/10"
+              >
+                <Link to="/admin" className="flex items-center gap-2">
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Link>
+              </Button>
+            )}
+            <Button
+              asChild
+              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
             >
-              <MessageCircle className="w-4 h-4" />
-              Contrate para Palestras & Consultoria
-            </a>
-          </Button>
+              <a
+                href="https://wa.me/5545999864213"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2"
+              >
+                <MessageCircle className="w-4 h-4" />
+                Contrate para Palestras & Consultoria
+              </a>
+            </Button>
+          </div>
 
           {/* Mobile Menu Button */}
           <button
@@ -94,6 +111,18 @@ const Header = () => {
                 {item}
               </button>
             ))}
+            {isAdmin && (
+              <Button
+                asChild
+                variant="outline"
+                className="w-full border-primary/50 hover:bg-primary/10"
+              >
+                <Link to="/admin" className="flex items-center gap-2 justify-center">
+                  <Shield className="w-4 h-4" />
+                  Admin
+                </Link>
+              </Button>
+            )}
             <Button
               asChild
               className="w-full bg-gradient-to-r from-primary to-secondary"
