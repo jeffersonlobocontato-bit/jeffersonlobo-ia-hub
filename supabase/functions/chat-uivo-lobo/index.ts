@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,10 +11,15 @@ const SYSTEM_PROMPT = `Responda como o assistente virtual "Uivo do Lobo", com pe
 Seja sempre objetivo: responda de forma concisa e detalhada à pergunta feita, evitando respostas longas ou dispersas. Sua resposta deve ser direta ao ponto, respondendo a dúvida com clareza, sem perder o detalhamento necessário. Sempre estimule o diálogo com uma pergunta ou convite para manter a conversa fluindo.
 
 **IMPORTANTE - PRIMEIRA INTERAÇÃO:**
-- Ao iniciar uma conversa, PRIMEIRO cumprimente de forma simpática e pergunte o nome do usuário ou como ele gostaria de ser chamado
-- Aguarde a resposta do usuário com o nome
-- A partir daí, SEMPRE use o nome fornecido durante toda a conversa de forma natural e personalizada
-- Só depois de saber o nome, pergunte sobre os temas do universo de Jefferson Lobo do interesse do usuário e liste claramente as alternativas de temas disponíveis no site
+- Ao iniciar uma conversa, PRIMEIRO cumprimente de forma simpática
+- Logo em seguida, peça 3 informações essenciais:
+  1. O nome completo do usuário
+  2. Como prefere ser chamado (apelido/nome preferido)
+  3. O número de WhatsApp com DDD
+- Explique que essas informações ajudam a personalizar a conversa e permitir contato futuro
+- Aguarde o usuário fornecer TODAS as 3 informações antes de prosseguir
+- A partir daí, SEMPRE use o nome preferido durante toda a conversa
+- Só depois de capturar esses dados, pergunte sobre os temas de interesse e liste as alternativas
 
 - Aguarde a escolha do usuário. A partir da seleção, aprofunde só no tema escolhido, usando raciocínio antes de responder objetivamente, sempre adaptando a interação a eventuais mudanças de assunto por parte do usuário — acompanhe e siga as sugestões do usuário sem travar ou ignorar novos temas.
 - Durante a conversa, sempre que possível, recomende serviços do site ou convide o usuário, de maneira natural e breve, a conversar com Jefferson Lobo pelo WhatsApp (45) 99986-4213, ou explorar recursos como o teste de maturidade em IA (https://jeffersonlobo.tech/teste-ia) e o livro sobre o Método Del.
@@ -273,7 +279,7 @@ serve(async (req) => {
   }
 
   try {
-    const { messages } = await req.json();
+    const { messages, leadData } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
@@ -281,6 +287,55 @@ serve(async (req) => {
     }
 
     console.log('💬 Nova mensagem no Uivo do Lobo');
+
+    // Se leadData foi fornecido, salvar/atualizar o lead
+    if (leadData?.nome && leadData?.whatsapp) {
+      const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+      const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+      const supabase = createClient(supabaseUrl, supabaseKey);
+
+      console.log('📝 Salvando lead:', leadData.nome);
+
+      // Verificar se o lead já existe (por WhatsApp)
+      const { data: existingLead } = await supabase
+        .from('chat_leads')
+        .select('*')
+        .eq('whatsapp', leadData.whatsapp)
+        .maybeSingle();
+
+      if (existingLead) {
+        // Atualizar lead existente
+        const updatedMessages = [...(existingLead.mensagens || []), ...leadData.mensagens || []];
+        const updatedInteresses = Array.from(new Set([
+          ...(existingLead.interesses || []),
+          ...(leadData.interesses || [])
+        ]));
+
+        await supabase
+          .from('chat_leads')
+          .update({
+            mensagens: updatedMessages,
+            interesses: updatedInteresses,
+            ultima_interacao: new Date().toISOString(),
+          })
+          .eq('id', existingLead.id);
+
+        console.log('✅ Lead atualizado');
+      } else {
+        // Criar novo lead
+        await supabase
+          .from('chat_leads')
+          .insert({
+            nome: leadData.nome,
+            apelido: leadData.apelido,
+            whatsapp: leadData.whatsapp,
+            mensagens: leadData.mensagens || [],
+            interesses: leadData.interesses || [],
+          });
+
+        console.log('✅ Novo lead criado');
+      }
+    }
 
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',

@@ -188,6 +188,42 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_leads: {
+        Row: {
+          apelido: string | null
+          created_at: string
+          id: string
+          interesses: string[] | null
+          mensagens: Json | null
+          nome: string
+          primeira_interacao: string
+          ultima_interacao: string
+          whatsapp: string
+        }
+        Insert: {
+          apelido?: string | null
+          created_at?: string
+          id?: string
+          interesses?: string[] | null
+          mensagens?: Json | null
+          nome: string
+          primeira_interacao?: string
+          ultima_interacao?: string
+          whatsapp: string
+        }
+        Update: {
+          apelido?: string | null
+          created_at?: string
+          id?: string
+          interesses?: string[] | null
+          mensagens?: Json | null
+          nome?: string
+          primeira_interacao?: string
+          ultima_interacao?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       contact_info: {
         Row: {
           email: string

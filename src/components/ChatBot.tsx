@@ -14,6 +14,12 @@ const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [leadCaptured, setLeadCaptured] = useState(false);
+  const [leadData, setLeadData] = useState<{
+    nome?: string;
+    apelido?: string;
+    whatsapp?: string;
+  }>({});
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -33,8 +39,72 @@ const ChatBot = () => {
     setInput('');
     setIsLoading(true);
 
+    // Detectar nome, apelido e WhatsApp na primeira mensagem do usuário
+    let currentLeadData = { ...leadData };
+    let shouldSaveLead = false;
+
+    if (!leadCaptured && updatedMessages.filter(m => m.role === 'user').length <= 3) {
+      const userText = input.toLowerCase();
+      
+      // Tentar extrair WhatsApp (padrões comuns)
+      const phoneMatch = input.match(/\(?\d{2}\)?\s*9?\d{4}[-\s]?\d{4}/);
+      if (phoneMatch && !currentLeadData.whatsapp) {
+        currentLeadData.whatsapp = phoneMatch[0].replace(/\D/g, '');
+      }
+
+      // Se ainda não tem nome completo, assumir que primeira mensagem relevante é o nome
+      if (!currentLeadData.nome && updatedMessages.filter(m => m.role === 'user').length === 2) {
+        currentLeadData.nome = input.trim();
+      }
+
+      // Se tem nome mas não tem apelido, próxima mensagem pode ser apelido
+      if (currentLeadData.nome && !currentLeadData.apelido && updatedMessages.filter(m => m.role === 'user').length === 3) {
+        currentLeadData.apelido = input.trim();
+      }
+
+      // Se tem todos os dados, marcar como capturado
+      if (currentLeadData.nome && currentLeadData.whatsapp) {
+        setLeadCaptured(true);
+        setLeadData(currentLeadData);
+        shouldSaveLead = true;
+      }
+    }
+
+    // Extrair possíveis interesses da conversa
+    const interesses: string[] = [];
+    const keywords = [
+      'método del', 'del', 'consultoria', 'treinamento', 'curso', 'ia', 
+      'inteligência artificial', 'agente', 'automação', 'livro', 'teste',
+      'maturidade', 'implementação', 'empresa', 'estratégia', 'governança'
+    ];
+    
+    const textLower = input.toLowerCase();
+    keywords.forEach(keyword => {
+      if (textLower.includes(keyword)) {
+        interesses.push(keyword);
+      }
+    });
+
     try {
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-uivo-lobo`;
+      
+      const requestBody: any = { messages: updatedMessages };
+      
+      // Se deve salvar o lead, incluir leadData
+      if (shouldSaveLead) {
+        requestBody.leadData = {
+          ...currentLeadData,
+          mensagens: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+          interesses,
+        };
+      } else if (leadCaptured && interesses.length > 0) {
+        // Se já tem lead, apenas atualizar interesses
+        requestBody.leadData = {
+          ...leadData,
+          mensagens: [{ role: userMessage.role, content: userMessage.content }],
+          interesses,
+        };
+      }
       
       const response = await fetch(CHAT_URL, {
         method: 'POST',
@@ -42,7 +112,7 @@ const ChatBot = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
-        body: JSON.stringify({ messages: updatedMessages }),
+        body: JSON.stringify(requestBody),
       });
 
       if (!response.ok || !response.body) {
