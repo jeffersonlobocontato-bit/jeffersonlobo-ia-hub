@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,12 +18,14 @@ const Auth = () => {
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const { signIn, signUp, user, resetPassword } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (user) {
-      navigate('/');
+      const from = (location.state as any)?.from?.pathname || '/';
+      navigate(from);
     }
-  }, [user, navigate]);
+  }, [user, navigate, location]);
 
   const validateForm = () => {
     const newErrors: { email?: string; password?: string } = {};
@@ -48,7 +50,8 @@ const Auth = () => {
     
     const { error } = await signIn(email, password);
     if (!error) {
-      navigate('/');
+      const from = (location.state as any)?.from?.pathname || '/';
+      navigate(from);
     }
   };
 
