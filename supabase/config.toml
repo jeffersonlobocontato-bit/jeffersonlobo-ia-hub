@@ -3,5 +3,8 @@ project_id = "cgydeldzhnfyexphaheq"
 [functions.chat-assistant]
 verify_jwt = false
 
+[functions.chat-uivo-lobo]
+verify_jwt = false
+
 [functions.send-test-email]
 verify_jwt = false
