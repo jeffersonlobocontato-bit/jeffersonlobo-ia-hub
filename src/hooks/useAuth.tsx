@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     let mounted = true;
 
     const checkAdminRole = async (userId: string) => {
-      console.log('🔍 Starting admin check for:', userId);
       try {
         const { data, error } = await supabase
           .from('user_roles')
@@ -36,42 +35,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .eq('user_id', userId)
           .single();
         
-        console.log('📊 Admin query result:', { userId, data, error });
-        
-        if (!mounted) {
-          console.log('⚠️ Component unmounted, skipping state update');
-          return;
-        }
+        if (!mounted) return;
         
         if (!error && data?.role === 'admin') {
-          console.log('✅ User IS admin');
           setIsAdmin(true);
         } else {
-          console.log('❌ User is NOT admin');
           setIsAdmin(false);
         }
       } catch (err) {
-        console.error('💥 Exception checking admin:', err);
+        console.error('Error checking admin:', err);
         if (mounted) setIsAdmin(false);
       }
     };
 
     // Initialize session
     const initializeAuth = async () => {
-      console.log('🚀 Initializing auth...');
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         
-        console.log('📱 Session result:', { 
-          hasSession: !!session, 
-          email: session?.user?.email,
-          error 
-        });
-        
-        if (!mounted) {
-          console.log('⚠️ Component unmounted during init');
-          return;
-        }
+        if (!mounted) return;
         
         setSession(session);
         setUser(session?.user ?? null);
@@ -79,14 +61,12 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (session?.user) {
           await checkAdminRole(session.user.id);
         } else {
-          console.log('ℹ️ No user, setting isAdmin to false');
           setIsAdmin(false);
         }
         
-        console.log('✅ Setting loading to FALSE');
         setLoading(false);
       } catch (err) {
-        console.error('💥 Init exception:', err);
+        console.error('Auth initialization error:', err);
         if (mounted) {
           setIsAdmin(false);
           setLoading(false);
@@ -95,26 +75,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     };
 
     // Listen to auth changes
-    console.log('👂 Setting up auth listener...');
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('🔐 Auth event:', event, 'Email:', session?.user?.email);
-        
-        if (!mounted) {
-          console.log('⚠️ Component unmounted during auth change');
-          return;
-        }
+      async (event, session) => {
+        if (!mounted) return;
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          checkAdminRole(session.user.id).finally(() => {
-            console.log('✅ Setting loading to FALSE after admin check');
-            setLoading(false);
-          });
+          await checkAdminRole(session.user.id);
+          setLoading(false);
         } else {
-          console.log('ℹ️ No session, setting isAdmin to false');
           setIsAdmin(false);
           setLoading(false);
         }
@@ -124,7 +95,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initializeAuth();
 
     return () => {
-      console.log('🔌 Cleaning up auth hook');
       mounted = false;
       subscription.unsubscribe();
     };
