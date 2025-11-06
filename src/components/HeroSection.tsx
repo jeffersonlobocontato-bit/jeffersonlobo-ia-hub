@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import { ArrowRight, Sparkles, BrainCircuit } from 'lucide-react';
 import heroBg from '@/assets/hero-bg.jpg';
 import { useHeroContent } from '@/hooks/useHeroContent';
 
@@ -10,6 +10,13 @@ const HeroSection = () => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  const openChatBot = () => {
+    const chatButton = document.querySelector('[class*="fixed bottom-6 right-6"]') as HTMLButtonElement;
+    if (chatButton) {
+      chatButton.click();
     }
   };
 
@@ -76,6 +83,15 @@ const HeroSection = () => {
             >
               {displayData.cta_primary}
               <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={openChatBot}
+              className="text-lg px-8 py-6 border-white/30 bg-white/10 text-white hover:bg-white/20 hover:scale-105 transition-all group"
+            >
+              <BrainCircuit className="mr-2 w-5 h-5 group-hover:animate-pulse" />
+              Fale com o Uivo do Lobo
             </Button>
             <Button
               size="lg"
