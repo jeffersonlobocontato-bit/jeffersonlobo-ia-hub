@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, MessageCircle, Shield } from 'lucide-react';
+import { Menu, X, MessageCircle, Shield, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const { isAdmin } = useAuth();
+  const { user, isAdmin, signOut } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,6 +74,16 @@ const Header = () => {
                 </Link>
               </Button>
             )}
+            {user && (
+              <Button
+                onClick={signOut}
+                variant="outline"
+                className="border-destructive/50 hover:bg-destructive/10"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </Button>
+            )}
             <Button
               asChild
               className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
@@ -121,6 +131,16 @@ const Header = () => {
                   <Shield className="w-4 h-4" />
                   Admin
                 </Link>
+              </Button>
+            )}
+            {user && (
+              <Button
+                onClick={signOut}
+                variant="outline"
+                className="w-full border-destructive/50 hover:bg-destructive/10"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
               </Button>
             )}
             <Button
