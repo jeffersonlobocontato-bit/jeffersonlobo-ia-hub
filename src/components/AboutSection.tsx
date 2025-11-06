@@ -7,13 +7,16 @@ const AboutSection = () => {
   const { data: aboutData, isLoading: isLoadingAbout } = useAboutContent();
   const { data: services = [], isLoading: isLoadingServices } = useServices();
 
-  const displayData = aboutData || {
-    name: "",
-    title: "Especialista em IA",
-    read_line: "",
-    description: "Conteúdo em atualização",
+  // Fallback data
+  const defaultData = {
+    name: "Jefferson Lobo",
+    title: "Especialista em IA e Inovação",
+    read_line: "Transformando ideias em realidade através da tecnologia",
+    description: "Com vasta experiência em tecnologia e inovação, dedico-me a explorar o potencial da Inteligência Artificial e seu impacto na sociedade.",
     profile_image: profileImg
   };
+
+  const displayData = aboutData || defaultData;
 
   const profileImage = displayData.profile_image;
 

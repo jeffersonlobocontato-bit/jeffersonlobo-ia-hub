@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 export const useBookContent = () => {
   return useQuery({
-    queryKey: ['book_content', Date.now()], // Force cache bust
+    queryKey: ['book_content'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('book_content')
@@ -13,10 +13,9 @@ export const useBookContent = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 0,
-    gcTime: 0, // No cache
-    refetchOnMount: 'always',
+    staleTime: 0, // Sem cache para mobile
+    gcTime: 1000 * 60 * 10,
+    refetchOnMount: true,
     refetchOnWindowFocus: true,
-    refetchOnReconnect: true,
   });
 };
