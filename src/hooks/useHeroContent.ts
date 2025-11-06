@@ -13,9 +13,8 @@ export const useHeroContent = () => {
       if (error) throw error;
       return data;
     },
-    staleTime: 0,
-    gcTime: 1000 * 60 * 10,
-    refetchOnMount: true,
-    refetchOnWindowFocus: true,
+    staleTime: 1000 * 60 * 5,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 };
