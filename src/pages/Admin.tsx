@@ -23,8 +23,10 @@ const Admin = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    loadAllContent();
-  }, []);
+    if (user) {
+      loadAllContent();
+    }
+  }, [user]);
 
   const loadAllContent = async () => {
     try {
@@ -37,12 +39,11 @@ const Admin = () => {
         supabase.from('contact_info').select('*').maybeSingle(),
       ]);
 
-      setHeroData(heroRes.data);
-      setAboutData(aboutRes.data);
-      setBookData(bookRes.data);
-      setContactData(contactRes.data);
+      setHeroData(heroRes.data || {});
+      setAboutData(aboutRes.data || {});
+      setBookData(bookRes.data || {});
+      setContactData(contactRes.data || {});
     } catch (error) {
-      console.error('Erro ao carregar:', error);
       toast({ title: "Erro ao carregar dados", variant: "destructive" });
     } finally {
       setLoading(false);

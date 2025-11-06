@@ -33,22 +33,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .from('user_roles')
           .select('role')
           .eq('user_id', userId)
-          .single();
+          .maybeSingle();
         
         if (!mounted) return;
         
-        if (!error && data?.role === 'admin') {
+        if (data?.role === 'admin') {
           setIsAdmin(true);
         } else {
           setIsAdmin(false);
         }
       } catch (err) {
-        console.error('Error checking admin:', err);
         if (mounted) setIsAdmin(false);
       }
     };
 
-    // Initialize session
     const initializeAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -63,18 +61,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         } else {
           setIsAdmin(false);
         }
-        
-        setLoading(false);
       } catch (err) {
-        console.error('Auth initialization error:', err);
-        if (mounted) {
-          setIsAdmin(false);
-          setLoading(false);
-        }
+        if (mounted) setIsAdmin(false);
+      } finally {
+        if (mounted) setLoading(false);
       }
     };
 
-    // Listen to auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
         if (!mounted) return;
@@ -84,10 +77,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         
         if (session?.user) {
           await checkAdminRole(session.user.id);
-          setLoading(false);
         } else {
           setIsAdmin(false);
-          setLoading(false);
         }
       }
     );
