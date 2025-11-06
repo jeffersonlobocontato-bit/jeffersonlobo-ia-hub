@@ -49,61 +49,71 @@ const Admin = () => {
   }, []);
 
   const loadAllContent = async () => {
-    // Load Hero
-    const { data: hero } = await supabase
-      .from('hero_content')
-      .select('*')
-      .maybeSingle();
-    setHeroData(hero);
+    console.log('📦 Admin - Carregando conteúdo...');
+    try {
+      // Load Hero
+      const { data: hero, error: heroError } = await supabase
+        .from('hero_content')
+        .select('*')
+        .maybeSingle();
+      console.log('Hero:', hero, 'Error:', heroError);
+      setHeroData(hero);
 
-    // Load About
-    const { data: about } = await supabase
-      .from('about_content')
-      .select('*')
-      .maybeSingle();
-    setAboutData(about);
+      // Load About
+      const { data: about, error: aboutError } = await supabase
+        .from('about_content')
+        .select('*')
+        .maybeSingle();
+      console.log('About:', about, 'Error:', aboutError);
+      setAboutData(about);
 
-    // Load Book
-    const { data: book } = await supabase
-      .from('book_content')
-      .select('*')
-      .maybeSingle();
-    setBookData(book);
+      // Load Book
+      const { data: book, error: bookError } = await supabase
+        .from('book_content')
+        .select('*')
+        .maybeSingle();
+      console.log('Book:', book, 'Error:', bookError);
+      setBookData(book);
 
-    // Load Services
-    const { data: servicesData } = await supabase
-      .from('services')
-      .select('*')
-      .order('display_order');
-    setServices(servicesData || []);
+      // Load Services
+      const { data: servicesData } = await supabase
+        .from('services')
+        .select('*')
+        .order('display_order');
+      setServices(servicesData || []);
 
-    // Load Blog Posts
-    const { data: postsData } = await supabase
-      .from('blog_posts')
-      .select('*')
-      .order('date', { ascending: false });
-    setBlogPosts(postsData || []);
+      // Load Blog Posts
+      const { data: postsData } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .order('date', { ascending: false });
+      setBlogPosts(postsData || []);
 
-    // Load Contact Info
-    const { data: contact } = await supabase
-      .from('contact_info')
-      .select('*')
-      .maybeSingle();
-    setContactData(contact);
+      // Load Contact Info
+      const { data: contact } = await supabase
+        .from('contact_info')
+        .select('*')
+        .maybeSingle();
+      setContactData(contact);
 
-    // Load Book Features
-    const { data: featuresData } = await supabase
-      .from('book_features')
-      .select('*')
-      .order('display_order');
-    setBookFeatures(featuresData || []);
+      // Load Book Features
+      const { data: featuresData } = await supabase
+        .from('book_features')
+        .select('*')
+        .order('display_order');
+      setBookFeatures(featuresData || []);
 
-    // Load Book Reviews
-    const { data: reviewsData } = await supabase
-      .from('book_reviews')
-      .select('*')
-      .order('display_order');
-    setBookReviews(reviewsData || []);
+      // Load Book Reviews
+      const { data: reviewsData } = await supabase
+        .from('book_reviews')
+        .select('*')
+        .order('display_order');
+      setBookReviews(reviewsData || []);
+      
+      console.log('✅ Admin - Conteúdo carregado com sucesso');
+    } catch (error) {
+      console.error('❌ Admin - Erro ao carregar:', error);
+    }
   };
 
   const updateHeroContent = async () => {

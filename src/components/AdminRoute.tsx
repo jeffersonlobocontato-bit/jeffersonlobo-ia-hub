@@ -10,6 +10,8 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
   const { user, isAdmin, loading } = useAuth();
   const location = useLocation();
 
+  console.log('🔐 AdminRoute - user:', user?.email, 'isAdmin:', isAdmin, 'loading:', loading);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
