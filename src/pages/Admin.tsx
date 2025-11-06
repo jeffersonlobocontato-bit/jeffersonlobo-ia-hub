@@ -502,7 +502,21 @@ const Admin = () => {
     }
   };
 
+  // Debug loading state
+  console.log('🔍 Admin render check:', {
+    heroData: !!heroData,
+    aboutData: !!aboutData,
+    bookData: !!bookData,
+    contactData: !!contactData,
+  });
+
   if (!heroData || !aboutData || !bookData || !contactData) {
+    console.log('⏳ Still loading - Missing data:', {
+      hero: !heroData,
+      about: !aboutData,
+      book: !bookData,
+      contact: !contactData
+    });
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -512,6 +526,8 @@ const Admin = () => {
       </div>
     );
   }
+
+  console.log('✅ All data loaded, rendering admin panel');
 
   return (
     <div className="min-h-screen bg-background">
