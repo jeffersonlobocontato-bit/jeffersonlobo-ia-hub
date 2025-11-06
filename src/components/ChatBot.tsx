@@ -100,8 +100,8 @@ const ChatBot = () => {
             <MessageCircle className="h-5 w-5 text-primary" />
           </div>
           <div>
-            <h3 className="font-semibold text-sm">Assistente IA</h3>
-            <p className="text-xs text-muted-foreground">Jefferson Lobo</p>
+            <h3 className="font-semibold text-sm">Uivo do Lobo</h3>
+            <p className="text-xs text-muted-foreground">Assistente IA</p>
           </div>
         </div>
         <Button
