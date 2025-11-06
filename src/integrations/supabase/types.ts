@@ -269,6 +269,135 @@ export type Database = {
         }
         Relationships: []
       }
+      ia_content_map: {
+        Row: {
+          ativo: boolean | null
+          competencia: Database["public"]["Enums"]["competencia_tipo"]
+          created_at: string
+          descricao: string | null
+          id: string
+          ordem: number | null
+          tipo: string
+          titulo: string
+          url: string
+        }
+        Insert: {
+          ativo?: boolean | null
+          competencia: Database["public"]["Enums"]["competencia_tipo"]
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number | null
+          tipo: string
+          titulo: string
+          url: string
+        }
+        Update: {
+          ativo?: boolean | null
+          competencia?: Database["public"]["Enums"]["competencia_tipo"]
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          ordem?: number | null
+          tipo?: string
+          titulo?: string
+          url?: string
+        }
+        Relationships: []
+      }
+      ia_maturity_leads: {
+        Row: {
+          competencias: Json | null
+          concluido: boolean | null
+          created_at: string
+          email: string
+          finalidade: Database["public"]["Enums"]["finalidade_tipo"]
+          id: string
+          nivel_maturidade:
+            | Database["public"]["Enums"]["maturidade_nivel"]
+            | null
+          nome: string
+          recomendacoes: Json | null
+          respostas: Json | null
+          score_avancado: number | null
+          score_basico: number | null
+          score_geral: number | null
+          score_intermediario: number | null
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          competencias?: Json | null
+          concluido?: boolean | null
+          created_at?: string
+          email: string
+          finalidade: Database["public"]["Enums"]["finalidade_tipo"]
+          id?: string
+          nivel_maturidade?:
+            | Database["public"]["Enums"]["maturidade_nivel"]
+            | null
+          nome: string
+          recomendacoes?: Json | null
+          respostas?: Json | null
+          score_avancado?: number | null
+          score_basico?: number | null
+          score_geral?: number | null
+          score_intermediario?: number | null
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          competencias?: Json | null
+          concluido?: boolean | null
+          created_at?: string
+          email?: string
+          finalidade?: Database["public"]["Enums"]["finalidade_tipo"]
+          id?: string
+          nivel_maturidade?:
+            | Database["public"]["Enums"]["maturidade_nivel"]
+            | null
+          nome?: string
+          recomendacoes?: Json | null
+          respostas?: Json | null
+          score_avancado?: number | null
+          score_basico?: number | null
+          score_geral?: number | null
+          score_intermediario?: number | null
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      ia_maturity_questions: {
+        Row: {
+          competencia: Database["public"]["Enums"]["competencia_tipo"]
+          created_at: string
+          finalidade: Database["public"]["Enums"]["finalidade_tipo"]
+          id: string
+          nivel: Database["public"]["Enums"]["nivel_tipo"]
+          ordem: number
+          pergunta: string
+        }
+        Insert: {
+          competencia: Database["public"]["Enums"]["competencia_tipo"]
+          created_at?: string
+          finalidade: Database["public"]["Enums"]["finalidade_tipo"]
+          id?: string
+          nivel: Database["public"]["Enums"]["nivel_tipo"]
+          ordem: number
+          pergunta: string
+        }
+        Update: {
+          competencia?: Database["public"]["Enums"]["competencia_tipo"]
+          created_at?: string
+          finalidade?: Database["public"]["Enums"]["finalidade_tipo"]
+          id?: string
+          nivel?: Database["public"]["Enums"]["nivel_tipo"]
+          ordem?: number
+          pergunta?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           active: boolean | null
@@ -338,6 +467,18 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "user"
+      competencia_tipo:
+        | "estrategia"
+        | "processos"
+        | "dados"
+        | "ferramentas"
+        | "pessoas"
+        | "etica"
+        | "seguranca"
+        | "governanca"
+      finalidade_tipo: "PF" | "PJ"
+      maturidade_nivel: "Iniciante" | "Em evolução" | "Avançado"
+      nivel_tipo: "BASICO" | "INTERMEDIARIO" | "AVANCADO"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -466,6 +607,19 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "user"],
+      competencia_tipo: [
+        "estrategia",
+        "processos",
+        "dados",
+        "ferramentas",
+        "pessoas",
+        "etica",
+        "seguranca",
+        "governanca",
+      ],
+      finalidade_tipo: ["PF", "PJ"],
+      maturidade_nivel: ["Iniciante", "Em evolução", "Avançado"],
+      nivel_tipo: ["BASICO", "INTERMEDIARIO", "AVANCADO"],
     },
   },
 } as const

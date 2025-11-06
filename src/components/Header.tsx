@@ -78,6 +78,14 @@ const Header = () => {
                 {item}
               </button>
             ))}
+            <Link
+              to="/teste-ia"
+              className={`hover:text-primary transition-colors font-medium ${
+                isScrolled ? 'text-foreground' : 'text-white drop-shadow-md'
+              }`}
+            >
+              Teste IA
+            </Link>
           </nav>
 
           {/* Desktop CTA Buttons */}
@@ -141,6 +149,13 @@ const Header = () => {
                 {item}
               </button>
             ))}
+            <Link
+              to="/teste-ia"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors font-medium"
+            >
+              Teste IA
+            </Link>
             {isAdmin && (
               <Button
                 asChild
