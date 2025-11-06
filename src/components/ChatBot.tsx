@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { MessageCircle, Send, X, Loader2 } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -188,7 +189,13 @@ const ChatBot = () => {
                   : 'bg-muted text-foreground'
               }`}
             >
-              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              {message.role === 'user' ? (
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              ) : (
+                <div className="text-sm prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                </div>
+              )}
             </div>
           </div>
         ))}
