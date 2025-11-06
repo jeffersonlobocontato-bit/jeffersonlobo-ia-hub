@@ -26,8 +26,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     let mounted = true;
+    console.log('🔵 useAuth: Iniciando useEffect');
 
     const checkAdminRole = async (userId: string) => {
+      console.log('🔍 Checando role admin para:', userId);
       try {
         const { data } = await supabase
           .from('user_roles')
@@ -35,31 +37,46 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           .eq('user_id', userId)
           .maybeSingle();
         
+        console.log('📊 Role data:', data);
+        
         if (mounted) {
-          setIsAdmin(data?.role === 'admin');
+          const isAdminUser = data?.role === 'admin';
+          console.log('✅ Setting isAdmin to:', isAdminUser);
+          setIsAdmin(isAdminUser);
         }
       } catch (err) {
+        console.error('❌ Erro ao checar admin:', err);
         if (mounted) setIsAdmin(false);
       }
     };
 
     const initializeAuth = async () => {
+      console.log('🚀 Inicializando autenticação...');
       try {
         const { data: { session } } = await supabase.auth.getSession();
         
-        if (!mounted) return;
+        console.log('📱 Session obtida:', session?.user?.email || 'Nenhuma sessão');
+        
+        if (!mounted) {
+          console.log('⚠️ Component desmontado, abortando');
+          return;
+        }
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('👤 Usuário encontrado, checando role...');
           await checkAdminRole(session.user.id);
         } else {
+          console.log('👤 Nenhum usuário, setando isAdmin=false');
           setIsAdmin(false);
         }
         
+        console.log('✅ Finalizando loading - setLoading(false)');
         setLoading(false);
       } catch (err) {
+        console.error('❌ Erro na inicialização:', err);
         if (mounted) {
           setIsAdmin(false);
           setLoading(false);
@@ -67,16 +84,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       }
     };
 
+    console.log('👂 Configurando listener onAuthStateChange');
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        if (!mounted) return;
+        console.log('🔔 Auth event:', event, 'Email:', session?.user?.email || 'none');
+        
+        if (!mounted) {
+          console.log('⚠️ Component desmontado no listener');
+          return;
+        }
         
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
+          console.log('👤 Usuário no listener, checando role...');
           checkAdminRole(session.user.id);
         } else {
+          console.log('👤 Nenhum usuário no listener');
           setIsAdmin(false);
         }
       }
@@ -85,6 +110,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     initializeAuth();
 
     return () => {
+      console.log('🧹 Limpando useAuth');
       mounted = false;
       subscription.unsubscribe();
     };

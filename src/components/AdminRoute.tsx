@@ -10,7 +10,10 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
   const { user, isAdmin, loading } = useAuth();
   const location = useLocation();
 
+  console.log('🛡️ AdminRoute - loading:', loading, 'user:', user?.email, 'isAdmin:', isAdmin);
+
   if (loading) {
+    console.log('⏳ AdminRoute: Mostrando tela de loading');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
         <div className="text-center">
@@ -22,10 +25,12 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
   }
 
   if (!user) {
+    console.log('🚫 AdminRoute: Sem usuário, redirecionando para /auth');
     return <Navigate to="/auth" state={{ from: location }} replace />;
   }
 
   if (!isAdmin) {
+    console.log('🚫 AdminRoute: Usuário não é admin');
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
         <div className="text-center max-w-md">
@@ -41,6 +46,7 @@ const AdminRoute = ({ children }: AdminRouteProps) => {
     );
   }
 
+  console.log('✅ AdminRoute: Permitindo acesso');
   return <>{children}</>;
 };
 
