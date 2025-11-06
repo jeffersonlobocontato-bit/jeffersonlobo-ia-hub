@@ -5,6 +5,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Download, Mail, MessageCircle } from "lucide-react";
 import { RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, Legend } from "recharts";
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 interface Lead {
   nome: string;
@@ -62,6 +64,119 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
 
   const handleWhatsApp = () => {
     window.open("https://wa.me/5545999864213", "_blank");
+  };
+
+  const handleDownloadPDF = async () => {
+    try {
+      toast.info("Gerando PDF...");
+      
+      const pdf = new jsPDF("p", "mm", "a4");
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+      
+      // Título
+      pdf.setFontSize(24);
+      pdf.setTextColor(102, 126, 234);
+      pdf.text("Teste de Maturidade em IA", pageWidth / 2, 20, { align: "center" });
+      
+      // Nome e data
+      pdf.setFontSize(12);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Nome: ${lead.nome}`, 20, 35);
+      pdf.text(`Data: ${new Date().toLocaleDateString("pt-BR")}`, 20, 42);
+      pdf.text(`Finalidade: ${lead.finalidade === "PF" ? "Pessoa Física" : "Pessoa Jurídica"}`, 20, 49);
+      
+      // Nível de Maturidade
+      pdf.setFontSize(16);
+      pdf.setTextColor(102, 126, 234);
+      pdf.text("Nível de Maturidade:", 20, 62);
+      pdf.setFontSize(20);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(lead.nivel_maturidade, 20, 72);
+      
+      // Score Geral
+      pdf.setFontSize(16);
+      pdf.setTextColor(102, 126, 234);
+      pdf.text("Score Geral:", 20, 87);
+      pdf.setFontSize(32);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`${lead.score_geral.toFixed(1)}/5.0`, 20, 100);
+      
+      // Scores por Nível
+      pdf.setFontSize(14);
+      pdf.setTextColor(102, 126, 234);
+      pdf.text("Scores por Nível:", 20, 120);
+      pdf.setFontSize(11);
+      pdf.setTextColor(0, 0, 0);
+      pdf.text(`Básico: ${lead.score_basico.toFixed(1)}/5.0`, 25, 130);
+      pdf.text(`Intermediário: ${lead.score_intermediario.toFixed(1)}/5.0`, 25, 138);
+      pdf.text(`Avançado: ${lead.score_avancado.toFixed(1)}/5.0`, 25, 146);
+      
+      // Competências
+      pdf.setFontSize(14);
+      pdf.setTextColor(102, 126, 234);
+      pdf.text("Competências:", 20, 162);
+      pdf.setFontSize(10);
+      pdf.setTextColor(0, 0, 0);
+      let yPos = 172;
+      Object.entries(lead.competencias || {}).forEach(([key, value]) => {
+        pdf.text(`${competenciaLabels[key]}: ${value.toFixed(1)}/5.0`, 25, yPos);
+        yPos += 8;
+      });
+      
+      // Gaps
+      if (gaps.length > 0) {
+        pdf.addPage();
+        pdf.setFontSize(14);
+        pdf.setTextColor(102, 126, 234);
+        pdf.text("Áreas de Melhoria:", 20, 20);
+        pdf.setFontSize(10);
+        pdf.setTextColor(0, 0, 0);
+        yPos = 30;
+        gaps.forEach((gap) => {
+          pdf.text(`• ${gap.competencia}: ${gap.score.toFixed(1)}/5.0`, 25, yPos);
+          yPos += 8;
+        });
+      }
+      
+      // Footer
+      const finalPage = pdf.internal.pages.length;
+      for (let i = 1; i <= finalPage; i++) {
+        pdf.setPage(i);
+        pdf.setFontSize(9);
+        pdf.setTextColor(128, 128, 128);
+        pdf.text("Jefferson Lobo - Especialista em IA", pageWidth / 2, pageHeight - 10, { align: "center" });
+        pdf.text("WhatsApp: +55 45 99986-4213", pageWidth / 2, pageHeight - 5, { align: "center" });
+      }
+      
+      pdf.save(`teste-ia-${lead.nome.replace(/\s+/g, "-").toLowerCase()}.pdf`);
+      toast.success("PDF baixado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao gerar PDF:", error);
+      toast.error("Erro ao gerar PDF");
+    }
+  };
+
+  const handleSendEmail = async () => {
+    try {
+      toast.info("Enviando email...");
+      
+      const { error } = await supabase.functions.invoke("send-test-email", {
+        body: {
+          nome: lead.nome,
+          email: lead.email,
+          nivelMaturidade: lead.nivel_maturidade,
+          scoreGeral: lead.score_geral,
+        },
+      });
+
+      if (error) throw error;
+      
+      toast.success("Email enviado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao enviar email:", error);
+      toast.error("Erro ao enviar email. Verifique se o RESEND_API_KEY está configurado.");
+    }
   };
 
   if (loading || !lead) {
@@ -207,11 +322,11 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
 
       {/* Ações */}
       <div className="flex items-center justify-center gap-4">
-        <Button variant="outline" size="lg">
+        <Button variant="outline" size="lg" onClick={handleDownloadPDF}>
           <Download className="w-4 h-4 mr-2" />
           Baixar PDF
         </Button>
-        <Button variant="outline" size="lg">
+        <Button variant="outline" size="lg" onClick={handleSendEmail}>
           <Mail className="w-4 h-4 mr-2" />
           Enviar por e-mail
         </Button>

@@ -19,6 +19,13 @@ const Header = () => {
   }, []);
 
   const scrollToSection = (id: string) => {
+    // Se não estiver na página inicial, navegar para ela primeiro
+    if (window.location.pathname !== '/') {
+      window.location.href = `/#${id}`;
+      setIsMobileMenuOpen(false);
+      return;
+    }
+    
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
@@ -54,8 +61,8 @@ const Header = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
-          <button
-            onClick={() => scrollToSection('home')}
+          <Link
+            to="/"
             className={`text-2xl font-bold hover:opacity-80 transition-opacity ${
               isScrolled 
                 ? 'gradient-primary bg-clip-text text-transparent' 
@@ -63,7 +70,7 @@ const Header = () => {
             }`}
           >
             Jefferson Lobo
-          </button>
+          </Link>
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-8">
