@@ -53,21 +53,21 @@ const Admin = () => {
     const { data: hero } = await supabase
       .from('hero_content')
       .select('*')
-      .single();
+      .maybeSingle();
     setHeroData(hero);
 
     // Load About
     const { data: about } = await supabase
       .from('about_content')
       .select('*')
-      .single();
+      .maybeSingle();
     setAboutData(about);
 
     // Load Book
     const { data: book } = await supabase
       .from('book_content')
       .select('*')
-      .single();
+      .maybeSingle();
     setBookData(book);
 
     // Load Services
@@ -88,7 +88,7 @@ const Admin = () => {
     const { data: contact } = await supabase
       .from('contact_info')
       .select('*')
-      .single();
+      .maybeSingle();
     setContactData(contact);
 
     // Load Book Features
