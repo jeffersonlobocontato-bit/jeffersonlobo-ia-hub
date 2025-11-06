@@ -52,6 +52,7 @@ const Admin = () => {
     console.log('📦 Admin - Carregando conteúdo...');
     try {
       // Load Hero
+      console.log('🔵 Carregando Hero...');
       const { data: hero, error: heroError } = await supabase
         .from('hero_content')
         .select('*')
@@ -60,6 +61,7 @@ const Admin = () => {
       setHeroData(hero);
 
       // Load About
+      console.log('🔵 Carregando About...');
       const { data: about, error: aboutError } = await supabase
         .from('about_content')
         .select('*')
@@ -68,6 +70,7 @@ const Admin = () => {
       setAboutData(about);
 
       // Load Book
+      console.log('🔵 Carregando Book...');
       const { data: book, error: bookError } = await supabase
         .from('book_content')
         .select('*')
@@ -76,38 +79,48 @@ const Admin = () => {
       setBookData(book);
 
       // Load Services
+      console.log('🔵 Carregando Services...');
       const { data: servicesData } = await supabase
         .from('services')
         .select('*')
         .order('display_order');
+      console.log('Services:', servicesData);
       setServices(servicesData || []);
 
       // Load Blog Posts
+      console.log('🔵 Carregando Blog Posts...');
       const { data: postsData } = await supabase
         .from('blog_posts')
         .select('*')
         .order('date', { ascending: false });
+      console.log('Blog Posts:', postsData);
       setBlogPosts(postsData || []);
 
       // Load Contact Info
+      console.log('🔵 Carregando Contact...');
       const { data: contact } = await supabase
         .from('contact_info')
         .select('*')
         .maybeSingle();
+      console.log('Contact:', contact);
       setContactData(contact);
 
       // Load Book Features
+      console.log('🔵 Carregando Features...');
       const { data: featuresData } = await supabase
         .from('book_features')
         .select('*')
         .order('display_order');
+      console.log('Features:', featuresData);
       setBookFeatures(featuresData || []);
 
       // Load Book Reviews
+      console.log('🔵 Carregando Reviews...');
       const { data: reviewsData } = await supabase
         .from('book_reviews')
         .select('*')
         .order('display_order');
+      console.log('Reviews:', reviewsData);
       setBookReviews(reviewsData || []);
       
       console.log('✅ Admin - Conteúdo carregado com sucesso');
