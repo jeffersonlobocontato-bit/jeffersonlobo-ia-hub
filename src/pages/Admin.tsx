@@ -39,10 +39,10 @@ const Admin = () => {
         supabase.from('contact_info').select('*').maybeSingle(),
       ]);
 
-      setHeroData(heroRes.data || {});
-      setAboutData(aboutRes.data || {});
-      setBookData(bookRes.data || {});
-      setContactData(contactRes.data || {});
+      setHeroData(heroRes.data);
+      setAboutData(aboutRes.data);
+      setBookData(bookRes.data);
+      setContactData(contactRes.data);
     } catch (error) {
       toast({ title: "Erro ao carregar dados", variant: "destructive" });
     } finally {
@@ -51,6 +51,11 @@ const Admin = () => {
   };
 
   const updateHero = async () => {
+    if (!heroData?.id) {
+      toast({ title: "Erro", description: "Dados não carregados corretamente", variant: "destructive" });
+      return;
+    }
+
     const { error } = await supabase
       .from('hero_content')
       .update({ ...heroData, updated_by: user?.id })
@@ -64,6 +69,11 @@ const Admin = () => {
   };
 
   const updateAbout = async () => {
+    if (!aboutData?.id) {
+      toast({ title: "Erro", description: "Dados não carregados corretamente", variant: "destructive" });
+      return;
+    }
+
     const { error } = await supabase
       .from('about_content')
       .update({ ...aboutData, updated_by: user?.id })
@@ -77,6 +87,11 @@ const Admin = () => {
   };
 
   const updateBook = async () => {
+    if (!bookData?.id) {
+      toast({ title: "Erro", description: "Dados não carregados corretamente", variant: "destructive" });
+      return;
+    }
+
     const { error } = await supabase
       .from('book_content')
       .update({ ...bookData, updated_by: user?.id })
@@ -90,6 +105,11 @@ const Admin = () => {
   };
 
   const updateContact = async () => {
+    if (!contactData?.id) {
+      toast({ title: "Erro", description: "Dados não carregados corretamente", variant: "destructive" });
+      return;
+    }
+
     const { error } = await supabase
       .from('contact_info')
       .update({ ...contactData, updated_by: user?.id })
