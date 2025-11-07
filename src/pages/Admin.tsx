@@ -16,6 +16,7 @@ import { AdminFeaturesTab } from '@/components/admin/AdminFeaturesTab';
 import { AdminReviewsTab } from '@/components/admin/AdminReviewsTab';
 import { AdminLeadsTab } from '@/components/admin/AdminLeadsTab';
 import AdminChatLeadsTab from '@/components/admin/AdminChatLeadsTab';
+import { AdminKnowledgeTab } from '@/components/admin/AdminKnowledgeTab';
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
@@ -331,7 +332,7 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <Tabs defaultValue="hero" className="w-full">
-          <TabsList className="grid w-full grid-cols-10 mb-8">
+          <TabsList className="grid w-full grid-cols-11 mb-8 overflow-x-auto">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">Sobre</TabsTrigger>
             <TabsTrigger value="services">Serviços</TabsTrigger>
@@ -341,6 +342,7 @@ const Admin = () => {
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="leads">Leads IA</TabsTrigger>
             <TabsTrigger value="chat-leads">Chat</TabsTrigger>
+            <TabsTrigger value="knowledge">Base RAG</TabsTrigger>
             <TabsTrigger value="contact">Contato</TabsTrigger>
           </TabsList>
 
@@ -402,6 +404,10 @@ const Admin = () => {
 
           <TabsContent value="chat-leads">
             <AdminChatLeadsTab />
+          </TabsContent>
+
+          <TabsContent value="knowledge">
+            <AdminKnowledgeTab />
           </TabsContent>
 
           <TabsContent value="contact">

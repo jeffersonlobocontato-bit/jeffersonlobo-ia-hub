@@ -1,3 +1,4 @@
+import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
@@ -143,6 +144,54 @@ serve(async (req) => {
 
     console.log('💬 Nova mensagem no Uivo do Lobo');
 
+    // Get last user message for RAG search
+    const lastUserMessage = messages.filter((m: any) => m.role === 'user').pop()?.content || '';
+    let contextFromRAG = '';
+
+    if (lastUserMessage) {
+      try {
+        // Generate embedding for user's question
+        const embeddingResponse = await fetch('https://api.openai.com/v1/embeddings', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'text-embedding-3-small',
+            input: lastUserMessage,
+          }),
+        });
+
+        if (embeddingResponse.ok) {
+          const embeddingData = await embeddingResponse.json();
+          const queryEmbedding = embeddingData.data[0].embedding;
+
+          // Search knowledge base
+          const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+          const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+          const supabase = createClient(supabaseUrl, supabaseKey);
+
+          const { data: results, error: searchError } = await supabase.rpc('search_knowledge', {
+            query_embedding: queryEmbedding,
+            match_threshold: 0.6,
+            match_count: 3
+          });
+
+          if (!searchError && results && results.length > 0) {
+            contextFromRAG = '\n\n**CONTEXTO RELEVANTE DA BASE DE CONHECIMENTO:**\n\n' + 
+              results.map((r: any) => 
+                `**${r.titulo}** (Fonte: ${r.fonte})\n${r.conteudo}\n`
+              ).join('\n---\n\n');
+            
+            console.log('✅ RAG: Encontrados', results.length, 'documentos relevantes');
+          }
+        }
+      } catch (ragError) {
+        console.error('⚠️ Erro no RAG (continuando sem contexto):', ragError);
+      }
+    }
+
     // Se leadData foi fornecido, salvar/atualizar o lead
     if (leadData?.nome && leadData?.whatsapp) {
       const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
@@ -192,6 +241,17 @@ serve(async (req) => {
       }
     }
 
+    // Prepare messages with RAG context
+    const messagesWithRAG = contextFromRAG 
+      ? [
+          ...messages.slice(0, -1),
+          { 
+            role: 'user', 
+            content: messages[messages.length - 1].content + contextFromRAG 
+          }
+        ]
+      : messages;
+
     const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -202,7 +262,7 @@ serve(async (req) => {
         model: 'google/gemini-2.5-flash',
         messages: [
           { role: 'system', content: SYSTEM_PROMPT },
-          ...messages
+          ...messagesWithRAG
         ],
         stream: true,
       }),
