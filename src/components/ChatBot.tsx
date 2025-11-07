@@ -255,7 +255,7 @@ const ChatBot = () => {
     return (
       <Button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-primary via-secondary to-primary animate-pulse-glow hover:scale-110 transition-transform z-50"
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-primary via-secondary to-primary animate-pulse-glow hover:scale-110 transition-transform z-50"
         size="icon"
       >
         <MessageCircle className="h-6 w-6" />
@@ -264,7 +264,7 @@ const ChatBot = () => {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[600px] bg-card border border-border rounded-lg shadow-2xl flex flex-col z-50">
+    <div className="fixed bottom-0 left-0 right-0 sm:bottom-6 sm:right-6 sm:left-auto w-full sm:w-96 h-[100dvh] sm:h-[600px] bg-card border-t sm:border border-border sm:rounded-lg shadow-2xl flex flex-col z-50">
       <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/10 to-secondary/10">
         <div className="flex items-center gap-3">
           <div className="h-10 w-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
