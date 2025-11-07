@@ -88,23 +88,34 @@ const ChatBot = () => {
     try {
       const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-uivo-lobo`;
       
+      console.log("🔵 ChatBot - Preparando requisição:", {
+        chatUrl: CHAT_URL,
+        shouldSaveLead,
+        leadCaptured,
+        currentLeadData,
+        interessesLength: interesses.length
+      });
+
       const requestBody: any = { messages: updatedMessages };
       
       // Se deve salvar o lead, incluir leadData
       if (shouldSaveLead) {
+        console.log("🔵 ChatBot - Salvando novo lead");
         requestBody.leadData = {
           ...currentLeadData,
           mensagens: updatedMessages.map(m => ({ role: m.role, content: m.content })),
           interesses,
         };
       } else if (leadCaptured && interesses.length > 0) {
-        // Se já tem lead, apenas atualizar interesses
+        console.log("🔵 ChatBot - Atualizando lead existente");
         requestBody.leadData = {
           ...leadData,
           mensagens: [{ role: userMessage.role, content: userMessage.content }],
           interesses,
         };
       }
+
+      console.log("🔵 ChatBot - Request body:", JSON.stringify(requestBody, null, 2));
       
       const response = await fetch(CHAT_URL, {
         method: 'POST',
@@ -113,6 +124,12 @@ const ChatBot = () => {
           'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
         },
         body: JSON.stringify(requestBody),
+      });
+
+      console.log("🔵 ChatBot - Resposta:", {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText
       });
 
       if (!response.ok || !response.body) {
@@ -189,13 +206,15 @@ const ChatBot = () => {
       }
 
     } catch (error) {
-      console.error('Erro ao enviar mensagem:', error);
+      console.error('❌ ChatBot - Erro completo:', error);
+      console.error('❌ ChatBot - Error stack:', (error as any)?.stack);
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: 'Desculpe, ocorreu um erro. Tente novamente.'
       }]);
     } finally {
       setIsLoading(false);
+      console.log("🔵 ChatBot - Loading desativado");
     }
   };
 
