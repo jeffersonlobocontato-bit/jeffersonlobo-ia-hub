@@ -1,0 +1,3 @@
+-- Habilitar extensões necessárias para Cron Jobs
+CREATE EXTENSION IF NOT EXISTS pg_cron SCHEMA extensions;
+CREATE EXTENSION IF NOT EXISTS pg_net SCHEMA extensions;
