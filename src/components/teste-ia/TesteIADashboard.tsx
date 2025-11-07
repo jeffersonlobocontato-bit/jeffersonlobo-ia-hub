@@ -318,10 +318,10 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
             </p>
             <Button 
               size="lg" 
-              className="h-11 sm:h-12 md:h-14 px-4 sm:px-6 md:px-8 text-sm sm:text-base md:text-lg w-full sm:w-auto" 
+              className="h-11 sm:h-12 md:h-14 px-3 sm:px-6 md:px-8 text-xs sm:text-base md:text-lg w-full sm:w-auto max-w-full" 
               onClick={handleWhatsApp}
             >
-              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-2 flex-shrink-0" />
+              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-1 sm:mr-2 flex-shrink-0" />
               <span className="truncate">Falar no WhatsApp</span>
             </Button>
           </div>
