@@ -434,6 +434,42 @@ export type Database = {
         }
         Relationships: []
       }
+      knowledge_base: {
+        Row: {
+          categoria: string
+          conteudo: string
+          created_at: string
+          embedding: string | null
+          fonte: string
+          id: string
+          metadata: Json | null
+          titulo: string
+          updated_at: string
+        }
+        Insert: {
+          categoria: string
+          conteudo: string
+          created_at?: string
+          embedding?: string | null
+          fonte: string
+          id?: string
+          metadata?: Json | null
+          titulo: string
+          updated_at?: string
+        }
+        Update: {
+          categoria?: string
+          conteudo?: string
+          created_at?: string
+          embedding?: string | null
+          fonte?: string
+          id?: string
+          metadata?: Json | null
+          titulo?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           active: boolean | null
@@ -499,6 +535,21 @@ export type Database = {
           _user_id: string
         }
         Returns: boolean
+      }
+      search_knowledge: {
+        Args: {
+          match_count?: number
+          match_threshold?: number
+          query_embedding: string
+        }
+        Returns: {
+          categoria: string
+          conteudo: string
+          fonte: string
+          id: string
+          similarity: number
+          titulo: string
+        }[]
       }
     }
     Enums: {
