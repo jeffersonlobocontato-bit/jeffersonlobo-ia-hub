@@ -210,11 +210,11 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
     }));
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-16 space-y-8">
+    <div className="container max-w-6xl mx-auto px-4 py-8 md:py-16 space-y-6 md:space-y-8">
       {/* Header */}
-      <div className="text-center space-y-4">
-        <h1 className="text-4xl font-bold">Seu Resultado</h1>
-        <p className="text-xl text-muted-foreground">
+      <div className="text-center space-y-3 md:space-y-4">
+        <h1 className="text-2xl md:text-4xl font-bold">Seu Resultado</h1>
+        <p className="text-base md:text-xl text-muted-foreground">
           Olá, {lead.nome}! Seu nível de maturidade em IA é:{" "}
           <span className="font-bold text-primary">{lead.nivel_maturidade}</span>
         </p>
@@ -223,13 +223,13 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
       {/* Score Geral */}
       <Card className="border-2">
         <CardHeader>
-          <CardTitle>Score Geral</CardTitle>
-          <CardDescription>Sua pontuação média em todas as questões</CardDescription>
+          <CardTitle className="text-lg md:text-xl">Score Geral</CardTitle>
+          <CardDescription className="text-sm">Sua pontuação média em todas as questões</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="text-6xl font-bold text-center text-primary">
+          <div className="text-4xl md:text-6xl font-bold text-center text-primary">
             {lead.score_geral.toFixed(1)}
-            <span className="text-2xl text-muted-foreground">/5.0</span>
+            <span className="text-xl md:text-2xl text-muted-foreground">/5.0</span>
           </div>
         </CardContent>
       </Card>
@@ -237,16 +237,16 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
       {/* Gráfico de Barras por Nível */}
       <Card className="border-2">
         <CardHeader>
-          <CardTitle>Scores por Nível</CardTitle>
-          <CardDescription>Sua performance em cada nível de maturidade</CardDescription>
+          <CardTitle className="text-lg md:text-xl">Scores por Nível</CardTitle>
+          <CardDescription className="text-sm">Sua performance em cada nível de maturidade</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
+          <ResponsiveContainer width="100%" height={250} className="md:h-[300px]">
             <BarChart data={barData}>
-              <XAxis dataKey="nivel" />
-              <YAxis domain={[0, 5]} />
+              <XAxis dataKey="nivel" tick={{ fontSize: 12 }} />
+              <YAxis domain={[0, 5]} tick={{ fontSize: 12 }} />
               <Tooltip />
-              <Legend />
+              <Legend wrapperStyle={{ fontSize: 12 }} />
               <Bar dataKey="score" fill="hsl(var(--primary))" name="Pontuação" />
             </BarChart>
           </ResponsiveContainer>
@@ -256,15 +256,15 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
       {/* Radar de Competências */}
       <Card className="border-2">
         <CardHeader>
-          <CardTitle>Radar de Competências</CardTitle>
-          <CardDescription>Sua performance em cada competência avaliada</CardDescription>
+          <CardTitle className="text-lg md:text-xl">Radar de Competências</CardTitle>
+          <CardDescription className="text-sm">Sua performance em cada competência avaliada</CardDescription>
         </CardHeader>
         <CardContent>
-          <ResponsiveContainer width="100%" height={400}>
+          <ResponsiveContainer width="100%" height={300} className="md:h-[400px]">
             <RadarChart data={radarData}>
               <PolarGrid />
-              <PolarAngleAxis dataKey="competencia" />
-              <PolarRadiusAxis domain={[0, 5]} />
+              <PolarAngleAxis dataKey="competencia" tick={{ fontSize: 10 }} className="md:text-xs" />
+              <PolarRadiusAxis domain={[0, 5]} tick={{ fontSize: 10 }} />
               <Radar
                 name="Score"
                 dataKey="valor"
@@ -281,20 +281,20 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
       {gaps.length > 0 && (
         <Card className="border-2 border-orange-500/20">
           <CardHeader>
-            <CardTitle>Aprendizados Necessários</CardTitle>
-            <CardDescription>Áreas com oportunidade de melhoria (score abaixo de 3.0)</CardDescription>
+            <CardTitle className="text-lg md:text-xl">Aprendizados Necessários</CardTitle>
+            <CardDescription className="text-sm">Áreas com oportunidade de melhoria (score abaixo de 3.0)</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="space-y-3 md:space-y-4">
               {gaps.map((gap) => (
-                <div key={gap.competencia} className="p-4 bg-muted/50 rounded-lg">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-semibold">{gap.competencia}</h4>
-                    <span className="text-sm text-muted-foreground">
+                <div key={gap.competencia} className="p-3 md:p-4 bg-muted/50 rounded-lg">
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0 mb-2">
+                    <h4 className="font-semibold text-sm md:text-base">{gap.competencia}</h4>
+                    <span className="text-xs md:text-sm text-muted-foreground">
                       Score: {gap.score.toFixed(1)}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-xs md:text-sm text-muted-foreground">
                     Recomendamos focar no desenvolvimento desta competência através de cursos, leituras e prática.
                   </p>
                 </div>
@@ -306,27 +306,27 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
 
       {/* CTA WhatsApp */}
       <Card className="border-2 border-primary/20 bg-primary/5">
-        <CardContent className="py-8">
-          <div className="text-center space-y-4">
-            <h3 className="text-2xl font-bold">Quer acelerar sua evolução em IA?</h3>
-            <p className="text-muted-foreground max-w-2xl mx-auto">
+        <CardContent className="py-6 md:py-8">
+          <div className="text-center space-y-3 md:space-y-4">
+            <h3 className="text-xl md:text-2xl font-bold">Quer acelerar sua evolução em IA?</h3>
+            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto px-4">
               Fale com o especialista Jefferson Lobo e descubra como transformar seus resultados com consultoria personalizada, treinamentos e o Método DEL.
             </p>
-            <Button size="lg" className="h-14 px-8 text-lg" onClick={handleWhatsApp}>
-              <MessageCircle className="w-5 h-5 mr-2" />
-              Falar com o especialista no WhatsApp
+            <Button size="lg" className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg w-full sm:w-auto" onClick={handleWhatsApp}>
+              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+              Falar no WhatsApp
             </Button>
           </div>
         </CardContent>
       </Card>
 
       {/* Ações */}
-      <div className="flex items-center justify-center gap-4">
-        <Button variant="outline" size="lg" onClick={handleDownloadPDF}>
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 md:gap-4">
+        <Button variant="outline" size="lg" className="h-12 md:h-14 text-sm md:text-base" onClick={handleDownloadPDF}>
           <Download className="w-4 h-4 mr-2" />
           Baixar PDF
         </Button>
-        <Button variant="outline" size="lg" onClick={handleSendEmail}>
+        <Button variant="outline" size="lg" className="h-12 md:h-14 text-sm md:text-base" onClick={handleSendEmail}>
           <Mail className="w-4 h-4 mr-2" />
           Enviar por e-mail
         </Button>
