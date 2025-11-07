@@ -32,7 +32,7 @@ const AboutSection = () => {
                 alt="Jefferson Lobo"
                 className="w-full h-full object-cover"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-background via-background/90 via-30% to-transparent to-60%" />
+              <div className="absolute inset-0 bg-gradient-to-t from-muted/30 via-muted/80 via-30% to-transparent to-60%" />
             </div>
             {/* Decorative Elements */}
             <div className="absolute -top-4 -right-4 w-72 h-72 bg-primary/20 rounded-full blur-3xl -z-10" />
