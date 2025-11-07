@@ -259,12 +259,16 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
           <CardTitle className="text-lg md:text-xl">Radar de Competências</CardTitle>
           <CardDescription className="text-sm">Sua performance em cada competência avaliada</CardDescription>
         </CardHeader>
-        <CardContent>
+        <CardContent className="overflow-hidden">
           <ResponsiveContainer width="100%" height={300} className="md:h-[400px]">
-            <RadarChart data={radarData}>
+            <RadarChart data={radarData} margin={{ top: 20, right: 30, bottom: 20, left: 30 }}>
               <PolarGrid />
-              <PolarAngleAxis dataKey="competencia" tick={{ fontSize: 10 }} className="md:text-xs" />
-              <PolarRadiusAxis domain={[0, 5]} tick={{ fontSize: 10 }} />
+              <PolarAngleAxis 
+                dataKey="competencia" 
+                tick={{ fontSize: 9 }} 
+                style={{ fontSize: '9px' }}
+              />
+              <PolarRadiusAxis domain={[0, 5]} tick={{ fontSize: 9 }} />
               <Radar
                 name="Score"
                 dataKey="valor"
@@ -306,15 +310,19 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
 
       {/* CTA WhatsApp */}
       <Card className="border-2 border-primary/20 bg-primary/5">
-        <CardContent className="py-6 md:py-8">
+        <CardContent className="py-6 md:py-8 px-4">
           <div className="text-center space-y-3 md:space-y-4">
-            <h3 className="text-xl md:text-2xl font-bold">Quer acelerar sua evolução em IA?</h3>
-            <p className="text-sm md:text-base text-muted-foreground max-w-2xl mx-auto px-4">
+            <h3 className="text-lg sm:text-xl md:text-2xl font-bold leading-tight">Quer acelerar sua evolução em IA?</h3>
+            <p className="text-xs sm:text-sm md:text-base text-muted-foreground max-w-2xl mx-auto">
               Fale com o especialista Jefferson Lobo e descubra como transformar seus resultados com consultoria personalizada, treinamentos e o Método DEL.
             </p>
-            <Button size="lg" className="h-12 md:h-14 px-6 md:px-8 text-base md:text-lg w-full sm:w-auto" onClick={handleWhatsApp}>
-              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-2" />
-              Falar no WhatsApp
+            <Button 
+              size="lg" 
+              className="h-11 sm:h-12 md:h-14 px-4 sm:px-6 md:px-8 text-sm sm:text-base md:text-lg w-full sm:w-auto" 
+              onClick={handleWhatsApp}
+            >
+              <MessageCircle className="w-4 h-4 md:w-5 md:h-5 mr-2 flex-shrink-0" />
+              <span className="truncate">Falar no WhatsApp</span>
             </Button>
           </div>
         </CardContent>
