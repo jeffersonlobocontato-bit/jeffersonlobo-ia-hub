@@ -65,34 +65,40 @@ const ChatBot = () => {
     setInput('');
     setIsLoading(true);
 
-    // Detectar nome, apelido e WhatsApp na primeira mensagem do usuário
+    // Detectar nome, apelido e WhatsApp de forma clara e separada
     let currentLeadData = { ...leadData };
     let shouldSaveLead = false;
 
     if (!leadCaptured && updatedMessages.filter(m => m.role === 'user').length <= 3) {
-      const userText = input.toLowerCase();
+      const trimmedInput = input.trim();
       
-      // Tentar extrair WhatsApp (padrões comuns)
-      const phoneMatch = input.match(/\(?\d{2}\)?\s*9?\d{4}[-\s]?\d{4}/);
-      if (phoneMatch && !currentLeadData.whatsapp) {
+      // Tentar extrair WhatsApp (padrões: (11) 98765-4321, 11987654321, 11 98765-4321, etc.)
+      const phoneMatch = trimmedInput.match(/(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}/);
+      const isPhoneMessage = phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 10;
+      
+      if (isPhoneMessage && !currentLeadData.whatsapp) {
+        // É um telefone - salvar apenas como WhatsApp
         currentLeadData.whatsapp = phoneMatch[0].replace(/\D/g, '');
+        console.log("📱 Telefone capturado:", currentLeadData.whatsapp);
+      } else if (!isPhoneMessage && trimmedInput.length > 0) {
+        // Não é telefone - é nome ou apelido
+        if (!currentLeadData.nome) {
+          // Primeira informação de texto é o nome
+          currentLeadData.nome = trimmedInput;
+          console.log("👤 Nome capturado:", currentLeadData.nome);
+        } else if (!currentLeadData.apelido && trimmedInput !== currentLeadData.nome) {
+          // Segunda informação de texto diferente do nome é o apelido
+          currentLeadData.apelido = trimmedInput;
+          console.log("✏️ Apelido capturado:", currentLeadData.apelido);
+        }
       }
 
-      // Se ainda não tem nome completo, assumir que primeira mensagem relevante é o nome
-      if (!currentLeadData.nome && updatedMessages.filter(m => m.role === 'user').length === 2) {
-        currentLeadData.nome = input.trim();
-      }
-
-      // Se tem nome mas não tem apelido, próxima mensagem pode ser apelido
-      if (currentLeadData.nome && !currentLeadData.apelido && updatedMessages.filter(m => m.role === 'user').length === 3) {
-        currentLeadData.apelido = input.trim();
-      }
-
-      // Se tem todos os dados, marcar como capturado
+      // Se tem todos os dados obrigatórios, marcar como capturado
       if (currentLeadData.nome && currentLeadData.whatsapp) {
         setLeadCaptured(true);
         setLeadData(currentLeadData);
         shouldSaveLead = true;
+        console.log("✅ Lead completo capturado:", currentLeadData);
       }
     }
 
