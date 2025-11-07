@@ -1,5 +1,4 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.79.0';
-import { DOMParser, Element } from 'https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,6 +15,62 @@ interface Episode {
   image_url?: string;
   episode_number?: number;
   season_number?: number;
+}
+
+function extractTag(xml: string, tag: string): string {
+  const regex = new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\/${tag}>`, 'i');
+  const match = xml.match(regex);
+  let value = match ? match[1].trim() : '';
+  
+  // Remove CDATA wrapper if present
+  value = value.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, '$1');
+  
+  return value;
+}
+
+function extractAttribute(xml: string, tag: string, attr: string): string {
+  const regex = new RegExp(`<${tag}[^>]*${attr}=["']([^"']*)["'][^>]*>`, 'i');
+  const match = xml.match(regex);
+  return match ? match[1] : '';
+}
+
+function parseRSSFeed(rssXml: string): Episode[] {
+  const episodes: Episode[] = [];
+  
+  // Split by item tags
+  const itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+  const items = rssXml.matchAll(itemRegex);
+  
+  for (const match of items) {
+    const itemXml = match[1];
+    
+    const title = extractTag(itemXml, 'title');
+    const description = extractTag(itemXml, 'description').replace(/<[^>]*>/g, '');
+    const pubDate = extractTag(itemXml, 'pubDate');
+    const duration = extractTag(itemXml, 'duration') || extractTag(itemXml, 'itunes:duration');
+    const guid = extractTag(itemXml, 'guid');
+    const audio_url = extractAttribute(itemXml, 'enclosure', 'url');
+    const image_url = extractAttribute(itemXml, 'itunes:image', 'href');
+    
+    // Tentar extrair número do episódio
+    const episodeMatch = title.match(/#(\d+)/);
+    const episode_number = episodeMatch ? parseInt(episodeMatch[1]) : undefined;
+    
+    if (title && audio_url && guid) {
+      episodes.push({
+        title,
+        description,
+        published_date: new Date(pubDate).toISOString(),
+        duration,
+        audio_url,
+        guid,
+        image_url,
+        episode_number,
+      });
+    }
+  }
+  
+  return episodes;
 }
 
 Deno.serve(async (req) => {
@@ -44,47 +99,12 @@ Deno.serve(async (req) => {
     // Buscar RSS
     const rssResponse = await fetch(config.rss_url);
     const rssText = await rssResponse.text();
+    
+    console.log('RSS recebido, fazendo parsing...');
 
-    // Parse XML
-    const parser = new DOMParser();
-    const xmlDoc = parser.parseFromString(rssText, 'text/xml');
-
-    if (!xmlDoc) {
-      throw new Error('Erro ao fazer parse do XML');
-    }
-
-    const items = xmlDoc.querySelectorAll('item');
-    const episodes: Episode[] = [];
-
-    items.forEach((itemNode) => {
-      const item = itemNode as unknown as Element;
-      const title = item.querySelector('title')?.textContent || '';
-      const description = item.querySelector('description')?.textContent || '';
-      const pubDate = item.querySelector('pubDate')?.textContent || '';
-      const duration = item.querySelector('duration')?.textContent || '';
-      const enclosure = item.querySelector('enclosure');
-      const audio_url = enclosure?.getAttribute('url') || '';
-      const guid = item.querySelector('guid')?.textContent || '';
-      const image = item.querySelector('image')?.getAttribute('href') || '';
-      
-      // Tentar extrair número do episódio do título
-      const episodeMatch = title.match(/#(\d+)/);
-      const episode_number = episodeMatch ? parseInt(episodeMatch[1]) : undefined;
-
-      if (title && audio_url && guid) {
-        episodes.push({
-          title,
-          description,
-          published_date: new Date(pubDate).toISOString(),
-          duration,
-          audio_url,
-          guid,
-          image_url: image,
-          episode_number,
-        });
-      }
-    });
-
+    // Parse episodes
+    const episodes = parseRSSFeed(rssText);
+    
     console.log(`Encontrados ${episodes.length} episódios`);
 
     // Inserir/atualizar episódios
@@ -103,7 +123,7 @@ Deno.serve(async (req) => {
         );
 
       if (upsertError) {
-        console.error('Erro ao inserir episódio:', upsertError);
+        console.error('Erro ao inserir episódio:', episode.title, upsertError);
       }
     }
 
