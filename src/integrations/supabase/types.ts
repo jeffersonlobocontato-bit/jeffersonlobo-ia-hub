@@ -470,6 +470,87 @@ export type Database = {
         }
         Relationships: []
       }
+      podcast_config: {
+        Row: {
+          id: string
+          last_sync: string | null
+          podcast_description: string | null
+          podcast_image: string | null
+          podcast_title: string
+          rss_url: string
+          updated_at: string | null
+          updated_by: string | null
+        }
+        Insert: {
+          id?: string
+          last_sync?: string | null
+          podcast_description?: string | null
+          podcast_image?: string | null
+          podcast_title: string
+          rss_url: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Update: {
+          id?: string
+          last_sync?: string | null
+          podcast_description?: string | null
+          podcast_image?: string | null
+          podcast_title?: string
+          rss_url?: string
+          updated_at?: string | null
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      podcast_episodes: {
+        Row: {
+          active: boolean | null
+          audio_url: string
+          created_at: string | null
+          description: string | null
+          duration: string | null
+          episode_number: number | null
+          guid: string
+          id: string
+          image_url: string | null
+          published_date: string
+          season_number: number | null
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          audio_url: string
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          episode_number?: number | null
+          guid: string
+          id?: string
+          image_url?: string | null
+          published_date: string
+          season_number?: number | null
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          audio_url?: string
+          created_at?: string | null
+          description?: string | null
+          duration?: string | null
+          episode_number?: number | null
+          guid?: string
+          id?: string
+          image_url?: string | null
+          published_date?: string
+          season_number?: number | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           active: boolean | null
