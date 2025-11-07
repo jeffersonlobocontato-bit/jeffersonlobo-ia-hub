@@ -9,6 +9,32 @@ interface Message {
   content: string;
 }
 
+const WHATSAPP_NUMBER = '5545999864213'; // (45) 99986-4213
+
+const processMessageContent = (content: string) => {
+  // Substituir [LINK_WHATSAPP]texto[/LINK_WHATSAPP] por botões clicáveis
+  const parts = content.split(/(\[LINK_WHATSAPP\].*?\[\/LINK_WHATSAPP\])/g);
+  
+  return parts.map((part, index) => {
+    const match = part.match(/\[LINK_WHATSAPP\](.*?)\[\/LINK_WHATSAPP\]/);
+    if (match) {
+      const linkText = match[1];
+      return (
+        <Button
+          key={index}
+          size="sm"
+          className="my-2 bg-green-600 hover:bg-green-700 text-white"
+          onClick={() => window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank')}
+        >
+          <MessageCircle className="w-3 h-3 mr-2" />
+          {linkText}
+        </Button>
+      );
+    }
+    return <ReactMarkdown key={index}>{part}</ReactMarkdown>;
+  });
+};
+
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
@@ -282,7 +308,7 @@ const ChatBot = () => {
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               ) : (
                 <div className="text-sm prose prose-sm max-w-none dark:prose-invert">
-                  <ReactMarkdown>{message.content}</ReactMarkdown>
+                  {processMessageContent(message.content)}
                 </div>
               )}
             </div>
