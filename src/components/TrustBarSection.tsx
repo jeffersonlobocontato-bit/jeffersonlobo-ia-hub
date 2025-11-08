@@ -1,0 +1,64 @@
+import { Star, Users, TrendingUp, Award } from 'lucide-react';
+import { Card } from '@/components/ui/card';
+
+const TrustBarSection = () => {
+  const stats = [
+    { icon: Users, value: '127', label: 'Palestras realizadas' },
+    { icon: TrendingUp, value: '45+', label: 'Empresas transformadas' },
+    { icon: Award, value: '97%', label: 'Taxa de satisfação' },
+    { icon: Star, value: '1.247+', label: 'Profissionais capacitados' },
+  ];
+
+  return (
+    <section className="py-16 bg-muted/50 border-y border-border/50">
+      <div className="container mx-auto px-4">
+        <div className="text-center mb-12">
+          <p className="text-sm uppercase tracking-wider text-muted-foreground mb-4">
+            Confiança e Resultados
+          </p>
+          <h2 className="text-2xl md:text-3xl font-bold">
+            Impacto comprovado em empresas e profissionais
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          {stats.map((stat, index) => (
+            <Card
+              key={index}
+              className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card/80 backdrop-blur"
+            >
+              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                <stat.icon className="w-6 h-6 text-primary" />
+              </div>
+              <div className="text-3xl font-bold gradient-primary bg-clip-text text-transparent mb-1">
+                {stat.value}
+              </div>
+              <div className="text-sm text-muted-foreground">
+                {stat.label}
+              </div>
+            </Card>
+          ))}
+        </div>
+
+        {/* Testimonial */}
+        <div className="mt-12 max-w-3xl mx-auto">
+          <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+            <div className="flex gap-1 mb-4 justify-center">
+              {[...Array(5)].map((_, i) => (
+                <Star key={i} className="w-5 h-5 fill-primary text-primary" />
+              ))}
+            </div>
+            <p className="text-lg text-center italic text-muted-foreground mb-4">
+              "A abordagem de Jefferson sobre IA é prática e transformadora. Em poucos meses, implementamos soluções que economizaram milhões em custos operacionais."
+            </p>
+            <p className="text-center font-semibold">
+              — Carlos Silva, CTO de empresa Fortune 500
+            </p>
+          </Card>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+export default TrustBarSection;

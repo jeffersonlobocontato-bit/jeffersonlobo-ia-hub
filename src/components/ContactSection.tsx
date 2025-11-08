@@ -29,6 +29,9 @@ const ContactSection = () => {
             <p className="text-lg text-muted-foreground">
               Transforme sua organização com insights sobre inteligência artificial, inovação e o futuro da tecnologia
             </p>
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 text-destructive mb-4">
+              <span className="text-sm font-semibold">⏰ Apenas 3 vagas disponíveis este mês</span>
+            </div>
             <div className="flex justify-center pt-4">
               <Button
                 size="lg"
@@ -43,7 +46,7 @@ const ContactSection = () => {
                   onClick={() => trackCTA('contact_whatsapp', 'contact_section')}
                 >
                   <MessageCircle className="w-5 h-5" />
-                  Entrar em contato
+                  Entrar em contato agora
                 </a>
               </Button>
             </div>

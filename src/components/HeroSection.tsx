@@ -25,16 +25,16 @@ const HeroSection = () => {
 
   // Fallback data quando banco está vazio
   const defaultData = {
-    headline: "Jefferson Lobo",
-    subtitle: "Especialista em Inteligência Artificial e Transformação Digital",
-    cta_primary: "Conheça meu livro",
-    cta_secondary: "Ler artigos",
-    stat1_number: "15+",
-    stat1_label: "Anos de experiência",
-    stat2_number: "100+",
-    stat2_label: "Projetos concluídos",
-    stat3_number: "50K+",
-    stat3_label: "Pessoas impactadas"
+    headline: "Jefferson Lobo ajuda empresas a implementar IA sem perder dinheiro",
+    subtitle: "Descubra onde sua empresa está na jornada de IA em 5 minutos",
+    cta_primary: "Fazer Diagnóstico Grátis",
+    cta_secondary: "Ver meu método",
+    stat1_number: "127",
+    stat1_label: "Palestras realizadas",
+    stat2_number: "45+",
+    stat2_label: "Empresas transformadas",
+    stat3_number: "97%",
+    stat3_label: "Taxa de satisfação"
   };
 
   const displayData = heroData || defaultData;
@@ -81,28 +81,25 @@ const HeroSection = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
             <Button
               size="lg"
-              variant="outline"
-              onClick={() => scrollToSection('livro')}
-              className="text-lg px-8 py-6 border-white/30 bg-white/10 text-white hover:bg-white/20"
+              asChild
+              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-lg px-8 py-6 shadow-2xl shadow-primary/50 animate-pulse-glow"
             >
-              {displayData.cta_primary}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            <Button
-              size="lg"
-              onClick={openChatBot}
-              className="bg-gradient-to-r from-primary via-secondary to-primary hover:opacity-90 transition-all text-lg px-8 py-6 animate-pulse-glow shadow-lg shadow-primary/50 group relative overflow-hidden"
-            >
-              <BrainCircuit className="mr-2 w-5 h-5 group-hover:rotate-12 transition-transform" />
-              Fale com o Uivo do Lobo
+              <a href="/teste-ia" onClick={() => trackCTA('hero_primary_cta', 'hero_section')}>
+                <BrainCircuit className="mr-2 w-5 h-5" />
+                {displayData.cta_primary}
+              </a>
             </Button>
             <Button
               size="lg"
               variant="outline"
-              onClick={() => scrollToSection('blog')}
+              onClick={() => {
+                trackCTA('hero_secondary_cta', 'hero_section');
+                scrollToSection('sobre');
+              }}
               className="text-lg px-8 py-6 border-white/30 bg-white/10 text-white hover:bg-white/20"
             >
               {displayData.cta_secondary}
+              <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
 

@@ -1,4 +1,4 @@
-import { Brain, CheckCircle, TrendingUp } from "lucide-react";
+import { Brain, CheckCircle, TrendingUp, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
@@ -36,14 +36,21 @@ const TesteIASection = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
             <Brain className="w-4 h-4" />
-            <span className="text-sm font-medium">Diagnóstico Gratuito</span>
+            <span className="text-sm font-medium">🔥 Diagnóstico Gratuito</span>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Teste de Maturidade em IA
+          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+            Sua IA está <span className="gradient-primary bg-clip-text text-transparent">genérica demais</span>?
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Descubra em apenas 5 minutos o nível de preparação da sua empresa ou da sua carreira para a era da Inteligência Artificial. Receba um relatório completo com insights e recomendações personalizadas.
+          <p className="text-xl text-muted-foreground mb-4">
+            80% das empresas erram aqui. Você está entre elas?
           </p>
+          <p className="text-lg text-muted-foreground">
+            Descubra em apenas 5 minutos o nível de preparação da sua empresa ou da sua carreira para a era da Inteligência Artificial. Receba um relatório completo em PDF com insights e recomendações personalizadas.
+          </p>
+          <div className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground">
+            <Users className="w-4 h-4 text-primary" />
+            <span className="font-semibold text-foreground">1.247 profissionais</span> já descobriram seu nível de maturidade
+          </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">

@@ -65,10 +65,11 @@ const AboutSection = () => {
         {/* Services Grid */}
         <div className="space-y-8">
           <div className="text-center">
-            <h3 className="text-3xl font-bold mb-4">Como posso ajudar você</h3>
+            <h3 className="text-3xl font-bold mb-4">
+              <span className="gradient-primary bg-clip-text text-transparent">Por que confiar</span> em Jefferson Lobo?
+            </h3>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-              Ofereço soluções completas para empresas e profissionais que
-              desejam se destacar na era da inteligência artificial
+              Experiência comprovada em ajudar empresas e profissionais a prosperarem na era da inteligência artificial
             </p>
           </div>
 

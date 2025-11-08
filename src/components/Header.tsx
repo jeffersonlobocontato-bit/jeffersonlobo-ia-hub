@@ -119,20 +119,6 @@ const Header = () => {
                 Sair
               </Button>
             )}
-            <Button
-              asChild
-              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
-            >
-              <a
-                href="https://wa.me/5545999864213"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                Contrate para Palestras & Consultoria
-              </a>
-            </Button>
           </div>
 
           {/* Mobile Menu Button */}
@@ -185,20 +171,6 @@ const Header = () => {
                 Sair
               </Button>
             )}
-            <Button
-              asChild
-              className="w-full bg-gradient-to-r from-primary to-secondary"
-            >
-              <a
-                href="https://wa.me/5545999864213"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2"
-              >
-                <MessageCircle className="w-4 h-4" />
-                Contrate para Palestras
-              </a>
-            </Button>
           </div>
         )}
       </div>
