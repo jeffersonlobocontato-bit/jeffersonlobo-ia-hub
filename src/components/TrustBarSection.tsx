@@ -1,13 +1,17 @@
-import { Star, Users, TrendingUp, Award } from 'lucide-react';
+import { Star } from 'lucide-react';
 import { Card } from '@/components/ui/card';
+import { useTrustStats } from '@/hooks/useTrustStats';
+import { useTestimonials } from '@/hooks/useTestimonials';
+import * as Icons from 'lucide-react';
 
 const TrustBarSection = () => {
-  const stats = [
-    { icon: Users, value: '127', label: 'Palestras realizadas' },
-    { icon: TrendingUp, value: '45+', label: 'Empresas transformadas' },
-    { icon: Award, value: '97%', label: 'Taxa de satisfação' },
-    { icon: Star, value: '1.247+', label: 'Profissionais capacitados' },
-  ];
+  const { data: trustStats = [] } = useTrustStats();
+  const { data: testimonials = [] } = useTestimonials();
+
+  const getIcon = (iconName: string) => {
+    const IconComponent = (Icons as any)[iconName] || Icons.Star;
+    return IconComponent;
+  };
 
   return (
     <section className="py-16 bg-muted/50 border-y border-border/50">
@@ -22,40 +26,45 @@ const TrustBarSection = () => {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {stats.map((stat, index) => (
-            <Card
-              key={index}
-              className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card/80 backdrop-blur"
-            >
-              <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
-                <stat.icon className="w-6 h-6 text-primary" />
-              </div>
-              <div className="text-3xl font-bold text-primary mb-1">
-                {stat.value}
-              </div>
-              <div className="text-sm text-muted-foreground">
-                {stat.label}
-              </div>
-            </Card>
-          ))}
+          {trustStats.map((stat) => {
+            const IconComponent = getIcon(stat.icon);
+            return (
+              <Card
+                key={stat.id}
+                className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card/80 backdrop-blur"
+              >
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                  <IconComponent className="w-6 h-6 text-primary" />
+                </div>
+                <div className="text-3xl font-bold text-primary mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  {stat.label}
+                </div>
+              </Card>
+            );
+          })}
         </div>
 
         {/* Testimonial */}
-        <div className="mt-12 max-w-3xl mx-auto">
-          <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
-            <div className="flex gap-1 mb-4 justify-center">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-5 h-5 fill-primary text-primary" />
-              ))}
-            </div>
-            <p className="text-lg text-center italic text-muted-foreground mb-4">
-              "A abordagem de Jefferson sobre IA é prática e transformadora. Em poucos meses, implementamos soluções que economizaram milhões em custos operacionais."
-            </p>
-            <p className="text-center font-semibold">
-              — Carlos Silva, CTO de empresa Fortune 500
-            </p>
-          </Card>
-        </div>
+        {testimonials.length > 0 && (
+          <div className="mt-12 max-w-3xl mx-auto">
+            <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+              <div className="flex gap-1 mb-4 justify-center">
+                {[...Array(Math.floor(testimonials[0].rating))].map((_, i) => (
+                  <Star key={i} className="w-5 h-5 fill-primary text-primary" />
+                ))}
+              </div>
+              <p className="text-lg text-center italic text-muted-foreground mb-4">
+                "{testimonials[0].quote}"
+              </p>
+              <p className="text-center font-semibold">
+                — {testimonials[0].author_name}, {testimonials[0].author_title}
+              </p>
+            </Card>
+          </div>
+        )}
       </div>
     </section>
   );

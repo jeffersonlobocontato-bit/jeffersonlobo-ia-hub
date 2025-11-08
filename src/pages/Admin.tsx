@@ -19,6 +19,7 @@ import { AdminLeadsTab } from '@/components/admin/AdminLeadsTab';
 import AdminChatLeadsTab from '@/components/admin/AdminChatLeadsTab';
 import { AdminKnowledgeTab } from '@/components/admin/AdminKnowledgeTab';
 import { AdminAnalyticsTab } from '@/components/admin/AdminAnalyticsTab';
+import { AdminTrustTab } from '@/components/admin/AdminTrustTab';
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
@@ -33,6 +34,8 @@ const Admin = () => {
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
   const [bookFeatures, setBookFeatures] = useState<any[]>([]);
   const [bookReviews, setBookReviews] = useState<any[]>([]);
+  const [trustStats, setTrustStats] = useState<any[]>([]);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -45,7 +48,7 @@ const Admin = () => {
     try {
       setLoading(true);
       
-      const [heroRes, aboutRes, bookRes, contactRes, servicesRes, postsRes, featuresRes, reviewsRes] = await Promise.all([
+      const [heroRes, aboutRes, bookRes, contactRes, servicesRes, postsRes, featuresRes, reviewsRes, statsRes, testimonialsRes] = await Promise.all([
         supabase.from('hero_content').select('*').maybeSingle(),
         supabase.from('about_content').select('*').maybeSingle(),
         supabase.from('book_content').select('*').maybeSingle(),
@@ -54,6 +57,8 @@ const Admin = () => {
         supabase.from('blog_posts').select('*').order('date', { ascending: false }),
         supabase.from('book_features').select('*').order('display_order'),
         supabase.from('book_reviews').select('*').order('display_order'),
+        supabase.from('trust_stats').select('*').order('display_order'),
+        supabase.from('testimonials').select('*').order('display_order'),
       ]);
 
       setHeroData(heroRes.data);
@@ -64,6 +69,8 @@ const Admin = () => {
       setBlogPosts(postsRes.data || []);
       setBookFeatures(featuresRes.data || []);
       setBookReviews(reviewsRes.data || []);
+      setTrustStats(statsRes.data || []);
+      setTestimonials(testimonialsRes.data || []);
     } catch (error) {
       toast({ title: "Erro ao carregar dados", variant: "destructive" });
     } finally {
@@ -288,6 +295,79 @@ const Admin = () => {
     }
   };
 
+  const updateTrustStat = async (stat: any) => {
+    const { error } = await supabase.from('trust_stats').update(stat).eq('id', stat.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Estatística atualizada!" });
+    }
+  };
+
+  const deleteTrustStat = async (id: string) => {
+    const { error } = await supabase.from('trust_stats').delete().eq('id', id);
+    if (error) {
+      toast({ title: "Erro ao deletar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Estatística deletada!" });
+      loadAllContent();
+    }
+  };
+
+  const addTrustStat = async () => {
+    const maxOrder = trustStats.length > 0 ? Math.max(...trustStats.map((s) => s.display_order)) : 0;
+    const { error } = await supabase.from('trust_stats').insert({
+      icon: 'Star',
+      value: '0',
+      label: 'Nova Estatística',
+      display_order: maxOrder + 1,
+      active: true,
+    });
+    if (error) {
+      toast({ title: "Erro ao adicionar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Estatística adicionada!" });
+      loadAllContent();
+    }
+  };
+
+  const updateTestimonial = async (testimonial: any) => {
+    const { error } = await supabase.from('testimonials').update(testimonial).eq('id', testimonial.id);
+    if (error) {
+      toast({ title: "Erro ao salvar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Depoimento atualizado!" });
+    }
+  };
+
+  const deleteTestimonial = async (id: string) => {
+    const { error } = await supabase.from('testimonials').delete().eq('id', id);
+    if (error) {
+      toast({ title: "Erro ao deletar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Depoimento deletado!" });
+      loadAllContent();
+    }
+  };
+
+  const addTestimonial = async () => {
+    const maxOrder = testimonials.length > 0 ? Math.max(...testimonials.map((t) => t.display_order)) : 0;
+    const { error } = await supabase.from('testimonials').insert({
+      quote: 'Novo depoimento',
+      author_name: 'Nome do Autor',
+      author_title: 'Cargo do Autor',
+      rating: 5.0,
+      display_order: maxOrder + 1,
+      active: true,
+    });
+    if (error) {
+      toast({ title: "Erro ao adicionar", description: error.message, variant: "destructive" });
+    } else {
+      toast({ title: "Depoimento adicionado!" });
+      loadAllContent();
+    }
+  };
+
   const handleLogout = async () => {
     await signOut();
     navigate('/auth');
@@ -341,6 +421,7 @@ const Admin = () => {
             <TabsTrigger value="book">Livro</TabsTrigger>
             <TabsTrigger value="features">Features</TabsTrigger>
             <TabsTrigger value="reviews">Avaliações</TabsTrigger>
+            <TabsTrigger value="trust">Confiança</TabsTrigger>
             <TabsTrigger value="podcast">Podcast</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="leads">Leads IA</TabsTrigger>
@@ -389,6 +470,21 @@ const Admin = () => {
               onSave={updateBookReview}
               onDelete={deleteBookReview}
               onAdd={addBookReview}
+            />
+          </TabsContent>
+
+          <TabsContent value="trust">
+            <AdminTrustTab
+              trustStats={trustStats}
+              testimonials={testimonials}
+              onUpdateTrustStats={setTrustStats}
+              onUpdateTestimonials={setTestimonials}
+              onSaveStat={updateTrustStat}
+              onDeleteStat={deleteTrustStat}
+              onAddStat={addTrustStat}
+              onSaveTestimonial={updateTestimonial}
+              onDeleteTestimonial={deleteTestimonial}
+              onAddTestimonial={addTestimonial}
             />
           </TabsContent>
 

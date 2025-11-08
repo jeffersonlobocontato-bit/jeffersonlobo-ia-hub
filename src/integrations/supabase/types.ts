@@ -728,6 +728,75 @@ export type Database = {
         }
         Relationships: []
       }
+      testimonials: {
+        Row: {
+          active: boolean | null
+          author_name: string
+          author_title: string
+          created_at: string | null
+          display_order: number
+          id: string
+          quote: string
+          rating: number | null
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          author_name: string
+          author_title: string
+          created_at?: string | null
+          display_order: number
+          id?: string
+          quote: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          author_name?: string
+          author_title?: string
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          quote?: string
+          rating?: number | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      trust_stats: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          display_order: number
+          icon: string
+          id: string
+          label: string
+          updated_at: string | null
+          value: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          display_order: number
+          icon: string
+          id?: string
+          label: string
+          updated_at?: string | null
+          value: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          display_order?: number
+          icon?: string
+          id?: string
+          label?: string
+          updated_at?: string | null
+          value?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
