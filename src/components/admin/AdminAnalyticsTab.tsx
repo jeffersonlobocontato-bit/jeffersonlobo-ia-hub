@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, FunnelChart, Funnel, LabelList } from 'recharts';
 import { Users, Eye, Clock, MousePointer, TrendingUp, Activity } from 'lucide-react';
 import { Heatmap } from './Heatmap';
 
@@ -34,6 +34,27 @@ interface CTAStat {
   unique_sessions: number;
 }
 
+interface FunnelStage {
+  name: string;
+  value: number;
+  fill: string;
+  description?: string;
+}
+
+interface ConversionFunnel {
+  totalVisitors: number;
+  viewedHero: number;
+  viewedBook: number;
+  viewedBlog: number;
+  viewedPodcast: number;
+  viewedTesteIA: number;
+  clickedAnyCTA: number;
+  clickedChatUivo: number;
+  clickedContact: number;
+  clickedBookPurchase: number;
+  clickedTesteIA: number;
+}
+
 type Period = '7' | '30' | '90';
 
 export const AdminAnalyticsTab = () => {
@@ -42,6 +63,7 @@ export const AdminAnalyticsTab = () => {
   const [pageStats, setPageStats] = useState<PageStat[]>([]);
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>([]);
   const [ctaStats, setCtaStats] = useState<CTAStat[]>([]);
+  const [conversionFunnel, setConversionFunnel] = useState<ConversionFunnel | null>(null);
   const [selectedPage, setSelectedPage] = useState<string>('/');
   const [loading, setLoading] = useState(true);
 
@@ -155,11 +177,80 @@ export const AdminAnalyticsTab = () => {
 
         setCtaStats(Array.from(ctaMap.values()).sort((a, b) => b.total_clicks - a.total_clicks));
       }
+
+      // Calculate conversion funnel
+      if (analyticsData && ctaData) {
+        const allSessions = new Set(analyticsData.map(a => a.session_id));
+        
+        // Sessions that viewed specific sections (based on scroll depth or duration)
+        const viewedHero = new Set(analyticsData.filter(a => a.page_path === '/' && (a.duration_seconds || 0) >= 3).map(a => a.session_id));
+        const viewedBook = new Set(analyticsData.filter(a => a.page_path === '/' && (a.duration_seconds || 0) >= 10).map(a => a.session_id));
+        const viewedBlog = new Set(analyticsData.filter(a => a.page_path === '/' && (a.duration_seconds || 0) >= 20).map(a => a.session_id));
+        const viewedPodcast = new Set(analyticsData.filter(a => a.page_path === '/' && (a.duration_seconds || 0) >= 30).map(a => a.session_id));
+        const viewedTesteIA = new Set(analyticsData.filter(a => a.page_path === '/teste-ia' || (a.page_path === '/' && (a.duration_seconds || 0) >= 40)).map(a => a.session_id));
+        
+        // Sessions that clicked any CTA
+        const clickedAnyCTA = new Set(ctaData.map(c => c.session_id));
+        const clickedChatUivo = new Set(ctaData.filter(c => c.cta_name === 'chat_uivo_open').map(c => c.session_id));
+        const clickedContact = new Set(ctaData.filter(c => c.cta_name === 'contact_whatsapp').map(c => c.session_id));
+        const clickedBookPurchase = new Set(ctaData.filter(c => c.cta_name === 'book_purchase').map(c => c.session_id));
+        const clickedTesteIA = new Set(ctaData.filter(c => c.cta_name === 'teste_ia_start').map(c => c.session_id));
+
+        setConversionFunnel({
+          totalVisitors: allSessions.size,
+          viewedHero: viewedHero.size,
+          viewedBook: viewedBook.size,
+          viewedBlog: viewedBlog.size,
+          viewedPodcast: viewedPodcast.size,
+          viewedTesteIA: viewedTesteIA.size,
+          clickedAnyCTA: clickedAnyCTA.size,
+          clickedChatUivo: clickedChatUivo.size,
+          clickedContact: clickedContact.size,
+          clickedBookPurchase: clickedBookPurchase.size,
+          clickedTesteIA: clickedTesteIA.size,
+        });
+      }
     } catch (error) {
       console.error('Erro ao carregar analytics:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  const generateFunnelData = (): FunnelStage[] => {
+    if (!conversionFunnel) return [];
+    
+    return [
+      {
+        name: 'Visitantes Totais',
+        value: conversionFunnel.totalVisitors,
+        fill: 'hsl(var(--chart-1))',
+        description: 'Entraram no site',
+      },
+      {
+        name: 'Engajamento Inicial',
+        value: conversionFunnel.viewedHero,
+        fill: 'hsl(var(--chart-2))',
+        description: 'Passaram 3+ segundos',
+      },
+      {
+        name: 'Exploraram Conteúdo',
+        value: conversionFunnel.viewedBook,
+        fill: 'hsl(var(--chart-3))',
+        description: 'Navegaram seções principais',
+      },
+      {
+        name: 'Clicaram em CTA',
+        value: conversionFunnel.clickedAnyCTA,
+        fill: 'hsl(var(--primary))',
+        description: 'Interagiram com CTAs',
+      },
+    ];
+  };
+
+  const calculateConversionRate = (current: number, previous: number): string => {
+    if (previous === 0) return '0%';
+    return `${((current / previous) * 100).toFixed(1)}%`;
   };
 
   if (loading) {
@@ -228,8 +319,9 @@ export const AdminAnalyticsTab = () => {
 
       {/* Charts Tabs */}
       <Tabs defaultValue="trends" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="inline-flex w-full mb-8 overflow-x-auto">
           <TabsTrigger value="trends">Tendências</TabsTrigger>
+          <TabsTrigger value="funnel">Funil</TabsTrigger>
           <TabsTrigger value="pages">Páginas</TabsTrigger>
           <TabsTrigger value="ctas">CTAs</TabsTrigger>
           <TabsTrigger value="heatmap">Mapa de Calor</TabsTrigger>
@@ -249,6 +341,176 @@ export const AdminAnalyticsTab = () => {
                 <Line type="monotone" dataKey="views" stroke="hsl(var(--chart-2))" name="Total de Visitas" />
               </LineChart>
             </ResponsiveContainer>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="funnel" className="space-y-4">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              Funil de Conversão - Jornada do Usuário
+            </h3>
+            
+            {conversionFunnel && (
+              <>
+                <div className="mb-6">
+                  <ResponsiveContainer width="100%" height={400}>
+                    <FunnelChart>
+                      <Tooltip 
+                        content={({ active, payload }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload as FunnelStage;
+                            return (
+                              <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
+                                <p className="font-semibold">{data.name}</p>
+                                <p className="text-2xl font-bold text-primary">{data.value}</p>
+                                <p className="text-sm text-muted-foreground">{data.description}</p>
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Funnel
+                        dataKey="value"
+                        data={generateFunnelData()}
+                        isAnimationActive
+                      >
+                        <LabelList 
+                          position="center" 
+                          fill="#fff" 
+                          stroke="none" 
+                          dataKey="name" 
+                          style={{ fontSize: '14px', fontWeight: 'bold' }}
+                        />
+                        <LabelList 
+                          position="center" 
+                          fill="#fff" 
+                          stroke="none" 
+                          dataKey="value" 
+                          style={{ fontSize: '20px', fontWeight: 'bold', marginTop: '20px' }}
+                          dy={20}
+                        />
+                      </Funnel>
+                    </FunnelChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Conversion Rates */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                  <Card className="p-4 bg-gradient-to-br from-primary/5 to-primary/10">
+                    <div className="text-sm text-muted-foreground mb-1">Taxa de Engajamento</div>
+                    <div className="text-2xl font-bold text-primary">
+                      {calculateConversionRate(conversionFunnel.viewedHero, conversionFunnel.totalVisitors)}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {conversionFunnel.viewedHero} de {conversionFunnel.totalVisitors} visitantes
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-4 bg-gradient-to-br from-secondary/5 to-secondary/10">
+                    <div className="text-sm text-muted-foreground mb-1">Taxa de Exploração</div>
+                    <div className="text-2xl font-bold text-secondary">
+                      {calculateConversionRate(conversionFunnel.viewedBook, conversionFunnel.viewedHero)}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {conversionFunnel.viewedBook} navegaram mais fundo
+                    </div>
+                  </Card>
+                  
+                  <Card className="p-4 bg-gradient-to-br from-green-500/5 to-green-500/10">
+                    <div className="text-sm text-muted-foreground mb-1">Taxa de Conversão</div>
+                    <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                      {calculateConversionRate(conversionFunnel.clickedAnyCTA, conversionFunnel.totalVisitors)}
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {conversionFunnel.clickedAnyCTA} converteram
+                    </div>
+                  </Card>
+                </div>
+
+                {/* CTA Performance Breakdown */}
+                <Card className="p-4 bg-muted/30">
+                  <h4 className="font-semibold mb-3">Performance por CTA</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="text-center p-3 bg-background rounded-lg">
+                      <div className="text-xs text-muted-foreground mb-1">Chat Uivo</div>
+                      <div className="text-lg font-bold">{conversionFunnel.clickedChatUivo}</div>
+                      <div className="text-xs text-primary">
+                        {calculateConversionRate(conversionFunnel.clickedChatUivo, conversionFunnel.totalVisitors)}
+                      </div>
+                    </div>
+                    
+                    <div className="text-center p-3 bg-background rounded-lg">
+                      <div className="text-xs text-muted-foreground mb-1">Contato</div>
+                      <div className="text-lg font-bold">{conversionFunnel.clickedContact}</div>
+                      <div className="text-xs text-primary">
+                        {calculateConversionRate(conversionFunnel.clickedContact, conversionFunnel.totalVisitors)}
+                      </div>
+                    </div>
+                    
+                    <div className="text-center p-3 bg-background rounded-lg">
+                      <div className="text-xs text-muted-foreground mb-1">Compra Livro</div>
+                      <div className="text-lg font-bold">{conversionFunnel.clickedBookPurchase}</div>
+                      <div className="text-xs text-primary">
+                        {calculateConversionRate(conversionFunnel.clickedBookPurchase, conversionFunnel.totalVisitors)}
+                      </div>
+                    </div>
+                    
+                    <div className="text-center p-3 bg-background rounded-lg">
+                      <div className="text-xs text-muted-foreground mb-1">Teste IA</div>
+                      <div className="text-lg font-bold">{conversionFunnel.clickedTesteIA}</div>
+                      <div className="text-xs text-primary">
+                        {calculateConversionRate(conversionFunnel.clickedTesteIA, conversionFunnel.totalVisitors)}
+                      </div>
+                    </div>
+                  </div>
+                </Card>
+
+                {/* Insights */}
+                <Card className="p-4 mt-4 bg-gradient-to-r from-primary/5 to-secondary/5 border-primary/20">
+                  <h4 className="font-semibold mb-2 flex items-center gap-2">
+                    <Activity className="w-4 h-4" />
+                    Insights da Jornada
+                  </h4>
+                  <ul className="space-y-2 text-sm">
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>
+                        <strong>{calculateConversionRate(conversionFunnel.viewedHero, conversionFunnel.totalVisitors)}</strong> dos visitantes permanecem pelo menos 3 segundos (bounce rate: {calculateConversionRate(conversionFunnel.totalVisitors - conversionFunnel.viewedHero, conversionFunnel.totalVisitors)})
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>
+                        <strong>{calculateConversionRate(conversionFunnel.clickedAnyCTA, conversionFunnel.viewedHero)}</strong> dos visitantes engajados clicam em algum CTA
+                      </span>
+                    </li>
+                    <li className="flex items-start gap-2">
+                      <span className="text-primary mt-0.5">•</span>
+                      <span>
+                        CTA mais efetivo: <strong>
+                          {conversionFunnel.clickedChatUivo >= Math.max(conversionFunnel.clickedContact, conversionFunnel.clickedBookPurchase, conversionFunnel.clickedTesteIA) 
+                            ? 'Chat Uivo do Lobo' 
+                            : conversionFunnel.clickedContact >= Math.max(conversionFunnel.clickedBookPurchase, conversionFunnel.clickedTesteIA)
+                            ? 'Entrar em Contato'
+                            : conversionFunnel.clickedBookPurchase >= conversionFunnel.clickedTesteIA
+                            ? 'Comprar Livro'
+                            : 'Teste IA'}
+                        </strong>
+                      </span>
+                    </li>
+                  </ul>
+                </Card>
+              </>
+            )}
+
+            {!conversionFunnel && (
+              <div className="text-center py-8">
+                <Activity className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+                <p className="text-muted-foreground">Dados insuficientes para gerar funil de conversão</p>
+              </div>
+            )}
           </Card>
         </TabsContent>
 
