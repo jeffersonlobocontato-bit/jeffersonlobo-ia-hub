@@ -14,7 +14,7 @@ const BlogSection = () => {
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
             <div className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-primary to-secondary relative">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white relative z-10 drop-shadow-lg">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-foreground relative z-10 drop-shadow-lg">
                 Blog
               </h2>
             </div>
