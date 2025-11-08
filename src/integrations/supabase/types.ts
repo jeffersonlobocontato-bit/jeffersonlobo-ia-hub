@@ -224,6 +224,48 @@ export type Database = {
         }
         Relationships: []
       }
+      click_events: {
+        Row: {
+          created_at: string
+          element_class: string | null
+          element_id: string | null
+          element_text: string | null
+          id: string
+          page_path: string
+          session_id: string
+          viewport_height: number
+          viewport_width: number
+          x_position: number
+          y_position: number
+        }
+        Insert: {
+          created_at?: string
+          element_class?: string | null
+          element_id?: string | null
+          element_text?: string | null
+          id?: string
+          page_path: string
+          session_id: string
+          viewport_height: number
+          viewport_width: number
+          x_position: number
+          y_position: number
+        }
+        Update: {
+          created_at?: string
+          element_class?: string | null
+          element_id?: string | null
+          element_text?: string | null
+          id?: string
+          page_path?: string
+          session_id?: string
+          viewport_height?: number
+          viewport_width?: number
+          x_position?: number
+          y_position?: number
+        }
+        Relationships: []
+      }
       contact_info: {
         Row: {
           email: string
@@ -551,6 +593,33 @@ export type Database = {
         }
         Relationships: []
       }
+      scroll_events: {
+        Row: {
+          created_at: string
+          id: string
+          max_scroll_depth: number
+          page_path: string
+          scroll_depth_percent: number
+          session_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          max_scroll_depth: number
+          page_path: string
+          scroll_depth_percent: number
+          session_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          max_scroll_depth?: number
+          page_path?: string
+          scroll_depth_percent?: number
+          session_id?: string
+        }
+        Relationships: []
+      }
       services: {
         Row: {
           active: boolean | null
@@ -584,6 +653,54 @@ export type Database = {
         }
         Relationships: []
       }
+      site_analytics: {
+        Row: {
+          city: string | null
+          country: string | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          ip_address: string | null
+          page_path: string
+          page_title: string | null
+          referrer: string | null
+          screen_height: number | null
+          screen_width: number | null
+          session_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          ip_address?: string | null
+          page_path: string
+          page_title?: string | null
+          referrer?: string | null
+          screen_height?: number | null
+          screen_width?: number | null
+          session_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          city?: string | null
+          country?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          ip_address?: string | null
+          page_path?: string
+          page_title?: string | null
+          referrer?: string | null
+          screen_height?: number | null
+          screen_width?: number | null
+          session_id?: string
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string | null
@@ -610,6 +727,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_click_density: {
+        Args: { end_date?: string; start_date?: string; target_page: string }
+        Returns: {
+          count: number
+          x: number
+          y: number
+        }[]
+      }
+      get_page_stats: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          avg_duration: number
+          page_path: string
+          unique_visitors: number
+          views: number
+        }[]
+      }
+      get_unique_visitors: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: number
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
