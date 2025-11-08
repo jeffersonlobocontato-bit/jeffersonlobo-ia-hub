@@ -36,8 +36,8 @@ const BookSection = () => {
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
           <div className="inline-block mb-4">
-            <div className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-primary to-secondary">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white">
+            <div className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-primary to-secondary relative">
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white relative z-10 drop-shadow-lg">
                 Meu livro
               </h2>
             </div>
