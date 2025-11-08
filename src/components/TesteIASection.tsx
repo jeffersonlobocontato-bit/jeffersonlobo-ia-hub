@@ -2,8 +2,10 @@ import { Brain, CheckCircle, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
+import { useTrackCTA } from "@/hooks/useTrackCTA";
 
 const TesteIASection = () => {
+  const { trackCTA } = useTrackCTA();
   const benefits = [
     {
       icon: Brain,
@@ -60,7 +62,11 @@ const TesteIASection = () => {
 
         <div className="text-center">
           <Link to="/teste-ia">
-            <Button size="lg" className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity">
+            <Button 
+              size="lg" 
+              className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+              onClick={() => trackCTA('teste_ia_start', 'teste_ia_section')}
+            >
               <Brain className="w-5 h-5 mr-2" />
               Fazer o Teste Agora
             </Button>

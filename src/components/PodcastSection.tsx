@@ -6,10 +6,12 @@ import { usePodcastConfig } from '@/hooks/usePodcastConfig';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 const PodcastSection = () => {
   const { data: episodes, isLoading: episodesLoading } = usePodcastEpisodes();
   const { data: config, isLoading: configLoading } = usePodcastConfig();
+  const { trackCTA } = useTrackCTA();
 
   if (episodesLoading || configLoading) {
     return (
@@ -86,6 +88,7 @@ const PodcastSection = () => {
                   className="w-full"
                   preload="metadata"
                   src={episode.audio_url}
+                  onPlay={() => trackCTA('podcast_play', 'podcast_section')}
                 >
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
@@ -95,7 +98,12 @@ const PodcastSection = () => {
                   className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all"
                   asChild
                 >
-                  <a href={episode.audio_url} target="_blank" rel="noopener noreferrer">
+                  <a 
+                    href={episode.audio_url} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    onClick={() => trackCTA('podcast_listen', 'podcast_section')}
+                  >
                     <Play className="h-4 w-4 mr-2" />
                     Ouvir Episódio
                   </a>

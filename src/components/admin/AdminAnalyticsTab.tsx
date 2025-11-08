@@ -27,6 +27,13 @@ interface TimeSeriesData {
   views: number;
 }
 
+interface CTAStat {
+  cta_name: string;
+  cta_location: string;
+  total_clicks: number;
+  unique_sessions: number;
+}
+
 type Period = '7' | '30' | '90';
 
 export const AdminAnalyticsTab = () => {
@@ -34,6 +41,7 @@ export const AdminAnalyticsTab = () => {
   const [summary, setSummary] = useState<AnalyticsSummary | null>(null);
   const [pageStats, setPageStats] = useState<PageStat[]>([]);
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>([]);
+  const [ctaStats, setCtaStats] = useState<CTAStat[]>([]);
   const [selectedPage, setSelectedPage] = useState<string>('/');
   const [loading, setLoading] = useState(true);
 
@@ -114,6 +122,39 @@ export const AdminAnalyticsTab = () => {
 
         setTimeSeriesData(timeSeries);
       }
+
+      // Load CTA stats
+      const { data: ctaData } = await supabase
+        .from('cta_events')
+        .select('*')
+        .gte('created_at', startDate.toISOString());
+
+      if (ctaData) {
+        const ctaMap = new Map<string, CTAStat>();
+        ctaData.forEach(cta => {
+          const key = `${cta.cta_name}_${cta.cta_location}`;
+          const existing = ctaMap.get(key) || {
+            cta_name: cta.cta_name,
+            cta_location: cta.cta_location,
+            total_clicks: 0,
+            unique_sessions: 0,
+          };
+          existing.total_clicks += 1;
+          ctaMap.set(key, existing);
+        });
+
+        // Calculate unique sessions per CTA
+        ctaMap.forEach((stat, key) => {
+          const sessions = new Set(
+            ctaData
+              .filter(c => `${c.cta_name}_${c.cta_location}` === key)
+              .map(c => c.session_id)
+          );
+          stat.unique_sessions = sessions.size;
+        });
+
+        setCtaStats(Array.from(ctaMap.values()).sort((a, b) => b.total_clicks - a.total_clicks));
+      }
     } catch (error) {
       console.error('Erro ao carregar analytics:', error);
     } finally {
@@ -187,9 +228,10 @@ export const AdminAnalyticsTab = () => {
 
       {/* Charts Tabs */}
       <Tabs defaultValue="trends" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="trends">Tendências</TabsTrigger>
           <TabsTrigger value="pages">Páginas</TabsTrigger>
+          <TabsTrigger value="ctas">CTAs</TabsTrigger>
           <TabsTrigger value="heatmap">Mapa de Calor</TabsTrigger>
         </TabsList>
 
@@ -251,6 +293,87 @@ export const AdminAnalyticsTab = () => {
               </table>
             </div>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="ctas" className="space-y-4">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              Conversões de CTAs
+            </h3>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={ctaStats} layout="vertical">
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis type="number" />
+                <YAxis 
+                  dataKey="cta_name" 
+                  type="category" 
+                  width={150}
+                  tick={{ fontSize: 12 }}
+                />
+                <Tooltip 
+                  content={({ active, payload }) => {
+                    if (active && payload && payload.length) {
+                      return (
+                        <div className="bg-background border border-border p-3 rounded-lg shadow-lg">
+                          <p className="font-semibold">{payload[0].payload.cta_name}</p>
+                          <p className="text-sm text-muted-foreground mb-2">
+                            Local: {payload[0].payload.cta_location}
+                          </p>
+                          <p className="text-sm">Total: {payload[0].value}</p>
+                          <p className="text-sm">Únicos: {payload[0].payload.unique_sessions}</p>
+                        </div>
+                      );
+                    }
+                    return null;
+                  }}
+                />
+                <Legend />
+                <Bar dataKey="total_clicks" fill="hsl(var(--primary))" name="Total de Cliques" />
+                <Bar dataKey="unique_sessions" fill="hsl(var(--chart-2))" name="Sessões Únicas" />
+              </BarChart>
+            </ResponsiveContainer>
+          </Card>
+
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4">Detalhes de CTAs</h3>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2">CTA</th>
+                    <th className="text-left p-2">Localização</th>
+                    <th className="text-right p-2">Total Cliques</th>
+                    <th className="text-right p-2">Sessões Únicas</th>
+                    <th className="text-right p-2">Taxa Conversão</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {ctaStats.map((stat, index) => (
+                    <tr key={index} className="border-b hover:bg-muted/50">
+                      <td className="p-2 font-medium">{stat.cta_name}</td>
+                      <td className="p-2 text-sm text-muted-foreground">{stat.cta_location}</td>
+                      <td className="text-right p-2">{stat.total_clicks}</td>
+                      <td className="text-right p-2">{stat.unique_sessions}</td>
+                      <td className="text-right p-2">
+                        {summary?.uniqueVisitors 
+                          ? `${((stat.unique_sessions / summary.uniqueVisitors) * 100).toFixed(1)}%`
+                          : '-'
+                        }
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Card>
+
+          {ctaStats.length === 0 && (
+            <Card className="p-8 text-center">
+              <Activity className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
+              <p className="text-muted-foreground">Nenhum evento de CTA registrado neste período</p>
+            </Card>
+          )}
         </TabsContent>
 
         <TabsContent value="heatmap" className="space-y-4">

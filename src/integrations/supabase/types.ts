@@ -299,6 +299,33 @@ export type Database = {
         }
         Relationships: []
       }
+      cta_events: {
+        Row: {
+          created_at: string | null
+          cta_location: string
+          cta_name: string
+          id: string
+          page_path: string
+          session_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          cta_location: string
+          cta_name: string
+          id?: string
+          page_path: string
+          session_id: string
+        }
+        Update: {
+          created_at?: string | null
+          cta_location?: string
+          cta_name?: string
+          id?: string
+          page_path?: string
+          session_id?: string
+        }
+        Relationships: []
+      }
       hero_content: {
         Row: {
           cta_primary: string
@@ -733,6 +760,15 @@ export type Database = {
           count: number
           x: number
           y: number
+        }[]
+      }
+      get_cta_stats: {
+        Args: { end_date?: string; start_date?: string }
+        Returns: {
+          cta_location: string
+          cta_name: string
+          total_clicks: number
+          unique_sessions: number
         }[]
       }
       get_page_stats: {

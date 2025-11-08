@@ -4,11 +4,13 @@ import { ShoppingCart, Star, BookOpen } from 'lucide-react';
 import bookCover from '@/assets/book-cover.jpg';
 import { useBookContent } from '@/hooks/useBookContent';
 import { useBookFeatures, useBookReviews } from '@/hooks/useBookFeatures';
+import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 const BookSection = () => {
   const { data: bookData, isLoading } = useBookContent();
   const { data: features = [] } = useBookFeatures();
   const { data: reviews = [] } = useBookReviews();
+  const { trackCTA } = useTrackCTA();
 
   // Fallback data
   const defaultData = {
@@ -118,7 +120,10 @@ const BookSection = () => {
                 <Button
                   size="lg"
                   className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
-                  onClick={() => window.open(displayData.purchase_link, '_blank')}
+                  onClick={() => {
+                    trackCTA('book_purchase', 'book_section');
+                    window.open(displayData.purchase_link, '_blank');
+                  }}
                 >
                   <ShoppingCart className="mr-2 w-5 h-5" />
                   Comprar agora

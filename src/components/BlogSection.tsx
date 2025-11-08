@@ -2,9 +2,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ExternalLink, Calendar, ArrowRight } from 'lucide-react';
 import { useBlogPosts } from '@/hooks/useBlogPosts';
+import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 const BlogSection = () => {
   const { data: blogPosts = [] } = useBlogPosts();
+  const { trackCTA } = useTrackCTA();
 
   return (
     <section id="blog" className="py-24 bg-muted/30">
@@ -65,7 +67,10 @@ const BlogSection = () => {
                       <Button
                         variant="ghost"
                         className="w-full justify-between group hover:bg-primary/10"
-                        onClick={() => window.open(post.linkedin_url, '_blank')}
+                        onClick={() => {
+                          trackCTA('blog_read_linkedin', 'blog_section');
+                          window.open(post.linkedin_url, '_blank');
+                        }}
                       >
                         <span className="flex items-center">
                           <ExternalLink className="w-4 h-4 mr-2" />
@@ -96,6 +101,7 @@ const BlogSection = () => {
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-[#0A66C2] hover:bg-[#004182] rounded-full transition-colors duration-200"
+              onClick={() => trackCTA('newsletter_subscribe', 'blog_section')}
             >
               Assinar no LinkedIn
             </a>

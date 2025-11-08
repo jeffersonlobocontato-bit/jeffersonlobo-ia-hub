@@ -2,9 +2,11 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Sparkles, BrainCircuit } from 'lucide-react';
 import heroBg from '@/assets/hero-bg.jpg';
 import { useHeroContent } from '@/hooks/useHeroContent';
+import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 const HeroSection = () => {
   const { data: heroData, isLoading } = useHeroContent();
+  const { trackCTA } = useTrackCTA();
 
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
@@ -14,6 +16,7 @@ const HeroSection = () => {
   };
 
   const openChatBot = () => {
+    trackCTA('chat_uivo_open', 'hero_section');
     const chatButton = document.querySelector('[class*="fixed bottom-6 right-6"]') as HTMLButtonElement;
     if (chatButton) {
       chatButton.click();

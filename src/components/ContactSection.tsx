@@ -1,7 +1,9 @@
 import { Button } from '@/components/ui/button';
 import { MessageCircle } from 'lucide-react';
+import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 const ContactSection = () => {
+  const { trackCTA } = useTrackCTA();
 
   return (
     <section id="contato" className="py-24 bg-background relative overflow-hidden">
@@ -38,6 +40,7 @@ const ContactSection = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2"
+                  onClick={() => trackCTA('contact_whatsapp', 'contact_section')}
                 >
                   <MessageCircle className="w-5 h-5" />
                   Entrar em contato
