@@ -315,7 +315,7 @@ const Admin = () => {
       <header className="border-b border-primary/20 bg-background/95 backdrop-blur sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div>
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+            <h1 className="text-2xl font-bold text-primary">
               Painel Administrativo
             </h1>
             <p className="text-sm text-muted-foreground">Gerencie todo o conteúdo do site</p>

@@ -39,7 +39,7 @@ const TesteIASection = () => {
             <span className="text-sm font-medium">🔥 Diagnóstico Gratuito</span>
           </div>
           <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Sua IA está <span className="gradient-primary bg-clip-text text-transparent">genérica demais</span>?
+            Sua IA está <span className="text-primary font-bold">genérica demais</span>?
           </h2>
           <p className="text-xl text-muted-foreground mb-4">
             80% das empresas erram aqui. Você está entre elas?

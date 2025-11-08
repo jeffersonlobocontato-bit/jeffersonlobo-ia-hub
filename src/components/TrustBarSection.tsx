@@ -30,7 +30,7 @@ const TrustBarSection = () => {
               <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                 <stat.icon className="w-6 h-6 text-primary" />
               </div>
-              <div className="text-3xl font-bold gradient-primary bg-clip-text text-transparent mb-1">
+              <div className="text-3xl font-bold text-primary mb-1">
                 {stat.value}
               </div>
               <div className="text-sm text-muted-foreground">

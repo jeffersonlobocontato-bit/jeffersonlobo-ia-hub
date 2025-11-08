@@ -43,7 +43,7 @@ const AboutSection = () => {
           <div className="space-y-6 animate-slide-up">
             {displayData.name && (
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight">
-                <span className="gradient-primary bg-clip-text text-transparent">
+                <span className="text-primary">
                   {displayData.name}
                 </span>
               </h1>
@@ -66,7 +66,7 @@ const AboutSection = () => {
         <div className="space-y-8">
           <div className="text-center">
             <h3 className="text-3xl font-bold mb-4">
-              <span className="gradient-primary bg-clip-text text-transparent">Por que confiar</span> em Jefferson Lobo?
+              <span className="text-primary">Por que confiar</span> em Jefferson Lobo?
             </h3>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Experiência comprovada em ajudar empresas e profissionais a prosperarem na era da inteligência artificial

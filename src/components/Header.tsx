@@ -65,7 +65,7 @@ const Header = () => {
             to="/"
             className={`text-2xl font-bold hover:opacity-80 transition-opacity ${
               isScrolled 
-                ? 'gradient-primary bg-clip-text text-transparent' 
+                ? 'text-primary' 
                 : 'text-white drop-shadow-lg'
             }`}
           >

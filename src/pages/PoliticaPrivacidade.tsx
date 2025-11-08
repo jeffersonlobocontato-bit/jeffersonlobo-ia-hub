@@ -8,7 +8,7 @@ export default function PoliticaPrivacidade() {
       <Header />
       <main className="flex-1 pt-20">
         <div className="container max-w-4xl mx-auto px-4 py-16">
-          <h1 className="text-4xl md:text-5xl font-bold mb-8 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h1 className="text-4xl md:text-5xl font-bold mb-8 text-primary">
             Política de Privacidade
           </h1>
           

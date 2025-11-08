@@ -47,7 +47,7 @@ const PodcastSection = () => {
     <section id="podcast" className="py-20 px-4 sm:px-6 lg:px-8 bg-secondary/20">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">
             O Código Lobo
           </h2>
           {config?.podcast_description && (

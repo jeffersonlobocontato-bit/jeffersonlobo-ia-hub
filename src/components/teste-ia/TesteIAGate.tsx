@@ -125,7 +125,7 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
         <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
           <Brain className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold text-primary">
           Teste de Maturidade em IA
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">

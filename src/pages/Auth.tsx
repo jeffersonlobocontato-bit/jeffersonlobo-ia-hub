@@ -84,7 +84,7 @@ const Auth = () => {
       
       <Card className="w-full max-w-md relative z-10 border-primary/20 bg-background/95 backdrop-blur">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent">
+          <CardTitle className="text-3xl font-bold text-primary">
             Jefferson Lobo
           </CardTitle>
           <CardDescription>
