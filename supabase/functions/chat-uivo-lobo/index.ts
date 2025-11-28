@@ -1,11 +1,40 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { z } from 'https://deno.land/x/zod@v3.22.4/mod.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Schema de validação para segurança
+const leadDataSchema = z.object({
+  nome: z.string()
+    .min(3, 'Nome deve ter no mínimo 3 caracteres')
+    .max(100, 'Nome deve ter no máximo 100 caracteres')
+    .regex(/^[a-zA-ZÀ-ÿ\s]+$/, 'Nome deve conter apenas letras'),
+  apelido: z.string()
+    .max(50, 'Apelido deve ter no máximo 50 caracteres')
+    .optional()
+    .nullable(),
+  whatsapp: z.string()
+    .regex(/^\d{10,15}$/, 'WhatsApp deve conter entre 10 e 15 dígitos'),
+  mensagens: z.array(z.any())
+    .max(100, 'Limite de mensagens excedido')
+    .optional(),
+  interesses: z.array(z.string())
+    .max(20, 'Limite de interesses excedido')
+    .optional(),
+}).strict();
+
+const requestSchema = z.object({
+  messages: z.array(z.object({
+    role: z.enum(['user', 'assistant', 'system']),
+    content: z.string().max(10000, 'Mensagem muito longa'),
+  })).min(1, 'Mensagens não podem estar vazias'),
+  leadData: leadDataSchema.optional(),
+}).strict();
 
 const SYSTEM_PROMPT = `Você é o assistente virtual "Uivo do Lobo" de Jefferson Lobo. Sua função é responder dúvidas sobre os serviços e conteúdos disponíveis em https://jeffersonlobo.tech/ usando a base de conhecimento fornecida.
 
@@ -135,7 +164,25 @@ serve(async (req) => {
   }
 
   try {
-    const { messages, leadData } = await req.json();
+    const rawBody = await req.json();
+    
+    // Validação de segurança
+    const validation = requestSchema.safeParse(rawBody);
+    if (!validation.success) {
+      console.error('❌ Validação falhou:', validation.error.errors);
+      return new Response(
+        JSON.stringify({ 
+          error: 'Dados inválidos', 
+          details: validation.error.errors.map(e => ({
+            field: e.path.join('.'),
+            message: e.message
+          }))
+        }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { messages, leadData } = validation.data;
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     
     if (!LOVABLE_API_KEY) {
