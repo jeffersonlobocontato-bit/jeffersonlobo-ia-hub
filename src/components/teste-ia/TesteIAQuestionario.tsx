@@ -204,11 +204,11 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
             onValueChange={(v) => handleResposta(parseInt(v))}
           >
             {[
-              { value: 1, label: "1 - Não faço / Não sei" },
-              { value: 2, label: "2 - Faço raramente" },
-              { value: 3, label: "3 - Faço às vezes" },
-              { value: 4, label: "4 - Faço frequentemente" },
-              { value: 5, label: "5 - Faço com excelência / Consistente" },
+              { value: 1, label: "Não sei / Não faço nada relacionado" },
+              { value: 2, label: "Conheço pouco e faço raramente" },
+              { value: 3, label: "Entendo razoavelmente e aplico às vezes" },
+              { value: 4, label: "Domino bem e aplico com frequência" },
+              { value: 5, label: "Domínio avançado e aplico consistentemente" },
             ].map((option) => (
               <div
                 key={option.value}
