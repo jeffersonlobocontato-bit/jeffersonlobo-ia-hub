@@ -57,7 +57,11 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
     console.log("🔵 Loading ativado");
 
     try {
+      // Gerar UUID no frontend
+      const leadId = crypto.randomUUID();
+
       const dadosInsert = {
+        id: leadId,
         nome: nome.trim(),
         email: email.trim(),
         whatsapp: whatsapp.replace(/\D/g, ""),
@@ -65,15 +69,13 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
       };
 
       console.log("🔵 Dados para insert:", dadosInsert);
-      console.log("🔵 Supabase URL:", import.meta.env.VITE_SUPABASE_URL);
-      console.log("🔵 Anon Key existe:", !!import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY);
 
-      const { data, error } = await supabase
+      // Remover o .select() - apenas fazer o insert
+      const { error } = await supabase
         .from("ia_maturity_leads")
-        .insert(dadosInsert)
-        .select();
+        .insert(dadosInsert);
 
-      console.log("🔵 Resposta Supabase:", { data, error });
+      console.log("🔵 Resposta Supabase:", { error });
 
       if (error) {
         console.error("❌ Erro do Supabase:", {
@@ -85,14 +87,9 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
         throw error;
       }
 
-      if (!data || data.length === 0) {
-        console.error("❌ Nenhum dado retornado");
-        throw new Error("Nenhum dado retornado após inserção");
-      }
-
-      console.log("✅ Lead criado com sucesso:", data[0]);
+      console.log("✅ Lead criado com sucesso, ID:", leadId);
       toast.success("Cadastro realizado! Vamos começar o teste.");
-      onComplete(data[0].id, finalidade);
+      onComplete(leadId, finalidade);
     } catch (error: any) {
       console.error("❌ Erro completo:", error);
       console.error("❌ Error stack:", error?.stack);
