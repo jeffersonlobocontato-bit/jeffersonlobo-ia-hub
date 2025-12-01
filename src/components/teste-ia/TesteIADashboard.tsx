@@ -50,9 +50,20 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
         .from("ia_maturity_leads")
         .select("*")
         .eq("id", leadId)
-        .single();
+        .maybeSingle();
 
-      if (error) throw error;
+      if (error) {
+        console.error("Erro ao carregar resultado:", error);
+        toast.error("Erro ao carregar resultado do teste");
+        return;
+      }
+
+      if (!data) {
+        console.error("Nenhum resultado encontrado para o ID:", leadId);
+        toast.error("Resultado não encontrado. Por favor, complete o teste novamente.");
+        return;
+      }
+
       setLead(data as Lead);
     } catch (error) {
       console.error("Erro ao carregar resultado:", error);
