@@ -14,13 +14,13 @@ const TrustBarSection = () => {
   };
 
   return (
-    <section className="py-16 bg-muted/50 border-y border-border/50">
+    <section className="border-y border-primary/20 bg-muted/40 py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <p className="text-sm uppercase tracking-wider text-muted-foreground mb-4">
+          <p className="text-sm uppercase tracking-wider text-muted-foreground mb-4 font-bold">
             Confiança e Resultados
           </p>
-          <h2 className="text-2xl md:text-3xl font-bold">
+          <h2 className="display-title text-3xl md:text-4xl">
             Impacto comprovado em empresas e profissionais
           </h2>
         </div>
@@ -31,15 +31,15 @@ const TrustBarSection = () => {
             return (
               <Card
                 key={stat.id}
-                className="p-6 text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card/80 backdrop-blur"
+                className="p-6 text-center transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card"
               >
-                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
+                <div className="w-12 h-12 mx-auto mb-4 border border-primary/30 bg-primary/10 flex items-center justify-center">
                   <IconComponent className="w-6 h-6 text-primary" />
                 </div>
-                <div className="text-3xl font-bold text-primary mb-1">
+                <div className="text-3xl font-black text-primary mb-1">
                   {stat.value}
                 </div>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-sm text-muted-foreground uppercase font-bold">
                   {stat.label}
                 </div>
               </Card>
@@ -50,7 +50,7 @@ const TrustBarSection = () => {
         {/* Testimonial */}
         {testimonials.length > 0 && (
           <div className="mt-12 max-w-3xl mx-auto">
-            <Card className="p-8 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+            <Card className="p-8 border-primary/20 bg-card">
               <div className="flex gap-1 mb-4 justify-center">
                 {[...Array(Math.floor(testimonials[0].rating))].map((_, i) => (
                   <Star key={i} className="w-5 h-5 fill-primary text-primary" />
