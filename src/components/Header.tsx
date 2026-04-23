@@ -40,7 +40,7 @@ const Header = () => {
       }`}
     >
       {/* Debug Auth Status - Remove in production */}
-      {process.env.NODE_ENV === 'development' && (
+      {import.meta.env.DEV && (
         <div className="bg-yellow-500/90 text-black text-xs py-1 px-4 text-center font-mono">
           Auth Status: {user ? (
             <>

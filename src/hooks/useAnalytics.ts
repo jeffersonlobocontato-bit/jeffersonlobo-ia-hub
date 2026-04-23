@@ -15,7 +15,7 @@ const getSessionId = (): string => {
 // Batch events to reduce database calls
 let clickEventsBatch: any[] = [];
 let scrollEventsBatch: any[] = [];
-let batchTimeout: NodeJS.Timeout | null = null;
+let batchTimeout: ReturnType<typeof setTimeout> | null = null;
 
 const flushBatch = async () => {
   if (clickEventsBatch.length > 0) {
