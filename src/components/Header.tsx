@@ -41,13 +41,13 @@ const Header = () => {
     >
       {/* Debug Auth Status - Remove in production */}
       {import.meta.env.DEV && (
-        <div className="bg-yellow-500/90 text-black text-xs py-1 px-4 text-center font-mono">
+        <div className="bg-primary/90 text-primary-foreground text-xs py-1 px-4 text-center font-mono">
           Auth Status: {user ? (
             <>
               <User className="w-3 h-3 inline mr-1" />
               Logado: {user.email?.substring(0, 20)}...
               {isAdmin && (
-                <Badge variant="default" className="ml-2 bg-green-600 text-white">
+                  <Badge variant="default" className="ml-2 bg-secondary text-secondary-foreground">
                   <Shield className="w-3 h-3 mr-1" />
                   ADMIN
                 </Badge>

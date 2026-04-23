@@ -388,7 +388,7 @@ const Admin = () => {
     <div className="min-h-screen bg-background">
       {/* Debug Auth Info */}
       {import.meta.env.DEV && (
-        <div className="bg-blue-500/90 text-white text-xs py-1 px-4 text-center font-mono">
+        <div className="bg-primary/90 text-primary-foreground text-xs py-1 px-4 text-center font-mono">
           Admin Panel - User: {user?.email} | Admin: {isAdmin ? '✅' : '❌'} | User ID: {user?.id?.substring(0, 8)}...
         </div>
       )}
