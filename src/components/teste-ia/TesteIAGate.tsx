@@ -117,12 +117,13 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
   };
 
   return (
-    <div className="container max-w-4xl mx-auto px-4 py-16">
+    <div className="container max-w-5xl mx-auto px-4 py-16">
       <div className="text-center mb-12 space-y-4">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-primary/10 mb-4">
+        <div className="inline-flex items-center justify-center h-20 w-20 border border-primary/30 bg-primary/10 mb-4">
           <Brain className="w-10 h-10 text-primary" />
         </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-primary">
+        <div className="section-kicker">Teste de maturidade</div>
+        <h1 className="display-title text-4xl md:text-5xl text-primary">
           Teste de Maturidade em IA
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -130,11 +131,11 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
         </p>
       </div>
 
-      <Card className="border-2 shadow-xl">
+      <Card className="border-2 border-primary/20 bg-card shadow-[18px_18px_0_hsl(var(--primary)/0.12)]">
         <CardHeader className="space-y-4">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
-            <CardTitle>Vamos começar!</CardTitle>
+            <CardTitle className="font-black uppercase">Vamos começar!</CardTitle>
           </div>
           <CardDescription>
             Preencha seus dados para iniciar o teste. Leva apenas 8-10 minutos e você receberá um relatório completo.

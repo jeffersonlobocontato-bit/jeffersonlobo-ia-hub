@@ -80,6 +80,10 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
   const handleDownloadPDF = async () => {
     try {
       toast.info("Gerando PDF...");
+      if (!lead || lead.score_geral == null || !lead.nivel_maturidade) {
+        toast.error("Seu relatório ainda não está pronto para download.");
+        return;
+      }
       
       const pdf = new jsPDF("p", "mm", "a4");
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -221,10 +225,11 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
     }));
 
   return (
-    <div className="container max-w-6xl mx-auto px-4 py-8 md:py-16 space-y-6 md:space-y-8">
+      <div className="container max-w-6xl mx-auto px-4 py-8 md:py-16 space-y-6 md:space-y-8">
       {/* Header */}
       <div className="text-center space-y-3 md:space-y-4">
-        <h1 className="text-2xl md:text-4xl font-bold">Seu Resultado</h1>
+        <div className="section-kicker mx-auto w-fit">Relatório final</div>
+        <h1 className="display-title text-3xl md:text-5xl">Seu Resultado</h1>
         <p className="text-base md:text-xl text-muted-foreground">
           Olá, {lead.nome}! Seu nível de maturidade em IA é:{" "}
           <span className="font-bold text-primary">{lead.nivel_maturidade}</span>
@@ -232,7 +237,7 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
       </div>
 
       {/* Score Geral */}
-      <Card className="border-2">
+      <Card className="border-2 border-primary/20 bg-card">
         <CardHeader>
           <CardTitle className="text-lg md:text-xl">Score Geral</CardTitle>
           <CardDescription className="text-sm">Sua pontuação média em todas as questões</CardDescription>
@@ -246,7 +251,7 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
       </Card>
 
       {/* Gráfico de Barras por Nível */}
-      <Card className="border-2">
+      <Card className="border-2 border-primary/20 bg-card">
         <CardHeader>
           <CardTitle className="text-lg md:text-xl">Scores por Nível</CardTitle>
           <CardDescription className="text-sm">Sua performance em cada nível de maturidade</CardDescription>
@@ -265,7 +270,7 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
       </Card>
 
       {/* Radar de Competências */}
-      <Card className="border-2">
+      <Card className="border-2 border-primary/20 bg-card">
         <CardHeader>
           <CardTitle className="text-lg md:text-xl">Radar de Competências</CardTitle>
           <CardDescription className="text-sm">Sua performance em cada competência avaliada</CardDescription>
@@ -294,7 +299,7 @@ export function TesteIADashboard({ leadId }: TesteIADashboardProps) {
 
       {/* Aprendizados Necessários */}
       {gaps.length > 0 && (
-        <Card className="border-2 border-orange-500/20">
+        <Card className="border-2 border-secondary/20 bg-card">
           <CardHeader>
             <CardTitle className="text-lg md:text-xl">Aprendizados Necessários</CardTitle>
             <CardDescription className="text-sm">Áreas com oportunidade de melhoria (score abaixo de 3.0)</CardDescription>
