@@ -25,42 +25,51 @@ const TesteIASection = () => {
   ];
 
   return (
-    <section id="teste-ia" className="py-20 md:py-32 relative overflow-hidden">
-      {/* Background decorations */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-primary/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-secondary/5 rounded-full blur-3xl" />
-      </div>
+    <section id="teste-ia" className="relative overflow-hidden bg-background py-20 md:py-32">
+      <div className="absolute inset-0 -z-10 bg-brand-grid opacity-40" />
+      <div className="absolute left-0 top-0 h-full w-4 bg-primary" />
 
       <div className="container mx-auto px-4">
-        <div className="text-center max-w-3xl mx-auto mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary mb-6">
-            <Brain className="w-4 h-4" />
-            <span className="text-sm font-medium">🔥 Diagnóstico Gratuito</span>
+        <div className="mx-auto mb-16 grid max-w-6xl gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
+          <div className="space-y-6">
+            <div className="section-kicker mb-0">
+              <Brain className="w-4 h-4" />
+              <span>Diagnóstico gratuito</span>
+            </div>
+            <h2 className="display-title text-4xl md:text-5xl lg:text-6xl">
+              Sua IA está <span className="text-primary">genérica demais</span>?
+            </h2>
+            <p className="text-lg text-muted-foreground">
+              Descubra em poucos minutos o nível de preparação da sua empresa ou da sua carreira para operar com inteligência artificial de verdade.
+            </p>
+            <div className="inline-flex items-center gap-2 border border-secondary/30 bg-secondary/10 px-4 py-3 text-sm font-bold uppercase text-foreground">
+              <Users className="w-4 h-4 text-secondary" />
+              <span><span className="text-primary">1.247 profissionais</span> já fizeram o diagnóstico</span>
+            </div>
           </div>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Sua IA está <span className="text-primary font-bold">genérica demais</span>?
-          </h2>
-          <p className="text-xl text-muted-foreground mb-4">
-            80% das empresas erram aqui. Você está entre elas?
-          </p>
-          <p className="text-lg text-muted-foreground">
-            Descubra em apenas 5 minutos o nível de preparação da sua empresa ou da sua carreira para a era da Inteligência Artificial. Receba um relatório completo em PDF com insights e recomendações personalizadas.
-          </p>
-          <div className="mt-6 inline-flex items-center gap-2 text-sm text-muted-foreground">
-            <Users className="w-4 h-4 text-primary" />
-            <span className="font-semibold text-foreground">1.247 profissionais</span> já descobriram seu nível de maturidade
+
+          <div className="panel-dark p-6 md:p-8">
+            <div className="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 text-primary mb-6">
+            <Brain className="w-4 h-4" />
+              <span className="text-sm font-bold uppercase">O que você recebe</span>
+            </div>
+            <div className="space-y-4 text-sm sm:text-base text-muted-foreground">
+              <p>• score geral por nível de maturidade</p>
+              <p>• leitura por competência crítica</p>
+              <p>• relatório em PDF para compartilhar e guardar</p>
+              <p>• próximos passos para aprofundar sua adoção de IA</p>
+            </div>
           </div>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
           {benefits.map((benefit, index) => (
-            <Card key={index} className="border-primary/20 bg-card/50 backdrop-blur hover:border-primary/40 transition-colors">
+            <Card key={index} className="border-primary/20 bg-card hover:border-primary/50 transition-colors">
               <CardContent className="pt-6">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center border border-primary/30 bg-primary/10">
                   <benefit.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-semibold mb-2">{benefit.title}</h3>
+                <h3 className="text-xl font-black uppercase mb-2">{benefit.title}</h3>
                 <p className="text-muted-foreground">{benefit.description}</p>
               </CardContent>
             </Card>
@@ -71,7 +80,7 @@ const TesteIASection = () => {
           <Link to="/teste-ia">
             <Button 
               size="lg" 
-              className="text-lg px-8 py-6 bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
+              className="text-lg px-8 py-6"
               onClick={() => trackCTA('teste_ia_start', 'teste_ia_section')}
             >
               <Brain className="w-5 h-5 mr-2" />

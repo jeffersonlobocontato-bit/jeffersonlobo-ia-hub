@@ -42,7 +42,7 @@ const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-24"
     >
       {/* Background Image with Overlay */}
       <div className="absolute inset-0 z-0">
@@ -51,86 +51,105 @@ const HeroSection = () => {
           alt="Jefferson Lobo - AI Expert"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-tech-dark/40 via-tech-dark/30 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
       </div>
+
+      <div className="absolute inset-0 z-0 bg-brand-grid opacity-70" />
+      <div className="absolute inset-x-0 top-24 z-0 h-px bg-primary/50" />
+      <div className="absolute inset-x-0 bottom-24 z-0 h-px bg-secondary/50" />
 
       {/* Animated Background Elements */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/3 left-1/4 w-64 h-64 bg-primary/10 rounded-full blur-3xl animate-pulse-glow" />
-        <div className="absolute bottom-1/3 right-1/4 w-64 h-64 bg-secondary/10 rounded-full blur-3xl animate-pulse-glow" />
+        <div className="absolute top-1/4 left-[8%] h-32 w-32 border border-primary/30 bg-primary/10" />
+        <div className="absolute bottom-[18%] right-[10%] h-28 w-48 border border-secondary/40 bg-secondary/10" />
       </div>
 
       {/* Content */}
       <div className="container mx-auto px-4 z-10 relative">
-        <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-white/30 bg-white/10 backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-white" />
-            <span className="text-sm font-medium text-white">
-              Explorando o futuro da tecnologia
-            </span>
-          </div>
+        <div className="mx-auto grid max-w-6xl items-end gap-10 lg:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-8 animate-fade-in text-left">
+            <div className="section-kicker">
+              <Sparkles className="w-4 h-4" />
+              <span>Estratégia prática em IA</span>
+            </div>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold leading-tight text-white drop-shadow-[0_4px_20px_rgba(0,0,0,0.8)]">
-            {displayData.headline}
-          </h1>
+            <h1 className="display-title max-w-4xl text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem]">
+              {displayData.headline}
+            </h1>
 
-          <p className="text-lg sm:text-xl md:text-2xl text-white max-w-2xl mx-auto drop-shadow-[0_2px_10px_rgba(0,0,0,0.8)]">
-            {displayData.subtitle}
-          </p>
+            <div className="max-w-2xl border-l-4 border-secondary pl-5">
+              <p className="text-lg sm:text-xl md:text-2xl text-foreground/90">
+                {displayData.subtitle}
+              </p>
+            </div>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button
-              size="lg"
-              asChild
-              className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 text-lg px-8 py-6 shadow-2xl shadow-primary/50 animate-pulse-glow"
-            >
-              <a href="/teste-ia" onClick={() => trackCTA('hero_primary_cta', 'hero_section')}>
-                <BrainCircuit className="mr-2 w-5 h-5" />
-                {displayData.cta_primary}
-              </a>
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              onClick={() => {
-                trackCTA('hero_secondary_cta', 'hero_section');
-                scrollToSection('sobre');
-              }}
-              className="text-lg px-8 py-6 border-white/30 bg-white/10 text-white hover:bg-white/20"
-            >
-              {displayData.cta_secondary}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-          </div>
-
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 sm:gap-8 pt-12 max-w-2xl mx-auto">
-            {[
-              { value: displayData.stat1_number, label: displayData.stat1_label },
-              { value: displayData.stat2_number, label: displayData.stat2_label },
-              { value: displayData.stat3_number, label: displayData.stat3_label },
-            ].map((stat, index) => (
-              <div 
-                key={index} 
-                className="text-center animate-fade-in"
-                style={{ animationDelay: `${index * 150}ms` }}
+            <div className="flex flex-col sm:flex-row gap-4 items-start pt-2">
+              <Button
+                size="lg"
+                asChild
+                className="text-lg px-8 py-6"
               >
-                <div className="text-2xl sm:text-3xl md:text-4xl font-bold text-white drop-shadow-lg">
-                  {stat.value}
-                </div>
-                <div className="text-xs sm:text-sm text-white/80 mt-1 drop-shadow-md">
-                  {stat.label}
-                </div>
+                <a href="/teste-ia" onClick={() => trackCTA('hero_primary_cta', 'hero_section')}>
+                  <BrainCircuit className="mr-2 w-5 h-5" />
+                  {displayData.cta_primary}
+                </a>
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => {
+                  trackCTA('hero_secondary_cta', 'hero_section');
+                  scrollToSection('sobre');
+                }}
+                className="text-lg px-8 py-6"
+              >
+                {displayData.cta_secondary}
+                <ArrowRight className="ml-2 w-5 h-5" />
+              </Button>
+            </div>
+          </div>
+
+          <div className="panel-dark p-6 sm:p-8 lg:p-10">
+            <div className="mb-6 border-b border-primary/20 pb-4">
+              <p className="text-xs font-bold uppercase text-muted-foreground">Assinatura visual</p>
+              <div className="mt-4 flex items-end gap-4">
+                <span className="display-title text-7xl sm:text-8xl text-primary">JL</span>
+                <span className="mb-3 h-2 w-24 bg-secondary" />
               </div>
-            ))}
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              {[
+                { value: displayData.stat1_number, label: displayData.stat1_label },
+                { value: displayData.stat2_number, label: displayData.stat2_label },
+                { value: displayData.stat3_number, label: displayData.stat3_label },
+              ].map((stat, index) => (
+                <div 
+                  key={index} 
+                  className="border border-border bg-background p-4 animate-fade-in"
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  <div className="text-3xl sm:text-4xl font-black text-primary">
+                    {stat.value}
+                  </div>
+                  <div className="mt-2 text-xs sm:text-sm font-bold uppercase text-muted-foreground">
+                    {stat.label}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="mt-6 text-sm uppercase text-muted-foreground">
+              Diagnóstico, conteúdo e posicionamento com presença visual forte e mensagem direta.
+            </p>
           </div>
         </div>
       </div>
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white/50 rounded-full p-1">
-          <div className="w-1 h-3 bg-white rounded-full mx-auto animate-pulse" />
+        <div className="w-6 h-10 border-2 border-primary/50 rounded-full p-1">
+          <div className="w-1 h-3 bg-primary rounded-full mx-auto animate-pulse" />
         </div>
       </div>
     </section>
