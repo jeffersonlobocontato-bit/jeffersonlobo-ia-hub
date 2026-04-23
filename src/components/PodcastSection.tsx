@@ -44,10 +44,11 @@ const PodcastSection = () => {
   }
 
   return (
-    <section id="podcast" className="py-20 px-4 sm:px-6 lg:px-8 bg-secondary/20">
+    <section id="podcast" className="bg-muted/20 py-20 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-7xl">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-primary">
+          <div className="section-kicker mb-4">Podcast</div>
+          <h2 className="display-title text-3xl md:text-4xl mb-4 text-primary">
             O Código Lobo
           </h2>
           {config?.podcast_description && (
@@ -59,9 +60,9 @@ const PodcastSection = () => {
 
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {episodes.map((episode) => (
-            <Card key={episode.id} className="group hover:shadow-lg transition-all duration-300">
+            <Card key={episode.id} className="group transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card">
               <CardHeader>
-                <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
+                <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors font-black uppercase">
                   {episode.title}
                 </CardTitle>
                 <CardDescription className="flex items-center gap-4 text-sm">
