@@ -12,13 +12,8 @@ const BlogSection = () => {
     <section id="blog" className="py-24 bg-muted/30">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <div className="inline-block mb-4">
-            <div className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-primary to-secondary relative">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-foreground relative z-10 drop-shadow-lg">
-                Blog
-              </h2>
-            </div>
-          </div>
+          <div className="section-kicker mb-4">Conteúdo</div>
+          <h2 className="display-title text-3xl sm:text-4xl md:text-5xl mb-4">Blog</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Insights sobre tecnologia, inteligência artificial, inovação e o
             futuro digital
@@ -36,13 +31,13 @@ const BlogSection = () => {
             return (
               <Card
                 key={post.id}
-                className="overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-primary/20 bg-card/80 backdrop-blur-sm animate-scale-in"
+                className="overflow-hidden transition-all duration-300 hover:-translate-y-2 border-primary/20 bg-card animate-scale-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
                 <div className="p-6 space-y-4">
                   {/* Category Badge */}
                   <div className="flex items-center justify-between">
-                    <span className="inline-block px-3 py-1 text-xs font-semibold rounded-full bg-primary/20 text-primary">
+                    <span className="inline-block px-3 py-1 text-xs font-bold uppercase border border-primary/30 bg-primary/10 text-primary">
                       {post.category}
                     </span>
                     <div className="flex items-center text-sm text-muted-foreground">
@@ -53,7 +48,7 @@ const BlogSection = () => {
 
                   {/* Content */}
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-bold hover:text-primary transition-colors">
+                      <h3 className="text-2xl font-black uppercase hover:text-primary transition-colors">
                       {post.title}
                     </h3>
                     <p className="text-muted-foreground leading-relaxed">
@@ -88,7 +83,7 @@ const BlogSection = () => {
 
         {/* Newsletter LinkedIn Section */}
         <div className="mt-16 max-w-3xl mx-auto">
-          <Card className="p-8 text-center bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+          <Card className="p-8 text-center bg-card border-primary/20">
             <h3 className="text-2xl font-bold mb-4">
               Receba conteúdos sobre IA e Tecnologia
             </h3>
@@ -100,7 +95,7 @@ const BlogSection = () => {
               href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7216140554995175424"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center px-8 py-3 text-base font-medium text-white bg-[#0A66C2] hover:bg-[#004182] rounded-full transition-colors duration-200"
+              className="inline-flex items-center justify-center border border-border bg-secondary px-8 py-3 text-base font-bold uppercase text-secondary-foreground transition-colors duration-200 hover:opacity-90"
               onClick={() => trackCTA('newsletter_subscribe', 'blog_section')}
             >
               Assinar no LinkedIn

@@ -26,22 +26,13 @@ const BookSection = () => {
   const coverImage = bookData?.cover_image || bookCover;
 
   return (
-    <section id="livro" className="py-24 bg-background relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
-      </div>
+    <section id="livro" className="relative overflow-hidden bg-background py-24">
+      <div className="absolute inset-0 z-0 bg-brand-grid opacity-20" />
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">
-          <div className="inline-block mb-4">
-            <div className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-primary to-secondary relative">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-foreground relative z-10 drop-shadow-lg">
-                Meu livro
-              </h2>
-            </div>
-          </div>
+          <div className="section-kicker mb-4">Publicação</div>
+          <h2 className="display-title text-3xl sm:text-4xl md:text-5xl mb-4">Meu livro</h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
             Uma jornada pelos caminhos da inteligência artificial e seu impacto
             no futuro da humanidade
@@ -55,20 +46,20 @@ const BookSection = () => {
               <img
                 src={coverImage}
                 alt="Capa do Livro"
-                className="w-full rounded-2xl shadow-2xl hover:scale-105 transition-transform duration-500"
+                className="w-full border border-primary/25 shadow-[18px_18px_0_hsl(var(--secondary)/0.18)] hover:scale-[1.01] transition-transform duration-500"
               />
-              <div className="absolute -inset-4 bg-gradient-to-r from-primary/30 to-secondary/30 rounded-2xl blur-2xl -z-10 animate-pulse-glow" />
+              <div className="absolute -bottom-5 -right-5 h-3 w-32 bg-primary" />
             </div>
           </div>
 
           {/* Book Details */}
           <div className="space-y-8 animate-slide-up">
             <div>
-              <h3 className="text-3xl font-bold mb-4">
+              <h3 className="text-3xl font-black uppercase mb-4">
                 {displayData.title}
               </h3>
               {displayData.subtitle && (
-                <h4 className="text-xl text-primary mb-4">{displayData.subtitle}</h4>
+                <h4 className="border-l-4 border-secondary pl-4 text-xl text-primary mb-4 font-bold uppercase">{displayData.subtitle}</h4>
               )}
               <p className="text-lg text-muted-foreground leading-relaxed">
                 {displayData.description}
@@ -80,7 +71,7 @@ const BookSection = () => {
               <div className="space-y-4">
                 {features.map((feature) => (
                   <div key={feature.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 border border-primary/30 bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <BookOpen className="w-4 h-4 text-primary" />
                     </div>
                     <span className="text-foreground">{feature.title}</span>
@@ -91,7 +82,7 @@ const BookSection = () => {
 
             {/* Reviews */}
             {reviews.length > 0 && reviews.map((review) => (
-              <Card key={review.id} className="p-6 bg-gradient-to-br from-primary/5 to-secondary/5 border-primary/20">
+              <Card key={review.id} className="p-6 bg-card border-primary/20">
                 <div className="flex items-center gap-1 mb-3">
                   {[...Array(5)].map((_, i) => (
                     <Star
@@ -119,7 +110,6 @@ const BookSection = () => {
               {displayData.purchase_link && displayData.purchase_link !== '#' && (
                 <Button
                   size="lg"
-                  className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
                   onClick={() => {
                     trackCTA('book_purchase', 'book_section');
                     window.open(displayData.purchase_link, '_blank');
