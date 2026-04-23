@@ -6,36 +6,28 @@ const ContactSection = () => {
   const { trackCTA } = useTrackCTA();
 
   return (
-    <section id="contato" className="py-24 bg-background relative overflow-hidden">
-      {/* Background Elements */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl" />
-        <div className="absolute bottom-1/4 right-0 w-96 h-96 bg-secondary/10 rounded-full blur-3xl" />
-      </div>
+    <section id="contato" className="relative overflow-hidden bg-background py-24">
+      <div className="absolute inset-0 z-0 bg-brand-grid opacity-35" />
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center mb-12">
-          <div className="inline-block mb-4">
-            <div className="px-6 sm:px-8 py-3 sm:py-4 rounded-full bg-gradient-to-r from-primary to-secondary relative">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-primary-foreground relative z-10 drop-shadow-lg">
-                Vamos conversar
-              </h2>
-            </div>
-          </div>
-          <div className="max-w-3xl mx-auto space-y-6">
-            <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold text-foreground">
+        <div className="panel-dark mx-auto mb-12 max-w-5xl p-8 md:p-12">
+          <div className="max-w-3xl mx-auto space-y-6 text-center">
+            <div className="section-kicker">Convites · consultoria · treinamentos</div>
+            <h2 className="display-title text-4xl sm:text-5xl md:text-6xl text-foreground">
+              Vamos conversar
+            </h2>
+            <h3 className="text-xl sm:text-2xl md:text-3xl font-black uppercase text-foreground">
               Convide Jefferson Lobo para sua próxima palestra, curso ou consultoria
             </h3>
             <p className="text-lg text-muted-foreground">
               Transforme sua organização com insights sobre inteligência artificial, inovação e o futuro da tecnologia
             </p>
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-destructive/10 text-destructive mb-4">
+            <div className="inline-flex items-center gap-2 border border-secondary/30 bg-secondary/10 px-4 py-2 text-foreground mb-4 font-bold uppercase">
               <span className="text-sm font-semibold">⏰ Apenas 3 vagas disponíveis este mês</span>
             </div>
             <div className="flex justify-center pt-4">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-primary to-secondary hover:opacity-90 transition-opacity"
                 asChild
               >
                 <a

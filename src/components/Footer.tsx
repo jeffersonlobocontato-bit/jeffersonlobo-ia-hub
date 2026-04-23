@@ -9,16 +9,18 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-tech-dark text-white">
+    <footer className="border-t border-primary/20 bg-background text-foreground">
       {/* Footer Links */}
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2">
-            <h3 className="text-2xl font-bold text-primary drop-shadow-lg mb-4">
-              Jefferson Lobo
-            </h3>
-            <p className="text-white/70 mb-4">
+            <div className="mb-4 flex items-end gap-4">
+              <span className="display-title text-6xl text-primary">JL</span>
+              <span className="mb-2 h-2 w-24 bg-secondary" />
+            </div>
+            <h3 className="text-2xl font-black uppercase text-foreground mb-4">Jefferson Lobo</h3>
+            <p className="text-muted-foreground mb-4 max-w-md">
               Palestrante, autor e especialista em inteligência artificial.
               Explorando o futuro da tecnologia com criatividade e impacto.
             </p>
@@ -26,13 +28,13 @@ const Footer = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-semibold mb-4 text-white">Navegação</h4>
+            <h4 className="font-bold uppercase mb-4 text-foreground">Navegação</h4>
             <ul className="space-y-2">
               {['home', 'sobre', 'livro', 'blog', 'contato'].map((item) => (
                 <li key={item}>
                   <button
                     onClick={() => scrollToSection(item)}
-                    className="text-white hover:text-primary transition-colors capitalize"
+                    className="text-foreground hover:text-primary transition-colors capitalize font-bold"
                   >
                     {item}
                   </button>
@@ -43,8 +45,8 @@ const Footer = () => {
 
           {/* Contact Info */}
           <div>
-            <h4 className="font-semibold mb-4 text-white">Contato</h4>
-            <ul className="space-y-2 text-white">
+            <h4 className="font-bold uppercase mb-4 text-foreground">Contato</h4>
+            <ul className="space-y-2 text-foreground">
               <li>
                 <a
                   href="mailto:jeffersonlobocontato@gmail.com"
@@ -68,7 +70,7 @@ const Footer = () => {
         </div>
 
         {/* Copyright */}
-        <div className="pt-8 border-t border-primary/20 text-center text-white/60 text-sm">
+        <div className="pt-8 border-t border-primary/20 text-center text-muted-foreground text-sm">
           <p>
             © {currentYear} Jefferson Lobo. Todos os direitos reservados.
           </p>

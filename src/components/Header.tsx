@@ -35,19 +35,21 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled ? 'bg-background/95 backdrop-blur-md shadow-lg' : 'bg-transparent'
+      className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
+        isScrolled
+          ? 'border-primary/20 bg-background/95 backdrop-blur-md shadow-[0_16px_40px_hsl(var(--foreground)/0.15)]'
+          : 'border-transparent bg-transparent'
       }`}
     >
       {/* Debug Auth Status - Remove in production */}
-      {process.env.NODE_ENV === 'development' && (
-        <div className="bg-yellow-500/90 text-black text-xs py-1 px-4 text-center font-mono">
+      {import.meta.env.DEV && (
+        <div className="bg-primary/90 text-primary-foreground text-xs py-1 px-4 text-center font-mono">
           Auth Status: {user ? (
             <>
               <User className="w-3 h-3 inline mr-1" />
               Logado: {user.email?.substring(0, 20)}...
               {isAdmin && (
-                <Badge variant="default" className="ml-2 bg-green-600 text-white">
+                  <Badge variant="default" className="ml-2 bg-secondary text-secondary-foreground">
                   <Shield className="w-3 h-3 mr-1" />
                   ADMIN
                 </Badge>
@@ -59,27 +61,33 @@ const Header = () => {
         </div>
       )}
       <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20">
+        <div className="flex items-center justify-between h-20 gap-4">
           {/* Logo */}
           <Link
             to="/"
-            className={`text-2xl font-bold hover:opacity-80 transition-opacity ${
+            className={`group flex items-center gap-3 hover:opacity-90 transition-opacity ${
               isScrolled 
-                ? 'text-primary' 
-                : 'text-white drop-shadow-lg'
+                ? 'text-foreground' 
+                : 'text-foreground'
             }`}
           >
-            Jefferson Lobo
+            <span className="flex h-11 w-11 items-center justify-center border border-primary bg-primary text-xl font-black uppercase text-primary-foreground shadow-[4px_4px_0_hsl(var(--secondary))] transition-transform group-hover:-translate-y-0.5">
+              JL
+            </span>
+            <span className="flex flex-col leading-none">
+              <span className="text-lg font-black uppercase">Jefferson Lobo</span>
+              <span className="text-[10px] font-bold uppercase text-muted-foreground">AI strategist · speaker · author</span>
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-8">
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
             {['home', 'sobre', 'livro', 'blog', 'contato'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
-                className={`hover:text-primary transition-colors capitalize font-medium ${
-                  isScrolled ? 'text-foreground' : 'text-white drop-shadow-md'
+                className={`text-sm uppercase hover:text-primary transition-colors font-bold ${
+                  isScrolled ? 'text-foreground' : 'text-foreground'
                 }`}
               >
                 {item}
@@ -87,8 +95,8 @@ const Header = () => {
             ))}
             <Link
               to="/teste-ia"
-              className={`hover:text-primary transition-colors font-medium ${
-                isScrolled ? 'text-foreground' : 'text-white drop-shadow-md'
+              className={`text-sm uppercase hover:text-primary transition-colors font-bold ${
+                isScrolled ? 'text-foreground' : 'text-foreground'
               }`}
             >
               Teste IA
@@ -101,7 +109,7 @@ const Header = () => {
               <Button
                 asChild
                 variant="outline"
-                className="border-primary/50 hover:bg-primary/10"
+                className="border-primary/50 bg-background/80 hover:bg-primary/10"
               >
                 <Link to="/admin" className="flex items-center gap-2">
                   <Shield className="w-4 h-4" />
@@ -113,7 +121,7 @@ const Header = () => {
               <Button
                 onClick={signOut}
                 variant="outline"
-                className="border-destructive/50 hover:bg-destructive/10"
+                className="border-destructive/50 bg-background/80 hover:bg-destructive/10"
               >
                 <LogOut className="w-4 h-4 mr-2" />
                 Sair
@@ -124,7 +132,7 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className={`md:hidden ${isScrolled ? 'text-foreground' : 'text-white drop-shadow-lg'}`}
+            className={`md:hidden ${isScrolled ? 'text-foreground' : 'text-foreground'}`}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
           </button>
@@ -132,12 +140,12 @@ const Header = () => {
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-6 space-y-4 animate-fade-in bg-background border-t border-border">
+          <div className="md:hidden py-6 space-y-4 animate-fade-in bg-background border-t border-primary/20">
             {['home', 'sobre', 'livro', 'blog', 'contato'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
-                className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors capitalize font-medium"
+                className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors uppercase font-bold"
               >
                 {item}
               </button>
@@ -145,7 +153,7 @@ const Header = () => {
             <Link
               to="/teste-ia"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors font-medium"
+              className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors uppercase font-bold"
             >
               Teste IA
             </Link>

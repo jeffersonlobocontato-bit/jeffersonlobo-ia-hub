@@ -191,12 +191,12 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
         <Progress value={progresso} className="h-2" />
       </div>
 
-      <Card className="border-2 shadow-xl">
+      <Card className="border-2 border-primary/20 bg-card shadow-[18px_18px_0_hsl(var(--secondary)/0.12)]">
         <CardHeader>
-          <CardDescription className="text-xs uppercase tracking-wider">
+          <CardDescription className="text-xs uppercase tracking-wider font-bold">
             {currentQuestion.competencia} • {currentQuestion.nivel}
           </CardDescription>
-          <CardTitle className="text-2xl">{currentQuestion.pergunta}</CardTitle>
+          <CardTitle className="text-2xl font-black uppercase">{currentQuestion.pergunta}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <RadioGroup
@@ -218,7 +218,7 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
                 <RadioGroupItem value={option.value.toString()} id={`opt-${option.value}`} />
                 <Label
                   htmlFor={`opt-${option.value}`}
-                  className="flex-1 cursor-pointer font-normal"
+                  className="flex-1 cursor-pointer font-normal leading-relaxed"
                 >
                   {option.label}
                 </Label>
