@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Brain, Sparkles } from "lucide-react";
+import { Brain, Sparkles, Users, Clock, Award, CheckCircle2 } from "lucide-react";
 
 interface TesteIAGateProps {
   onComplete: (leadId: string, finalidade: "PF" | "PJ") => void;
@@ -20,99 +20,62 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
   const [finalidade, setFinalidade] = useState<"PF" | "PJ">("PF");
   const [consentimento, setConsentimento] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [totalConcluidos, setTotalConcluidos] = useState<number | null>(null);
+
+  // Fetch social proof count
+  useEffect(() => {
+    supabase
+      .from("ia_maturity_leads")
+      .select("id", { count: "exact", head: true })
+      .eq("concluido", true)
+      .then(({ count }) => setTotalConcluidos(count ?? null));
+  }, []);
 
   const formatWhatsApp = (value: string) => {
-    const numbers = value.replace(/\D/g, "");
-    if (numbers.length <= 11) {
-      return numbers.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    const numbers = value.replace(/\D/g, "").slice(0, 11);
+    if (numbers.length <= 10) {
+      return numbers.replace(/(\d{2})(\d{4})(\d{0,4})/, "($1) $2-$3").replace(/-$/, "");
     }
-    return numbers.slice(0, 11).replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
+    return numbers.replace(/(\d{2})(\d{5})(\d{4})/, "($1) $2-$3");
   };
 
   const isFormValid = () => {
-    const nomeValido = nome.trim().split(" ").length >= 2;
+    const nomeValido = nome.trim().split(" ").filter(Boolean).length >= 2;
     const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-    const whatsappValido = whatsapp.replace(/\D/g, "").length === 11;
+    const digitos = whatsapp.replace(/\D/g, "").length;
+    const whatsappValido = digitos === 10 || digitos === 11;
     return nomeValido && emailValido && whatsappValido && consentimento;
   };
 
   const handleSubmit = async () => {
-    console.log("🔵 handleSubmit iniciado");
-    console.log("🔵 Validação:", {
-      isFormValid: isFormValid(),
-      nome: nome.trim(),
-      email,
-      whatsapp: whatsapp.replace(/\D/g, ""),
-      finalidade,
-      consentimento
-    });
-
     if (!isFormValid()) {
-      console.log("❌ Formulário inválido");
-      toast.error("Por favor, preencha todos os campos corretamente.");
+      toast.error("Preencha todos os campos corretamente. Telefone com 10 ou 11 dígitos.");
       return;
     }
 
     setLoading(true);
-    console.log("🔵 Loading ativado");
-
     try {
-      // Gerar UUID no frontend
       const leadId = crypto.randomUUID();
-
-      const dadosInsert = {
+      const { error } = await supabase.from("ia_maturity_leads").insert({
         id: leadId,
         nome: nome.trim(),
-        email: email.trim(),
+        email: email.trim().toLowerCase(),
         whatsapp: whatsapp.replace(/\D/g, ""),
         finalidade,
-      };
+      });
 
-      console.log("🔵 Dados para insert:", dadosInsert);
-
-      // Remover o .select() - apenas fazer o insert
-      const { error } = await supabase
-        .from("ia_maturity_leads")
-        .insert(dadosInsert);
-
-      console.log("🔵 Resposta Supabase:", { error });
-
-      if (error) {
-        console.error("❌ Erro do Supabase:", {
-          message: error.message,
-          details: error.details,
-          hint: error.hint,
-          code: error.code
-        });
-        throw error;
-      }
-
-      console.log("✅ Lead criado com sucesso, ID:", leadId);
-      toast.success("Cadastro realizado! Vamos começar o teste.");
+      if (error) throw error;
+      toast.success("Vamos começar seu diagnóstico!");
       onComplete(leadId, finalidade);
     } catch (error: any) {
-      console.error("❌ Erro completo:", error);
-      console.error("❌ Error stack:", error?.stack);
-      
-      let errorMessage = "Erro ao iniciar o teste. ";
-      
-      if (error?.message?.includes("duplicate")) {
-        errorMessage += "Este e-mail ou WhatsApp já está cadastrado.";
-      } else if (error?.code === "23505") {
-        errorMessage += "Você já iniciou este teste anteriormente.";
-      } else if (error?.message?.includes("row-level security")) {
-        errorMessage += "Erro de permissão. Contate o suporte.";
-      } else if (error?.message) {
-        errorMessage += error.message;
+      console.error("Erro:", error);
+      if (error?.code === "23505") {
+        toast.error("Você já iniciou este teste. Use outro e-mail para refazer.");
       } else {
-        errorMessage += "Erro desconhecido. Tente novamente.";
+        toast.error("Não foi possível iniciar. Tente novamente.");
       }
-      
-      console.error("❌ Mensagem de erro final:", errorMessage);
-      toast.error(errorMessage, { duration: 6000 });
     } finally {
       setLoading(false);
-      console.log("🔵 Loading desativado");
     }
   };
 
@@ -127,8 +90,45 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
           Teste de Maturidade em IA
         </h1>
         <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-          Descubra seu nível de maturidade em Inteligência Artificial e receba um diagnóstico personalizado com recomendações de aprendizado
+          Diagnóstico gratuito de 8 minutos. Receba seu nível de maturidade, gaps por
+          competência e um plano de ação 30/60/90 dias.
         </p>
+
+        {/* Social proof bar */}
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 pt-6 text-xs sm:text-sm font-bold uppercase tracking-widest text-muted-foreground">
+          {totalConcluidos !== null && totalConcluidos > 0 && (
+            <span className="flex items-center gap-2">
+              <Users className="w-4 h-4 text-primary" />
+              <span className="text-foreground">{totalConcluidos}+ profissionais</span> já fizeram
+            </span>
+          )}
+          <span className="flex items-center gap-2">
+            <Clock className="w-4 h-4 text-primary" />
+            <span className="text-foreground">8 minutos</span> em média
+          </span>
+          <span className="flex items-center gap-2">
+            <Award className="w-4 h-4 text-primary" />
+            <span className="text-foreground">Relatório</span> personalizado
+          </span>
+        </div>
+      </div>
+
+      <div className="grid md:grid-cols-3 gap-6 mb-8">
+        {[
+          { titulo: "Diagnóstico em 8 minutos", desc: "24 perguntas focadas no que importa." },
+          { titulo: "Radar por competência", desc: "8 dimensões: estratégia, dados, ferramentas, pessoas..." },
+          { titulo: "Plano de ação 30/60/90", desc: "Recomendações práticas para evoluir." },
+        ].map((f) => (
+          <div key={f.titulo} className="border-2 border-primary/20 bg-card p-4">
+            <div className="flex items-start gap-3">
+              <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="font-black uppercase text-sm">{f.titulo}</p>
+                <p className="text-xs text-muted-foreground mt-1">{f.desc}</p>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
 
       <Card className="border-2 border-primary/20 bg-card shadow-[18px_18px_0_hsl(var(--primary)/0.12)]">
@@ -138,29 +138,18 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
             <CardTitle className="font-black uppercase">Vamos começar!</CardTitle>
           </div>
           <CardDescription>
-            Preencha seus dados para iniciar o teste. Leva apenas 8-10 minutos e você receberá um relatório completo.
+            Seus dados são tratados conforme a LGPD e usados somente para enviar seu relatório.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
             <Label htmlFor="nome">Nome completo *</Label>
-            <Input
-              id="nome"
-              placeholder="João Silva Santos"
-              value={nome}
-              onChange={(e) => setNome(e.target.value)}
-            />
+            <Input id="nome" placeholder="João Silva Santos" value={nome} onChange={(e) => setNome(e.target.value)} />
           </div>
 
           <div className="space-y-2">
             <Label htmlFor="email">E-mail *</Label>
-            <Input
-              id="email"
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+            <Input id="email" type="email" placeholder="seu@email.com" value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
 
           <div className="space-y-2">
@@ -198,20 +187,15 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
               onCheckedChange={(checked) => setConsentimento(checked as boolean)}
             />
             <Label htmlFor="consentimento" className="text-sm font-normal leading-relaxed cursor-pointer">
-              Autorizo o tratamento dos meus dados pessoais para fins de avaliação e contato, conforme a{" "}
+              Autorizo o tratamento dos meus dados conforme a{" "}
               <a href="/politica-privacidade" className="text-primary underline">
                 Política de Privacidade
               </a>
-              . Estou ciente de que posso solicitar a exclusão dos meus dados a qualquer momento.
+              . Posso solicitar exclusão a qualquer momento.
             </Label>
           </div>
 
-          <Button
-            onClick={handleSubmit}
-            disabled={!isFormValid() || loading}
-            className="w-full h-12 text-lg"
-            size="lg"
-          >
+          <Button onClick={handleSubmit} disabled={!isFormValid() || loading} className="w-full h-12 text-lg" size="lg">
             {loading ? "Iniciando..." : "Começar o teste"}
           </Button>
         </CardContent>

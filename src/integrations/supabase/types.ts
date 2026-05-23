@@ -503,6 +503,54 @@ export type Database = {
         }
         Relationships: []
       }
+      ia_maturity_recommendations: {
+        Row: {
+          acao_30d: string | null
+          acao_60d: string | null
+          acao_90d: string | null
+          ativo: boolean | null
+          competencia: string
+          created_at: string | null
+          descricao: string
+          id: string
+          nivel: string
+          ordem: number
+          recursos: Json | null
+          titulo: string
+          updated_at: string | null
+        }
+        Insert: {
+          acao_30d?: string | null
+          acao_60d?: string | null
+          acao_90d?: string | null
+          ativo?: boolean | null
+          competencia: string
+          created_at?: string | null
+          descricao: string
+          id?: string
+          nivel?: string
+          ordem?: number
+          recursos?: Json | null
+          titulo: string
+          updated_at?: string | null
+        }
+        Update: {
+          acao_30d?: string | null
+          acao_60d?: string | null
+          acao_90d?: string | null
+          ativo?: boolean | null
+          competencia?: string
+          created_at?: string | null
+          descricao?: string
+          id?: string
+          nivel?: string
+          ordem?: number
+          recursos?: Json | null
+          titulo?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       knowledge_base: {
         Row: {
           categoria: string
