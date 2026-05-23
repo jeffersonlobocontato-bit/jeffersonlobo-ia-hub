@@ -109,25 +109,6 @@ const HeroSection = () => {
             </Button>
           </div>
 
-          {/* Barra de prova social estilo Rundown */}
-          <div className="pt-12 mt-8 border-t border-primary/20">
-            <p className="text-xs sm:text-sm font-bold uppercase tracking-widest text-muted-foreground mb-6">
-              Já levou IA para times de empresas como
-            </p>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-10 gap-y-3 text-sm sm:text-base font-black uppercase text-foreground/70">
-              <span>Itaú</span>
-              <span className="text-primary">•</span>
-              <span>Sebrae</span>
-              <span className="text-primary">•</span>
-              <span>Globo</span>
-              <span className="text-primary">•</span>
-              <span>Vivo</span>
-              <span className="text-primary">•</span>
-              <span>Magalu</span>
-              <span className="text-primary">•</span>
-              <span>Unimed</span>
-            </div>
-          </div>
         </div>
       </div>
 
