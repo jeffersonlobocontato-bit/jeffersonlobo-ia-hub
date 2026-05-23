@@ -115,7 +115,9 @@ All colors MUST be HSL.
   }
 
   .display-title {
-    @apply font-black uppercase leading-none;
+    @apply font-black uppercase leading-[0.95];
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .highlight-yellow {
