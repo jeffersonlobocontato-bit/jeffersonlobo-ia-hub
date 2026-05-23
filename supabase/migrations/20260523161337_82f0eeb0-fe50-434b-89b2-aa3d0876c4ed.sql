@@ -1,0 +1,3 @@
+UPDATE public.about_content
+SET description = description || E'\n\nEntre suas experiências recentes, conduziu uma imersão em Inteligência Artificial para a equipe da Gazeta do Povo, apoiando a implementação prática de IA na redação e nas operações do veículo. Atuou também como facilitador em imersão internacional de IA para industriais, conectando lideranças do setor produtivo às fronteiras da tecnologia. Complementa sua trajetória com formação imersiva em Inteligência Artificial pelo MIT, em Boston (EUA), reforçando o repertório técnico e estratégico que aplica em projetos, palestras e consultorias.'
+WHERE description NOT LIKE '%Gazeta do Povo%';
