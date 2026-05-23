@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -6,7 +6,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, RotateCcw } from "lucide-react";
 
 interface Question {
   id: string;
@@ -20,9 +20,16 @@ interface TesteIAQuestionarioProps {
   leadId: string;
   finalidade: "PF" | "PJ";
   onComplete: () => void;
+  onRestart?: () => void;
 }
 
-export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQuestionarioProps) {
+const nivelLabel: Record<string, string> = {
+  BASICO: "Básico",
+  INTERMEDIARIO: "Intermediário",
+  AVANCADO: "Avançado",
+};
+
+export function TesteIAQuestionario({ leadId, finalidade, onComplete, onRestart }: TesteIAQuestionarioProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, number>>({});
@@ -30,7 +37,22 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
 
   useEffect(() => {
     loadQuestions();
-  }, [finalidade]);
+    // Restore saved answers
+    supabase
+      .from("ia_maturity_leads")
+      .select("respostas")
+      .eq("id", leadId)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data?.respostas && Array.isArray(data.respostas)) {
+          const restored: Record<string, number> = {};
+          (data.respostas as any[]).forEach((r: any) => {
+            if (r.id_pergunta) restored[r.id_pergunta] = r.resposta;
+          });
+          setRespostas(restored);
+        }
+      });
+  }, [finalidade, leadId]);
 
   const loadQuestions = async () => {
     try {
@@ -39,102 +61,60 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
         .select("*")
         .eq("finalidade", finalidade)
         .order("ordem");
-
       if (error) throw error;
       setQuestions(data || []);
     } catch (error) {
-      console.error("Erro ao carregar perguntas:", error);
+      console.error(error);
       toast.error("Erro ao carregar perguntas");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleResposta = async (valor: number) => {
-    const currentQuestion = questions[currentIndex];
-    const novasRespostas = { ...respostas, [currentQuestion.id]: valor };
-    setRespostas(novasRespostas);
-
-    // Autosave
+  const persistRespostas = async (novas: Record<string, number>) => {
+    const arr = Object.entries(novas).map(([id, resposta]) => {
+      const q = questions.find((q) => q.id === id);
+      return { id_pergunta: id, resposta, competencia: q?.competencia, nivel: q?.nivel };
+    });
     try {
-      const respostasArray = Object.entries(novasRespostas).map(([id, resposta]) => {
-        const q = questions.find((q) => q.id === id);
-        return {
-          id_pergunta: id,
-          resposta,
-          competencia: q?.competencia,
-          nivel: q?.nivel,
-        };
-      });
-
-      await supabase
-        .from("ia_maturity_leads")
-        .update({ respostas: respostasArray })
-        .eq("id", leadId);
-    } catch (error) {
-      console.error("Erro ao salvar resposta:", error);
+      await supabase.from("ia_maturity_leads").update({ respostas: arr }).eq("id", leadId);
+    } catch (e) {
+      console.error("Autosave falhou:", e);
     }
   };
 
-  const handleProximo = () => {
-    if (currentIndex < questions.length - 1) {
-      setCurrentIndex(currentIndex + 1);
-    }
+  const handleResposta = (valor: number) => {
+    const currentQuestion = questions[currentIndex];
+    const novas = { ...respostas, [currentQuestion.id]: valor };
+    setRespostas(novas);
+    persistRespostas(novas);
   };
 
-  const handleVoltar = () => {
-    if (currentIndex > 0) {
-      setCurrentIndex(currentIndex - 1);
-    }
-  };
+  const handleProximo = () => currentIndex < questions.length - 1 && setCurrentIndex(currentIndex + 1);
+  const handleVoltar = () => currentIndex > 0 && setCurrentIndex(currentIndex - 1);
 
   const handleFinalizar = async () => {
     setLoading(true);
     try {
-      const respostasArray = Object.entries(respostas).map(([id, resposta]) => {
+      const arr = Object.entries(respostas).map(([id, resposta]) => {
         const q = questions.find((q) => q.id === id);
-        return {
-          id_pergunta: id,
-          resposta,
-          competencia: q?.competencia,
-          nivel: q?.nivel,
-        };
+        return { id_pergunta: id, resposta, competencia: q?.competencia, nivel: q?.nivel };
       });
 
-      // Calcular scores por nível (média dinâmica baseada no número real de perguntas)
-      const respostasBasico = respostasArray.filter((r) => r.nivel === "BASICO");
-      const scoreBasico = respostasBasico.length > 0 
-        ? respostasBasico.reduce((acc, r) => acc + r.resposta, 0) / respostasBasico.length
-        : 0;
-      
-      const respostasIntermediario = respostasArray.filter((r) => r.nivel === "INTERMEDIARIO");
-      const scoreIntermediario = respostasIntermediario.length > 0
-        ? respostasIntermediario.reduce((acc, r) => acc + r.resposta, 0) / respostasIntermediario.length
-        : 0;
-      
-      const respostasAvancado = respostasArray.filter((r) => r.nivel === "AVANCADO");
-      const scoreAvancado = respostasAvancado.length > 0
-        ? respostasAvancado.reduce((acc, r) => acc + r.resposta, 0) / respostasAvancado.length
-        : 0;
-      
+      const avg = (vals: number[]) => (vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0);
+      const scoreBasico = avg(arr.filter((r) => r.nivel === "BASICO").map((r) => r.resposta));
+      const scoreIntermediario = avg(arr.filter((r) => r.nivel === "INTERMEDIARIO").map((r) => r.resposta));
+      const scoreAvancado = avg(arr.filter((r) => r.nivel === "AVANCADO").map((r) => r.resposta));
       const scoreGeral = (scoreBasico + scoreIntermediario + scoreAvancado) / 3;
 
-      // Calcular competências (média dinâmica baseada no número real de perguntas por competência)
-      const competenciasTemp: Record<string, number[]> = {};
-      respostasArray.forEach((r) => {
-        if (!competenciasTemp[r.competencia!]) competenciasTemp[r.competencia!] = [];
-        competenciasTemp[r.competencia!].push(r.resposta);
+      const compTemp: Record<string, number[]> = {};
+      arr.forEach((r) => {
+        if (!compTemp[r.competencia!]) compTemp[r.competencia!] = [];
+        compTemp[r.competencia!].push(r.resposta);
       });
-
       const competencias: Record<string, number> = {};
-      Object.keys(competenciasTemp).forEach((comp) => {
-        const valores = competenciasTemp[comp];
-        competencias[comp] = valores.length > 0 
-          ? valores.reduce((a, b) => a + b, 0) / valores.length 
-          : 0;
-      });
+      Object.keys(compTemp).forEach((c) => (competencias[c] = avg(compTemp[c])));
 
-      // Determinar nível de maturidade
       let nivelMaturidade: "Iniciante" | "Em evolução" | "Avançado";
       if (scoreGeral < 2.5) nivelMaturidade = "Iniciante";
       else if (scoreGeral < 4.0) nivelMaturidade = "Em evolução";
@@ -143,7 +123,7 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
       await supabase
         .from("ia_maturity_leads")
         .update({
-          respostas: respostasArray,
+          respostas: arr,
           score_basico: scoreBasico,
           score_intermediario: scoreIntermediario,
           score_avancado: scoreAvancado,
@@ -157,12 +137,24 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
       toast.success("Teste finalizado! Veja seu resultado.");
       onComplete();
     } catch (error) {
-      console.error("Erro ao finalizar teste:", error);
+      console.error(error);
       toast.error("Erro ao finalizar teste");
     } finally {
       setLoading(false);
     }
   };
+
+  // Dynamic level label per actual question
+  const nivelAtual = useMemo(() => {
+    if (!questions.length) return "";
+    const niv = questions[currentIndex]?.nivel;
+    return niv ? nivelLabel[niv] || niv : "";
+  }, [questions, currentIndex]);
+
+  const tempoRestanteMin = useMemo(() => {
+    const restantes = Math.max(0, questions.length - currentIndex - 1);
+    return Math.max(1, Math.round((restantes * 18) / 60));
+  }, [questions.length, currentIndex]);
 
   if (loading || questions.length === 0) {
     return (
@@ -178,23 +170,38 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
 
   const currentQuestion = questions[currentIndex];
   const progresso = ((currentIndex + 1) / questions.length) * 100;
-  const nivelAtual =
-    currentIndex < 8 ? "Básico" : currentIndex < 16 ? "Intermediário" : "Avançado";
 
   return (
     <div className="container max-w-4xl mx-auto px-4 py-16">
       <div className="mb-8 space-y-4">
-        <div className="flex items-center justify-between text-sm text-muted-foreground">
-          <span>Questão {currentIndex + 1} de {questions.length}</span>
-          <span>Nível: {nivelAtual}</span>
+        <div className="flex items-center justify-between text-sm text-muted-foreground flex-wrap gap-2">
+          <span>
+            Questão {currentIndex + 1} de {questions.length}
+          </span>
+          <span className="flex items-center gap-3">
+            <span className="flex items-center gap-1">
+              <Clock className="w-3.5 h-3.5" /> ~{tempoRestanteMin} min restantes
+            </span>
+            <span>Nível: <span className="font-bold text-foreground">{nivelAtual}</span></span>
+          </span>
         </div>
         <Progress value={progresso} className="h-2" />
+        {onRestart && (
+          <button
+            onClick={() => {
+              if (confirm("Tem certeza que quer recomeçar? Suas respostas serão apagadas.")) onRestart();
+            }}
+            className="text-xs text-muted-foreground hover:text-primary inline-flex items-center gap-1"
+          >
+            <RotateCcw className="w-3 h-3" /> Recomeçar
+          </button>
+        )}
       </div>
 
       <Card className="border-2 border-primary/20 bg-card shadow-[18px_18px_0_hsl(var(--secondary)/0.12)]">
         <CardHeader>
           <CardDescription className="text-xs uppercase tracking-wider font-bold">
-            {currentQuestion.competencia} • {currentQuestion.nivel}
+            {currentQuestion.competencia} • {nivelAtual}
           </CardDescription>
           <CardTitle className="text-2xl font-black uppercase">{currentQuestion.pergunta}</CardTitle>
         </CardHeader>
@@ -216,10 +223,7 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
                 onClick={() => handleResposta(option.value)}
               >
                 <RadioGroupItem value={option.value.toString()} id={`opt-${option.value}`} />
-                <Label
-                  htmlFor={`opt-${option.value}`}
-                  className="flex-1 cursor-pointer font-normal leading-relaxed"
-                >
+                <Label htmlFor={`opt-${option.value}`} className="flex-1 cursor-pointer font-normal leading-relaxed">
                   {option.label}
                 </Label>
               </div>
@@ -227,32 +231,16 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete }: TesteIAQ
           </RadioGroup>
 
           <div className="flex items-center justify-between gap-4 pt-4">
-            <Button
-              variant="outline"
-              onClick={handleVoltar}
-              disabled={currentIndex === 0}
-              className="w-32"
-            >
-              <ChevronLeft className="w-4 h-4 mr-2" />
-              Voltar
+            <Button variant="outline" onClick={handleVoltar} disabled={currentIndex === 0} className="w-32">
+              <ChevronLeft className="w-4 h-4 mr-2" /> Voltar
             </Button>
-
             {currentIndex === questions.length - 1 ? (
-              <Button
-                onClick={handleFinalizar}
-                disabled={!respostas[currentQuestion.id] || loading}
-                className="w-32"
-              >
+              <Button onClick={handleFinalizar} disabled={!respostas[currentQuestion.id] || loading} className="w-32">
                 {loading ? "Finalizando..." : "Finalizar"}
               </Button>
             ) : (
-              <Button
-                onClick={handleProximo}
-                disabled={!respostas[currentQuestion.id]}
-                className="w-32"
-              >
-                Avançar
-                <ChevronRight className="w-4 h-4 ml-2" />
+              <Button onClick={handleProximo} disabled={!respostas[currentQuestion.id]} className="w-32">
+                Avançar <ChevronRight className="w-4 h-4 ml-2" />
               </Button>
             )}
           </div>
