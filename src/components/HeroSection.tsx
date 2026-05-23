@@ -1,29 +1,17 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles, BrainCircuit } from 'lucide-react';
+import { ArrowRight, BrainCircuit } from 'lucide-react';
 import heroBg from '@/assets/hero-bg.jpg';
 import { useHeroContent } from '@/hooks/useHeroContent';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 const HeroSection = () => {
-  const { data: heroData, isLoading } = useHeroContent();
+  const { data: heroData } = useHeroContent();
   const { trackCTA } = useTrackCTA();
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const openChatBot = () => {
-    trackCTA('chat_uivo_open', 'hero_section');
-    const chatButton = document.querySelector('[class*="fixed bottom-6 right-6"]') as HTMLButtonElement;
-    if (chatButton) {
-      chatButton.click();
-    }
-  };
-
-  // Fallback data quando banco está vazio
   const defaultData = {
     headline: "Jefferson Lobo ajuda empresas a implementar IA sem perder dinheiro",
     subtitle: "Descubra onde sua empresa está na jornada de IA em 5 minutos",
@@ -39,115 +27,112 @@ const HeroSection = () => {
 
   const displayData = heroData || defaultData;
 
+  // Quebra a headline e aplica destaque amarelo "highlighter" na palavra-chave
+  // Estratégia: pega as 2 últimas palavras antes de "sem perder dinheiro" ou destaca "IA"
+  const renderHeadline = (text: string) => {
+    const keywords = ['IA', 'inteligência artificial', 'Inteligência Artificial'];
+    let result: React.ReactNode = text;
+    for (const kw of keywords) {
+      const idx = text.indexOf(kw);
+      if (idx !== -1) {
+        result = (
+          <>
+            {text.slice(0, idx)}
+            <span className="highlight-yellow">{kw}</span>
+            {text.slice(idx + kw.length)}
+          </>
+        );
+        return result;
+      }
+    }
+    return text;
+  };
+
   return (
     <section
       id="home"
       className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-24"
     >
-      {/* Background Image with Overlay */}
+      {/* Background Image cinematográfico */}
       <div className="absolute inset-0 z-0">
         <img
           src={heroBg}
-          alt="Jefferson Lobo - AI Expert"
+          alt="Jefferson Lobo - Especialista em IA"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background" />
+        <div className="absolute inset-0 bg-brand-grid opacity-40" />
       </div>
 
-      <div className="absolute inset-0 z-0 bg-brand-grid opacity-70" />
-      <div className="absolute inset-x-0 top-24 z-0 h-px bg-primary/50" />
-      <div className="absolute inset-x-0 bottom-24 z-0 h-px bg-secondary/50" />
-
-      {/* Animated Background Elements */}
-      <div className="absolute inset-0 z-0">
-        <div className="absolute top-1/4 left-[8%] h-32 w-32 border border-primary/30 bg-primary/10" />
-        <div className="absolute bottom-[18%] right-[10%] h-28 w-48 border border-secondary/40 bg-secondary/10" />
-      </div>
-
-      {/* Content */}
+      {/* Conteúdo centralizado estilo Rundown */}
       <div className="container mx-auto px-4 z-10 relative">
-        <div className="mx-auto grid max-w-6xl items-end gap-10 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="space-y-8 animate-fade-in text-left">
-            <div className="section-kicker">
-              <Sparkles className="w-4 h-4" />
-              <span>Estratégia prática em IA</span>
-            </div>
+        <div className="mx-auto max-w-5xl text-center space-y-8 animate-fade-in">
 
-            <h1 className="display-title max-w-4xl text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem]">
-              {displayData.headline}
-            </h1>
-
-            <div className="max-w-2xl border-l-4 border-secondary pl-5">
-              <p className="text-lg sm:text-xl md:text-2xl text-foreground/90">
-                {displayData.subtitle}
-              </p>
-            </div>
-
-            <div className="flex flex-col sm:flex-row gap-4 items-start pt-2">
-              <Button
-                size="lg"
-                asChild
-                className="text-lg px-8 py-6"
-              >
-                <a href="/teste-ia" onClick={() => trackCTA('hero_primary_cta', 'hero_section')}>
-                  <BrainCircuit className="mr-2 w-5 h-5" />
-                  {displayData.cta_primary}
-                </a>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => {
-                  trackCTA('hero_secondary_cta', 'hero_section');
-                  scrollToSection('sobre');
-                }}
-                className="text-lg px-8 py-6"
-              >
-                {displayData.cta_secondary}
-                <ArrowRight className="ml-2 w-5 h-5" />
-              </Button>
-            </div>
+          {/* Roles slash line (Matt Wolfe style) */}
+          <div className="roles-slash">
+            <span className="role">Palestrante</span>
+            <span className="sep">/</span>
+            <span className="role">Autor</span>
+            <span className="sep">/</span>
+            <span className="role">Estrategista de IA</span>
           </div>
 
-          <div className="panel-dark p-6 sm:p-8 lg:p-10">
-            <div className="mb-6 border-b border-primary/20 pb-4">
-              <p className="text-xs font-bold uppercase text-muted-foreground">Assinatura visual</p>
-              <div className="mt-4 flex items-end gap-4">
-                <span className="display-title text-7xl sm:text-8xl text-primary">JL</span>
-                <span className="mb-3 h-2 w-24 bg-secondary" />
-              </div>
-            </div>
+          {/* Headline massivo com palavra em highlighter amarelo */}
+          <h1 className="display-title text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] xl:text-[7rem] tracking-tight">
+            {renderHeadline(displayData.headline)}
+          </h1>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-              {[
-                { value: displayData.stat1_number, label: displayData.stat1_label },
-                { value: displayData.stat2_number, label: displayData.stat2_label },
-                { value: displayData.stat3_number, label: displayData.stat3_label },
-              ].map((stat, index) => (
-                <div 
-                  key={index} 
-                  className="border border-border bg-background p-4 animate-fade-in"
-                  style={{ animationDelay: `${index * 150}ms` }}
-                >
-                  <div className="text-3xl sm:text-4xl font-black text-primary">
-                    {stat.value}
-                  </div>
-                  <div className="mt-2 text-xs sm:text-sm font-bold uppercase text-muted-foreground">
-                    {stat.label}
-                  </div>
-                </div>
-              ))}
-            </div>
+          {/* Subtitle */}
+          <p className="mx-auto max-w-2xl text-lg sm:text-xl md:text-2xl text-foreground/90 font-medium">
+            {displayData.subtitle}
+          </p>
 
-            <p className="mt-6 text-sm uppercase text-muted-foreground">
-              Diagnóstico, conteúdo e posicionamento com presença visual forte e mensagem direta.
+          {/* CTAs */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
+            <Button size="lg" asChild className="text-base sm:text-lg px-8 py-6">
+              <a href="/teste-ia" onClick={() => trackCTA('hero_primary_cta', 'hero_section')}>
+                <BrainCircuit className="mr-2 w-5 h-5" />
+                {displayData.cta_primary}
+              </a>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              onClick={() => {
+                trackCTA('hero_secondary_cta', 'hero_section');
+                scrollToSection('sobre');
+              }}
+              className="text-base sm:text-lg px-8 py-6"
+            >
+              {displayData.cta_secondary}
+              <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Barra de prova social estilo Rundown */}
+          <div className="pt-12 mt-8 border-t border-primary/20">
+            <p className="text-xs sm:text-sm font-bold uppercase tracking-widest text-muted-foreground mb-6">
+              Já levou IA para times de empresas como
             </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 sm:gap-x-10 gap-y-3 text-sm sm:text-base font-black uppercase text-foreground/70">
+              <span>Itaú</span>
+              <span className="text-primary">•</span>
+              <span>Sebrae</span>
+              <span className="text-primary">•</span>
+              <span>Globo</span>
+              <span className="text-primary">•</span>
+              <span>Vivo</span>
+              <span className="text-primary">•</span>
+              <span>Magalu</span>
+              <span className="text-primary">•</span>
+              <span>Unimed</span>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Scroll Indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 animate-bounce hidden md:block">
         <div className="w-6 h-10 border-2 border-primary/50 rounded-full p-1">
           <div className="w-1 h-3 bg-primary rounded-full mx-auto animate-pulse" />
         </div>
