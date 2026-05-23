@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, BrainCircuit } from 'lucide-react';
-import heroBg from '@/assets/hero-bg.jpg';
+import heroBg from '@/assets/jefferson-portrait.png';
 import { useHeroContent } from '@/hooks/useHeroContent';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 
