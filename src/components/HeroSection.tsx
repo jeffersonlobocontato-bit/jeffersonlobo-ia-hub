@@ -78,7 +78,7 @@ const HeroSection = () => {
           </div>
 
           {/* Headline massivo com palavra em highlighter amarelo */}
-          <h1 className="display-title text-5xl sm:text-6xl md:text-7xl lg:text-[6rem] xl:text-[7rem] tracking-tight">
+          <h1 className="display-title text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem] tracking-tight break-words hyphens-auto">
             {renderHeadline(displayData.headline)}
           </h1>
 
