@@ -13,8 +13,8 @@ const HeroSection = () => {
   };
 
   const defaultData = {
-    headline: "Jefferson Lobo ajuda empresas a implementar IA sem perder dinheiro",
-    subtitle: "Descubra onde sua empresa está na jornada de IA em 5 minutos",
+    headline: "IA está redesenhando empresas, carreiras e profissões. Lidere essa transformação.",
+    subtitle: "Diagnóstico, estratégia e implementação de Inteligência Artificial para empresas que querem resultado real — e profissionais que não aceitam ficar para trás.",
     cta_primary: "Fazer Diagnóstico Grátis",
     cta_secondary: "Ver meu método",
     stat1_number: "127",
