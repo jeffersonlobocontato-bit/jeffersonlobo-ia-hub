@@ -10,6 +10,8 @@ import BlogSection from '@/components/BlogSection';
 import ContactSection from '@/components/ContactSection';
 import Footer from '@/components/Footer';
 import ChatBot from '@/components/ChatBot';
+import NewsletterSection from '@/components/NewsletterSection';
+
 import StickyHeaderCTA from '@/components/StickyHeaderCTA';
 import { Separator } from '@/components/ui/separator';
 
