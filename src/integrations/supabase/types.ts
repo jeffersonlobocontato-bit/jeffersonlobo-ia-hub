@@ -595,6 +595,14 @@ export type Database = {
           acao_30d: string | null
           acao_60d: string | null
           acao_90d: string | null
+          acao_pf_30d: string | null
+          acao_pf_60d: string | null
+          acao_pf_90d: string | null
+          acao_pj_30d: string | null
+          acao_pj_60d: string | null
+          acao_pj_90d: string | null
+          aprendizado_pf: Json | null
+          aprendizado_pj: Json | null
           ativo: boolean | null
           competencia: string
           created_at: string | null
@@ -602,6 +610,7 @@ export type Database = {
           id: string
           nivel: string
           ordem: number
+          por_que_importa: string | null
           recursos: Json | null
           titulo: string
           updated_at: string | null
@@ -610,6 +619,14 @@ export type Database = {
           acao_30d?: string | null
           acao_60d?: string | null
           acao_90d?: string | null
+          acao_pf_30d?: string | null
+          acao_pf_60d?: string | null
+          acao_pf_90d?: string | null
+          acao_pj_30d?: string | null
+          acao_pj_60d?: string | null
+          acao_pj_90d?: string | null
+          aprendizado_pf?: Json | null
+          aprendizado_pj?: Json | null
           ativo?: boolean | null
           competencia: string
           created_at?: string | null
@@ -617,6 +634,7 @@ export type Database = {
           id?: string
           nivel?: string
           ordem?: number
+          por_que_importa?: string | null
           recursos?: Json | null
           titulo: string
           updated_at?: string | null
@@ -625,6 +643,14 @@ export type Database = {
           acao_30d?: string | null
           acao_60d?: string | null
           acao_90d?: string | null
+          acao_pf_30d?: string | null
+          acao_pf_60d?: string | null
+          acao_pf_90d?: string | null
+          acao_pj_30d?: string | null
+          acao_pj_60d?: string | null
+          acao_pj_90d?: string | null
+          aprendizado_pf?: Json | null
+          aprendizado_pj?: Json | null
           ativo?: boolean | null
           competencia?: string
           created_at?: string | null
@@ -632,6 +658,7 @@ export type Database = {
           id?: string
           nivel?: string
           ordem?: number
+          por_que_importa?: string | null
           recursos?: Json | null
           titulo?: string
           updated_at?: string | null
