@@ -1,53 +1,85 @@
-# Ativar emails automáticos do briefing
+# Régua de Vendas Automatizada
 
-Domínio `notify.jeffersonlobo.tech` já está verificado e a infraestrutura de emails do Lovable Cloud já está provisionada. Falta apenas escafoldar os templates transacionais e disparar o envio quando um briefing for criado.
+Objetivo: te alertar **em segundos** no Telegram quando chega lead quente, e nutrir o lead automaticamente por email até você responder.
 
-## O que será entregue
+---
 
-1. **Email de notificação interna** → `jeffersonlobocontato@gmail.com`
-   - Disparado sempre que um novo briefing é inserido
-   - Contém todos os campos: nome, empresa, cargo, email, whatsapp, tipo, data, formato, público, cidade e mensagem
-   - Link direto para `/admin` (aba Briefings)
+## Parte 1 — Alertas instantâneos no Telegram
 
-2. **Email de confirmação ao lead** → email informado no formulário
-   - "Recebemos seu briefing, retornaremos em até 24h"
-   - Tom brutalista alinhado ao site (preto/amarelo, Arial Black, sombra deslocada)
-   - Inclui resumo do que ele preencheu para reforçar confiança
+### Setup (você faz 1 vez, leva 2 minutos)
+1. Abre o Telegram, busca `@BotFather`, manda `/newbot`
+2. Escolhe um nome (ex: "Jefferson Lobo Leads Bot")
+3. Copia o **token** que ele te dá
+4. Busca `@userinfobot` no Telegram e manda `/start` — ele te dá seu **chat_id numérico**
+5. Você me passa esses 2 valores (vou pedir como secrets seguros)
 
-## Como vai funcionar (técnico)
+### O que vou construir
+- Edge Function `send-telegram-alert` que recebe payload e dispara mensagem formatada pro seu chat
+- Mensagem com markdown: nome, email, telefone, tipo de evento, link direto pro admin e botão "Abrir WhatsApp do lead"
 
-1. Rodar `scaffold_transactional_email` para criar:
-   - Edge Function `send-transactional-email`
-   - Edge Function `handle-email-unsubscribe`
-   - Edge Function `handle-email-suppression`
-   - Página `/unsubscribe` no app
-   - Template inicial de exemplo
+### Gatilhos que vão te alertar
+1. **Briefing enviado** (já existe, vou adicionar o alerta)
+2. **Teste de maturidade concluído** (novo gatilho)
+3. **Teste de maturidade iniciado mas não concluído** (alerta após 30min de inatividade — recuperação)
 
-2. Criar 2 templates React Email em `supabase/functions/_shared/transactional-email-templates/`:
-   - `briefing-internal-notification.tsx` (notificação interna estilo "novo lead")
-   - `briefing-lead-confirmation.tsx` (confirmação ao lead, estilo brutalista)
-   - Registrar ambos em `registry.ts`
+---
 
-3. Editar `BriefingForm.tsx`:
-   - Após `insert` bem-sucedido em `briefing_requests`, disparar **duas chamadas paralelas** `supabase.functions.invoke('send-transactional-email', ...)`:
-     - Uma para `jeffersonlobocontato@gmail.com` com template `briefing-internal-notification`
-     - Outra para o email do lead com template `briefing-lead-confirmation`
-   - Usar `idempotencyKey` baseado no UUID do briefing para evitar duplicação em retry
-   - Falhas no email **não bloqueiam** o sucesso do formulário (envio assíncrono)
+## Parte 2 — Sequência de nutrição automática (5 emails)
 
-4. Redeploy de todas as Edge Functions
+### Templates novos (estilo brutalista, mesma identidade do site)
+1. **T+1h** — `briefing-em-analise`: "Estou analisando seu briefing pessoalmente, [nome]"
+2. **T+24h** — `case-relacionado`: case de sucesso do tipo de palestra que o lead escolheu
+3. **T+3d** — `convite-teste-maturidade`: só envia se o lead AINDA não fez o teste
+4. **T+7d** — `posso-ajudar`: pergunta aberta + botão wa.me direto pro seu WhatsApp
+5. **T+14d** — `ultima-chamada`: reengajamento final + oferta de conversa rápida
 
-## Estilo dos templates
+### Regras de envio
+- Cada email checa antes de enviar se o lead **já avançou** (ex: se já marcou reunião, para a sequência)
+- Cada email tem condições próprias (ex: convite ao teste só se score = null)
+- Tudo respeita unsubscribe automático
 
-- Fundo branco (regra obrigatória), mas com blocos internos amarelos `#FFD700` e pretos `#000`
-- Headings em Arial Black uppercase
-- Botões com sombra deslocada brutalista
-- Sem links de descadastro manuais (sistema adiciona automaticamente no email do lead)
+---
 
-## Fora de escopo
+## Arquitetura técnica
 
-- Não vou criar um dashboard de logs de email (já existe `email_send_log`; podemos adicionar depois se quiser)
-- Não vou alterar emails de autenticação
-- Não vou criar campanhas/newsletter (apenas transacionais conforme política do Lovable)
+### Tabelas novas
+- `sales_sequence_jobs` — agenda de envios pendentes
+  - campos: lead_id, lead_email, lead_name, template_name, scheduled_for, status (pending/sent/skipped/cancelled), context (jsonb com tipo_evento, briefing_id etc), attempts
+- `sales_sequence_state` — controle por lead
+  - campos: lead_email, current_step, sequence_paused, paused_reason
 
-Posso seguir?
+### Edge Functions novas
+- `send-telegram-alert` — dispara mensagem no Telegram via connector gateway
+- `schedule-sales-sequence` — cria os 5 jobs agendados quando briefing é criado
+- `process-sales-sequence` — roda a cada 5 min via pg_cron, busca jobs `pending` com `scheduled_for <= now()`, valida condições, chama `send-transactional-email`, marca como sent
+
+### Conector
+- Conectar **Telegram** via `standard_connectors--connect` (gratuito, sem custos)
+
+### Cron job
+- `process-sales-sequence` executando `*/5 * * * *` (a cada 5 minutos)
+
+### Triggers no código
+- `BriefingForm.tsx`: ao inserir briefing → invoca `send-telegram-alert` + `schedule-sales-sequence`
+- Onde o teste de maturidade é concluído → invoca `send-telegram-alert`
+- Job separado detecta testes "abandonados" há 30min e dispara alerta uma única vez
+
+---
+
+## O que NÃO está no escopo
+- WhatsApp via Twilio (fica para fase 2, se você quiser depois)
+- SMS / push web
+- Painel de acompanhamento da régua no admin (posso adicionar depois)
+
+---
+
+## Ordem de execução
+1. Migration: criar `sales_sequence_jobs` + `sales_sequence_state` + cron job
+2. Conectar Telegram via connector
+3. Criar Edge Function `send-telegram-alert` + pedir seu chat_id
+4. Criar 5 templates de email + registrar no registry
+5. Criar Edge Functions `schedule-sales-sequence` e `process-sales-sequence`
+6. Integrar alertas nos triggers (briefing, teste concluído, teste abandonado)
+7. Deploy de tudo + teste end-to-end
+
+Você confirma o plano e eu implemento tudo de uma vez?
