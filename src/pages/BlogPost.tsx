@@ -186,7 +186,7 @@ const BlogPost = () => {
             <Share2 className="w-4 h-4 text-muted-foreground" />
             <span className="text-sm font-bold uppercase text-muted-foreground">Compartilhar:</span>
             <a
-              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`}
+              href={`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(shareUrl)}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-sm font-bold uppercase border-b-2 border-foreground hover:text-primary"
