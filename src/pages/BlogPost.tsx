@@ -156,7 +156,7 @@ const BlogPost = () => {
               <img
                 src={post.cover_image}
                 alt={post.cover_alt || post.title}
-                className="w-full aspect-[16/9] object-cover"
+                className="w-full h-auto"
                 loading="eager"
               />
               {post.cover_alt && (
