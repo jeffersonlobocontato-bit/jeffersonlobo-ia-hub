@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { TesteIAGate } from "@/components/teste-ia/TesteIAGate";
@@ -52,16 +52,11 @@ export default function TesteIA() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>Teste de Maturidade em IA — Jefferson Lobo</title>
-        <meta
-          name="description"
-          content="Diagnóstico gratuito de 8 minutos: descubra seu nível de maturidade em Inteligência Artificial e receba um plano de ação 30/60/90 dias."
-        />
-        <link rel="canonical" href="https://jeffersonlobo.tech/teste-ia" />
-        <meta property="og:title" content="Teste de Maturidade em IA — Jefferson Lobo" />
-        <meta property="og:description" content="Diagnóstico gratuito em 8 minutos com relatório personalizado." />
-      </Helmet>
+      <SEO
+        title="Teste de Maturidade em IA — Jefferson Lobo"
+        description="Diagnóstico gratuito de 8 minutos: descubra seu nível de maturidade em Inteligência Artificial e receba um plano de ação 30/60/90 dias."
+        path="/teste-ia"
+      />
       <Header />
       <main className="flex-1 pt-20 bg-brand-grid">
         {etapa === "gate" && (

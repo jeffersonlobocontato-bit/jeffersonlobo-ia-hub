@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;
@@ -63,6 +64,12 @@ const Unsubscribe = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <SEO
+        title="Descadastrar — Jefferson Lobo"
+        description="Descadastre seu email da lista de comunicação de Jefferson Lobo."
+        path="/unsubscribe"
+        noindex
+      />
       <div className="panel-dark max-w-lg w-full p-8 md:p-10 text-center space-y-5">
         {state.kind === 'loading' && (
           <>

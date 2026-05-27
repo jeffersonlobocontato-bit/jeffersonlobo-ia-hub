@@ -1,0 +1,9 @@
+# Jefferson Lobo
+
+> Palestrante, autor e consultor em Inteligência Artificial. Conteúdo prático sobre IA, inovação e transformação digital para empresas e lideranças.
+
+## Pages
+
+- [Home](/): Apresentação de Jefferson Lobo, palestras, cursos e consultoria em IA.
+- [Teste de Maturidade em IA](/teste-ia): Diagnóstico gratuito sobre o nível de maturidade da sua empresa ou time em IA.
+- [Política de Privacidade](/politica-privacidade): Como tratamos dados pessoais coletados no site.

@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { z } from 'zod';
+import { SEO } from '@/components/SEO';
 
 const emailSchema = z.string().email('Email inválido');
 const passwordSchema = z.string().min(6, 'Senha deve ter no mínimo 6 caracteres');
@@ -80,6 +81,12 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <SEO
+        title="Entrar — Jefferson Lobo"
+        description="Acesse sua conta para gerenciar seu Teste de Maturidade em IA e o portal de Jefferson Lobo."
+        path="/auth"
+        noindex
+      />
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       
       <Card className="w-full max-w-md relative z-10 border-primary/20 bg-background/95 backdrop-blur">

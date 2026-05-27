@@ -24,6 +24,7 @@ import AdminBriefingsTab from '@/components/admin/AdminBriefingsTab';
 import AdminStagePhotosTab from '@/components/admin/AdminStagePhotosTab';
 import AdminSpeakingLogosTab from '@/components/admin/AdminSpeakingLogosTab';
 import AdminPalestrasTab from '@/components/admin/AdminPalestrasTab';
+import { SEO } from '@/components/SEO';
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
@@ -390,6 +391,12 @@ const Admin = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title="Painel Admin — Jefferson Lobo"
+        description="Painel administrativo do portal de Jefferson Lobo."
+        path="/admin"
+        noindex
+      />
       {/* Debug Auth Info */}
       {import.meta.env.DEV && (
         <div className="bg-primary/90 text-primary-foreground text-xs py-1 px-4 text-center font-mono">
