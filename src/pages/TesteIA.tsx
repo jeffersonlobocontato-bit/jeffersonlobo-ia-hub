@@ -12,6 +12,7 @@ const STORAGE_KEY = "ia_maturity_progress_v1";
 export default function TesteIA() {
   const [etapa, setEtapa] = useState<Etapa>("gate");
   const [leadId, setLeadId] = useState<string>("");
+  const [accessToken, setAccessToken] = useState<string>("");
   const [finalidade, setFinalidade] = useState<"PF" | "PJ">("PF");
 
   // Force dark mode for brutalist aesthetic
@@ -25,8 +26,9 @@ export default function TesteIA() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw);
-        if (saved.leadId && saved.etapa) {
+        if (saved.leadId && saved.etapa && saved.accessToken) {
           setLeadId(saved.leadId);
+          setAccessToken(saved.accessToken);
           setFinalidade(saved.finalidade || "PF");
           setEtapa(saved.etapa);
         }
@@ -36,17 +38,18 @@ export default function TesteIA() {
 
   // Persist progress
   useEffect(() => {
-    if (leadId) {
+    if (leadId && accessToken) {
       localStorage.setItem(
         STORAGE_KEY,
-        JSON.stringify({ leadId, finalidade, etapa })
+        JSON.stringify({ leadId, accessToken, finalidade, etapa })
       );
     }
-  }, [leadId, finalidade, etapa]);
+  }, [leadId, accessToken, finalidade, etapa]);
 
   const resetProgress = () => {
     localStorage.removeItem(STORAGE_KEY);
     setLeadId("");
+    setAccessToken("");
     setEtapa("gate");
   };
 
@@ -61,8 +64,9 @@ export default function TesteIA() {
       <main className="flex-1 pt-20 bg-brand-grid">
         {etapa === "gate" && (
           <TesteIAGate
-            onComplete={(id, tipo) => {
+            onComplete={(id, tipo, token) => {
               setLeadId(id);
+              setAccessToken(token);
               setFinalidade(tipo);
               setEtapa("questionario");
             }}
@@ -71,16 +75,18 @@ export default function TesteIA() {
         {etapa === "questionario" && (
           <TesteIAQuestionario
             leadId={leadId}
+            accessToken={accessToken}
             finalidade={finalidade}
             onComplete={() => setEtapa("resultado")}
             onRestart={resetProgress}
           />
         )}
         {etapa === "resultado" && (
-          <TesteIADashboard leadId={leadId} onRestart={resetProgress} />
+          <TesteIADashboard leadId={leadId} accessToken={accessToken} onRestart={resetProgress} />
         )}
       </main>
       <Footer />
     </div>
   );
 }
+
