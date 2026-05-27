@@ -105,9 +105,9 @@ const BriefingForm = () => {
             <SelectTrigger><SelectValue /></SelectTrigger>
             <SelectContent>
               <SelectItem value="palestra">Palestra / Keynote</SelectItem>
-              <SelectItem value="workshop">Workshop ou Imersão</SelectItem>
-              <SelectItem value="consultoria">Consultoria estratégica</SelectItem>
-              <SelectItem value="imersao">Imersão executiva</SelectItem>
+              <SelectItem value="imersao">Imersão executiva (nivelamento + governança)</SelectItem>
+              <SelectItem value="consultoria">Consultoria estratégica (conversa com liderança)</SelectItem>
+              <SelectItem value="workshop">Workshop para time</SelectItem>
               <SelectItem value="outro">Outro</SelectItem>
             </SelectContent>
           </Select>
