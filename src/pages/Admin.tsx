@@ -22,6 +22,7 @@ import { AdminAnalyticsTab } from '@/components/admin/AdminAnalyticsTab';
 import { AdminTrustTab } from '@/components/admin/AdminTrustTab';
 import AdminBriefingsTab from '@/components/admin/AdminBriefingsTab';
 import AdminStagePhotosTab from '@/components/admin/AdminStagePhotosTab';
+import AdminSpeakingLogosTab from '@/components/admin/AdminSpeakingLogosTab';
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
