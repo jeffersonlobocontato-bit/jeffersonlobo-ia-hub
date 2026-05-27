@@ -41,25 +41,7 @@ const Header = () => {
           : 'border-transparent bg-transparent'
       }`}
     >
-      {/* Debug Auth Status - Remove in production */}
-      {import.meta.env.DEV && (
-        <div className="bg-primary/90 text-primary-foreground text-xs py-1 px-4 text-center font-mono">
-          Auth Status: {user ? (
-            <>
-              <User className="w-3 h-3 inline mr-1" />
-              Logado: {user.email?.substring(0, 20)}...
-              {isAdmin && (
-                  <Badge variant="default" className="ml-2 bg-secondary text-secondary-foreground">
-                  <Shield className="w-3 h-3 mr-1" />
-                  ADMIN
-                </Badge>
-              )}
-            </>
-          ) : (
-            <>❌ Não logado</>
-          )}
-        </div>
-      )}
+      {/* Debug banner removed for production polish */}
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-20 gap-4">
           {/* Logo */}
@@ -82,7 +64,7 @@ const Header = () => {
 
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            {['home', 'sobre', 'livro', 'blog', 'contato'].map((item) => (
+            {['home', 'palestras', 'sobre', 'livro', 'contato'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
@@ -141,7 +123,7 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-6 space-y-4 animate-fade-in bg-background border-t border-primary/20">
-            {['home', 'sobre', 'livro', 'blog', 'contato'].map((item) => (
+            {['home', 'palestras', 'sobre', 'livro', 'contato'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
