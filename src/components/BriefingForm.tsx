@@ -63,9 +63,18 @@ const BriefingForm = () => {
     trackCTA('briefing_submit', 'briefing_form');
     setSuccess(true);
 
-    // Fire-and-forget: emails não bloqueiam o sucesso do formulário.
+    // Fire-and-forget: emails e telegram não bloqueiam o sucesso do formulário.
     const data = parsed.data;
+    const telegramText = `🔔 <b>Novo Briefing</b>\n\n` +
+      `👤 <b>Nome:</b> ${data.nome}\n` +
+      `📧 <b>Email:</b> ${data.email}\n` +
+      (data.whatsapp ? `📱 <b>WhatsApp:</b> ${data.whatsapp}\n` : '') +
+      (data.empresa ? `🏢 <b>Empresa:</b> ${data.empresa}\n` : '') +
+      (data.tipo ? `🎤 <b>Tipo:</b> ${data.tipo}\n` : '') +
+      (data.data_evento ? `📅 <b>Data:</b> ${data.data_evento}\n` : '') +
+      (data.mensagem ? `\n💬 ${data.mensagem}` : '');
     void Promise.allSettled([
+      supabase.functions.invoke('notify-telegram', { body: { text: telegramText } }),
       supabase.functions.invoke('send-transactional-email', {
         body: {
           templateName: 'briefing-internal-notification',

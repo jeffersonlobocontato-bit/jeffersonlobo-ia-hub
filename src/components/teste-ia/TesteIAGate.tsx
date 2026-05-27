@@ -65,6 +65,15 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
       });
 
       if (error) throw error;
+
+      // Fire-and-forget: notificação Telegram
+      const telegramText = `🧠 <b>Novo Lead - Teste IA</b>\n\n` +
+        `👤 <b>Nome:</b> ${nome.trim()}\n` +
+        `📧 <b>Email:</b> ${email.trim().toLowerCase()}\n` +
+        `📱 <b>WhatsApp:</b> ${whatsapp.replace(/\D/g, "")}\n` +
+        `🎯 <b>Finalidade:</b> ${finalidade}`;
+      void supabase.functions.invoke('notify-telegram', { body: { text: telegramText } });
+
       toast.success("Vamos começar seu diagnóstico!");
       onComplete(leadId, finalidade);
     } catch (error: any) {
