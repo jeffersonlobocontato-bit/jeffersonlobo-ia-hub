@@ -126,19 +126,18 @@ export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplet
       else if (scoreGeral < 4.0) nivelMaturidade = "Em evolução";
       else nivelMaturidade = "Avançado";
 
-      await supabase
-        .from("ia_maturity_leads")
-        .update({
-          respostas: arr,
-          score_basico: scoreBasico,
-          score_intermediario: scoreIntermediario,
-          score_avancado: scoreAvancado,
-          score_geral: scoreGeral,
-          competencias,
-          nivel_maturidade: nivelMaturidade,
-          concluido: true,
-        })
-        .eq("id", leadId);
+      await supabase.rpc("finalize_maturity_lead", {
+        p_id: leadId,
+        p_token: accessToken,
+        p_respostas: arr as any,
+        p_score_basico: scoreBasico,
+        p_score_intermediario: scoreIntermediario,
+        p_score_avancado: scoreAvancado,
+        p_score_geral: scoreGeral,
+        p_competencias: competencias as any,
+        p_nivel_maturidade: nivelMaturidade,
+      });
+
 
       toast.success("Teste finalizado! Veja seu resultado.");
       onComplete();
