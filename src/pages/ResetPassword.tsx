@@ -52,6 +52,12 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <SEO
+        title="Redefinir senha — Jefferson Lobo"
+        description="Crie uma nova senha de acesso à sua conta no portal de Jefferson Lobo."
+        path="/reset-password"
+        noindex
+      />
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       
       <Card className="w-full max-w-md relative z-10 border-primary/20 bg-background/95 backdrop-blur">

@@ -81,6 +81,12 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-4">
+      <SEO
+        title="Entrar — Jefferson Lobo"
+        description="Acesse sua conta para gerenciar seu Teste de Maturidade em IA e o portal de Jefferson Lobo."
+        path="/auth"
+        noindex
+      />
       <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       
       <Card className="w-full max-w-md relative z-10 border-primary/20 bg-background/95 backdrop-blur">
