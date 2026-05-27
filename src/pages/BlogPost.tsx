@@ -117,25 +117,6 @@ const BlogPost = () => {
       <Header />
 
       <main className="pt-24 pb-16">
-        {/* Editorial header — full bleed cover */}
-        {post.cover_image && (
-          <figure className="w-full mb-10">
-            <div className="container mx-auto px-0 md:px-4 max-w-5xl">
-              <img
-                src={post.cover_image}
-                alt={post.cover_alt || post.title}
-                className="w-full aspect-[16/9] md:aspect-[21/9] object-cover"
-                loading="eager"
-              />
-              {post.cover_alt && (
-                <figcaption className="text-xs text-muted-foreground mt-2 px-4 italic">
-                  {post.cover_alt}
-                </figcaption>
-              )}
-            </div>
-          </figure>
-        )}
-
         <article className="container mx-auto px-5 max-w-[680px]">
           <nav aria-label="Breadcrumb" className="mb-6 text-xs">
             <Link to="/" className="text-muted-foreground hover:text-primary uppercase font-bold tracking-wider">Home</Link>
@@ -143,7 +124,7 @@ const BlogPost = () => {
             <Link to="/blog" className="text-muted-foreground hover:text-primary uppercase font-bold tracking-wider">Blog</Link>
           </nav>
 
-          <header className="mb-10">
+          <header className="mb-8">
             <div className="mb-5">
               <span className="text-xs font-black uppercase tracking-[0.2em] text-primary border-b-2 border-primary pb-1">
                 {post.category}
@@ -169,6 +150,22 @@ const BlogPost = () => {
               )}
             </div>
           </header>
+
+          {post.cover_image && (
+            <figure className="mb-10 -mx-5 md:mx-0">
+              <img
+                src={post.cover_image}
+                alt={post.cover_alt || post.title}
+                className="w-full aspect-[16/9] object-cover"
+                loading="eager"
+              />
+              {post.cover_alt && (
+                <figcaption className="text-xs text-muted-foreground mt-2 px-5 md:px-0 italic">
+                  {post.cover_alt}
+                </figcaption>
+              )}
+            </figure>
+          )}
 
           {post.content_md && <BlogContent content={post.content_md} slug={post.slug} />}
 
