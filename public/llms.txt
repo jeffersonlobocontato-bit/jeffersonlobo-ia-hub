@@ -5,5 +5,11 @@
 ## Pages
 
 - [Home](/): Apresentação de Jefferson Lobo, palestras, cursos e consultoria em IA.
+- [Blog](/blog): Artigos e análises sobre Inteligência Artificial, tecnologia e o futuro do trabalho.
 - [Teste de Maturidade em IA](/teste-ia): Diagnóstico gratuito sobre o nível de maturidade da sua empresa ou time em IA.
 - [Política de Privacidade](/politica-privacidade): Como tratamos dados pessoais coletados no site.
+
+## Blog feeds
+
+- Sitemap completo com todos os artigos: /sitemap.xml
+- Cada artigo está em /blog/:slug com Schema.org Article + BreadcrumbList.
