@@ -57,15 +57,20 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
     setLoading(true);
     try {
       const leadId = crypto.randomUUID();
-      const { error } = await supabase.from("ia_maturity_leads").insert({
-        id: leadId,
-        nome: nome.trim(),
-        email: email.trim().toLowerCase(),
-        whatsapp: whatsapp.replace(/\D/g, ""),
-        finalidade,
-      });
+      const { data, error } = await supabase
+        .from("ia_maturity_leads")
+        .insert({
+          id: leadId,
+          nome: nome.trim(),
+          email: email.trim().toLowerCase(),
+          whatsapp: whatsapp.replace(/\D/g, ""),
+          finalidade,
+        })
+        .select("id, access_token")
+        .single();
 
       if (error) throw error;
+      const accessToken = (data as any)?.access_token as string;
 
       // Fire-and-forget: notificação Telegram
       const telegramText = `🧠 <b>Novo Lead - Teste IA</b>\n\n` +
@@ -76,7 +81,8 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
       void supabase.functions.invoke('notify-telegram', { body: { text: telegramText } });
 
       toast.success("Vamos começar seu diagnóstico!");
-      onComplete(leadId, finalidade);
+      onComplete(leadId, finalidade, accessToken);
+
     } catch (error: any) {
       console.error("Erro:", error);
       if (error?.code === "23505") {
