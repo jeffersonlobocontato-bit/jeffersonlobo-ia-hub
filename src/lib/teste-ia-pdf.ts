@@ -364,6 +364,110 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
     });
   }
 
+  // === PÁGINA FINAL — CTA SPEAKER / CONSULTOR ===
+  pdf.addPage();
+  pdf.setFillColor(13, 13, 13);
+  pdf.rect(0, 0, W, H, "F");
+
+  // Faixa amarela superior
+  pdf.setFillColor(252, 211, 77);
+  pdf.rect(0, 0, W, 55, "F");
+  pdf.setTextColor(13, 13, 13);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.text("PRÓXIMO PASSO", M, 22);
+  pdf.setFontSize(26);
+  pdf.text("LEVE ESSA CONVERSA", M, 36);
+  pdf.text("PARA DENTRO DA SUA EMPRESA", M, 48);
+
+  // Pitch
+  let cy = 72;
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(13);
+  const pitchTitle =
+    lead.finalidade === "PJ"
+      ? "Sua liderança e seus times precisam falar a mesma língua de IA."
+      : "Se a empresa onde você atua ainda trata IA como hype, esse relatório é só o começo.";
+  const pitchTitleLines = pdf.splitTextToSize(pitchTitle, CONTENT_W);
+  pdf.text(pitchTitleLines, M, cy);
+  cy += pitchTitleLines.length * 6 + 6;
+
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10.5);
+  pdf.setTextColor(220, 220, 220);
+  const pitch = [
+    "Sou Jefferson Lobo — estrategista de IA, palestrante e consultor para empresas que querem sair do improviso e construir uma operação madura, ética e produtiva com Inteligência Artificial.",
+    "",
+    "Trabalho com:",
+    "• Palestras e keynotes para eventos corporativos, convenções e summits.",
+    "• Imersões e workshops de sensibilização e mudança de mindset para lideranças e equipes.",
+    "• Consultoria estratégica para estruturar governança, processos e capacitação em IA.",
+    "",
+    lead.finalidade === "PJ"
+      ? "Se esse diagnóstico apontou lacunas em estratégia, pessoas, governança ou segurança — é exatamente aí que eu atuo. Posso desenhar um programa sob medida para sua empresa."
+      : "Se você identifica que a empresa onde você trabalha precisa desse despertar — me indique. Posso conversar com a liderança e desenhar uma ação sob medida (palestra, imersão ou consultoria).",
+  ];
+  pitch.forEach((p) => {
+    if (p === "") {
+      cy += 3;
+      return;
+    }
+    const lines = pdf.splitTextToSize(p, CONTENT_W);
+    pdf.text(lines, M, cy);
+    cy += lines.length * 5 + 2;
+  });
+
+  // Caixa de contato
+  cy += 6;
+  const boxH = 58;
+  pdf.setFillColor(252, 211, 77);
+  pdf.rect(M, cy, CONTENT_W, boxH, "F");
+  pdf.setTextColor(13, 13, 13);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.text("FALE COMIGO", M + 5, cy + 10);
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(14);
+  pdf.text("JEFFERSON LOBO", M + 5, cy + 20);
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.text("Estrategista de IA · Palestrante · Consultor", M + 5, cy + 27);
+
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10);
+  let ly = cy + 38;
+  pdf.text("Site:", M + 5, ly);
+  pdf.setFont("helvetica", "normal");
+  pdf.textWithLink("jeffersonlobo.tech", M + 22, ly, { url: "https://jeffersonlobo.tech" });
+
+  ly += 6;
+  pdf.setFont("helvetica", "bold");
+  pdf.text("E-mail:", M + 5, ly);
+  pdf.setFont("helvetica", "normal");
+  pdf.textWithLink("contato@jeffersonlobo.tech", M + 22, ly, { url: "mailto:contato@jeffersonlobo.tech" });
+
+  ly += 6;
+  pdf.setFont("helvetica", "bold");
+  pdf.text("LinkedIn:", M + 5, ly);
+  pdf.setFont("helvetica", "normal");
+  pdf.textWithLink("linkedin.com/in/jeffersonlobo", M + 27, ly, { url: "https://www.linkedin.com/in/jeffersonlobo" });
+
+  // Selo laranja
+  pdf.setFillColor(234, 88, 12);
+  pdf.rect(M, cy + boxH + 6, CONTENT_W, 18, "F");
+  pdf.setTextColor(255, 255, 255);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(11);
+  pdf.text(
+    "INDIQUE PARA SUA EMPRESA · AGENDE UMA CONVERSA SEM COMPROMISSO",
+    W / 2,
+    cy + boxH + 18,
+    { align: "center" }
+  );
+
+
   // === RODAPÉ ===
   const pages = pdf.internal.pages.length - 1;
   for (let i = 1; i <= pages; i++) {
