@@ -18,10 +18,12 @@ interface Question {
 
 interface TesteIAQuestionarioProps {
   leadId: string;
+  accessToken: string;
   finalidade: "PF" | "PJ";
   onComplete: () => void;
   onRestart?: () => void;
 }
+
 
 const nivelLabel: Record<string, string> = {
   BASICO: "Básico",
