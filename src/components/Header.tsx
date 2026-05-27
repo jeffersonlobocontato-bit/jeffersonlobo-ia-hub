@@ -1,9 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Menu, X, MessageCircle, Shield, LogOut, User, UserCheck } from 'lucide-react';
+import { Menu, X, Shield, LogOut } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
-import { Badge } from '@/components/ui/badge';
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);

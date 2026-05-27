@@ -20,6 +20,7 @@ import AdminChatLeadsTab from '@/components/admin/AdminChatLeadsTab';
 import { AdminKnowledgeTab } from '@/components/admin/AdminKnowledgeTab';
 import { AdminAnalyticsTab } from '@/components/admin/AdminAnalyticsTab';
 import { AdminTrustTab } from '@/components/admin/AdminTrustTab';
+import AdminBriefingsTab from '@/components/admin/AdminBriefingsTab';
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
@@ -425,6 +426,7 @@ const Admin = () => {
             <TabsTrigger value="podcast">Podcast</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="leads">Leads IA</TabsTrigger>
+            <TabsTrigger value="briefings">Briefings</TabsTrigger>
             <TabsTrigger value="chat-leads">Chat</TabsTrigger>
             <TabsTrigger value="knowledge">Base RAG</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
