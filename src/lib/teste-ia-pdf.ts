@@ -1,9 +1,11 @@
 import jsPDF from "jspdf";
 
+export type Finalidade = "PF" | "PJ" | string;
+
 export interface PdfLead {
   nome: string;
   email?: string;
-  finalidade: string;
+  finalidade: Finalidade;
   score_basico: number | null;
   score_intermediario: number | null;
   score_avancado: number | null;
@@ -12,14 +14,30 @@ export interface PdfLead {
   competencias: Record<string, number> | null;
 }
 
+export interface AprendizadoItem {
+  tipo?: string;
+  titulo?: string;
+  fonte?: string;
+  link?: string;
+}
+
 export interface PdfRecommendation {
   competencia: string;
   nivel: string;
   titulo: string;
   descricao: string;
+  por_que_importa?: string | null;
   acao_30d: string | null;
   acao_60d: string | null;
   acao_90d: string | null;
+  acao_pf_30d?: string | null;
+  acao_pf_60d?: string | null;
+  acao_pf_90d?: string | null;
+  acao_pj_30d?: string | null;
+  acao_pj_60d?: string | null;
+  acao_pj_90d?: string | null;
+  aprendizado_pf?: AprendizadoItem[] | null;
+  aprendizado_pj?: AprendizadoItem[] | null;
 }
 
 const competenciaLabels: Record<string, string> = {
@@ -32,6 +50,20 @@ const competenciaLabels: Record<string, string> = {
   seguranca: "Segurança",
   governanca: "Governança",
 };
+
+function pickAcoes(rec: PdfRecommendation, finalidade: Finalidade) {
+  const isPJ = finalidade === "PJ";
+  return {
+    d30: (isPJ ? rec.acao_pj_30d : rec.acao_pf_30d) || rec.acao_30d || "",
+    d60: (isPJ ? rec.acao_pj_60d : rec.acao_pf_60d) || rec.acao_60d || "",
+    d90: (isPJ ? rec.acao_pj_90d : rec.acao_pf_90d) || rec.acao_90d || "",
+  };
+}
+
+function pickAprendizado(rec: PdfRecommendation, finalidade: Finalidade): AprendizadoItem[] {
+  const list = finalidade === "PJ" ? rec.aprendizado_pj : rec.aprendizado_pf;
+  return Array.isArray(list) ? list : [];
+}
 
 export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommendation[]) {
   if (lead.score_geral == null) throw new Error("Relatório indisponível: lead sem score.");
@@ -50,8 +82,10 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   const pdf = new jsPDF("p", "mm", "a4");
   const W = pdf.internal.pageSize.getWidth();
   const H = pdf.internal.pageSize.getHeight();
+  const M = 15; // margem
+  const CONTENT_W = W - M * 2;
 
-  // CAPA
+  // === CAPA ===
   pdf.setFillColor(13, 13, 13);
   pdf.rect(0, 0, W, H, "F");
   pdf.setFillColor(252, 211, 77);
@@ -59,51 +93,51 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   pdf.setTextColor(13, 13, 13);
   pdf.setFont("helvetica", "bold");
   pdf.setFontSize(32);
-  pdf.text("TESTE DE", 15, 28);
-  pdf.text("MATURIDADE EM IA", 15, 44);
+  pdf.text("TESTE DE", M, 28);
+  pdf.text("MATURIDADE EM IA", M, 44);
 
   pdf.setFontSize(11);
   pdf.setTextColor(252, 211, 77);
-  pdf.text("RELATÓRIO PERSONALIZADO", 15, 80);
+  pdf.text("RELATÓRIO PERSONALIZADO", M, 80);
 
   pdf.setFontSize(28);
   pdf.setTextColor(255, 255, 255);
-  pdf.text(lead.nome.toUpperCase(), 15, 95);
+  pdf.text(lead.nome.toUpperCase(), M, 95);
 
   pdf.setFontSize(11);
   pdf.setTextColor(180, 180, 180);
   pdf.text(
-    `${new Date().toLocaleDateString("pt-BR")} · ${lead.finalidade === "PF" ? "Pessoa Física" : "Pessoa Jurídica"}`,
-    15,
+    `${new Date().toLocaleDateString("pt-BR")} · ${lead.finalidade === "PF" ? "Profissional (PF)" : "Liderança / Empresário (PJ)"}`,
+    M,
     105
   );
 
   pdf.setFillColor(252, 211, 77);
-  pdf.rect(15, 125, W - 30, 40, "F");
+  pdf.rect(M, 125, CONTENT_W, 40, "F");
   pdf.setTextColor(13, 13, 13);
   pdf.setFontSize(10);
-  pdf.text("SEU NÍVEL DE MATURIDADE", 20, 137);
+  pdf.text("SEU NÍVEL DE MATURIDADE", M + 5, 137);
   pdf.setFontSize(28);
-  pdf.text((lead.nivel_maturidade || "-").toUpperCase(), 20, 158);
+  pdf.text((lead.nivel_maturidade || "-").toUpperCase(), M + 5, 158);
 
   pdf.setFillColor(234, 88, 12);
-  pdf.rect(15, 175, W - 30, 40, "F");
+  pdf.rect(M, 175, CONTENT_W, 40, "F");
   pdf.setTextColor(255, 255, 255);
   pdf.setFontSize(10);
-  pdf.text("SCORE GERAL", 20, 187);
+  pdf.text("SCORE GERAL", M + 5, 187);
   pdf.setFontSize(36);
-  pdf.text(`${lead.score_geral.toFixed(1)}`, 20, 210);
+  pdf.text(`${lead.score_geral.toFixed(1)}`, M + 5, 210);
   pdf.setFontSize(14);
-  pdf.text("/5.0", 55, 210);
+  pdf.text("/5.0", M + 40, 210);
 
-  // PÁGINA 2
+  // === PÁGINA 2 — SCORES + COMPETÊNCIAS ===
   pdf.addPage();
   pdf.setFillColor(255, 255, 255);
   pdf.rect(0, 0, W, H, "F");
 
   pdf.setTextColor(13, 13, 13);
   pdf.setFontSize(20);
-  pdf.text("SCORES POR NÍVEL", 15, 25);
+  pdf.text("SCORES POR NÍVEL", M, 25);
 
   pdf.setFontSize(12);
   const niveis = [
@@ -114,33 +148,40 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   let y = 40;
   niveis.forEach((n) => {
     pdf.setFillColor(240, 240, 240);
-    pdf.rect(15, y, W - 30, 14, "F");
+    pdf.rect(M, y, CONTENT_W, 14, "F");
     pdf.setFillColor(252, 211, 77);
-    pdf.rect(15, y, ((W - 30) * (n.v || 0)) / 5, 14, "F");
+    pdf.rect(M, y, (CONTENT_W * (n.v || 0)) / 5, 14, "F");
     pdf.setTextColor(13, 13, 13);
     pdf.setFontSize(11);
-    pdf.text(`${n.l}`, 20, y + 9);
-    pdf.text(`${(n.v || 0).toFixed(1)}/5.0`, W - 35, y + 9);
+    pdf.text(`${n.l}`, M + 5, y + 9);
+    pdf.text(`${(n.v || 0).toFixed(1)}/5.0`, W - M - 20, y + 9);
     y += 20;
   });
 
   y += 10;
   pdf.setFontSize(20);
-  pdf.text("COMPETÊNCIAS", 15, y);
+  pdf.text("COMPETÊNCIAS", M, y);
   y += 12;
   pdf.setFontSize(11);
   Object.entries(competencias).forEach(([k, v]) => {
     pdf.setFillColor(240, 240, 240);
-    pdf.rect(15, y, W - 30, 10, "F");
+    pdf.rect(M, y, CONTENT_W, 10, "F");
     pdf.setFillColor(252, 211, 77);
-    pdf.rect(15, y, ((W - 30) * v) / 5, 10, "F");
+    pdf.rect(M, y, (CONTENT_W * v) / 5, 10, "F");
     pdf.setTextColor(13, 13, 13);
-    pdf.text(competenciaLabels[k] || k, 20, y + 7);
-    pdf.text(`${v.toFixed(1)}`, W - 30, y + 7);
+    pdf.text(competenciaLabels[k] || k, M + 5, y + 7);
+    pdf.text(`${v.toFixed(1)}`, W - M - 10, y + 7);
     y += 14;
   });
 
-  // PÁGINA 3
+  // === PÁGINA 3 — PLANO DE AÇÃO 30/60/90 ===
+  const ensureSpace = (need: number) => {
+    if (y > H - need - 12) {
+      pdf.addPage();
+      y = 25;
+    }
+  };
+
   if (planoAcao.length > 0) {
     pdf.addPage();
     pdf.setFillColor(255, 255, 255);
@@ -148,45 +189,182 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
     pdf.setTextColor(13, 13, 13);
     pdf.setFontSize(20);
-    pdf.text("PLANO DE AÇÃO 30/60/90", 15, 25);
+    pdf.setFont("helvetica", "bold");
+    pdf.text("PLANO DE AÇÃO 30 / 60 / 90", M, 25);
 
-    y = 40;
+    pdf.setFontSize(10);
+    pdf.setFont("helvetica", "normal");
+    pdf.setTextColor(110, 110, 110);
+    const personaLine =
+      lead.finalidade === "PJ"
+        ? "Recomendações para liderança, gestores e empresários (PJ)"
+        : "Recomendações para profissionais de mercado (PF)";
+    pdf.text(personaLine, M, 32);
+
+    y = 44;
+
     planoAcao.forEach((p, i) => {
-      if (y > H - 60) {
-        pdf.addPage();
-        y = 25;
-      }
+      const acoes = pickAcoes(p.rec, lead.finalidade);
+
+      ensureSpace(60);
+
+      // Cabeçalho do bloco
       pdf.setFillColor(13, 13, 13);
-      pdf.rect(15, y, W - 30, 8, "F");
+      pdf.rect(M, y, CONTENT_W, 9, "F");
       pdf.setTextColor(252, 211, 77);
+      pdf.setFont("helvetica", "bold");
       pdf.setFontSize(11);
-      pdf.text(`${i + 1}. ${p.competencia.toUpperCase()} — ${p.rec.titulo}`, 18, y + 6);
-      y += 12;
+      const headerText = `${i + 1}. ${p.competencia.toUpperCase()} — ${p.rec.titulo}`;
+      const headerLines = pdf.splitTextToSize(headerText, CONTENT_W - 6);
+      pdf.text(headerLines[0], M + 3, y + 6);
+      y += 13;
 
-      pdf.setTextColor(60, 60, 60);
+      // Score
+      pdf.setFont("helvetica", "normal");
+      pdf.setTextColor(120, 120, 120);
+      pdf.setFontSize(9);
+      pdf.text(`Score atual: ${p.score.toFixed(1)}/5`, M, y);
+      y += 6;
+
+      // Descrição
       pdf.setFontSize(10);
-      const desc = pdf.splitTextToSize(p.rec.descricao, W - 30);
-      pdf.text(desc, 15, y);
-      y += desc.length * 5 + 4;
+      pdf.setTextColor(60, 60, 60);
+      const desc = pdf.splitTextToSize(p.rec.descricao || "", CONTENT_W);
+      pdf.text(desc, M, y);
+      y += desc.length * 4.5 + 3;
 
-      [
-        { l: "30 DIAS", t: p.rec.acao_30d },
-        { l: "60 DIAS", t: p.rec.acao_60d },
-        { l: "90 DIAS", t: p.rec.acao_90d },
-      ].forEach((step) => {
-        if (!step.t) return;
-        pdf.setTextColor(234, 88, 12);
+      // Por que importa
+      if (p.rec.por_que_importa) {
+        ensureSpace(20);
+        pdf.setFont("helvetica", "bold");
         pdf.setFontSize(9);
-        pdf.text(`▸ ${step.l}`, 15, y);
-        pdf.setTextColor(13, 13, 13);
-        const tt = pdf.splitTextToSize(step.t, W - 50);
-        pdf.text(tt, 35, y);
-        y += tt.length * 5 + 2;
+        pdf.setTextColor(234, 88, 12);
+        pdf.text("POR QUE IMPORTA", M, y);
+        y += 5;
+        pdf.setFont("helvetica", "italic");
+        pdf.setFontSize(9);
+        pdf.setTextColor(60, 60, 60);
+        const pqi = pdf.splitTextToSize(p.rec.por_que_importa, CONTENT_W);
+        pdf.text(pqi, M, y);
+        y += pqi.length * 4.5 + 4;
+      }
+
+      // Etapas 30/60/90 — layout em linhas separadas com badge à esquerda
+      const steps = [
+        { l: "30 DIAS", t: acoes.d30, bg: [252, 211, 77], fg: [13, 13, 13] },
+        { l: "60 DIAS", t: acoes.d60, bg: [234, 88, 12], fg: [255, 255, 255] },
+        { l: "90 DIAS", t: acoes.d90, bg: [13, 13, 13], fg: [252, 211, 77] },
+      ];
+      const BADGE_W = 22;
+      const TEXT_X = M + BADGE_W + 4;
+      const TEXT_W = CONTENT_W - BADGE_W - 4;
+
+      steps.forEach((step) => {
+        if (!step.t) return;
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9.5);
+        pdf.setTextColor(30, 30, 30);
+        const lines = pdf.splitTextToSize(step.t, TEXT_W);
+        const blockH = Math.max(10, lines.length * 4.5 + 3);
+        ensureSpace(blockH + 2);
+
+        // Badge
+        pdf.setFillColor(step.bg[0], step.bg[1], step.bg[2]);
+        pdf.rect(M, y, BADGE_W, blockH, "F");
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(8);
+        pdf.setTextColor(step.fg[0], step.fg[1], step.fg[2]);
+        pdf.text(step.l, M + BADGE_W / 2, y + blockH / 2 + 2, { align: "center" });
+
+        // Texto
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9.5);
+        pdf.setTextColor(30, 30, 30);
+        pdf.text(lines, TEXT_X, y + 5);
+
+        y += blockH + 3;
       });
-      y += 8;
+
+      y += 6;
     });
   }
 
+  // === PÁGINA(S) FINAL — TRILHA DE CONHECIMENTO ===
+  const trilhas = planoAcao
+    .map((p) => ({ comp: p.competencia, items: pickAprendizado(p.rec, lead.finalidade) }))
+    .filter((t) => t.items.length > 0);
+
+  if (trilhas.length > 0) {
+    pdf.addPage();
+    pdf.setFillColor(255, 255, 255);
+    pdf.rect(0, 0, W, H, "F");
+    pdf.setTextColor(13, 13, 13);
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(20);
+    pdf.text("TRILHA DE CONHECIMENTO", M, 25);
+
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    pdf.setTextColor(110, 110, 110);
+    const trilhaSub =
+      lead.finalidade === "PJ"
+        ? "Curadoria para líderes, gestores e empresários — livros, cursos, frameworks e comunidades."
+        : "Curadoria para profissionais de mercado — livros, cursos, práticas e comunidades.";
+    const subLines = pdf.splitTextToSize(trilhaSub, CONTENT_W);
+    pdf.text(subLines, M, 32);
+
+    y = 32 + subLines.length * 5 + 8;
+
+    trilhas.forEach((t) => {
+      ensureSpace(20);
+      pdf.setFillColor(252, 211, 77);
+      pdf.rect(M, y, CONTENT_W, 8, "F");
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(11);
+      pdf.setTextColor(13, 13, 13);
+      pdf.text(t.comp.toUpperCase(), M + 3, y + 5.5);
+      y += 12;
+
+      t.items.forEach((it) => {
+        const tipo = (it.tipo || "Recurso").toUpperCase();
+        const titulo = it.titulo || "";
+        const fonte = it.fonte || "";
+
+        // tipo badge
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(8);
+        const tipoW = pdf.getTextWidth(tipo) + 6;
+        const tipoTextLines = pdf.splitTextToSize(`${titulo}${fonte ? " — " + fonte : ""}`, CONTENT_W - tipoW - 6);
+        const blockH = Math.max(8, tipoTextLines.length * 4.3 + 2);
+        ensureSpace(blockH + 5);
+
+        pdf.setFillColor(13, 13, 13);
+        pdf.rect(M, y, tipoW, 6, "F");
+        pdf.setTextColor(252, 211, 77);
+        pdf.text(tipo, M + 3, y + 4.2);
+
+        // Texto
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9.5);
+        pdf.setTextColor(30, 30, 30);
+        pdf.text(tipoTextLines, M + tipoW + 3, y + 4.2);
+
+        y += blockH + 3;
+
+        if (it.link) {
+          pdf.setFont("helvetica", "normal");
+          pdf.setFontSize(8);
+          pdf.setTextColor(80, 110, 180);
+          const linkLines = pdf.splitTextToSize(it.link, CONTENT_W - 6);
+          pdf.textWithLink(linkLines[0], M + tipoW + 3, y, { url: it.link });
+          y += 5;
+        }
+      });
+      y += 6;
+    });
+  }
+
+  // === RODAPÉ ===
   const pages = pdf.internal.pages.length - 1;
   for (let i = 1; i <= pages; i++) {
     pdf.setPage(i);

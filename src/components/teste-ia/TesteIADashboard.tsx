@@ -33,14 +33,30 @@ interface Lead {
   respostas: any[];
 }
 
+interface AprendizadoItem {
+  tipo?: string;
+  titulo?: string;
+  fonte?: string;
+  link?: string;
+}
+
 interface Recommendation {
   competencia: string;
   nivel: string;
   titulo: string;
   descricao: string;
+  por_que_importa?: string | null;
   acao_30d: string | null;
   acao_60d: string | null;
   acao_90d: string | null;
+  acao_pf_30d?: string | null;
+  acao_pf_60d?: string | null;
+  acao_pf_90d?: string | null;
+  acao_pj_30d?: string | null;
+  acao_pj_60d?: string | null;
+  acao_pj_90d?: string | null;
+  aprendizado_pf?: AprendizadoItem[] | null;
+  aprendizado_pj?: AprendizadoItem[] | null;
 }
 
 interface TesteIADashboardProps {
