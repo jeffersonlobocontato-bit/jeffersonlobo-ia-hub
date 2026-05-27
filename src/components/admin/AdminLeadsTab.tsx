@@ -5,9 +5,20 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
-import { Download, ExternalLink } from "lucide-react";
+import { Download, ExternalLink, FileDown, Trash2 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { generateTesteIAPdf } from "@/lib/teste-ia-pdf";
 
 interface Lead {
   id: string;
@@ -17,6 +28,9 @@ interface Lead {
   finalidade: string;
   concluido: boolean;
   score_geral: number | null;
+  score_basico: number | null;
+  score_intermediario: number | null;
+  score_avancado: number | null;
   nivel_maturidade: string | null;
   created_at: string;
   competencias: Record<string, number> | null;
@@ -25,6 +39,8 @@ interface Lead {
 export function AdminLeadsTab() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [loading, setLoading] = useState(true);
+  const [leadToDelete, setLeadToDelete] = useState<Lead | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
 
   useEffect(() => {
     loadLeads();
@@ -44,6 +60,47 @@ export function AdminLeadsTab() {
       toast.error("Erro ao carregar leads");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDownloadReport = async (lead: Lead) => {
+    if (!lead.concluido || lead.score_geral == null) {
+      toast.error("Lead ainda não concluiu o teste.");
+      return;
+    }
+    setDownloadingId(lead.id);
+    try {
+      const { data: recs, error } = await supabase
+        .from("ia_maturity_recommendations")
+        .select("*")
+        .eq("ativo", true)
+        .order("ordem");
+      if (error) throw error;
+      generateTesteIAPdf(lead as any, (recs || []) as any);
+      toast.success("Relatório baixado!");
+    } catch (e) {
+      console.error(e);
+      toast.error("Erro ao gerar relatório");
+    } finally {
+      setDownloadingId(null);
+    }
+  };
+
+  const handleDeleteLead = async () => {
+    if (!leadToDelete) return;
+    try {
+      const { error } = await supabase
+        .from("ia_maturity_leads")
+        .delete()
+        .eq("id", leadToDelete.id);
+      if (error) throw error;
+      toast.success("Lead excluído");
+      setLeads((prev) => prev.filter((l) => l.id !== leadToDelete.id));
+    } catch (e) {
+      console.error(e);
+      toast.error("Erro ao excluir lead");
+    } finally {
+      setLeadToDelete(null);
     }
   };
 
@@ -172,16 +229,37 @@ export function AdminLeadsTab() {
                         {format(new Date(lead.created_at), "dd/MM/yy HH:mm", { locale: ptBR })}
                       </TableCell>
                       <TableCell className="text-right">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => {
-                            const url = `https://wa.me/${lead.whatsapp.replace(/\D/g, "")}`;
-                            window.open(url, "_blank");
-                          }}
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </Button>
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Baixar relatório PDF"
+                            disabled={!lead.concluido || downloadingId === lead.id}
+                            onClick={() => handleDownloadReport(lead)}
+                          >
+                            <FileDown className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Abrir WhatsApp"
+                            onClick={() => {
+                              const url = `https://wa.me/${lead.whatsapp.replace(/\D/g, "")}`;
+                              window.open(url, "_blank");
+                            }}
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            title="Excluir lead"
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            onClick={() => setLeadToDelete(lead)}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))
@@ -198,6 +276,30 @@ export function AdminLeadsTab() {
           )}
         </CardContent>
       </Card>
+
+      <AlertDialog open={!!leadToDelete} onOpenChange={(open) => !open && setLeadToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Excluir lead?</AlertDialogTitle>
+            <AlertDialogDescription>
+              {leadToDelete && (
+                <>
+                  Esta ação removerá permanentemente o lead <strong>{leadToDelete.nome}</strong> ({leadToDelete.email}) e seu resultado do teste. Não pode ser desfeita.
+                </>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteLead}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Excluir
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
