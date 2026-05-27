@@ -25,13 +25,13 @@ const PalestrasSection = () => {
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-3xl mx-auto text-center mb-14 space-y-4">
-          <div className="section-kicker">Palestras · Workshops · Consultoria</div>
+          <div className="section-kicker">Palestras · Imersões · Consultoria</div>
           <h2 className="display-title text-4xl sm:text-5xl md:text-6xl">
             Leve a conversa de <span className="highlight-yellow">IA</span> para dentro da sua empresa
           </h2>
           <p className="text-lg text-muted-foreground">
-            Três formatos para sensibilizar lideranças, capacitar times e estruturar a jornada de IA da
-            sua organização — do palco ao roadmap executivo.
+            Três formatos para sensibilizar lideranças, nivelar a linguagem sobre IA e iniciar a
+            jornada de governança — do palco à mesa executiva. A execução fica com seu time.
           </p>
         </div>
 
