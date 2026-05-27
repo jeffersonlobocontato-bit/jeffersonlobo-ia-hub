@@ -61,6 +61,7 @@ interface Recommendation {
 
 interface TesteIADashboardProps {
   leadId: string;
+  accessToken: string;
   onRestart?: () => void;
 }
 
@@ -75,7 +76,7 @@ const competenciaLabels: Record<string, string> = {
   governanca: "Governança",
 };
 
-export function TesteIADashboard({ leadId, onRestart }: TesteIADashboardProps) {
+export function TesteIADashboard({ leadId, accessToken, onRestart }: TesteIADashboardProps) {
   const [lead, setLead] = useState<Lead | null>(null);
   const [loading, setLoading] = useState(true);
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
@@ -83,16 +84,17 @@ export function TesteIADashboard({ leadId, onRestart }: TesteIADashboardProps) {
 
   useEffect(() => {
     loadAll();
-  }, [leadId]);
+  }, [leadId, accessToken]);
 
   const loadAll = async () => {
     try {
-      const [{ data: leadData }, { data: recs }, { data: allLeads }] = await Promise.all([
-        supabase.from("ia_maturity_leads").select("*").eq("id", leadId).maybeSingle(),
+      const [{ data: leadRows }, { data: recs }, { data: statsData }] = await Promise.all([
+        supabase.rpc("get_maturity_lead", { p_id: leadId, p_token: accessToken }),
         supabase.from("ia_maturity_recommendations").select("*").eq("ativo", true).order("ordem"),
-        supabase.from("ia_maturity_leads").select("score_geral").eq("concluido", true).not("score_geral", "is", null),
+        supabase.rpc("get_maturity_stats"),
       ]);
 
+      const leadData = Array.isArray(leadRows) ? leadRows[0] : leadRows;
       if (!leadData) {
         toast.error("Resultado não encontrado.");
         return;
@@ -100,10 +102,11 @@ export function TesteIADashboard({ leadId, onRestart }: TesteIADashboardProps) {
       setLead(leadData as Lead);
       setRecommendations((recs || []) as Recommendation[]);
 
-      if (allLeads && allLeads.length > 0) {
-        const sum = allLeads.reduce((acc, l: any) => acc + (l.score_geral || 0), 0);
-        setAvgGeral(sum / allLeads.length);
+      const stats = Array.isArray(statsData) ? statsData[0] : statsData;
+      if (stats?.avg_score_geral != null) {
+        setAvgGeral(Number(stats.avg_score_geral));
       }
+
     } catch (e) {
       console.error(e);
       toast.error("Erro ao carregar resultado");
