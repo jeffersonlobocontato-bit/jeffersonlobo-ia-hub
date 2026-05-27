@@ -450,6 +450,12 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
   ly += 6;
   pdf.setFont("helvetica", "bold");
+  pdf.text("WhatsApp:", M + 5, ly);
+  pdf.setFont("helvetica", "normal");
+  pdf.textWithLink("(45) 99986-4213", M + 30, ly, { url: "https://wa.me/5545999864213" });
+
+  ly += 6;
+  pdf.setFont("helvetica", "bold");
   pdf.text("LinkedIn:", M + 5, ly);
   pdf.setFont("helvetica", "normal");
   pdf.textWithLink("linkedin.com/in/jeffersonlobo", M + 27, ly, { url: "https://www.linkedin.com/in/jeffersonlobo" });
