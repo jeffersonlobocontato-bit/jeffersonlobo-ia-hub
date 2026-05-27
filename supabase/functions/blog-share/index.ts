@@ -60,7 +60,6 @@ function renderHtml(post: any): string {
 <meta name="twitter:description" content="${description}" />
 <meta name="twitter:image" content="${image}" />
 
-<meta http-equiv="refresh" content="0; url=${url}" />
 <script>window.location.replace(${JSON.stringify(url)});</script>
 </head>
 <body>
