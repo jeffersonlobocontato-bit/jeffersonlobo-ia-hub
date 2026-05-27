@@ -119,7 +119,7 @@ Deno.serve(async (req) => {
     if (!slug || !/^[a-z0-9-]{1,200}$/.test(slug)) {
       return new Response(notFoundHtml(), {
         status: 404,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        headers: htmlHeaders,
       })
     }
 
@@ -135,22 +135,19 @@ Deno.serve(async (req) => {
     if (error || !post) {
       return new Response(notFoundHtml(), {
         status: 404,
-        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+        headers: htmlHeaders,
       })
     }
 
     return new Response(renderHtml(post), {
       status: 200,
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'public, max-age=300, s-maxage=600',
-      },
+      headers: htmlHeaders,
     })
   } catch (e) {
     console.error('blog-share error', e)
     return new Response(notFoundHtml(), {
       status: 500,
-      headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      headers: htmlHeaders,
     })
   }
 })
