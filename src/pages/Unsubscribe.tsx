@@ -64,6 +64,12 @@ const Unsubscribe = () => {
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <SEO
+        title="Descadastrar — Jefferson Lobo"
+        description="Descadastre seu email da lista de comunicação de Jefferson Lobo."
+        path="/unsubscribe"
+        noindex
+      />
       <div className="panel-dark max-w-lg w-full p-8 md:p-10 text-center space-y-5">
         {state.kind === 'loading' && (
           <>
