@@ -14,6 +14,7 @@ export type PalestraFormat = {
   cta_label: string | null;
   display_order: number;
   active: boolean | null;
+  image_url: string | null;
 };
 
 export const usePalestraFormats = () => {
