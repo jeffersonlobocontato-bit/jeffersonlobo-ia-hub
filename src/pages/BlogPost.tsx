@@ -82,10 +82,9 @@ const BlogPost = () => {
     ],
   };
 
-  // URL usada nos botões de compartilhar: aponta para a edge function que devolve
-  // HTML com og:* corretos para crawlers (WhatsApp, LinkedIn, X, Facebook) e
-  // redireciona humanos para /blog/:slug.
-  const shareUrl = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/blog-share/${post.slug}`;
+  // URL amigável usada nos botões de compartilhar. Em produção, /share/blog/:slug
+  // é proxy para a função de preview social e redireciona humanos para /blog/:slug.
+  const shareUrl = `${SITE_URL}/share/blog/${post.slug}`;
   const sharePayload = encodeURIComponent(`${post.title} — ${shareUrl}`);
 
   return (
