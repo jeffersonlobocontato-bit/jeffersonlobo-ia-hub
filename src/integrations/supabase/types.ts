@@ -776,6 +776,7 @@ export type Database = {
           duration: string | null
           icon: string | null
           id: string
+          image_position: string | null
           image_url: string | null
           kicker: string | null
           slug: string
@@ -793,6 +794,7 @@ export type Database = {
           duration?: string | null
           icon?: string | null
           id?: string
+          image_position?: string | null
           image_url?: string | null
           kicker?: string | null
           slug: string
@@ -810,6 +812,7 @@ export type Database = {
           duration?: string | null
           icon?: string | null
           id?: string
+          image_position?: string | null
           image_url?: string | null
           kicker?: string | null
           slug?: string
@@ -1045,6 +1048,7 @@ export type Database = {
           display_order: number
           event_name: string | null
           id: string
+          image_position: string | null
           image_url: string
         }
         Insert: {
@@ -1054,6 +1058,7 @@ export type Database = {
           display_order?: number
           event_name?: string | null
           id?: string
+          image_position?: string | null
           image_url: string
         }
         Update: {
@@ -1063,6 +1068,7 @@ export type Database = {
           display_order?: number
           event_name?: string | null
           id?: string
+          image_position?: string | null
           image_url?: string
         }
         Relationships: []
