@@ -99,12 +99,12 @@ const HeroSection = () => {
               size="lg"
               variant="outline"
               onClick={() => {
-                trackCTA('hero_secondary_cta', 'hero_section');
-                scrollToSection('sobre');
+                trackCTA('hero_contratar_palestra', 'hero_section');
+                scrollToSection('palestras');
               }}
               className="text-base sm:text-lg px-8 py-6"
             >
-              {displayData.cta_secondary}
+              Contratar palestra
               <ArrowRight className="ml-2 w-5 h-5" />
             </Button>
           </div>
