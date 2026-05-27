@@ -1,8 +1,10 @@
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ExternalLink, Calendar, ArrowRight } from 'lucide-react';
 import { useBlogPosts } from '@/hooks/useBlogPosts';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
+import { isInternalPost, extractFirstParagraph } from '@/lib/blog-utils';
 
 const BlogSection = () => {
   const { data: blogPosts = [] } = useBlogPosts();
@@ -21,21 +23,48 @@ const BlogSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
-          {blogPosts.map((post, index) => {
+          {blogPosts.map((post: any, index: number) => {
+            const internal = isInternalPost(post);
             const formattedDate = new Date(post.date).toLocaleDateString('pt-BR', {
               day: 'numeric',
               month: 'long',
-              year: 'numeric'
+              year: 'numeric',
             });
-            
+            const lead = internal
+              ? extractFirstParagraph(post.content_md, 220)
+              : post.excerpt;
+
             return (
               <Card
                 key={post.id}
                 className="overflow-hidden transition-all duration-300 hover:-translate-y-2 border-primary/20 bg-card animate-scale-in"
                 style={{ animationDelay: `${index * 100}ms` }}
               >
+                {post.cover_image && (
+                  <Link
+                    to={internal ? `/blog/${post.slug}` : '#'}
+                    onClick={(e) => {
+                      if (!internal) {
+                        e.preventDefault();
+                        if (post.linkedin_url) {
+                          trackCTA('blog_read_linkedin', 'blog_section');
+                          window.open(post.linkedin_url, '_blank');
+                        }
+                      } else {
+                        trackCTA('blog_read_internal', 'blog_section');
+                      }
+                    }}
+                    className="block"
+                  >
+                    <img
+                      src={post.cover_image}
+                      alt={post.cover_alt || post.title}
+                      className="w-full aspect-video object-cover border-b-2 border-foreground"
+                      loading="lazy"
+                    />
+                  </Link>
+                )}
                 <div className="p-6 space-y-4">
-                  {/* Category Badge */}
                   <div className="flex items-center justify-between">
                     <span className="inline-block px-3 py-1 text-xs font-bold uppercase border border-primary/30 bg-primary/10 text-primary">
                       {post.category}
@@ -46,42 +75,65 @@ const BlogSection = () => {
                     </div>
                   </div>
 
-                  {/* Content */}
                   <div className="space-y-2">
-                      <h3 className="text-2xl font-black uppercase hover:text-primary transition-colors">
-                      {post.title}
+                    <h3 className="text-2xl font-black uppercase hover:text-primary transition-colors">
+                      {internal ? (
+                        <Link to={`/blog/${post.slug}`}>{post.title}</Link>
+                      ) : (
+                        post.title
+                      )}
                     </h3>
-                    <p className="text-muted-foreground leading-relaxed">
-                      {post.excerpt}
+                    <p className="text-muted-foreground leading-relaxed line-clamp-3">
+                      {lead}
                     </p>
                   </div>
 
-                  {/* CTA to LinkedIn */}
-                  {post.linkedin_url && (
-                    <div className="pt-4 border-t border-border">
+                  <div className="pt-4 border-t border-border">
+                    {internal ? (
                       <Button
+                        asChild
                         variant="ghost"
                         className="w-full justify-between group hover:bg-primary/10"
-                        onClick={() => {
-                          trackCTA('blog_read_linkedin', 'blog_section');
-                          window.open(post.linkedin_url, '_blank');
-                        }}
                       >
-                        <span className="flex items-center">
-                          <ExternalLink className="w-4 h-4 mr-2" />
-                          Veja no LinkedIn
-                        </span>
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        <Link
+                          to={`/blog/${post.slug}`}
+                          onClick={() => trackCTA('blog_read_internal', 'blog_section')}
+                        >
+                          <span>Ler artigo completo</span>
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Link>
                       </Button>
-                    </div>
-                  )}
+                    ) : (
+                      post.linkedin_url && (
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between group hover:bg-primary/10"
+                          onClick={() => {
+                            trackCTA('blog_read_linkedin', 'blog_section');
+                            window.open(post.linkedin_url, '_blank');
+                          }}
+                        >
+                          <span className="flex items-center">
+                            <ExternalLink className="w-4 h-4 mr-2" />
+                            Veja no LinkedIn
+                          </span>
+                          <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </Button>
+                      )
+                    )}
+                  </div>
                 </div>
               </Card>
             );
           })}
         </div>
 
-        {/* Newsletter LinkedIn Section */}
+        <div className="text-center mt-10">
+          <Button asChild variant="outline" size="lg">
+            <Link to="/blog">Ver todos os artigos</Link>
+          </Button>
+        </div>
+
         <div className="mt-16 max-w-3xl mx-auto">
           <Card className="p-8 text-center bg-card border-primary/20">
             <h3 className="text-2xl font-bold mb-4">
