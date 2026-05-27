@@ -25,6 +25,8 @@ import AdminStagePhotosTab from '@/components/admin/AdminStagePhotosTab';
 import AdminSpeakingLogosTab from '@/components/admin/AdminSpeakingLogosTab';
 import AdminPalestrasTab from '@/components/admin/AdminPalestrasTab';
 import { SEO } from '@/components/SEO';
+import { TelegramTestCard } from '@/components/admin/TelegramTestCard';
+
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
