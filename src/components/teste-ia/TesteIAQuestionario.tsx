@@ -31,7 +31,7 @@ const nivelLabel: Record<string, string> = {
   AVANCADO: "Avançado",
 };
 
-export function TesteIAQuestionario({ leadId, finalidade, onComplete, onRestart }: TesteIAQuestionarioProps) {
+export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplete, onRestart }: TesteIAQuestionarioProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, number>>({});
@@ -39,22 +39,21 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete, onRestart 
 
   useEffect(() => {
     loadQuestions();
-    // Restore saved answers
+    // Restore saved answers via secure RPC
     supabase
-      .from("ia_maturity_leads")
-      .select("respostas")
-      .eq("id", leadId)
-      .maybeSingle()
+      .rpc("get_maturity_lead", { p_id: leadId, p_token: accessToken })
       .then(({ data }) => {
-        if (data?.respostas && Array.isArray(data.respostas)) {
+        const row = Array.isArray(data) ? data[0] : data;
+        if (row?.respostas && Array.isArray(row.respostas)) {
           const restored: Record<string, number> = {};
-          (data.respostas as any[]).forEach((r: any) => {
+          (row.respostas as any[]).forEach((r: any) => {
             if (r.id_pergunta) restored[r.id_pergunta] = r.resposta;
           });
           setRespostas(restored);
         }
       });
-  }, [finalidade, leadId]);
+  }, [finalidade, leadId, accessToken]);
+
 
   const loadQuestions = async () => {
     try {
