@@ -776,6 +776,7 @@ export type Database = {
           duration: string | null
           icon: string | null
           id: string
+          image_url: string | null
           kicker: string | null
           slug: string
           title: string
@@ -792,6 +793,7 @@ export type Database = {
           duration?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           kicker?: string | null
           slug: string
           title: string
@@ -808,6 +810,7 @@ export type Database = {
           duration?: string | null
           icon?: string | null
           id?: string
+          image_url?: string | null
           kicker?: string | null
           slug?: string
           title?: string
