@@ -10,8 +10,9 @@ import { toast } from "sonner";
 import { Brain, Sparkles, Users, Clock, Award, CheckCircle2 } from "lucide-react";
 
 interface TesteIAGateProps {
-  onComplete: (leadId: string, finalidade: "PF" | "PJ") => void;
+  onComplete: (leadId: string, finalidade: "PF" | "PJ", accessToken: string) => void;
 }
+
 
 export function TesteIAGate({ onComplete }: TesteIAGateProps) {
   const [nome, setNome] = useState("");
