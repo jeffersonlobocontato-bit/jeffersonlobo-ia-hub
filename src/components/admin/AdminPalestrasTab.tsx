@@ -255,6 +255,34 @@ const AdminPalestrasTab = () => {
               <Input value={item.image_url ?? ''} onChange={(e) => update(item.id, { image_url: e.target.value })} placeholder="/palco/... ou https://..." />
             </div>
 
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <Label className="text-xs">Foco da imagem (preset)</Label>
+                <select
+                  className="w-full h-9 px-2 rounded-md border border-input bg-background text-sm"
+                  value={POSITION_PRESETS.some(p => p.value === (item.image_position || 'center')) ? (item.image_position || 'center') : ''}
+                  onChange={(e) => update(item.id, { image_position: e.target.value })}
+                >
+                  {POSITION_PRESETS.map((p) => (
+                    <option key={p.value} value={p.value}>{p.label}</option>
+                  ))}
+                  <option value="">— customizado —</option>
+                </select>
+              </div>
+              <div>
+                <Label className="text-xs">Customizado (ex: 50% 25%)</Label>
+                <Input
+                  value={item.image_position ?? ''}
+                  onChange={(e) => update(item.id, { image_position: e.target.value })}
+                  placeholder="center, 50% 30%, left top..."
+                />
+              </div>
+            </div>
+            <p className="text-[10px] text-muted-foreground">
+              Dica: use "center top" para evitar cortar cabeças. O segundo valor é a posição vertical (0% = topo, 100% = base).
+            </p>
+
+
             <Button size="sm" className="w-full" onClick={() => save(item)}>
               Salvar alterações
             </Button>
