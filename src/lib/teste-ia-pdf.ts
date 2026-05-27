@@ -420,7 +420,7 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
   // Caixa de contato
   cy += 6;
-  const boxH = 58;
+  const boxH = 66;
   pdf.setFillColor(252, 211, 77);
   pdf.rect(M, cy, CONTENT_W, boxH, "F");
   pdf.setTextColor(13, 13, 13);
@@ -447,6 +447,12 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   pdf.text("E-mail:", M + 5, ly);
   pdf.setFont("helvetica", "normal");
   pdf.textWithLink("contato@jeffersonlobo.tech", M + 22, ly, { url: "mailto:contato@jeffersonlobo.tech" });
+
+  ly += 6;
+  pdf.setFont("helvetica", "bold");
+  pdf.text("WhatsApp:", M + 5, ly);
+  pdf.setFont("helvetica", "normal");
+  pdf.textWithLink("(45) 99986-4213", M + 30, ly, { url: "https://wa.me/5545999864213" });
 
   ly += 6;
   pdf.setFont("helvetica", "bold");
