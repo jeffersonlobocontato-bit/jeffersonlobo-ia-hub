@@ -112,49 +112,62 @@ const BlogPost = () => {
         <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
       </Helmet>
 
+      <ReadingProgress />
       <Header />
 
       <main className="pt-24 pb-16">
-        <article className="container mx-auto px-4 max-w-3xl">
-          <nav aria-label="Breadcrumb" className="mb-6 text-sm">
-            <Link to="/" className="text-muted-foreground hover:text-primary uppercase font-bold">Home</Link>
-            <span className="mx-2 text-muted-foreground">/</span>
-            <Link to="/blog" className="text-muted-foreground hover:text-primary uppercase font-bold">Blog</Link>
-          </nav>
-
-          <header className="mb-8">
-            <div className="flex flex-wrap items-center gap-3 mb-4 text-sm">
-              <span className="px-3 py-1 border-2 border-primary bg-primary/10 text-primary font-bold uppercase text-xs">
-                {post.category}
-              </span>
-              <span className="flex items-center gap-1 text-muted-foreground">
-                <Calendar className="w-4 h-4" /> {formattedDate}
-              </span>
-              {readingMin > 0 && (
-                <span className="flex items-center gap-1 text-muted-foreground">
-                  <Clock className="w-4 h-4" /> {readingMin} min de leitura
-                </span>
-              )}
-            </div>
-            <h1 className="display-title text-3xl md:text-5xl mb-4 leading-tight">{post.title}</h1>
-            <p className="text-lg md:text-xl text-muted-foreground leading-relaxed">{post.excerpt}</p>
-          </header>
-
-          {post.cover_image && (
-            <figure className="mb-10 -mx-4 md:mx-0">
+        {/* Editorial header — full bleed cover */}
+        {post.cover_image && (
+          <figure className="w-full mb-10">
+            <div className="container mx-auto px-0 md:px-4 max-w-5xl">
               <img
                 src={post.cover_image}
                 alt={post.cover_alt || post.title}
-                className="w-full aspect-video object-cover border-2 border-foreground"
+                className="w-full aspect-[16/9] md:aspect-[21/9] object-cover"
                 loading="eager"
               />
               {post.cover_alt && (
-                <figcaption className="text-xs text-muted-foreground mt-2 text-center italic">
+                <figcaption className="text-xs text-muted-foreground mt-2 px-4 italic">
                   {post.cover_alt}
                 </figcaption>
               )}
-            </figure>
-          )}
+            </div>
+          </figure>
+        )}
+
+        <article className="container mx-auto px-5 max-w-[680px]">
+          <nav aria-label="Breadcrumb" className="mb-6 text-xs">
+            <Link to="/" className="text-muted-foreground hover:text-primary uppercase font-bold tracking-wider">Home</Link>
+            <span className="mx-2 text-muted-foreground">/</span>
+            <Link to="/blog" className="text-muted-foreground hover:text-primary uppercase font-bold tracking-wider">Blog</Link>
+          </nav>
+
+          <header className="mb-10">
+            <div className="mb-5">
+              <span className="text-xs font-black uppercase tracking-[0.2em] text-primary border-b-2 border-primary pb-1">
+                {post.category}
+              </span>
+            </div>
+            <h1 className="display-title text-3xl md:text-5xl lg:text-6xl mb-6 leading-[1.05] tracking-tight">
+              {post.title}
+            </h1>
+            {post.excerpt && (
+              <p className="font-serif text-xl md:text-2xl text-muted-foreground leading-snug font-light mb-6">
+                {post.excerpt}
+              </p>
+            )}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs uppercase tracking-wider text-muted-foreground border-t border-b border-border py-3">
+              <span className="font-bold text-foreground">Jefferson Lobo</span>
+              <span className="flex items-center gap-1.5">
+                <Calendar className="w-3.5 h-3.5" /> {formattedDate}
+              </span>
+              {readingMin > 0 && (
+                <span className="flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" /> {readingMin} min de leitura
+                </span>
+              )}
+            </div>
+          </header>
 
           {post.content_md && <BlogContent content={post.content_md} slug={post.slug} />}
 
