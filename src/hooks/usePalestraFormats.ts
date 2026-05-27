@@ -15,6 +15,7 @@ export type PalestraFormat = {
   display_order: number;
   active: boolean | null;
   image_url: string | null;
+  image_position: string | null;
 };
 
 export const usePalestraFormats = () => {
