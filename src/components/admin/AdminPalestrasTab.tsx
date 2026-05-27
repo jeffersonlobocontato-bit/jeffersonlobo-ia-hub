@@ -23,7 +23,18 @@ type Format = {
   display_order: number;
   active: boolean | null;
   image_url: string | null;
+  image_position: string | null;
 };
+
+const POSITION_PRESETS = [
+  { label: 'Centro', value: 'center' },
+  { label: 'Topo (mostrar cabeças)', value: 'center top' },
+  { label: 'Topo esquerda', value: 'left top' },
+  { label: 'Topo direita', value: 'right top' },
+  { label: 'Base', value: 'center bottom' },
+  { label: 'Esquerda', value: 'left center' },
+  { label: 'Direita', value: 'right center' },
+];
 
 const AdminPalestrasTab = () => {
   const { toast } = useToast();
