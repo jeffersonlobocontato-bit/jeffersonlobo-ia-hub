@@ -7,6 +7,7 @@ import Footer from '@/components/Footer';
 import { useBlogPost, useRelatedPosts } from '@/hooks/useBlogPost';
 import { BlogContent } from '@/components/blog/BlogContent';
 import { BlogInlineCTA } from '@/components/blog/BlogInlineCTA';
+import { ReadingProgress } from '@/components/blog/ReadingProgress';
 import { calcReadingMinutes, isInternalPost } from '@/lib/blog-utils';
 import { Card } from '@/components/ui/card';
 
