@@ -508,6 +508,10 @@ const Admin = () => {
             <AdminLeadsTab />
           </TabsContent>
 
+          <TabsContent value="briefings">
+            <AdminBriefingsTab />
+          </TabsContent>
+
           <TabsContent value="chat-leads">
             <AdminChatLeadsTab />
           </TabsContent>
