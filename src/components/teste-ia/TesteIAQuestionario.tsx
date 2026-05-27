@@ -78,11 +78,16 @@ export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplet
       return { id_pergunta: id, resposta, competencia: q?.competencia, nivel: q?.nivel };
     });
     try {
-      await supabase.from("ia_maturity_leads").update({ respostas: arr }).eq("id", leadId);
+      await supabase.rpc("update_maturity_respostas", {
+        p_id: leadId,
+        p_token: accessToken,
+        p_respostas: arr as any,
+      });
     } catch (e) {
       console.error("Autosave falhou:", e);
     }
   };
+
 
   const handleResposta = (valor: number) => {
     const currentQuestion = questions[currentIndex];
