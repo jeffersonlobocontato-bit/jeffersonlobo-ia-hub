@@ -51,36 +51,63 @@ export type Database = {
         Row: {
           active: boolean | null
           category: string
+          content_md: string | null
+          cover_alt: string | null
+          cover_image: string | null
           created_at: string | null
           created_by: string | null
           date: string
           excerpt: string
           id: string
           linkedin_url: string | null
+          published_at: string | null
+          reading_minutes: number | null
+          seo_description: string | null
+          seo_title: string | null
+          slug: string
+          tags: string[] | null
           title: string
           updated_at: string | null
         }
         Insert: {
           active?: boolean | null
           category: string
+          content_md?: string | null
+          cover_alt?: string | null
+          cover_image?: string | null
           created_at?: string | null
           created_by?: string | null
           date: string
           excerpt: string
           id?: string
           linkedin_url?: string | null
+          published_at?: string | null
+          reading_minutes?: number | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug: string
+          tags?: string[] | null
           title: string
           updated_at?: string | null
         }
         Update: {
           active?: boolean | null
           category?: string
+          content_md?: string | null
+          cover_alt?: string | null
+          cover_image?: string | null
           created_at?: string | null
           created_by?: string | null
           date?: string
           excerpt?: string
           id?: string
           linkedin_url?: string | null
+          published_at?: string | null
+          reading_minutes?: number | null
+          seo_description?: string | null
+          seo_title?: string | null
+          slug?: string
+          tags?: string[] | null
           title?: string
           updated_at?: string | null
         }
