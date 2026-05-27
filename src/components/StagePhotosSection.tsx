@@ -1,42 +1,120 @@
 import { useStagePhotos } from '@/hooks/useStagePhotos';
 
+type Photo = {
+  id: string;
+  image_url: string;
+  caption?: string | null;
+  event_name?: string | null;
+};
+
+const StagePhotoCard = ({
+  photo,
+  className = '',
+  imgClassName = 'h-full w-full object-cover',
+}: {
+  photo: Photo;
+  className?: string;
+  imgClassName?: string;
+}) => (
+  <figure
+    className={`group relative overflow-hidden border-2 border-primary/30 shadow-[6px_6px_0_hsl(var(--primary))] transition-transform hover:-translate-y-1 ${className}`}
+  >
+    <img
+      src={photo.image_url}
+      alt={photo.caption || photo.event_name || 'Jefferson Lobo no palco'}
+      className={`${imgClassName} transition-transform duration-700 group-hover:scale-105`}
+      loading="lazy"
+    />
+    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
+    {(photo.event_name || photo.caption) && (
+      <figcaption className="absolute inset-x-0 bottom-0 p-4">
+        {photo.event_name && (
+          <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-primary">
+            {photo.event_name}
+          </div>
+        )}
+        {photo.caption && (
+          <div className="mt-1 text-xs sm:text-sm text-foreground/90 leading-snug">
+            {photo.caption}
+          </div>
+        )}
+      </figcaption>
+    )}
+  </figure>
+);
+
 const StagePhotosSection = () => {
   const { data: photos = [] } = useStagePhotos();
   if (photos.length === 0) return null;
 
+  const list = photos as Photo[];
+  // Layout assimétrico de até 6 fotos
+  const featured = list[0];
+  const wide = list[1];
+  const tall = list[2];
+  const small1 = list[3];
+  const small2 = list[4];
+  const small3 = list[5];
+
   return (
-    <section className="bg-background py-20">
+    <section className="bg-background py-20 md:py-24">
       <div className="container mx-auto px-4">
-        <div className="text-center mb-10">
-          <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground font-bold mb-2">
-            No palco
-          </p>
-          <h2 className="display-title text-3xl md:text-4xl">
-            Provocando lideranças e plateias Brasil afora
+        <div className="text-center mb-12 max-w-2xl mx-auto space-y-3">
+          <p className="section-kicker">Prova de palco</p>
+          <h2 className="display-title text-3xl md:text-5xl">
+            Provocando <span className="highlight-yellow">lideranças</span> Brasil afora
           </h2>
+          <p className="text-muted-foreground">
+            Palestras, imersões executivas e sessões de governança em IA — para conselhos,
+            diretorias e times de liderança.
+          </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
-          {photos.map((p: any) => (
-            <figure
-              key={p.id}
-              className="group relative overflow-hidden border-2 border-primary/30 shadow-[4px_4px_0_hsl(var(--primary))]"
-            >
-              <img
-                src={p.image_url}
-                alt={p.caption || p.event_name || 'Jefferson Lobo no palco'}
-                className="w-full h-56 md:h-72 object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              {(p.event_name || p.caption) && (
-                <figcaption className="absolute inset-x-0 bottom-0 bg-background/85 backdrop-blur p-3">
-                  {p.event_name && (
-                    <div className="text-xs font-black uppercase text-primary">{p.event_name}</div>
-                  )}
-                  {p.caption && <div className="text-xs text-foreground/80">{p.caption}</div>}
-                </figcaption>
-              )}
-            </figure>
+
+        {/* Mobile: stack simples */}
+        <div className="md:hidden grid grid-cols-1 gap-4">
+          {list.slice(0, 6).map((p) => (
+            <StagePhotoCard key={p.id} photo={p} imgClassName="w-full h-64 object-cover" />
           ))}
+        </div>
+
+        {/* Desktop: masonry assimétrico */}
+        <div className="hidden md:grid grid-cols-12 gap-5 auto-rows-[140px]">
+          {featured && (
+            <StagePhotoCard
+              photo={featured}
+              className="col-span-5 row-span-3"
+            />
+          )}
+          {wide && (
+            <StagePhotoCard
+              photo={wide}
+              className="col-span-7 row-span-2"
+            />
+          )}
+          {tall && (
+            <StagePhotoCard
+              photo={tall}
+              className="col-span-4 row-span-2"
+            />
+          )}
+          {small1 && (
+            <StagePhotoCard
+              photo={small1}
+              className="col-span-3 row-span-2"
+            />
+          )}
+          {small2 && (
+            <StagePhotoCard
+              photo={small2}
+              className="col-span-5 row-span-2"
+            />
+          )}
+          {small3 && (
+            <StagePhotoCard
+              photo={small3}
+              className="col-span-7 row-span-2"
+            />
+          )}
         </div>
       </div>
     </section>
