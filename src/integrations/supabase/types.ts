@@ -188,6 +188,60 @@ export type Database = {
         }
         Relationships: []
       }
+      briefing_requests: {
+        Row: {
+          cargo: string | null
+          cidade: string | null
+          created_at: string
+          data_evento: string | null
+          email: string
+          empresa: string | null
+          formato: string | null
+          id: string
+          mensagem: string | null
+          nome: string
+          publico: string | null
+          status: string
+          tipo: string
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          cargo?: string | null
+          cidade?: string | null
+          created_at?: string
+          data_evento?: string | null
+          email: string
+          empresa?: string | null
+          formato?: string | null
+          id?: string
+          mensagem?: string | null
+          nome: string
+          publico?: string | null
+          status?: string
+          tipo: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          cargo?: string | null
+          cidade?: string | null
+          created_at?: string
+          data_evento?: string | null
+          email?: string
+          empresa?: string | null
+          formato?: string | null
+          id?: string
+          mensagem?: string | null
+          nome?: string
+          publico?: string | null
+          status?: string
+          tipo?: string
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       chat_leads: {
         Row: {
           apelido: string | null
@@ -417,7 +471,10 @@ export type Database = {
         Row: {
           cta_primary: string
           cta_secondary: string
+          cta_tertiary: string | null
+          cta_tertiary_target: string | null
           headline: string
+          hero_video_url: string | null
           id: string
           stat1_label: string
           stat1_number: string
@@ -432,7 +489,10 @@ export type Database = {
         Insert: {
           cta_primary: string
           cta_secondary: string
+          cta_tertiary?: string | null
+          cta_tertiary_target?: string | null
           headline: string
+          hero_video_url?: string | null
           id?: string
           stat1_label: string
           stat1_number: string
@@ -447,7 +507,10 @@ export type Database = {
         Update: {
           cta_primary?: string
           cta_secondary?: string
+          cta_tertiary?: string | null
+          cta_tertiary_target?: string | null
           headline?: string
+          hero_video_url?: string | null
           id?: string
           stat1_label?: string
           stat1_number?: string
@@ -701,6 +764,57 @@ export type Database = {
         }
         Relationships: []
       }
+      palestra_formats: {
+        Row: {
+          active: boolean | null
+          audience: string | null
+          created_at: string | null
+          cta_label: string | null
+          deliverables: Json | null
+          description: string
+          display_order: number
+          duration: string | null
+          icon: string | null
+          id: string
+          kicker: string | null
+          slug: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          audience?: string | null
+          created_at?: string | null
+          cta_label?: string | null
+          deliverables?: Json | null
+          description: string
+          display_order?: number
+          duration?: string | null
+          icon?: string | null
+          id?: string
+          kicker?: string | null
+          slug: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          audience?: string | null
+          created_at?: string | null
+          cta_label?: string | null
+          deliverables?: Json | null
+          description?: string
+          display_order?: number
+          duration?: string | null
+          icon?: string | null
+          id?: string
+          kicker?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       podcast_config: {
         Row: {
           id: string
@@ -890,6 +1004,66 @@ export type Database = {
         }
         Relationships: []
       }
+      speaking_logos: {
+        Row: {
+          active: boolean | null
+          created_at: string | null
+          display_order: number
+          id: string
+          link: string | null
+          logo_url: string | null
+          name: string
+        }
+        Insert: {
+          active?: boolean | null
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          link?: string | null
+          logo_url?: string | null
+          name: string
+        }
+        Update: {
+          active?: boolean | null
+          created_at?: string | null
+          display_order?: number
+          id?: string
+          link?: string | null
+          logo_url?: string | null
+          name?: string
+        }
+        Relationships: []
+      }
+      stage_photos: {
+        Row: {
+          active: boolean | null
+          caption: string | null
+          created_at: string | null
+          display_order: number
+          event_name: string | null
+          id: string
+          image_url: string
+        }
+        Insert: {
+          active?: boolean | null
+          caption?: string | null
+          created_at?: string | null
+          display_order?: number
+          event_name?: string | null
+          id?: string
+          image_url: string
+        }
+        Update: {
+          active?: boolean | null
+          caption?: string | null
+          created_at?: string | null
+          display_order?: number
+          event_name?: string | null
+          id?: string
+          image_url?: string
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -917,10 +1091,13 @@ export type Database = {
       testimonials: {
         Row: {
           active: boolean | null
+          author_company: string | null
           author_name: string
+          author_photo: string | null
           author_title: string
           created_at: string | null
           display_order: number
+          event_name: string | null
           id: string
           quote: string
           rating: number | null
@@ -928,10 +1105,13 @@ export type Database = {
         }
         Insert: {
           active?: boolean | null
+          author_company?: string | null
           author_name: string
+          author_photo?: string | null
           author_title: string
           created_at?: string | null
           display_order: number
+          event_name?: string | null
           id?: string
           quote: string
           rating?: number | null
@@ -939,10 +1119,13 @@ export type Database = {
         }
         Update: {
           active?: boolean | null
+          author_company?: string | null
           author_name?: string
+          author_photo?: string | null
           author_title?: string
           created_at?: string | null
           display_order?: number
+          event_name?: string | null
           id?: string
           quote?: string
           rating?: number | null
