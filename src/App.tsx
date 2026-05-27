@@ -12,6 +12,7 @@ import Admin from "./pages/Admin";
 import ResetPassword from "./pages/ResetPassword";
 import TesteIA from "./pages/TesteIA";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
+import Unsubscribe from "./pages/Unsubscribe";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +31,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/teste-ia" element={<TesteIA />} />
               <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
+              <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route
                 path="/admin"
                 element={

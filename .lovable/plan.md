@@ -1,42 +1,53 @@
-# Ajuste de posicionamento dos formatos de Palestras / Consultoria
+# Ativar emails automáticos do briefing
 
-Reposicionar dois dos três cards da `PalestrasSection` (e dados correspondentes em `palestra_formats`) para refletir o que você realmente entrega: conversa executiva e início de jornada — **sem implantação técnica**.
+Domínio `notify.jeffersonlobo.tech` já está verificado e a infraestrutura de emails do Lovable Cloud já está provisionada. Falta apenas escafoldar os templates transacionais e disparar o envio quando um briefing for criado.
 
-## Mudanças nos formatos
+## O que será entregue
 
-### 1. Keynote (manter)
-Sem alterações de essência. Pequeno ajuste de copy só se necessário para harmonizar com os outros dois.
+1. **Email de notificação interna** → `jeffersonlobocontato@gmail.com`
+   - Disparado sempre que um novo briefing é inserido
+   - Contém todos os campos: nome, empresa, cargo, email, whatsapp, tipo, data, formato, público, cidade e mensagem
+   - Link direto para `/admin` (aba Briefings)
 
-### 2. Workshop / Imersão — reposicionar
-- **Kicker**: "Nivelamento e largada da jornada"
-- **Público**: lideranças, gestores e times-chave (não desenvolvedores)
-- **Objetivo**: sensibilizar, nivelar linguagem sobre IA, mapear oportunidades e **iniciar a construção da governança**
-- **Entregáveis**:
-  - Nivelamento conceitual de IA aplicada ao negócio
-  - Mapa inicial de casos de uso priorizados
-  - Princípios e diretrizes iniciais de governança de IA
-  - Plano de primeiros 90 dias para a jornada interna
-- **Deixar explícito**: não é treinamento técnico nem implantação de ferramentas
+2. **Email de confirmação ao lead** → email informado no formulário
+   - "Recebemos seu briefing, retornaremos em até 24h"
+   - Tom brutalista alinhado ao site (preto/amarelo, Arial Black, sombra deslocada)
+   - Inclui resumo do que ele preencheu para reforçar confiança
 
-### 3. Consultoria estratégica — reposicionar
-- **Kicker**: "Conversa com a liderança"
-- **Público**: C-level, donos, diretores, gestores de área — **não é mesa técnica de TI**
-- **Objetivo**: provocar e estruturar a decisão executiva sobre IA — visão, prioridades, riscos, governança e caminhos
-- **Entregáveis**:
-  - Sessões executivas de alinhamento (visão e ambição em IA)
-  - Recomendação de prioridades e quick wins
-  - Estrutura inicial de governança (papéis, princípios, guardrails)
-  - Indicação de caminhos e parceiros para a execução
-- **Deixar explícito no card**: "Não implanto projetos. Abro o caminho para que sua equipe (ou parceiros) executem com clareza."
+## Como vai funcionar (técnico)
 
-## Onde aplicar
+1. Rodar `scaffold_transactional_email` para criar:
+   - Edge Function `send-transactional-email`
+   - Edge Function `handle-email-unsubscribe`
+   - Edge Function `handle-email-suppression`
+   - Página `/unsubscribe` no app
+   - Template inicial de exemplo
 
-- Atualizar registros da tabela `palestra_formats` (campos `kicker`, `description`, `audience`, `deliverables`, eventualmente `title`) via migration de UPDATE — sem alterar estrutura da tabela.
-- `src/components/PalestrasSection.tsx` já lê tudo do banco, então não precisa de mudança de código.
-- Conferir o intro da seção (`h2` + parágrafo) para alinhar com a nova narrativa (tirar qualquer eco de "capacitar times" que sugira treinamento técnico).
-- Ajustar opções do `BriefingForm` se necessário (rótulos de "consultoria" e "imersão") para refletir a mesma linguagem.
+2. Criar 2 templates React Email em `supabase/functions/_shared/transactional-email-templates/`:
+   - `briefing-internal-notification.tsx` (notificação interna estilo "novo lead")
+   - `briefing-lead-confirmation.tsx` (confirmação ao lead, estilo brutalista)
+   - Registrar ambos em `registry.ts`
+
+3. Editar `BriefingForm.tsx`:
+   - Após `insert` bem-sucedido em `briefing_requests`, disparar **duas chamadas paralelas** `supabase.functions.invoke('send-transactional-email', ...)`:
+     - Uma para `jeffersonlobocontato@gmail.com` com template `briefing-internal-notification`
+     - Outra para o email do lead com template `briefing-lead-confirmation`
+   - Usar `idempotencyKey` baseado no UUID do briefing para evitar duplicação em retry
+   - Falhas no email **não bloqueiam** o sucesso do formulário (envio assíncrono)
+
+4. Redeploy de todas as Edge Functions
+
+## Estilo dos templates
+
+- Fundo branco (regra obrigatória), mas com blocos internos amarelos `#FFD700` e pretos `#000`
+- Headings em Arial Black uppercase
+- Botões com sombra deslocada brutalista
+- Sem links de descadastro manuais (sistema adiciona automaticamente no email do lead)
 
 ## Fora de escopo
 
-- Não criar novos formatos nem novas tabelas.
-- Não mexer em layout, ordem do Index, Hero ou prova social.
+- Não vou criar um dashboard de logs de email (já existe `email_send_log`; podemos adicionar depois se quiser)
+- Não vou alterar emails de autenticação
+- Não vou criar campanhas/newsletter (apenas transacionais conforme política do Lovable)
+
+Posso seguir?

@@ -48,7 +48,12 @@ const BriefingForm = () => {
       return;
     }
     setSubmitting(true);
-    const payload = { ...parsed.data, data_evento: parsed.data.data_evento || null };
+    const briefingId = crypto.randomUUID();
+    const payload = {
+      ...parsed.data,
+      id: briefingId,
+      data_evento: parsed.data.data_evento || null,
+    };
     const { error } = await supabase.from('briefing_requests').insert(payload as any);
     setSubmitting(false);
     if (error) {
@@ -57,6 +62,40 @@ const BriefingForm = () => {
     }
     trackCTA('briefing_submit', 'briefing_form');
     setSuccess(true);
+
+    // Fire-and-forget: emails não bloqueiam o sucesso do formulário.
+    const data = parsed.data;
+    void Promise.allSettled([
+      supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'briefing-internal-notification',
+          recipientEmail: 'jeffersonlobocontato@gmail.com',
+          idempotencyKey: `briefing-internal-${briefingId}`,
+          templateData: { ...data, briefingId },
+        },
+      }),
+      supabase.functions.invoke('send-transactional-email', {
+        body: {
+          templateName: 'briefing-lead-confirmation',
+          recipientEmail: data.email,
+          idempotencyKey: `briefing-lead-${briefingId}`,
+          templateData: {
+            nome: data.nome,
+            tipo: data.tipo,
+            data_evento: data.data_evento || undefined,
+            formato: data.formato || undefined,
+            publico: data.publico || undefined,
+            cidade: data.cidade || undefined,
+          },
+        },
+      }),
+    ]).then((results) => {
+      results.forEach((r, i) => {
+        if (r.status === 'rejected') {
+          console.error(`[briefing-email-${i}] failed`, r.reason);
+        }
+      });
+    });
   };
 
   if (success) {
