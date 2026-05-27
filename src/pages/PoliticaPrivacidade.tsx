@@ -1,10 +1,16 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { SEO } from "@/components/SEO";
 
 export default function PoliticaPrivacidade() {
   return (
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-background via-background to-primary/5">
+      <SEO
+        title="Política de Privacidade — Jefferson Lobo"
+        description="Saiba como o site de Jefferson Lobo coleta, usa e protege seus dados pessoais. Política de privacidade em conformidade com a LGPD."
+        path="/politica-privacidade"
+      />
       <Header />
       <main className="flex-1 pt-20">
         <div className="container max-w-4xl mx-auto px-4 py-16">

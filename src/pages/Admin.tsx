@@ -24,6 +24,7 @@ import AdminBriefingsTab from '@/components/admin/AdminBriefingsTab';
 import AdminStagePhotosTab from '@/components/admin/AdminStagePhotosTab';
 import AdminSpeakingLogosTab from '@/components/admin/AdminSpeakingLogosTab';
 import AdminPalestrasTab from '@/components/admin/AdminPalestrasTab';
+import { SEO } from '@/components/SEO';
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();

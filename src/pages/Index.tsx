@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { SEO } from '@/components/SEO';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import TesteIASection from '@/components/TesteIASection';
@@ -32,20 +32,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Jefferson Lobo — Palestrante de IA, Estrategista e Autor</title>
-        <meta
-          name="description"
-          content="Palestras, workshops e consultoria em Inteligência Artificial para empresas e lideranças. Solicite uma proposta ou faça o Teste de Maturidade em IA gratuito."
-        />
-        <link rel="canonical" href="https://jeffersonlobo.tech/" />
-        <meta property="og:title" content="Jefferson Lobo — Palestrante de IA" />
-        <meta
-          property="og:description"
-          content="Leve a conversa de IA para dentro da sua empresa. Keynotes, workshops e consultoria estratégica."
-        />
-        <meta property="og:url" content="https://jeffersonlobo.tech/" />
-      </Helmet>
+      <SEO
+        title="Jefferson Lobo — Palestrante de IA, Estrategista e Autor"
+        description="Palestras, workshops e consultoria em Inteligência Artificial para empresas e lideranças. Solicite uma proposta ou faça o Teste de Maturidade em IA gratuito."
+        path="/"
+      />
       <Header />
       <main>
         <HeroSection />

@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { CheckCircle2, AlertTriangle, Loader2 } from 'lucide-react';
+import { SEO } from '@/components/SEO';
 
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
 const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string;

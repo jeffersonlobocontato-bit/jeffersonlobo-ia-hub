@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { z } from 'zod';
+import { SEO } from '@/components/SEO';
 
 const passwordSchema = z.string().min(6, 'Senha deve ter no mínimo 6 caracteres');
 
