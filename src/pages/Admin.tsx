@@ -520,6 +520,10 @@ const Admin = () => {
             <AdminStagePhotosTab />
           </TabsContent>
 
+          <TabsContent value="speaking-logos">
+            <AdminSpeakingLogosTab />
+          </TabsContent>
+
           <TabsContent value="chat-leads">
             <AdminChatLeadsTab />
           </TabsContent>
