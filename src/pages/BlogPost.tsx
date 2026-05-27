@@ -82,9 +82,10 @@ const BlogPost = () => {
     ],
   };
 
-  // URL amigável usada nos botões de compartilhar. Em produção, /share/blog/:slug
-  // é proxy para a função de preview social e redireciona humanos para /blog/:slug.
-  const shareUrl = `${SITE_URL}/share/blog/${post.slug}`;
+  // URL de compartilhamento aponta direto para a edge function que serve OG tags
+  // corretas (título, descrição e cover image) para crawlers do WhatsApp/LinkedIn/X.
+  // Humanos são redirecionados via JS para /blog/:slug.
+  const shareUrl = `https://cgydeldzhnfyexphaheq.supabase.co/functions/v1/blog-share?slug=${post.slug}`;
   const sharePayload = encodeURIComponent(`${post.title} — ${shareUrl}`);
 
   return (
