@@ -93,6 +93,18 @@ export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminB
               />
 
               <div className="space-y-2">
+                <Label>Linha fina / Subtítulo (aparece logo abaixo do título no post)</Label>
+                <Textarea
+                  value={post.subtitle || ''}
+                  onChange={(e) => patch(post.id, { subtitle: e.target.value })}
+                  rows={2}
+                  maxLength={240}
+                  placeholder="Frase curta que complementa o título e prepara o leitor para o texto."
+                />
+                <p className="text-xs text-muted-foreground">{(post.subtitle || '').length}/240</p>
+              </div>
+
+              <div className="space-y-2">
                 <Label>Resumo (1-2 frases — aparece na home e nas buscas)</Label>
                 <Textarea
                   value={post.excerpt || ''}

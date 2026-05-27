@@ -152,9 +152,9 @@ const BlogPost = () => {
             <h1 className="display-title text-3xl md:text-5xl lg:text-6xl mb-6 leading-[1.05] tracking-tight">
               {post.title}
             </h1>
-            {post.excerpt && (
-              <p className="font-serif text-xl md:text-2xl text-muted-foreground leading-snug font-light mb-6">
-                {post.excerpt}
+            {post.subtitle && (
+              <p className="font-serif text-xl md:text-2xl text-foreground/85 leading-snug font-light mb-6">
+                {post.subtitle}
               </p>
             )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs uppercase tracking-wider text-muted-foreground border-t border-b border-border py-3">
