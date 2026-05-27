@@ -82,7 +82,11 @@ const BlogPost = () => {
     ],
   };
 
-  const sharePayload = encodeURIComponent(`${post.title} — ${url}`);
+  // URL usada nos botões de compartilhar: aponta para a edge function que devolve
+  // HTML com og:* corretos para crawlers (WhatsApp, LinkedIn, X, Facebook) e
+  // redireciona humanos para /blog/:slug.
+  const shareUrl = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/blog-share/${post.slug}`;
+  const sharePayload = encodeURIComponent(`${post.title} — ${shareUrl}`);
 
   return (
     <div className="min-h-screen bg-background">
