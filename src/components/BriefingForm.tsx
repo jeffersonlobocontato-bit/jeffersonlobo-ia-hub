@@ -48,10 +48,8 @@ const BriefingForm = () => {
       return;
     }
     setSubmitting(true);
-    const { error } = await supabase.from('briefing_requests').insert({
-      ...parsed.data,
-      data_evento: parsed.data.data_evento || null,
-    });
+    const payload = { ...parsed.data, data_evento: parsed.data.data_evento || null };
+    const { error } = await supabase.from('briefing_requests').insert(payload as any);
     setSubmitting(false);
     if (error) {
       toast({ title: 'Não foi possível enviar', description: error.message, variant: 'destructive' });
