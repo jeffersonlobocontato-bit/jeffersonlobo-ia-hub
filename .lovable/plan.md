@@ -1,69 +1,111 @@
+# Auditoria + plano de melhoria — foco: vender palestras e consultorias
 
-## Objetivo
+Objetivo de negócio: **gerar reuniões qualificadas com decisores (RH, marketing, C-level, organizadores de eventos) para palestras e consultorias em IA.**
 
-Transformar o "Plano de Ação 30/60/90" do Teste de Maturidade em IA em um conteúdo mais profundo, criativo e **personalizado pelo tipo de respondente**:
+Veredito: estrutura sólida e identidade visual forte, mas o site hoje vende **o Teste de IA** — não vende **você como speaker/consultor**. O Teste é ótima isca, mas o funil termina solto. Plano abaixo cobre 5 fases priorizadas por ROI comercial.
 
-- **PF (profissional de mercado)** — foco em empregabilidade, produtividade individual, portfólio, posicionamento, hard/soft skills.
-- **PJ (liderança, gestor, empresário)** — foco em estratégia, governança, ROI, times, processos e cultura.
+---
 
-Cada bloco passa a entregar, além das 3 ações temporais: **uma trilha de conhecimento recomendada** (cursos/livros/comunidades/práticas) coerente com o perfil.
+## O que mantemos
 
-## Mudanças no banco
+- Identidade brutalista, Teste de Maturidade como lead magnet, CMS/Admin, analytics próprio e SEO básico.
 
-Estender `ia_maturity_recommendations` com colunas novas (sem quebrar o que existe):
+## Problemas críticos identificados
 
-- `acao_pf_30d`, `acao_pf_60d`, `acao_pf_90d` (text)
-- `acao_pj_30d`, `acao_pj_60d`, `acao_pj_90d` (text)
-- `aprendizado_pf` (jsonb — lista de itens: tipo, título, fonte/autor, link opcional)
-- `aprendizado_pj` (jsonb — mesma estrutura)
-- `por_que_importa` (text — 1 parágrafo de contexto estratégico)
+1. **Oferta comercial invisível**: não há seção dedicada a Palestras nem a Consultoria. Não há formatos, vídeo de palco, logos de quem contratou (Gazeta do Povo, MIT, imersão internacional ainda não viraram prova visual).
+2. **CTAs não convertem para o objetivo**: hero, sticky e secundário levam todos ao Teste. Decisor que vem por indicação não tem caminho de 1 clique para "Contratar palestra".
+3. **ContactSection genérica**: só um botão de WhatsApp. Sem briefing, sem qualificação, sem registro no banco.
+4. **Prova social fraca**: 1 depoimento textual, sem logos, sem fotos de palco, sem vídeos.
+5. **Headline inspiracional demais**: não diz o que você entrega para quem quer contratar.
+6. **Ordem do Index mata conversão**: Livro/Podcast/Blog vêm antes do Contato e empurram o decisor para fora.
+7. **Higiene**: banner de Debug Auth no Header, footer com link "livro" mas sem "palestras", fallbacks de stats inventados.
 
-Popular conteúdo novo, criativo e específico para as **8 competências × 2 níveis** (BÁSICO / INTERMEDIÁRIO) — 16 registros. Os campos antigos (`acao_30d/60d/90d`, `descricao`) permanecem como fallback.
+---
 
-Exemplo (Segurança · Básico · PJ):
-- 30d: Publicar política oficial de uso de IA + lista de ferramentas homologadas; comunicar em town hall.
-- 60d: Contratar DLP com regras específicas para prompts (Microsoft Purview, Nightfall ou Forcepoint); treinar lideranças em red-team de prompts.
-- 90d: Rodar simulação de incidente (vazamento via chatbot) com plano de resposta; auditoria externa de exposição.
-- Trilha PJ: livro *AI Snake Oil* (Narayanan), curso MIT Sloan "AI Strategy", framework NIST AI RMF, comunidade IAPP.
+## Plano aprovado — execução nesta ordem
 
-Exemplo (Segurança · Básico · PF):
-- 30d: Auditar seus próprios hábitos — listar tudo que já colou em LLM público; revogar acessos.
-- 60d: Dominar uso de modelos locais (Ollama, LM Studio) para dados sensíveis; configurar contas "workspace" sem treino.
-- 90d: Certificar-se em fundamentos de segurança em IA (ex.: ISC2 Certified in AI Security, AI Safety Fundamentals da BlueDot).
-- Trilha PF: curso DeepLearning.AI "Generative AI for Everyone", newsletter Latent Space, prática semanal de red-teaming de prompts.
+### Fase 1 · Tornar a oferta comercial visível
+- Criar `PalestrasSection` com 3 formatos (Keynote, Workshop/Imersão, Consultoria estratégica) — cada card: público-alvo, duração, entregáveis, CTA "Quero conversar".
+- `LogosBarSection` separada com logos (Gazeta do Povo, MIT, imersão internacional, clientes).
+- Hero: trocar CTA secundário "Ver meu método" por **"Contratar palestra"** → scroll para PalestrasSection.
+- StickyHeaderCTA: passar a alternar — "Diagnóstico" no topo, "Solicitar proposta" depois da seção Sobre.
 
-(Mesmo nível de profundidade replicado para Estratégia, Processos, Dados, Ferramentas, Pessoas, Ética, Governança × Básico/Intermediário.)
+### Fase 2 · Qualificar leads de palestra
+- Refazer `ContactSection` como **formulário de briefing**: nome, empresa, cargo, e-mail, WhatsApp, tipo (palestra/workshop/consultoria/imersão), data, formato, público, cidade, mensagem.
+- Nova tabela `briefing_requests` (RLS: admin lê tudo, anon insere). GRANTs corretos.
+- Edge function `send-briefing-email` (Lovable Emails) que notifica você no recebimento.
+- Tela de sucesso oferecendo o Teste IA enquanto aguarda retorno.
+- Botão WhatsApp continua como alternativa.
 
-## Mudanças no PDF (`src/lib/teste-ia-pdf.ts`)
+### Fase 3 · Prova social que vende palestra
+- Reformular `TrustBarSection`: faixa de logos + grid de fotos de palco + carrossel de depoimentos com foto/cargo/empresa.
+- Nova tabela `stage_photos` (CMS) + nova tab `AdminStagePhotosTab`.
+- Nova tabela `speaking_logos` + nova tab `AdminLogosTab`.
+- Estender `testimonials` com campos `author_photo`, `author_company`, `event_name`.
 
-1. Aceitar `finalidade` do lead e selecionar `acao_pf_*` ou `acao_pj_*` (fallback nos antigos).
-2. Página 3 (Plano 30/60/90) reformatada para corrigir o **bug atual de sobreposição** ("30 DIAS" colidindo com o texto da ação): aumentar coluna do rótulo, quebrar linha do texto com `splitTextToSize` respeitando margem real.
-3. Adicionar bloco "Por que importa" abaixo do título de cada plano.
-4. Adicionar **nova página "Trilha de Conhecimento Recomendada"** ao final, listando os itens de `aprendizado_pf`/`aprendizado_pj` agrupados pelas 3 competências do plano — com tipo (📚 Livro / 🎓 Curso / 🧪 Prática / 👥 Comunidade / 📰 Newsletter).
-5. Pequeno polimento visual: numeração dos passos com mais respiro, badges 30/60/90 com fundo colorido distinto.
+### Fase 4 · Reordenar e enxugar o Index
+- Nova ordem: Hero → Teste IA → LogosBar → **Palestras** → Sobre → Prova social (palco + depoimentos) → **Briefing** → Livro → Podcast → Blog → Footer.
+- Atualizar Header e Footer com links "Palestras" e "Contratar".
 
-## Mudanças na dashboard (`TesteIADashboard.tsx`)
+### Fase 5 · Polimento, autoridade e SEO
+- Editar copy/headline do Hero via `hero_content` para versão mais comercial (mantendo opção de A/B).
+- Suporte a vídeo de palco no Hero (campo `hero_video_url` em `hero_content`); fallback para imagem atual.
+- JSON-LD `Person` + `Service` em `index.html` (SEO local "palestrante IA Brasil").
+- Remover banner Debug Auth do Header.
+- Criar página dedicada `/palestras` (deep-dive + briefing próprio) — facilita compartilhar link em propostas.
+- Tab `AdminBriefingsTab` para gerenciar leads de briefing (visualizar, marcar status, exportar).
 
-1. Renderizar plano usando os novos campos PF/PJ conforme `lead.finalidade`.
-2. Mostrar bloco "Por que importa" e a Trilha de Conhecimento como cards após o plano.
-3. Nenhuma mudança em scoring/lógica do teste.
+---
 
-## Mudanças no admin
-
-`AdminLeadsTab` já baixa o PDF — sem alteração de fluxo. Apenas se beneficia automaticamente do conteúdo mais rico.
-
-## Resumo técnico
+## Mudanças técnicas resumidas
 
 ```text
-DB:   ALTER TABLE ia_maturity_recommendations ADD … (6 colunas) + UPDATE de 16 linhas
-PDF:  refator de layout pág. 3 + nova pág. 4 (trilha) + seleção por finalidade
-UI:   TesteIADashboard lê novos campos e renderiza trilha
+DB:
+  + briefing_requests (id, nome, empresa, cargo, email, whatsapp,
+                       tipo, data_evento, formato, publico, cidade,
+                       mensagem, status, created_at)
+  + speaking_logos (id, name, logo_url, link, display_order, active)
+  + stage_photos (id, image_url, caption, event_name, display_order, active)
+  ~ testimonials (+ author_photo, author_company, event_name)
+  ~ hero_content (+ hero_video_url, cta_tertiary, cta_tertiary_target)
+
+Edge functions:
+  + send-briefing-email (Lovable Emails)
+
+Frontend:
+  + src/components/PalestrasSection.tsx
+  + src/components/LogosBarSection.tsx
+  + src/components/StagePhotosSection.tsx
+  + src/components/BriefingForm.tsx  (substitui núcleo do ContactSection)
+  + src/pages/Palestras.tsx
+  + src/components/admin/AdminPalestrasTab.tsx
+  + src/components/admin/AdminBriefingsTab.tsx
+  + src/components/admin/AdminLogosTab.tsx
+  + src/components/admin/AdminStagePhotosTab.tsx
+  ~ HeroSection (novo CTA + suporte a vídeo)
+  ~ Index (nova ordem)
+  ~ Header/Footer (novos links)
+  ~ StickyHeaderCTA (CTA dinâmico)
+  ~ TestimonialsCarousel novo dentro de TrustBarSection
+  ~ index.html (JSON-LD)
+  - Debug Auth banner
+
+SEO/conteúdo:
+  Tokens brutalistas mantidos, nenhuma cor hardcoded.
+  Validação com zod no formulário de briefing.
 ```
 
-Sem mudanças em autenticação, RLS ou estrutura de leads.
+---
 
-## Fora de escopo
+## O que NÃO está no escopo
 
-- Geração dinâmica por LLM (poderíamos fazer numa próxima iteração via edge function se quiser conteúdo ainda mais personalizado pelas respostas exatas).
-- Tradução/i18n.
-- Reescrita do questionário.
+- Reescrita do Teste de IA (já refinado nas últimas iterações).
+- Internacionalização.
+- Pagamento online de palestras (continua via proposta humana).
+- Integração com CRM externo (pode entrar em fase futura via Resend/HubSpot connector).
+
+---
+
+## Execução
+
+Vou rodar as fases em sequência, parando para você revisar entre cada fase. Começo pela **Fase 1 (oferta visível)** porque é a que mais move conversão imediata.
