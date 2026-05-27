@@ -70,7 +70,7 @@ const BriefingForm = () => {
       `📧 <b>Email:</b> ${data.email}\n` +
       (data.whatsapp ? `📱 <b>WhatsApp:</b> ${data.whatsapp}\n` : '') +
       (data.empresa ? `🏢 <b>Empresa:</b> ${data.empresa}\n` : '') +
-      (data.tipo_evento ? `🎤 <b>Evento:</b> ${data.tipo_evento}\n` : '') +
+      (data.tipo ? `🎤 <b>Tipo:</b> ${data.tipo}\n` : '') +
       (data.data_evento ? `📅 <b>Data:</b> ${data.data_evento}\n` : '') +
       (data.mensagem ? `\n💬 ${data.mensagem}` : '');
     void Promise.allSettled([
