@@ -41,8 +41,20 @@ const PalestrasSection = () => {
             return (
               <Card
                 key={f.id}
-                className="relative flex flex-col p-8 border-2 border-primary/30 bg-card shadow-[6px_6px_0_hsl(var(--primary))] transition-transform hover:-translate-y-1"
+                className="relative flex flex-col overflow-hidden border-2 border-primary/30 bg-card shadow-[6px_6px_0_hsl(var(--primary))] transition-transform hover:-translate-y-1"
               >
+                {f.image_url && (
+                  <div className="relative h-44 w-full overflow-hidden border-b-2 border-primary/30">
+                    <img
+                      src={f.image_url}
+                      alt={f.title}
+                      loading="lazy"
+                      className="h-full w-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
+                  </div>
+                )}
+                <div className="flex flex-col flex-1 p-8">
                 <div className="mb-5 inline-flex h-12 w-12 items-center justify-center border-2 border-primary bg-primary/10">
                   <Icon className="w-6 h-6 text-primary" />
                 </div>
@@ -88,6 +100,7 @@ const PalestrasSection = () => {
                   {f.cta_label || 'Solicitar proposta'}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
+                </div>
               </Card>
             );
           })}

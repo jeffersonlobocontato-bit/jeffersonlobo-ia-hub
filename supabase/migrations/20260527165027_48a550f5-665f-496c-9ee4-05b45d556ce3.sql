@@ -1,0 +1,1 @@
+ALTER TABLE public.palestra_formats ADD COLUMN IF NOT EXISTS image_url TEXT;
