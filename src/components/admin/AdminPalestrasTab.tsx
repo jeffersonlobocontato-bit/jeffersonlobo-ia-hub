@@ -152,7 +152,12 @@ const AdminPalestrasTab = () => {
             <div className="flex gap-3">
               <div className="w-32 h-32 shrink-0 border border-border bg-muted/40 overflow-hidden flex items-center justify-center">
                 {item.image_url ? (
-                  <img src={item.image_url} alt={item.title} className="w-full h-full object-cover" />
+                  <img
+                    src={item.image_url}
+                    alt={item.title}
+                    className="w-full h-full object-cover"
+                    style={{ objectPosition: item.image_position || 'center' }}
+                  />
                 ) : (
                   <span className="text-[10px] text-muted-foreground text-center px-2">Sem imagem</span>
                 )}
