@@ -213,8 +213,10 @@ const Admin = () => {
   };
 
   const addBlogPost = async () => {
+    const ts = Date.now();
     const { error } = await supabase.from('blog_posts').insert({
       title: 'Novo Post',
+      slug: `novo-post-${ts}`,
       excerpt: 'Resumo do post',
       category: 'Categoria',
       date: new Date().toISOString().split('T')[0],
