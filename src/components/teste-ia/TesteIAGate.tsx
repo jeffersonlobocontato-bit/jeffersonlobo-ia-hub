@@ -23,14 +23,14 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
   const [loading, setLoading] = useState(false);
   const [totalConcluidos, setTotalConcluidos] = useState<number | null>(null);
 
-  // Fetch social proof count
+  // Fetch social proof count (via secure RPC, no PII)
   useEffect(() => {
-    supabase
-      .from("ia_maturity_leads")
-      .select("id", { count: "exact", head: true })
-      .eq("concluido", true)
-      .then(({ count }) => setTotalConcluidos(count ?? null));
+    supabase.rpc("get_maturity_stats").then(({ data }) => {
+      const row = Array.isArray(data) ? data[0] : data;
+      if (row?.total_concluidos != null) setTotalConcluidos(Number(row.total_concluidos));
+    });
   }, []);
+
 
   const formatWhatsApp = (value: string) => {
     const numbers = value.replace(/\D/g, "").slice(0, 11);
