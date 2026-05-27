@@ -25,6 +25,8 @@ import AdminStagePhotosTab from '@/components/admin/AdminStagePhotosTab';
 import AdminSpeakingLogosTab from '@/components/admin/AdminSpeakingLogosTab';
 import AdminPalestrasTab from '@/components/admin/AdminPalestrasTab';
 import { SEO } from '@/components/SEO';
+import { TelegramTestCard } from '@/components/admin/TelegramTestCard';
+
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
@@ -424,7 +426,9 @@ const Admin = () => {
       </header>
 
       <main className="container mx-auto px-4 py-8">
+        <TelegramTestCard />
         <Tabs defaultValue="hero" className="w-full">
+
           <TabsList className="inline-flex w-full mb-8 overflow-x-auto">
             <TabsTrigger value="hero">Hero</TabsTrigger>
             <TabsTrigger value="about">Sobre</TabsTrigger>

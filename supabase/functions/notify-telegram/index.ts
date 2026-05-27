@@ -16,13 +16,17 @@ Deno.serve(async (req) => {
     if (!TELEGRAM_API_KEY) throw new Error('TELEGRAM_API_KEY not configured');
     if (!TELEGRAM_CHAT_ID) throw new Error('TELEGRAM_CHAT_ID not configured');
 
-    const { text } = await req.json();
+    const { text, test } = await req.json();
     if (!text || typeof text !== 'string') {
       return new Response(JSON.stringify({ error: 'text is required' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
     }
+
+    const maskedChatId = TELEGRAM_CHAT_ID.length > 6
+      ? `${TELEGRAM_CHAT_ID.slice(0, 4)}…${TELEGRAM_CHAT_ID.slice(-2)}`
+      : '***';
 
     const response = await fetch(`${GATEWAY_URL}/sendMessage`, {
       method: 'POST',
@@ -41,13 +45,21 @@ Deno.serve(async (req) => {
 
     const data = await response.json();
     if (!response.ok) {
-      throw new Error(`Telegram API [${response.status}]: ${JSON.stringify(data)}`);
+      const err = `Telegram API [${response.status}]: ${JSON.stringify(data)}`;
+      if (test) {
+        return new Response(JSON.stringify({ ok: false, error: err, chat_id_used: maskedChatId, telegram_response: data, status: response.status }), {
+          status: 200,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      throw new Error(err);
     }
 
-    return new Response(JSON.stringify({ ok: true, message_id: data.result?.message_id }), {
+    return new Response(JSON.stringify({ ok: true, message_id: data.result?.message_id, chat_id_used: test ? maskedChatId : undefined }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     console.error('notify-telegram error:', message);
