@@ -44,12 +44,13 @@ const PalestrasSection = () => {
                 className="relative flex flex-col overflow-hidden border-2 border-primary/30 bg-card shadow-[6px_6px_0_hsl(var(--primary))] transition-transform hover:-translate-y-1"
               >
                 {f.image_url && (
-                  <div className="relative h-44 w-full overflow-hidden border-b-2 border-primary/30">
+                  <div className="relative h-56 md:h-64 w-full overflow-hidden border-b-2 border-primary/30 bg-muted">
                     <img
                       src={f.image_url}
                       alt={f.title}
                       loading="lazy"
                       className="h-full w-full object-cover"
+                      style={{ objectPosition: f.image_position || 'center' }}
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-card/80 via-transparent to-transparent" />
                   </div>
