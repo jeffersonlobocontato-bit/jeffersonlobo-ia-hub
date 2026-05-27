@@ -18,10 +18,12 @@ interface Question {
 
 interface TesteIAQuestionarioProps {
   leadId: string;
+  accessToken: string;
   finalidade: "PF" | "PJ";
   onComplete: () => void;
   onRestart?: () => void;
 }
+
 
 const nivelLabel: Record<string, string> = {
   BASICO: "Básico",
@@ -29,7 +31,7 @@ const nivelLabel: Record<string, string> = {
   AVANCADO: "Avançado",
 };
 
-export function TesteIAQuestionario({ leadId, finalidade, onComplete, onRestart }: TesteIAQuestionarioProps) {
+export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplete, onRestart }: TesteIAQuestionarioProps) {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [respostas, setRespostas] = useState<Record<string, number>>({});
@@ -37,22 +39,21 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete, onRestart 
 
   useEffect(() => {
     loadQuestions();
-    // Restore saved answers
+    // Restore saved answers via secure RPC
     supabase
-      .from("ia_maturity_leads")
-      .select("respostas")
-      .eq("id", leadId)
-      .maybeSingle()
+      .rpc("get_maturity_lead", { p_id: leadId, p_token: accessToken })
       .then(({ data }) => {
-        if (data?.respostas && Array.isArray(data.respostas)) {
+        const row = Array.isArray(data) ? data[0] : data;
+        if (row?.respostas && Array.isArray(row.respostas)) {
           const restored: Record<string, number> = {};
-          (data.respostas as any[]).forEach((r: any) => {
+          (row.respostas as any[]).forEach((r: any) => {
             if (r.id_pergunta) restored[r.id_pergunta] = r.resposta;
           });
           setRespostas(restored);
         }
       });
-  }, [finalidade, leadId]);
+  }, [finalidade, leadId, accessToken]);
+
 
   const loadQuestions = async () => {
     try {
@@ -77,11 +78,16 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete, onRestart 
       return { id_pergunta: id, resposta, competencia: q?.competencia, nivel: q?.nivel };
     });
     try {
-      await supabase.from("ia_maturity_leads").update({ respostas: arr }).eq("id", leadId);
+      await supabase.rpc("update_maturity_respostas", {
+        p_id: leadId,
+        p_token: accessToken,
+        p_respostas: arr as any,
+      });
     } catch (e) {
       console.error("Autosave falhou:", e);
     }
   };
+
 
   const handleResposta = (valor: number) => {
     const currentQuestion = questions[currentIndex];
@@ -120,19 +126,18 @@ export function TesteIAQuestionario({ leadId, finalidade, onComplete, onRestart 
       else if (scoreGeral < 4.0) nivelMaturidade = "Em evolução";
       else nivelMaturidade = "Avançado";
 
-      await supabase
-        .from("ia_maturity_leads")
-        .update({
-          respostas: arr,
-          score_basico: scoreBasico,
-          score_intermediario: scoreIntermediario,
-          score_avancado: scoreAvancado,
-          score_geral: scoreGeral,
-          competencias,
-          nivel_maturidade: nivelMaturidade,
-          concluido: true,
-        })
-        .eq("id", leadId);
+      await supabase.rpc("finalize_maturity_lead", {
+        p_id: leadId,
+        p_token: accessToken,
+        p_respostas: arr as any,
+        p_score_basico: scoreBasico,
+        p_score_intermediario: scoreIntermediario,
+        p_score_avancado: scoreAvancado,
+        p_score_geral: scoreGeral,
+        p_competencias: competencias as any,
+        p_nivel_maturidade: nivelMaturidade,
+      });
+
 
       toast.success("Teste finalizado! Veja seu resultado.");
       onComplete();

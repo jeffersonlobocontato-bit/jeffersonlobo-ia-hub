@@ -10,8 +10,9 @@ import { toast } from "sonner";
 import { Brain, Sparkles, Users, Clock, Award, CheckCircle2 } from "lucide-react";
 
 interface TesteIAGateProps {
-  onComplete: (leadId: string, finalidade: "PF" | "PJ") => void;
+  onComplete: (leadId: string, finalidade: "PF" | "PJ", accessToken: string) => void;
 }
+
 
 export function TesteIAGate({ onComplete }: TesteIAGateProps) {
   const [nome, setNome] = useState("");
@@ -22,14 +23,14 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
   const [loading, setLoading] = useState(false);
   const [totalConcluidos, setTotalConcluidos] = useState<number | null>(null);
 
-  // Fetch social proof count
+  // Fetch social proof count (via secure RPC, no PII)
   useEffect(() => {
-    supabase
-      .from("ia_maturity_leads")
-      .select("id", { count: "exact", head: true })
-      .eq("concluido", true)
-      .then(({ count }) => setTotalConcluidos(count ?? null));
+    supabase.rpc("get_maturity_stats").then(({ data }) => {
+      const row = Array.isArray(data) ? data[0] : data;
+      if (row?.total_concluidos != null) setTotalConcluidos(Number(row.total_concluidos));
+    });
   }, []);
+
 
   const formatWhatsApp = (value: string) => {
     const numbers = value.replace(/\D/g, "").slice(0, 11);
@@ -56,15 +57,20 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
     setLoading(true);
     try {
       const leadId = crypto.randomUUID();
-      const { error } = await supabase.from("ia_maturity_leads").insert({
-        id: leadId,
-        nome: nome.trim(),
-        email: email.trim().toLowerCase(),
-        whatsapp: whatsapp.replace(/\D/g, ""),
-        finalidade,
-      });
+      const { data, error } = await supabase
+        .from("ia_maturity_leads")
+        .insert({
+          id: leadId,
+          nome: nome.trim(),
+          email: email.trim().toLowerCase(),
+          whatsapp: whatsapp.replace(/\D/g, ""),
+          finalidade,
+        })
+        .select("id, access_token")
+        .single();
 
       if (error) throw error;
+      const accessToken = (data as any)?.access_token as string;
 
       // Fire-and-forget: notificação Telegram
       const telegramText = `🧠 <b>Novo Lead - Teste IA</b>\n\n` +
@@ -75,7 +81,8 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
       void supabase.functions.invoke('notify-telegram', { body: { text: telegramText } });
 
       toast.success("Vamos começar seu diagnóstico!");
-      onComplete(leadId, finalidade);
+      onComplete(leadId, finalidade, accessToken);
+
     } catch (error: any) {
       console.error("Erro:", error);
       if (error?.code === "23505") {

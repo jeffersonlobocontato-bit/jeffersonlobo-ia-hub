@@ -562,6 +562,7 @@ export type Database = {
       }
       ia_maturity_leads: {
         Row: {
+          access_token: string
           competencias: Json | null
           concluido: boolean | null
           created_at: string
@@ -582,6 +583,7 @@ export type Database = {
           whatsapp: string
         }
         Insert: {
+          access_token?: string
           competencias?: Json | null
           concluido?: boolean | null
           created_at?: string
@@ -602,6 +604,7 @@ export type Database = {
           whatsapp: string
         }
         Update: {
+          access_token?: string
           competencias?: Json | null
           concluido?: boolean | null
           created_at?: string
@@ -1209,6 +1212,20 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      finalize_maturity_lead: {
+        Args: {
+          p_competencias: Json
+          p_id: string
+          p_nivel_maturidade: string
+          p_respostas: Json
+          p_score_avancado: number
+          p_score_basico: number
+          p_score_geral: number
+          p_score_intermediario: number
+          p_token: string
+        }
+        Returns: boolean
+      }
       get_click_density: {
         Args: { end_date?: string; start_date?: string; target_page: string }
         Returns: {
@@ -1224,6 +1241,43 @@ export type Database = {
           cta_name: string
           total_clicks: number
           unique_sessions: number
+        }[]
+      }
+      get_maturity_lead: {
+        Args: { p_id: string; p_token: string }
+        Returns: {
+          access_token: string
+          competencias: Json | null
+          concluido: boolean | null
+          created_at: string
+          email: string
+          finalidade: Database["public"]["Enums"]["finalidade_tipo"]
+          id: string
+          nivel_maturidade:
+            | Database["public"]["Enums"]["maturidade_nivel"]
+            | null
+          nome: string
+          recomendacoes: Json | null
+          respostas: Json | null
+          score_avancado: number | null
+          score_basico: number | null
+          score_geral: number | null
+          score_intermediario: number | null
+          updated_at: string
+          whatsapp: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "ia_maturity_leads"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
+      get_maturity_stats: {
+        Args: never
+        Returns: {
+          avg_score_geral: number
+          total_concluidos: number
         }[]
       }
       get_page_stats: {
@@ -1277,6 +1331,10 @@ export type Database = {
           similarity: number
           titulo: string
         }[]
+      }
+      update_maturity_respostas: {
+        Args: { p_id: string; p_respostas: Json; p_token: string }
+        Returns: boolean
       }
     }
     Enums: {
