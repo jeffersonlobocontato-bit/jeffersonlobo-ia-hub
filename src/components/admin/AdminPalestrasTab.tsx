@@ -72,6 +72,7 @@ const AdminPalestrasTab = () => {
       display_order: item.display_order,
       active: item.active,
       image_url: item.image_url,
+      image_position: item.image_position,
     }).eq('id', item.id);
     if (error) toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
     else toast({ title: 'Formato salvo!' });
