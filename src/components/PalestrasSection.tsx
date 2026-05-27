@@ -100,6 +100,7 @@ const PalestrasSection = () => {
                   {f.cta_label || 'Solicitar proposta'}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </Button>
+                </div>
               </Card>
             );
           })}
