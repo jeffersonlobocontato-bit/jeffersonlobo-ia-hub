@@ -1,143 +1,113 @@
 
-# Plano: Blog SEO + Posts internos com foto, conteúdo em markdown e CTAs intercalados
-
 ## Objetivo
-Transformar a seção de blog num motor de indexação (Google + crawlers de IA) e geração de leads, sem quebrar o fluxo atual de posts externos do LinkedIn.
+
+Transformar o blog em duas frentes:
+
+1. **Leitura** — diagramação fluida, arejada e hierárquica, como portais de notícia (UOL, NYT, The Intercept).
+2. **Edição** — substituir o textarea de Markdown por um editor visual (WYSIWYG) com barra de ferramentas para títulos, negrito, itálico, listas, links, citação e **frase de destaque** (pull quote) inserida no meio do texto.
+
+Mantemos Markdown como formato de armazenamento (continua bom para SEO, diff, portabilidade e os CTAs intercalados já existentes). O editor só passa a ser visual — escreve Markdown por baixo.
 
 ---
 
-## 1. Modelo de dados (migração)
+## 1. Editor rico no admin (`MarkdownEditor.tsx`)
 
-Adicionar à tabela `blog_posts`:
+Substituir o `<Textarea>` atual por um editor **TipTap** (já é o padrão de fato no ecossistema React, leve, extensível, gera HTML→Markdown limpo).
 
-- `slug` (text, unique) — URL amigável, gerada do título no admin (editável)
-- `cover_image` (text) — URL da foto de capa (opcional)
-- `cover_alt` (text) — texto alternativo da foto (SEO + acessibilidade)
-- `content_md` (text) — corpo completo do post em **markdown** (opcional; quando preenchido, o post é "interno")
-- `seo_title` (text, opcional) — sobrescreve `<title>` se quiser otimizar separado
-- `seo_description` (text, opcional) — sobrescreve `<meta description>`
-- `reading_minutes` (int, calculado) — tempo de leitura estimado
-- `published_at` (timestamptz) — para `article:published_time`
-- `tags` (text[]) — palavras-chave
+**Toolbar fixa no topo do editor**, agrupada:
 
-Regra de tipo do post (computada no front):
-- `content_md` preenchido → **post interno** (foto + título + 1º parágrafo + "Ler mais")
-- `content_md` vazio + `linkedin_url` → **post externo** (formato atual; CTA LinkedIn)
+- Parágrafo · H2 · H3 · H4
+- **B** · *I* · ~~S~~ · `code`
+- Lista • · Lista 1. · Citação `"`
+- 🔗 Link · 🖼 Imagem (do bucket `blog-covers`)
+- **★ Destaque** (insere um *pull quote* — bloco `> [!destaque]` no Markdown)
+- ─ Separador (hr) · ↶ Desfazer · ↷ Refazer
+- Botão "Markdown" para alternar para o textarea cru (escape hatch para quem prefere)
 
-Storage: criar bucket público `blog-covers` com policies de leitura pública e write apenas admin.
+**Persistência:** o editor mantém o conteúdo como Markdown em `content_md` (via `tiptap-markdown`). Nada muda no banco.
 
----
-
-## 2. Admin (AdminBlogTab)
-
-Campos novos no formulário:
-- Upload de foto de capa (Supabase Storage) + campo `cover_alt`
-- Campo `slug` (auto-sugerido do título, editável, com validação de unicidade e formato `[a-z0-9-]`)
-- Editor de **markdown** (textarea grande com preview lado-a-lado, usando `react-markdown`)
-- Tags (input separado por vírgula)
-- SEO avançado (collapsible): `seo_title`, `seo_description`
-- Switch: "Conteúdo completo no site" (se off, força usar `linkedin_url`)
-
-Validação Zod no submit (título 10-120, slug único, excerpt ≤ 200, content_md ≤ 50k).
+**Pull quote (frase de destaque):**
+- No Markdown fica como bloco customizado: `> [!destaque]\n> Texto da frase em destaque`
+- No render, vira um `<aside class="pull-quote">` grande, com aspas tipográficas, tipografia display e borda lateral.
 
 ---
 
-## 3. Listagem (`BlogSection` na home)
+## 2. Diagramação editorial em `BlogPost.tsx` + `BlogContent.tsx`
 
-Manter card atual, mas:
-- Mostrar foto de capa quando houver (topo do card, `aspect-video`, `loading="lazy"`, alt correto)
-- Mostrar título + 1º parágrafo do `content_md` (extraído) OU `excerpt` se externo
-- CTA do card:
-  - Interno → "Ler artigo completo" → `/blog/:slug`
-  - Externo → mantém "Veja no LinkedIn" atual
+Inspiração: NYT / The Intercept / Piauí.
 
----
+**Layout da página do post:**
+- Container central **mais estreito e respirado**: `max-w-[680px]` (hoje é `max-w-3xl` = 768px e o texto fica colado). Margem lateral generosa no desktop.
+- **Capa em largura total** (bleed) acima do título no desktop, com legenda discreta abaixo.
+- **Cabeçalho editorial:** categoria pequena em caps → título grande em serifa display → linha fina → **dek** (subtítulo/excerpt em fonte maior, peso leve, cor suave) → linha de autor + data + tempo de leitura.
+- **Barra de progresso de leitura** fixa no topo (1px, cor primary).
 
-## 4. Página de artigo `/blog/:slug` (nova rota)
+**Tipografia do corpo (`.blog-content`):**
+- Fonte serifa para o corpo (ex.: `Lora` ou `Source Serif 4` via Google Fonts) — quebra do "tudo Arial Black" e melhora dramaticamente a leitura longa.
+- `font-size: 1.125rem` (18px) mobile, `1.1875rem` (19px) desktop.
+- `line-height: 1.75`.
+- `max-width: 65ch` dentro do container.
+- Parágrafos com `margin-bottom: 1.5em`.
+- **Drop cap** opcional no primeiro parágrafo (`::first-letter` grande, float left).
+- H2/H3 mantêm sans display (Arial Black) mas com mais respiro acima (`mt-16`) e uma linha fina divisória.
+- **Links** em primary com sublinhado fino, sem peso bold (fica menos agressivo).
+- **Listas** com bullets/numeração customizados e indentação maior.
+- **Blockquote padrão** discreto (barra lateral fina, itálico).
+- **Pull quote** (`> [!destaque]`): bloco que "sai" do fluxo — fonte display 2xl/3xl, peso bold, com aspas grandes decorativas, borda superior + inferior 2px, `my-12`. No desktop pode flutuar à direita ocupando ~40% da largura (`md:float-right md:w-2/5 md:ml-8`).
+- **Imagens inline:** largura total do container + legenda em itálico abaixo.
 
-Estrutura:
-1. **Header SEO**: `<Helmet>` com title/description, canonical, og:* (image = cover), `article:published_time`, `article:author`
-2. **JSON-LD Article + BreadcrumbList** (Schema.org) inline
-3. **Hero**: foto de capa + título H1 + meta (data, tempo de leitura, categoria, tags)
-4. **Corpo markdown** renderizado com `react-markdown` + `remark-gfm`, headings semânticos (H2/H3), prose tipográfico
-5. **CTAs intercalados** em pontos estratégicos do corpo (ver §5)
-6. **Footer do artigo**: bio curta do autor, compartilhar (LinkedIn/WhatsApp/X), "Posts relacionados" (mesma categoria/tags)
-7. **CTA final forte**: Teste de Maturidade IA
-
-Adicionar rota em `src/App.tsx`: `<Route path="/blog/:slug" element={<BlogPost />} />`.
-
-Adicionar `/blog` (index) opcional listando todos os posts para SEO/crawlers.
-
----
-
-## 5. CTAs intercalados (componente `BlogInlineCTA`)
-
-Regra de inserção automática: dividir o markdown por parágrafos e injetar CTAs em ~25%, 55% e 85% do total (mínimo 4 parágrafos entre cada). Sequência rotativa:
-1. **Teste de Maturidade IA** (`/teste-ia`) — cor primary
-2. **Solicitar palestra / proposta** (#contato) — cor secondary
-3. **Livro / Podcast** (alternar) — cor accent
-4. **Newsletter LinkedIn** (no rodapé do artigo, sempre)
-
-Cada CTA é um card brutalista contextualizado ao tema do post (texto fixo por tipo, não depende do conteúdo).
-
-Tracking: cada CTA chama `trackCTA('blog_inline_<tipo>', 'blog_post:<slug>')`.
+**Os CTAs intercalados** já existentes (`BlogInlineCTA`) ganham margens verticais maiores (`my-14`) e ficam visualmente mais "respirados" entre seções.
 
 ---
 
-## 6. SEO técnico
+## 3. Renderização do pull quote
 
-- **Dependência**: instalar `react-helmet-async`, `react-markdown`, `remark-gfm`
-- Adicionar `<HelmetProvider>` em `main.tsx`
-- Remover `<link rel="canonical">` estático do `index.html` (cada rota terá o seu via Helmet)
-- Atualizar `scripts/generate-sitemap.ts` para **ler `blog_posts` do Supabase** e gerar uma URL por post (`/blog/:slug` com `lastmod = updated_at`). Roda no prebuild.
-- Atualizar `public/robots.txt` e `public/llms.txt` para listar `/blog` como conteúdo indexável
-- Atualizar `SEO.tsx` para aceitar `ogImage` por rota (já aceita), `ogType="article"` e `article:*` meta
-- JSON-LD por post: `@type: "Article"` com `headline`, `image`, `datePublished`, `dateModified`, `author`, `publisher`, `mainEntityOfPage`
-- JSON-LD `BreadcrumbList`: Home → Blog → Post
-- Headings: garantir único `<h1>` (título do post); CTAs intercalados usam `<h3>`
+Em `BlogContent.tsx`, antes de jogar no `ReactMarkdown`, faz-se um pré-processamento simples: blocos `> [!destaque]\n> ...` são substituídos por um marcador que vira `<aside class="pull-quote">...</aside>` via componente customizado no `mdComponents.blockquote` (que inspeciona se o conteúdo começa com `[!destaque]`).
+
+Alternativa mais limpa: usar `remark-directive` + `:::destaque ... :::`. Vou pelo `blockquote` para não adicionar dependência nova.
 
 ---
 
-## 7. Otimizações para crawlers de IA
+## 4. Estilos globais
 
-- `content_md` é renderizado server-friendly (texto puro no HTML, sem dependência exclusiva de JS para conteúdo crítico)
-- `public/llms.txt` atualizado listando posts com resumo
-- Meta `description` rica, primeiro parágrafo informativo, tags como `<meta name="keywords">` (peso baixo, mas usado por alguns crawlers de IA)
-- Tempo de leitura, autor, data visíveis no HTML
+Adicionar em `src/index.css`:
+
+```css
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap');
+
+.blog-content { font-family: 'Source Serif 4', Georgia, serif; }
+.blog-content p { font-size: 1.125rem; line-height: 1.75; }
+.blog-content .pull-quote { /* ver acima */ }
+.blog-content p:first-of-type::first-letter { /* drop cap */ }
+.reading-progress { position: fixed; top: 0; height: 2px; background: hsl(var(--primary)); z-index: 60; }
+```
+
+Tokens (cores, espaçamentos) continuam vindo do design system — nada hard-coded fora dos `--*`.
 
 ---
 
-## 8. Hooks/queries
+## 5. Arquivos
 
-- `useBlogPosts()` (existente): adicionar novos campos no select
-- `useBlogPost(slug)`: novo hook para buscar 1 post por slug com cache
-- `useRelatedPosts(slug, category)`: 3 posts relacionados
+**Novos**
+- `src/components/blog/RichEditor.tsx` — TipTap + toolbar + conversor para Markdown
+- `src/components/blog/ReadingProgress.tsx` — barra fina no topo
+
+**Editados**
+- `src/components/blog/MarkdownEditor.tsx` → passa a renderizar `RichEditor` por padrão, com toggle "Markdown cru"
+- `src/components/blog/BlogContent.tsx` → suporte ao pull quote + componentes Markdown com tipografia editorial
+- `src/pages/BlogPost.tsx` → novo cabeçalho editorial, capa em bleed, container 680px, `ReadingProgress`
+- `src/index.css` → fonte serifa, estilos `.blog-content`, `.pull-quote`, drop cap
+- `tailwind.config.ts` → família `serif: ['"Source Serif 4"', 'Georgia', 'serif']` se necessário
+
+**Dependências novas**
+- `@tiptap/react`, `@tiptap/starter-kit`, `@tiptap/extension-link`, `@tiptap/extension-image`, `tiptap-markdown`
+
+Nenhuma mudança de schema, rotas ou backend.
 
 ---
 
-## Detalhes técnicos
+## Fora de escopo
 
-**Arquivos novos**
-- `supabase/migrations/<ts>_blog_seo_fields.sql` — colunas, bucket, policies
-- `src/pages/BlogPost.tsx`
-- `src/pages/BlogIndex.tsx` (lista pública /blog)
-- `src/components/blog/BlogInlineCTA.tsx`
-- `src/components/blog/BlogContent.tsx` (markdown render + inserção de CTAs)
-- `src/components/blog/CoverImageUploader.tsx` (admin)
-- `src/components/blog/MarkdownEditor.tsx` (textarea + preview)
-- `src/hooks/useBlogPost.ts`, `src/hooks/useRelatedPosts.ts`
-- `src/lib/blog-utils.ts` (slugify, extractFirstParagraph, calcReadingTime, injectCTAs)
-
-**Arquivos editados**
-- `src/App.tsx` (rotas /blog e /blog/:slug)
-- `src/main.tsx` (HelmetProvider)
-- `src/components/BlogSection.tsx` (foto + CTA condicional)
-- `src/components/admin/AdminBlogTab.tsx` (novos campos)
-- `src/integrations/supabase/types.ts` (auto, após migração)
-- `scripts/generate-sitemap.ts` (incluir posts)
-- `index.html` (remover canonical estático)
-- `public/llms.txt`, `public/robots.txt`
-
-**Dependências novas**: `react-helmet-async`, `react-markdown`, `remark-gfm`
-
-**Compatibilidade**: posts existentes (sem `content_md`) seguem funcionando como externos — comportamento atual preservado.
+- Não muda o sistema de CTAs intercalados (já funciona).
+- Não muda o card de blog na home.
+- Não muda autenticação, RLS ou edge functions.
