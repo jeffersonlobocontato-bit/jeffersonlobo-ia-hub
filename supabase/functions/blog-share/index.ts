@@ -8,6 +8,13 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 
 const SITE_URL = 'https://jeffersonlobo.tech'
+const FALLBACK_IMAGE =
+  'https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp'
+
+const htmlHeaders = {
+  'content-type': 'text/html; charset=utf-8',
+  'cache-control': 'public, max-age=60, s-maxage=300',
+}
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -23,16 +30,39 @@ function escapeHtml(s: string): string {
     .replace(/'/g, '&#39;')
 }
 
+function truncateText(s: string, max = 180): string {
+  const text = (s || '').replace(/\s+/g, ' ').trim()
+  if (text.length <= max) return text
+  const cut = text.slice(0, max - 1)
+  return `${cut.slice(0, cut.lastIndexOf(' ') || cut.length).trim()}…`
+}
+
+function socialImageUrl(image?: string | null): string {
+  if (!image) return FALLBACK_IMAGE
+
+  try {
+    const url = new URL(image)
+    if (url.pathname.includes('/storage/v1/object/public/')) {
+      url.pathname = url.pathname.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
+      url.searchParams.set('width', '1200')
+      url.searchParams.set('height', '630')
+      url.searchParams.set('resize', 'contain')
+      url.searchParams.set('quality', '80')
+      return url.toString()
+    }
+  } catch (_) {
+    return image
+  }
+
+  return image
+}
+
 function renderHtml(post: any): string {
   const url = `${SITE_URL}/blog/${post.slug}`
-  const title = escapeHtml(post.seo_title || post.title)
-  const description = escapeHtml(
-    post.seo_description || post.subtitle || post.excerpt || '',
-  ).slice(0, 300)
-  const image = escapeHtml(
-    post.cover_image ||
-      'https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp',
-  )
+  const shareUrl = `${SITE_URL}/share/blog/${post.slug}`
+  const title = escapeHtml(post.title)
+  const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ''))
+  const image = escapeHtml(socialImageUrl(post.cover_image))
   const imageAlt = escapeHtml(post.cover_alt || post.title)
 
   return `<!doctype html>
@@ -46,16 +76,18 @@ function renderHtml(post: any): string {
 
 <meta property="og:type" content="article" />
 <meta property="og:site_name" content="Jefferson Lobo" />
-<meta property="og:url" content="${url}" />
+<meta property="og:url" content="${shareUrl}" />
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${description}" />
 <meta property="og:image" content="${image}" />
+<meta property="og:image:secure_url" content="${image}" />
+<meta property="og:image:type" content="image/png" />
 <meta property="og:image:alt" content="${imageAlt}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:url" content="${url}" />
+<meta name="twitter:url" content="${shareUrl}" />
 <meta name="twitter:title" content="${title}" />
 <meta name="twitter:description" content="${description}" />
 <meta name="twitter:image" content="${image}" />
