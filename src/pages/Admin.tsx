@@ -21,6 +21,7 @@ import { AdminKnowledgeTab } from '@/components/admin/AdminKnowledgeTab';
 import { AdminAnalyticsTab } from '@/components/admin/AdminAnalyticsTab';
 import { AdminTrustTab } from '@/components/admin/AdminTrustTab';
 import AdminBriefingsTab from '@/components/admin/AdminBriefingsTab';
+import AdminStagePhotosTab from '@/components/admin/AdminStagePhotosTab';
 
 const Admin = () => {
   const { signOut, user, isAdmin } = useAuth();
@@ -427,6 +428,7 @@ const Admin = () => {
             <TabsTrigger value="blog">Blog</TabsTrigger>
             <TabsTrigger value="leads">Leads IA</TabsTrigger>
             <TabsTrigger value="briefings">Briefings</TabsTrigger>
+            <TabsTrigger value="stage-photos">Galeria</TabsTrigger>
             <TabsTrigger value="chat-leads">Chat</TabsTrigger>
             <TabsTrigger value="knowledge">Base RAG</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
