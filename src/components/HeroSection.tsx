@@ -58,8 +58,13 @@ const HeroSection = () => {
         <img
           src={heroBg}
           alt="Jefferson Lobo - Especialista em IA"
+          width={1920}
+          height={1080}
+          fetchPriority="high"
+          decoding="async"
           className="w-full h-full object-cover"
         />
+
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background" />
         <div className="absolute inset-0 bg-brand-grid opacity-40" />
       </div>
