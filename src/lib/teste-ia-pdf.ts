@@ -420,7 +420,7 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
   // Caixa de contato
   cy += 6;
-  const boxH = 58;
+  const boxH = 66;
   pdf.setFillColor(252, 211, 77);
   pdf.rect(M, cy, CONTENT_W, boxH, "F");
   pdf.setTextColor(13, 13, 13);
