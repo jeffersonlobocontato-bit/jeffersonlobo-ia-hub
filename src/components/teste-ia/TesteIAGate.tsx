@@ -56,21 +56,18 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
 
     setLoading(true);
     try {
-      const leadId = crypto.randomUUID();
-      const { data, error } = await supabase
-        .from("ia_maturity_leads")
-        .insert({
-          id: leadId,
-          nome: nome.trim(),
-          email: email.trim().toLowerCase(),
-          whatsapp: whatsapp.replace(/\D/g, ""),
-          finalidade,
-        })
-        .select("id, access_token")
-        .single();
+      const { data, error } = await supabase.rpc("create_maturity_lead", {
+        p_nome: nome.trim(),
+        p_email: email.trim().toLowerCase(),
+        p_whatsapp: whatsapp.replace(/\D/g, ""),
+        p_finalidade: finalidade,
+      });
 
       if (error) throw error;
-      const accessToken = (data as any)?.access_token as string;
+      const row = Array.isArray(data) ? data[0] : data;
+      const leadId = (row as any)?.id as string;
+      const accessToken = (row as any)?.access_token as string;
+      if (!leadId || !accessToken) throw new Error("invalid_response");
 
       // Fire-and-forget: notificação Telegram
       const telegramText = `🧠 <b>Novo Lead - Teste IA</b>\n\n` +
