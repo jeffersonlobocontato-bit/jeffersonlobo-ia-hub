@@ -17,31 +17,35 @@ const StagePhotoCard = ({
   imgClassName?: string;
 }) => (
   <figure
-    className={`group relative overflow-hidden border-2 border-primary/30 shadow-[6px_6px_0_hsl(var(--primary))] transition-transform hover:-translate-y-1 ${className}`}
+    className={`group relative overflow-hidden border border-foreground/10 bg-foreground transition-all duration-300 hover:border-foreground/30 ${className}`}
   >
     <img
       src={photo.image_url}
       alt={photo.caption || photo.event_name || 'Jefferson Lobo no palco'}
-      className={`${imgClassName} transition-transform duration-700 group-hover:scale-105`}
+      className={`${imgClassName} transition-transform duration-700 group-hover:scale-[1.03]`}
       loading="lazy"
     />
-    <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/30 to-transparent" />
+    {/* Gradiente escuro para garantir legibilidade da legenda */}
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-foreground via-foreground/70 to-transparent" />
     {(photo.event_name || photo.caption) && (
-      <figcaption className="absolute inset-x-0 bottom-0 p-4">
-        {photo.event_name && (
-          <div className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-primary">
-            {photo.event_name}
-          </div>
-        )}
-        {photo.caption && (
-          <div className="mt-1 text-xs sm:text-sm text-foreground/90 leading-snug">
-            {photo.caption}
-          </div>
-        )}
+      <figcaption className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
+        <div className="border-l-2 border-primary pl-3">
+          {photo.event_name && (
+            <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-background/70">
+              {photo.event_name}
+            </div>
+          )}
+          {photo.caption && (
+            <div className="mt-1 text-sm sm:text-base font-bold text-background leading-snug">
+              {photo.caption}
+            </div>
+          )}
+        </div>
       </figcaption>
     )}
   </figure>
 );
+
 
 const StagePhotosSection = () => {
   const { data: photos = [] } = useStagePhotos();
