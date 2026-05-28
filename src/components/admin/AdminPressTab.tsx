@@ -18,6 +18,7 @@ export const AdminPressTab = () => {
   const [importOpen, setImportOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [showBase, setShowBase] = useState(false);
+  const [baseSelected, setBaseSelected] = useState<Set<string>>(new Set());
   const { lists, loading: loadingLists, reload: reloadLists } = usePressLists();
 
   const load = async () => {
@@ -107,8 +108,8 @@ export const AdminPressTab = () => {
           {loading ? <p className="text-muted-foreground">Carregando...</p> : (
             <PressContactsTable
               contacts={contacts}
-              selectedIds={new Set()}
-              setSelectedIds={() => {}}
+              selectedIds={baseSelected}
+              setSelectedIds={setBaseSelected}
               reload={() => { load(); reloadLists(); }}
             />
           )}
