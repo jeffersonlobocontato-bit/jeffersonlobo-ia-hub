@@ -290,51 +290,67 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
             )}
 
             {/* FILTRO POR REGIÃO */}
-            {selectedLists.size > 0 && regionCounts.length > 0 && (
-              <Card className="p-3 space-y-2">
-                <div className="flex items-center justify-between flex-wrap gap-2">
-                  <div className="text-xs uppercase font-bold">
-                    Filtrar por região <span className="text-muted-foreground font-normal normal-case">(opcional — nenhuma selecionada = todas)</span>
-                  </div>
-                  <div className="flex gap-2">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => setSelectedRegions(new Set(regionCounts.map(([r]) => r)))}
-                    >
-                      Marcar todas
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setSelectedRegions(new Set())}
-                      disabled={selectedRegions.size === 0}
-                    >
-                      Limpar
-                    </Button>
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {regionCounts.map(([r, n]) => {
-                    const active = selectedRegions.has(r);
-                    return (
-                      <button
-                        key={r}
-                        type="button"
-                        onClick={() => toggleRegion(r)}
-                        className={`px-3 py-1.5 rounded-full border-2 text-xs font-bold uppercase transition-colors ${
-                          active
-                            ? 'bg-primary text-primary-foreground border-primary'
-                            : 'bg-transparent border-border hover:border-primary'
-                        }`}
+            {selectedLists.size > 0 && regionCounts.length > 0 && (() => {
+              const allSelected = selectedRegions.size === regionCounts.length;
+              const noneSelected = selectedRegions.size === 0;
+              return (
+                <Card className="p-3 space-y-2">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <div className="text-xs uppercase font-bold">
+                      Regiões {noneSelected
+                        ? <span className="text-muted-foreground font-normal normal-case">(nenhuma selecionada = todas)</span>
+                        : <span className="text-muted-foreground font-normal normal-case">({selectedRegions.size}/{regionCounts.length} selecionadas)</span>}
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedRegions(new Set(regionCounts.map(([r]) => r)))}
+                        disabled={allSelected}
                       >
-                        {r} <span className="font-mono opacity-70">({n})</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </Card>
-            )}
+                        Marcar todas
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSelectedRegions(new Set())}
+                        disabled={noneSelected}
+                      >
+                        Desmarcar todas
+                      </Button>
+                    </div>
+                  </div>
+                  <div className="max-h-[220px] overflow-y-auto divide-y border rounded">
+                    <label className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-muted/50 bg-muted/30">
+                      <Checkbox
+                        checked={allSelected ? true : noneSelected ? false : 'indeterminate'}
+                        onCheckedChange={() => {
+                          if (allSelected) setSelectedRegions(new Set());
+                          else setSelectedRegions(new Set(regionCounts.map(([r]) => r)));
+                        }}
+                      />
+                      <div className="font-bold uppercase text-xs flex-1">Selecionar todas</div>
+                      <span className="text-xs font-mono text-muted-foreground">
+                        {contacts.length}
+                      </span>
+                    </label>
+                    {regionCounts.map(([r, n]) => {
+                      const checked = noneSelected || selectedRegions.has(r);
+                      return (
+                        <label
+                          key={r}
+                          className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-muted/50"
+                        >
+                          <Checkbox checked={checked} onCheckedChange={() => toggleRegion(r)} />
+                          <div className="flex-1 font-medium">{r}</div>
+                          <span className="text-xs font-mono text-muted-foreground">{n}</span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </Card>
+              );
+            })()}
 
             {/* SELEÇÃO DE VEÍCULOS */}
             {filteredContacts.length > 0 && (
