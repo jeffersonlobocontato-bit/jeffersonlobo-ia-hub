@@ -47,12 +47,20 @@ function wrapHtml(body: string, contact: Contact): string {
   return `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#111;line-height:1.5;max-width:640px;margin:0 auto;padding:24px;">
 ${body}
 <hr style="border:none;border-top:1px solid #ddd;margin:32px 0 16px;">
-<p style="font-size:12px;color:#666;">
+<p style="font-size:13px;color:#444;line-height:1.6;margin:0 0 16px;">
+Este conteúdo é compartilhado de forma colaborativa para apoiar redações e profissionais da comunicação na cobertura de temas relacionados à Inteligência Artificial, com base em pesquisas, tendências, pautas de oportunidade e artigos de opinião sobre IA, inovação, comunicação e transformação digital.
+</p>
+<p style="font-size:13px;color:#111;margin:0 0 16px;">
+<strong>Jefferson Lobo</strong><br>
+Consultor em Marketing e IA
+</p>
+<p style="font-size:12px;color:#666;margin:16px 0 0;">
 Você está recebendo este email como contato de imprensa de <strong>${contact.veiculo}</strong>${contact.municipio ? " — " + contact.municipio : ""}.<br>
 Para não receber mais comunicações, <a href="${optOutLink}" style="color:#666;">clique aqui para solicitar remoção</a>.
 </p>
 </body></html>`;
 }
+
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
