@@ -50,10 +50,11 @@ const Admin = () => {
   });
 
   useEffect(() => {
-    if (user) {
+    if (user?.id) {
       loadAllContent();
     }
-  }, [user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
 
   const loadAllContent = async () => {
     try {
