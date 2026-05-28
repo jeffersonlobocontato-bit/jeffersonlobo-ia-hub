@@ -72,7 +72,7 @@ function writeSharePages(posts: BlogPostRow[]) {
 
   for (const post of posts.filter((p) => p.slug)) {
     const postUrl = `${BASE_URL}/blog/${post.slug}`;
-    const shareUrl = `${BASE_URL}/share/blog/${post.slug}/index.html`;
+    const shareUrl = `${BASE_URL}/share/blog/${post.slug}/`;
     const title = escapeHtml(post.title);
     const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ""));
     const image = escapeHtml(socialImageUrl(post.cover_image));
