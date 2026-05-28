@@ -1,5 +1,23 @@
 import jsPDF from "jspdf";
-import signatureDataUrl from "@/assets/jefferson-signature.png?inline";
+import signatureUrl from "@/assets/jefferson-signature.png";
+
+// Pré-carrega a assinatura como dataURL para uso síncrono no jsPDF
+let signatureDataUrl: string | null = null;
+(async () => {
+  try {
+    const res = await fetch(signatureUrl);
+    const blob = await res.blob();
+    signatureDataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (e) {
+    console.warn("Falha ao carregar assinatura:", e);
+  }
+})();
+
 
 
 export type Finalidade = "PF" | "PJ" | string;
