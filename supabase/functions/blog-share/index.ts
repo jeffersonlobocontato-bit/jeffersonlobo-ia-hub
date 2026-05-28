@@ -121,7 +121,7 @@ Deno.serve(async (req) => {
     if (!slug || !/^[a-z0-9-]{1,200}$/.test(slug)) {
       return new Response(notFoundHtml(), {
         status: 404,
-        headers: htmlHeaders,
+        headers: htmlResponseHeaders(),
       })
     }
 
@@ -137,7 +137,7 @@ Deno.serve(async (req) => {
     if (error || !post) {
       return new Response(notFoundHtml(), {
         status: 404,
-        headers: htmlHeaders,
+        headers: htmlResponseHeaders(),
       })
     }
 
@@ -145,13 +145,13 @@ Deno.serve(async (req) => {
     const shareUrl = `https://${url.host}${url.pathname}?slug=${post.slug}`
     return new Response(renderHtml(post, shareUrl), {
       status: 200,
-      headers: htmlHeaders,
+      headers: htmlResponseHeaders(),
     })
   } catch (e) {
     console.error('blog-share error', e)
     return new Response(notFoundHtml(), {
       status: 500,
-      headers: htmlHeaders,
+      headers: htmlResponseHeaders(),
     })
   }
 })
