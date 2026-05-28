@@ -240,32 +240,36 @@ export default function CommercialLanding(props: CommercialLandingProps) {
           </div>
         </section>
 
-        {/* FORMATOS — volta ao claro */}
-        <section className="bg-background py-20">
+        {/* FORMATOS — fundo CREME */}
+        <section className="bg-surface-cream py-20 border-y-2 border-foreground">
           <div className="container mx-auto px-4 max-w-5xl">
             <SectionHead
               kicker="Formatos disponíveis"
               title="Adaptado ao seu contexto"
             />
             <div className="space-y-4">
-              {props.formats.map((f, i) => (
-                <Card
-                  key={i}
-                  className="rounded-none border-2 border-foreground bg-card shadow-[5px_5px_0_hsl(var(--foreground))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_hsl(var(--foreground))] transition-all"
-                >
-                  <CardContent className="p-6 grid md:grid-cols-[1fr_auto] gap-4 items-center">
-                    <div>
-                      <h3 className="text-xl font-black uppercase text-foreground mb-1 tracking-tight">
-                        {f.name}
-                      </h3>
-                      <p className="text-sm text-muted-foreground">{f.description}</p>
-                    </div>
-                    <div className="text-xs uppercase font-black text-foreground border-2 border-foreground bg-primary px-4 py-2 w-fit shadow-[3px_3px_0_hsl(var(--foreground))]">
-                      {f.duration}
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+              {props.formats.map((f, i) => {
+                const badges = ["bg-primary", "bg-secondary", "bg-surface-mint", "bg-surface-sky"];
+                const badge = badges[i % badges.length];
+                return (
+                  <Card
+                    key={i}
+                    className="rounded-none border-2 border-foreground bg-card shadow-[5px_5px_0_hsl(var(--foreground))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_hsl(var(--foreground))] transition-all"
+                  >
+                    <CardContent className="p-6 grid md:grid-cols-[1fr_auto] gap-4 items-center">
+                      <div>
+                        <h3 className="text-xl font-black uppercase text-foreground mb-1 tracking-tight">
+                          {f.name}
+                        </h3>
+                        <p className="text-sm text-muted-foreground">{f.description}</p>
+                      </div>
+                      <div className={`text-xs uppercase font-black text-foreground border-2 border-foreground ${badge} px-4 py-2 w-fit shadow-[3px_3px_0_hsl(var(--foreground))]`}>
+                        {f.duration}
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </div>
         </section>
@@ -273,8 +277,8 @@ export default function CommercialLanding(props: CommercialLandingProps) {
         <TrustBarSection />
         <StagePhotosSection />
 
-        {/* FAQ — fundo creme */}
-        <section className="bg-muted py-20 border-y-2 border-foreground">
+        {/* FAQ — fundo PÊSSEGO */}
+        <section className="bg-surface-peach py-20 border-y-2 border-foreground">
           <div className="container mx-auto px-4 max-w-3xl">
             <SectionHead kicker="Perguntas frequentes" title="Dúvidas comuns" />
             <Accordion type="single" collapsible className="w-full">
@@ -287,7 +291,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
                   <AccordionTrigger className="text-left font-black uppercase text-foreground hover:no-underline">
                     {f.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed text-base">
+                  <AccordionContent className="text-foreground/80 leading-relaxed text-base">
                     {f.a}
                   </AccordionContent>
                 </AccordionItem>
