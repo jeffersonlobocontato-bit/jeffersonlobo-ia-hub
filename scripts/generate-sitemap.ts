@@ -66,20 +66,27 @@ function socialImageUrl(image?: string | null): string {
 }
 
 function writeSharePages(posts: BlogPostRow[]) {
-  const baseDir = resolve("public/share/blog");
-  rmSync(baseDir, { recursive: true, force: true });
-  mkdirSync(baseDir, { recursive: true });
+  const destinations = [
+    { dir: resolve("public/noticia"), path: (slug: string) => `${BASE_URL}/noticia/${slug}/` },
+    { dir: resolve("public/share/blog"), path: (slug: string) => `${BASE_URL}/share/blog/${slug}/` },
+  ];
+
+  for (const destination of destinations) {
+    rmSync(destination.dir, { recursive: true, force: true });
+    mkdirSync(destination.dir, { recursive: true });
+  }
 
   for (const post of posts.filter((p) => p.slug)) {
     const postUrl = `${BASE_URL}/blog/${post.slug}`;
-    const shareUrl = `${BASE_URL}/share/blog/${post.slug}`;
     const title = escapeHtml(post.title);
     const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ""));
     const image = escapeHtml(socialImageUrl(post.cover_image));
     const imageAlt = escapeHtml(post.cover_alt || post.title);
-    const dir = resolve(baseDir, post.slug);
-    mkdirSync(dir, { recursive: true });
-    writeFileSync(resolve(dir, "index.html"), `<!doctype html>
+    for (const destination of destinations) {
+      const shareUrl = destination.path(post.slug);
+      const dir = resolve(destination.dir, post.slug);
+      mkdirSync(dir, { recursive: true });
+      writeFileSync(resolve(dir, "index.html"), `<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
@@ -105,6 +112,7 @@ function writeSharePages(posts: BlogPostRow[]) {
 </head>
 <body><a href="${postUrl}">${title}</a></body>
 </html>`);
+    }
   }
 }
 
