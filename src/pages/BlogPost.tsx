@@ -8,8 +8,11 @@ import Footer from '@/components/Footer';
 import { useBlogPost, useRelatedPosts } from '@/hooks/useBlogPost';
 import { BlogContent } from '@/components/blog/BlogContent';
 import { BlogInlineCTA } from '@/components/blog/BlogInlineCTA';
+import { BlogTOC } from '@/components/blog/BlogTOC';
+import { BlogFAQ, type FAQItem } from '@/components/blog/BlogFAQ';
 import { ReadingProgress } from '@/components/blog/ReadingProgress';
 import { calcReadingMinutes, isInternalPost } from '@/lib/blog-utils';
+
 import { Card } from '@/components/ui/card';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
@@ -60,7 +63,19 @@ const BlogPost = () => {
     year: 'numeric',
   });
 
-  const articleJsonLd = {
+  const wordCount = (post.content_md || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/[#>*_`~\-\[\]()!]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+
+  const faqItems: FAQItem[] = Array.isArray((post as any).faq)
+    ? ((post as any).faq as FAQItem[]).filter((f) => f?.q?.trim() && f?.a?.trim())
+    : [];
+
+  const tldr = (post.excerpt || post.subtitle || '').trim();
+
+  const articleJsonLd: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
@@ -77,6 +92,14 @@ const BlogPost = () => {
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     keywords: (post.tags || []).join(', '),
     articleSection: post.category,
+    inLanguage: 'pt-BR',
+    isAccessibleForFree: true,
+    wordCount: wordCount || undefined,
+    about: (post.tags || []).slice(0, 8).map((t: string) => ({ '@type': 'Thing', name: t })),
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['h1', '[data-tldr]'],
+    },
   };
 
   const breadcrumbJsonLd = {
@@ -88,6 +111,18 @@ const BlogPost = () => {
       { '@type': 'ListItem', position: 3, name: post.title, item: url },
     ],
   };
+
+  const faqJsonLd = faqItems.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqItems.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
 
   // URL de compartilhamento: arquivo .html plano e versionado no caminho.
   // Não usamos ?v=2 porque alguns scrapers/caches tratam query string como
