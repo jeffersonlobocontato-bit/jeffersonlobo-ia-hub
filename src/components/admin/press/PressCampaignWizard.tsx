@@ -379,7 +379,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
 
         {/* FOOTER NAV */}
         <div className="flex items-center justify-between border-t pt-3 mt-2">
-          <Button variant="ghost" onClick={() => setStep((s) => Math.max(1, (s - 1) as Step))} disabled={step === 1}>
+          <Button variant="ghost" onClick={() => setStep((s) => Math.max(1, s - 1) as Step)} disabled={step === 1}>
             <ChevronLeft className="w-4 h-4 mr-1" /> Voltar
           </Button>
           <div className="text-xs text-muted-foreground">Passo {step} de 4</div>
