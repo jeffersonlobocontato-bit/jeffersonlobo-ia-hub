@@ -291,7 +291,27 @@ const BlogPost = () => {
             </figure>
           )}
 
+          {/* TL;DR — bloco para LLMs absorverem resumo objetivo no topo */}
+          {tldr && (
+            <aside
+              data-tldr
+              aria-label="Resumo do artigo"
+              className="mb-8 border-l-4 border-primary bg-muted/50 p-5"
+            >
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-primary mb-2">
+                TL;DR — Em resumo
+              </div>
+              <p className="text-base md:text-lg leading-relaxed text-foreground/90 m-0">
+                {tldr}
+              </p>
+            </aside>
+          )}
+
+          {post.content_md && <BlogTOC content={post.content_md} />}
+
           {post.content_md && <BlogContent content={post.content_md} slug={post.slug} />}
+
+          {faqItems.length > 0 && <BlogFAQ faq={faqItems} />}
 
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 mt-10 pt-6 border-t-2 border-border">
