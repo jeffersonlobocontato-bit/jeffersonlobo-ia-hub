@@ -26,7 +26,7 @@ const StagePhotoCard = ({
       loading="lazy"
     />
     {/* Degradê preto executivo da base ao topo */}
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black via-black/85 via-40% to-transparent" />
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black via-black/70 via-30% to-transparent" />
     {(photo.event_name || photo.caption) && (
       <figcaption className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
         {photo.event_name && (
