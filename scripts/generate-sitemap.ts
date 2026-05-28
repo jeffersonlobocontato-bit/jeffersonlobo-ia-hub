@@ -69,6 +69,11 @@ function socialImageUrl(image?: string | null): string {
   return image;
 }
 
+function shareVersionFromDate(value?: string | null): string {
+  const digits = (value || today).replace(/\D/g, "").slice(0, 12);
+  return digits || today.replace(/\D/g, "");
+}
+
 function writeSharePages(posts: BlogPostRow[]) {
   // A hospedagem da Lovable serve arquivos .html planos, mas não resolve
   // index.html em diretórios — qualquer path terminado em "/" cai no fallback
@@ -89,8 +94,10 @@ function writeSharePages(posts: BlogPostRow[]) {
     const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ""));
     const image = escapeHtml(socialImageUrl(post.cover_image));
     const imageAlt = escapeHtml(post.cover_alt || post.title);
-    const shareUrl = `${BASE_URL}/noticia/${post.slug}.html`;
-    const html = `<!doctype html>
+    const shareVersion = shareVersionFromDate(post.updated_at || post.date);
+    const versionedShareUrl = `${BASE_URL}/noticia/${post.slug}-${shareVersion}.html`;
+    const legacyShareUrl = `${BASE_URL}/noticia/${post.slug}.html`;
+    const renderHtml = (shareUrl: string) => `<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
@@ -117,11 +124,12 @@ function writeSharePages(posts: BlogPostRow[]) {
 <body><a href="${postUrl}">${title}</a></body>
 </html>`;
 
-    writeFileSync(resolve(flatDir, `${post.slug}.html`), html);
+    writeFileSync(resolve(flatDir, `${post.slug}-${shareVersion}.html`), renderHtml(versionedShareUrl));
+    writeFileSync(resolve(flatDir, `${post.slug}.html`), renderHtml(legacyShareUrl));
 
     const legacyPostDir = resolve(legacyDir, post.slug);
     mkdirSync(legacyPostDir, { recursive: true });
-    writeFileSync(resolve(legacyPostDir, "index.html"), html);
+    writeFileSync(resolve(legacyPostDir, "index.html"), renderHtml(legacyShareUrl));
   }
 }
 

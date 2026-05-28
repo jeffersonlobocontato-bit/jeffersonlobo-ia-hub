@@ -14,4 +14,4 @@ Plano de correção:
 4. Evitar que a mensagem escrita no WhatsApp force o preview genérico: compartilhar só a URL, como sites de notícia fazem.
 5. Validar com uma requisição simulando crawler do WhatsApp e confirmar no HTML bruto que aparecem `og:title` e `og:image` da notícia, antes de concluir.
 
-Observação importante: o visual final no WhatsApp depende do cache do próprio WhatsApp. Como a URL técnica antiga já apareceu correta parcialmente e a URL `/noticia` já cacheou errado, a correção mais segura é usar uma URL nova ou acrescentar um parâmetro de versão no compartilhamento, por exemplo `&v=2`, para forçar novo scrape.
+Observação importante: o visual final no WhatsApp depende do cache do próprio WhatsApp. Não usar `?v=2` na URL compartilhada: esse parâmetro pode fazer alguns scrapers/caches tratarem o link como fallback genérico e puxarem a imagem institucional do site. A correção segura é versionar o caminho do arquivo, por exemplo `/noticia/slug-20260527.html`, mantendo o `.html` físico com Open Graph próprio da matéria.
