@@ -48,6 +48,14 @@ All colors MUST be HSL.
     --brand-gold: 49 100% 50%;
     --brand-orange: 23 100% 56%;
     --brand-cream: 42 100% 96%;
+
+    /* Surfaces coloridas para módulos (estilo StartSe) — fundo geral branco, módulos com cor */
+    --surface-cream: 48 80% 94%;       /* creme amarelado */
+    --surface-peach: 22 100% 92%;      /* pêssego/laranja claro */
+    --surface-mint: 158 55% 90%;       /* verde menta suave */
+    --surface-sky: 205 90% 92%;        /* azul céu claro */
+    --surface-lilac: 260 70% 94%;      /* lilás claro */
+    --surface-coral: 12 90% 90%;       /* coral suave */
   }
 
   .dark {
