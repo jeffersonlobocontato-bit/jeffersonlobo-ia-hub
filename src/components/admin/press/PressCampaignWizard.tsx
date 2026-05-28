@@ -104,8 +104,19 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
     return contacts.filter(c => selectedRegions.has(((c.regiao ?? '').trim() || 'Sem região')));
   }, [contacts, selectedRegions]);
 
-  const totalElegiveis = filteredContacts.length;
-  const preview = filteredContacts[0];
+  const finalContacts = useMemo(
+    () => filteredContacts.filter(c => !excludedIds.has(c.id)),
+    [filteredContacts, excludedIds],
+  );
+
+  const toggleContact = (id: string) => {
+    const next = new Set(excludedIds);
+    next.has(id) ? next.delete(id) : next.add(id);
+    setExcludedIds(next);
+  };
+
+  const totalElegiveis = finalContacts.length;
+  const preview = finalContacts[0];
 
   // === SEND EMAIL ===
   const dispararEmail = async () => {
