@@ -369,6 +369,7 @@ export const AdminAnalyticsTab = () => {
       <Tabs defaultValue="trends" className="w-full">
         <TabsList className="inline-flex w-full mb-8 overflow-x-auto">
           <TabsTrigger value="trends">Tendências</TabsTrigger>
+          <TabsTrigger value="origin">Origem</TabsTrigger>
           <TabsTrigger value="funnel">Funil</TabsTrigger>
           <TabsTrigger value="pages">Páginas</TabsTrigger>
           <TabsTrigger value="ctas">CTAs</TabsTrigger>
