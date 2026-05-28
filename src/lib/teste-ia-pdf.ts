@@ -352,6 +352,34 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
         y += blockH + 3;
       });
 
+      // Caminho de influência — orientação sutil conectando o gap a uma ação
+      // que o leitor pode propor dentro da empresa. Tom: carreira, não venda.
+      const caminhoTxt = pickCaminho(p.key, lead.finalidade);
+      if (caminhoTxt) {
+        const caminhoLines = pdf.splitTextToSize(caminhoTxt, CONTENT_W - 8);
+        const caminhoH = Math.max(14, caminhoLines.length * 4.5 + 9);
+        ensureSpace(caminhoH + 4);
+
+        // Fundo grafite
+        pdf.setFillColor(30, 30, 30);
+        pdf.rect(M, y, CONTENT_W, caminhoH, "F");
+        // Faixa amarela à esquerda
+        pdf.setFillColor(252, 211, 77);
+        pdf.rect(M, y, 2, caminhoH, "F");
+
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(7.5);
+        pdf.setTextColor(252, 211, 77);
+        pdf.text("COMO LEVAR ADIANTE", M + 6, y + 5.5);
+
+        pdf.setFont("helvetica", "italic");
+        pdf.setFontSize(9);
+        pdf.setTextColor(235, 235, 235);
+        pdf.text(caminhoLines, M + 6, y + 10);
+
+        y += caminhoH + 4;
+      }
+
       y += 6;
     });
   }
