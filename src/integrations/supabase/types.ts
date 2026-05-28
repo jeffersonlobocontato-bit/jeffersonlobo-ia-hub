@@ -58,6 +58,7 @@ export type Database = {
           created_by: string | null
           date: string
           excerpt: string
+          faq: Json | null
           id: string
           linkedin_url: string | null
           published_at: string | null
@@ -80,6 +81,7 @@ export type Database = {
           created_by?: string | null
           date: string
           excerpt: string
+          faq?: Json | null
           id?: string
           linkedin_url?: string | null
           published_at?: string | null
@@ -102,6 +104,7 @@ export type Database = {
           created_by?: string | null
           date?: string
           excerpt?: string
+          faq?: Json | null
           id?: string
           linkedin_url?: string | null
           published_at?: string | null

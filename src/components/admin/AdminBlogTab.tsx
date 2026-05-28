@@ -4,11 +4,75 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
-import { Save, Trash2, Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Save, Trash2, Plus, ChevronDown, ChevronUp, X } from 'lucide-react';
 import { useState } from 'react';
 import { CoverImageUploader } from '@/components/blog/CoverImageUploader';
 import { MarkdownEditor } from '@/components/blog/MarkdownEditor';
 import { slugify, calcReadingMinutes } from '@/lib/blog-utils';
+
+interface FaqItem { q: string; a: string; }
+
+const FaqEditor = ({
+  value,
+  onChange,
+}: {
+  value: FaqItem[];
+  onChange: (next: FaqItem[]) => void;
+}) => {
+  const items = value || [];
+  const update = (i: number, patch: Partial<FaqItem>) =>
+    onChange(items.map((it, idx) => (idx === i ? { ...it, ...patch } : it)));
+  const add = () => onChange([...items, { q: '', a: '' }]);
+  const remove = (i: number) => onChange(items.filter((_, idx) => idx !== i));
+
+  return (
+    <div className="space-y-3 border-2 border-dashed border-border p-4">
+      <div className="flex items-center justify-between">
+        <Label className="m-0">
+          FAQ (perguntas frequentes) — opcional, melhora indexação por IA
+        </Label>
+        <Button type="button" size="sm" variant="outline" onClick={add}>
+          <Plus className="w-3 h-3 mr-1" /> Pergunta
+        </Button>
+      </div>
+      {items.length === 0 && (
+        <p className="text-xs text-muted-foreground">
+          Adicione perguntas que seu público costuma fazer. Gera bloco FAQ no fim do
+          artigo + FAQPage schema (rich result Google e citação por LLMs).
+        </p>
+      )}
+      {items.map((it, i) => (
+        <div key={i} className="space-y-2 border border-border p-3 bg-muted/30">
+          <div className="flex items-start gap-2">
+            <Input
+              value={it.q}
+              onChange={(e) => update(i, { q: e.target.value })}
+              placeholder="Pergunta"
+              className="flex-1"
+            />
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() => remove(i)}
+              aria-label="Remover pergunta"
+            >
+              <X className="w-4 h-4" />
+            </Button>
+          </div>
+          <Textarea
+            value={it.a}
+            onChange={(e) => update(i, { a: e.target.value })}
+            placeholder="Resposta clara e objetiva"
+            rows={3}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
+
+
 
 interface AdminBlogTabProps {
   data: any[];
@@ -159,6 +223,13 @@ export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminB
                 />
                 <Label>Publicado</Label>
               </div>
+
+              {/* FAQ opcional — gera FAQPage schema.org no post, ótimo para GEO/Google */}
+              <FaqEditor
+                value={Array.isArray(post.faq) ? post.faq : []}
+                onChange={(faq) => patch(post.id, { faq })}
+              />
+
 
               <button
                 type="button"

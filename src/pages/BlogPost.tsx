@@ -8,8 +8,11 @@ import Footer from '@/components/Footer';
 import { useBlogPost, useRelatedPosts } from '@/hooks/useBlogPost';
 import { BlogContent } from '@/components/blog/BlogContent';
 import { BlogInlineCTA } from '@/components/blog/BlogInlineCTA';
+import { BlogTOC } from '@/components/blog/BlogTOC';
+import { BlogFAQ, type FAQItem } from '@/components/blog/BlogFAQ';
 import { ReadingProgress } from '@/components/blog/ReadingProgress';
 import { calcReadingMinutes, isInternalPost } from '@/lib/blog-utils';
+
 import { Card } from '@/components/ui/card';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
@@ -60,7 +63,19 @@ const BlogPost = () => {
     year: 'numeric',
   });
 
-  const articleJsonLd = {
+  const wordCount = (post.content_md || '')
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/[#>*_`~\-\[\]()!]/g, ' ')
+    .split(/\s+/)
+    .filter(Boolean).length;
+
+  const faqItems: FAQItem[] = Array.isArray((post as any).faq)
+    ? ((post as any).faq as FAQItem[]).filter((f) => f?.q?.trim() && f?.a?.trim())
+    : [];
+
+  const tldr = (post.excerpt || post.subtitle || '').trim();
+
+  const articleJsonLd: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
@@ -77,6 +92,14 @@ const BlogPost = () => {
     mainEntityOfPage: { '@type': 'WebPage', '@id': url },
     keywords: (post.tags || []).join(', '),
     articleSection: post.category,
+    inLanguage: 'pt-BR',
+    isAccessibleForFree: true,
+    wordCount: wordCount || undefined,
+    about: (post.tags || []).slice(0, 8).map((t: string) => ({ '@type': 'Thing', name: t })),
+    speakable: {
+      '@type': 'SpeakableSpecification',
+      cssSelector: ['h1', '[data-tldr]'],
+    },
   };
 
   const breadcrumbJsonLd = {
@@ -88,6 +111,18 @@ const BlogPost = () => {
       { '@type': 'ListItem', position: 3, name: post.title, item: url },
     ],
   };
+
+  const faqJsonLd = faqItems.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faqItems.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
 
   // URL de compartilhamento: arquivo .html plano e versionado no caminho.
   // Não usamos ?v=2 porque alguns scrapers/caches tratam query string como
@@ -123,6 +158,9 @@ const BlogPost = () => {
         {post.cover_image && <meta name="twitter:image" content={post.cover_image} />}
         <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
+        {faqJsonLd && (
+          <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
+        )}
       </Helmet>
 
       <ReadingProgress />
@@ -253,7 +291,27 @@ const BlogPost = () => {
             </figure>
           )}
 
+          {/* TL;DR — bloco para LLMs absorverem resumo objetivo no topo */}
+          {tldr && (
+            <aside
+              data-tldr
+              aria-label="Resumo do artigo"
+              className="mb-8 border-l-4 border-primary bg-muted/50 p-5"
+            >
+              <div className="text-[10px] font-black uppercase tracking-[0.25em] text-primary mb-2">
+                TL;DR — Em resumo
+              </div>
+              <p className="text-base md:text-lg leading-relaxed text-foreground/90 m-0">
+                {tldr}
+              </p>
+            </aside>
+          )}
+
+          {post.content_md && <BlogTOC content={post.content_md} />}
+
           {post.content_md && <BlogContent content={post.content_md} slug={post.slug} />}
+
+          {faqItems.length > 0 && <BlogFAQ faq={faqItems} />}
 
           {post.tags && post.tags.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 mt-10 pt-6 border-t-2 border-border">

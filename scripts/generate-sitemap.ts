@@ -195,9 +195,40 @@ async function fetchBlogPosts(): Promise<BlogPostRow[]> {
   }
 }
 
+function writeLlmsTxt(blogPosts: BlogPostRow[]) {
+  const lines: string[] = [];
+  lines.push('# Jefferson Lobo');
+  lines.push('');
+  lines.push('> Palestrante, autor e consultor em Inteligência Artificial aplicada a marketing, negócios e lideranças. Conteúdo prático sobre IA generativa, agentes, estratégia e cultura de IA.');
+  lines.push('');
+  lines.push('## Páginas principais');
+  lines.push('');
+  lines.push(`- [Home](${BASE_URL}/): visão geral, palestras, livro, podcast e teste de maturidade em IA.`);
+  lines.push(`- [Palestras de IA](${BASE_URL}/palestras-ia): keynotes e palestras corporativas sobre Inteligência Artificial.`);
+  lines.push(`- [Workshop de IA](${BASE_URL}/workshop-ia): workshops práticos de IA generativa para times e lideranças.`);
+  lines.push(`- [Consultoria de IA](${BASE_URL}/consultoria-ia): consultoria estratégica em adoção e governança de IA.`);
+  lines.push(`- [Teste de Maturidade em IA](${BASE_URL}/teste-ia): diagnóstico gratuito de maturidade em IA para pessoas e empresas.`);
+  lines.push(`- [Imprensa](${BASE_URL}/imprensa): material de imprensa, bio e fotos de palco.`);
+  lines.push('');
+  lines.push('## Blog');
+  lines.push('');
+  for (const p of blogPosts.filter((r) => r.slug).slice(0, 100)) {
+    const summary = truncateText(p.seo_description || p.excerpt || p.subtitle || '', 180);
+    lines.push(`- [${p.title}](${BASE_URL}/blog/${p.slug})${summary ? `: ${summary}` : ''}`);
+  }
+  lines.push('');
+  lines.push('## Optional');
+  lines.push('');
+  lines.push(`- [Sitemap XML](${BASE_URL}/sitemap.xml)`);
+  lines.push('');
+  writeFileSync(resolve('public/llms.txt'), lines.join('\n'));
+  console.log(`llms.txt written (${blogPosts.length} blog posts referenced)`);
+}
+
 async function main() {
   const blogPosts = await fetchBlogPosts();
   await writeSharePages(blogPosts);
+  writeLlmsTxt(blogPosts);
 
   const entries: SitemapEntry[] = [
     { path: "/", lastmod: today, changefreq: "weekly", priority: "1.0" },
