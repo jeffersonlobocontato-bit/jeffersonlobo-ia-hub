@@ -34,7 +34,12 @@ const AdminStagePhotosTab = () => {
       .select('*')
       .order('display_order');
     if (error) toast({ title: 'Erro ao carregar', description: error.message, variant: 'destructive' });
-    setItems((data ?? []) as StagePhoto[]);
+    setItems(((data ?? []) as any[]).map((r) => ({
+      ...r,
+      focal_x: r.focal_x ?? 50,
+      focal_y: r.focal_y ?? 50,
+      zoom: r.zoom ?? 1,
+    })) as StagePhoto[]);
     setLoading(false);
   };
 
