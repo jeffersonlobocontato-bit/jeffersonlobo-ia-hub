@@ -2,10 +2,11 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Card } from '@/components/ui/card';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle2 } from 'lucide-react';
 import type { PressContact } from '@/lib/press-utils';
 import { PressContactsTable } from './press/PressContactsTable';
 import { PressCampaignsTab } from './press/PressCampaignsTab';
+import { PressEmailCampaignTab } from './press/PressEmailCampaignTab';
 
 export const AdminPressTab = () => {
   const [contacts, setContacts] = useState<PressContact[]>([]);
