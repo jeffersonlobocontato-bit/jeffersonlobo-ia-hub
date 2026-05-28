@@ -203,6 +203,7 @@ async function main() {
     { path: "/", lastmod: today, changefreq: "weekly", priority: "1.0" },
     { path: "/blog", lastmod: today, changefreq: "weekly", priority: "0.9" },
     { path: "/teste-ia", lastmod: today, changefreq: "monthly", priority: "0.8" },
+    { path: "/imprensa", lastmod: today, changefreq: "monthly", priority: "0.6" },
     { path: "/politica-privacidade", lastmod: today, changefreq: "yearly", priority: "0.3" },
     ...blogPosts.filter((r) => r.slug).map((r) => ({
       path: `/blog/${r.slug}`,
