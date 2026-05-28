@@ -14,6 +14,9 @@ import TesteIA from "./pages/TesteIA";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import Unsubscribe from "./pages/Unsubscribe";
 import Imprensa from "./pages/Imprensa";
+import PalestrasIA from "./pages/PalestrasIA";
+import WorkshopIA from "./pages/WorkshopIA";
+import ConsultoriaIA from "./pages/ConsultoriaIA";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
@@ -36,6 +39,9 @@ const App = () => (
               <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/imprensa" element={<Imprensa />} />
+              <Route path="/palestras-ia" element={<PalestrasIA />} />
+              <Route path="/workshop-ia" element={<WorkshopIA />} />
+              <Route path="/consultoria-ia" element={<ConsultoriaIA />} />
               <Route path="/blog" element={<BlogIndex />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route
