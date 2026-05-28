@@ -139,8 +139,8 @@ Deno.serve(async (req) => {
       })
     }
 
-    // og:url usa a URL real desta função, que é o que o crawler está visitando
-    const shareUrl = `${url.origin}${url.pathname}?slug=${post.slug}`
+    // og:url usa a URL real desta função (https), que é o que o crawler está visitando
+    const shareUrl = `https://${url.host}${url.pathname}?slug=${post.slug}`
     return new Response(renderHtml(post, shareUrl), {
       status: 200,
       headers: htmlHeaders,
