@@ -1,6 +1,6 @@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { SEO } from "@/components/SEO";
 
 export default function PoliticaPrivacidade() {
@@ -20,7 +20,7 @@ export default function PoliticaPrivacidade() {
           
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>1. Informações que Coletamos</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">1. Informações que Coletamos</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
@@ -38,7 +38,7 @@ export default function PoliticaPrivacidade() {
 
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>2. Como Usamos suas Informações</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">2. Como Usamos suas Informações</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>Utilizamos as informações coletadas para:</p>
@@ -54,7 +54,7 @@ export default function PoliticaPrivacidade() {
 
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>3. Compartilhamento de Informações</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">3. Compartilhamento de Informações</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
@@ -71,7 +71,7 @@ export default function PoliticaPrivacidade() {
 
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>4. Segurança dos Dados</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">4. Segurança dos Dados</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
@@ -83,7 +83,7 @@ export default function PoliticaPrivacidade() {
 
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>5. Seus Direitos (LGPD)</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">5. Seus Direitos (LGPD)</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>De acordo com a Lei Geral de Proteção de Dados (LGPD), você tem direito a:</p>
@@ -100,7 +100,7 @@ export default function PoliticaPrivacidade() {
 
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>6. Cookies e Tecnologias Similares</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">6. Cookies e Tecnologias Similares</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
@@ -113,7 +113,7 @@ export default function PoliticaPrivacidade() {
 
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>7. Retenção de Dados</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">7. Retenção de Dados</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
@@ -125,7 +125,7 @@ export default function PoliticaPrivacidade() {
 
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>8. Alterações nesta Política</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">8. Alterações nesta Política</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>
@@ -137,7 +137,7 @@ export default function PoliticaPrivacidade() {
 
           <Card>
             <CardHeader>
-              <CardTitle>9. Contato</CardTitle>
+              <h2 className="text-2xl font-semibold leading-none tracking-tight">9. Contato</h2>
             </CardHeader>
             <CardContent className="space-y-4 text-muted-foreground">
               <p>

@@ -113,6 +113,9 @@ const Header = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-menu"
             className={`md:hidden ${isScrolled ? 'text-foreground' : 'text-foreground'}`}
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
