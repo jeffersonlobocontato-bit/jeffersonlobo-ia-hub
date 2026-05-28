@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, FunnelChart, Funnel, LabelList } from 'recharts';
-import { Users, Eye, Clock, MousePointer, TrendingUp, Activity } from 'lucide-react';
+import { Users, Eye, Clock, MousePointer, TrendingUp, Activity, Globe } from 'lucide-react';
 import { Heatmap } from './Heatmap';
 
 interface AnalyticsSummary {
@@ -41,6 +41,13 @@ interface FunnelStage {
   description?: string;
 }
 
+interface SourceStat { key: string; sessions: number; }
+interface TrafficOrigin {
+  channels: SourceStat[];
+  referrers: SourceStat[];
+  campaigns: SourceStat[];
+}
+
 interface ConversionFunnel {
   totalVisitors: number;
   viewedHero: number;
@@ -64,6 +71,7 @@ export const AdminAnalyticsTab = () => {
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>([]);
   const [ctaStats, setCtaStats] = useState<CTAStat[]>([]);
   const [conversionFunnel, setConversionFunnel] = useState<ConversionFunnel | null>(null);
+  const [trafficOrigin, setTrafficOrigin] = useState<TrafficOrigin | null>(null);
   const [selectedPage, setSelectedPage] = useState<string>('/');
   const [loading, setLoading] = useState(true);
 
@@ -143,7 +151,47 @@ export const AdminAnalyticsTab = () => {
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         setTimeSeriesData(timeSeries);
+
+        // Traffic origin — first-touch por sessão
+        const seenSessions = new Set<string>();
+        const channelMap = new Map<string, Set<string>>();
+        const referrerMap = new Map<string, Set<string>>();
+        const campaignMap = new Map<string, Set<string>>();
+        const sorted = [...analyticsData].sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        for (const row of sorted) {
+          if (seenSessions.has(row.session_id)) continue;
+          seenSessions.add(row.session_id);
+          const channel = (row as any).traffic_source || 'desconhecido';
+          if (!channelMap.has(channel)) channelMap.set(channel, new Set());
+          channelMap.get(channel)!.add(row.session_id);
+
+          const refDom = (row as any).referrer_domain;
+          if (refDom) {
+            if (!referrerMap.has(refDom)) referrerMap.set(refDom, new Set());
+            referrerMap.get(refDom)!.add(row.session_id);
+          }
+
+          const utmSource = (row as any).utm_source;
+          const utmCampaign = (row as any).utm_campaign;
+          if (utmSource || utmCampaign) {
+            const key = `${utmSource || '—'} / ${utmCampaign || '—'}`;
+            if (!campaignMap.has(key)) campaignMap.set(key, new Set());
+            campaignMap.get(key)!.add(row.session_id);
+          }
+        }
+        const toStats = (m: Map<string, Set<string>>): SourceStat[] =>
+          Array.from(m.entries())
+            .map(([key, set]) => ({ key, sessions: set.size }))
+            .sort((a, b) => b.sessions - a.sessions);
+        setTrafficOrigin({
+          channels: toStats(channelMap),
+          referrers: toStats(referrerMap).slice(0, 15),
+          campaigns: toStats(campaignMap).slice(0, 15),
+        });
       }
+
 
       // Load CTA stats
       const { data: ctaData } = await supabase
@@ -321,6 +369,7 @@ export const AdminAnalyticsTab = () => {
       <Tabs defaultValue="trends" className="w-full">
         <TabsList className="inline-flex w-full mb-8 overflow-x-auto">
           <TabsTrigger value="trends">Tendências</TabsTrigger>
+          <TabsTrigger value="origin">Origem</TabsTrigger>
           <TabsTrigger value="funnel">Funil</TabsTrigger>
           <TabsTrigger value="pages">Páginas</TabsTrigger>
           <TabsTrigger value="ctas">CTAs</TabsTrigger>
@@ -341,6 +390,112 @@ export const AdminAnalyticsTab = () => {
                 <Line type="monotone" dataKey="views" stroke="hsl(var(--chart-2))" name="Total de Visitas" />
               </LineChart>
             </ResponsiveContainer>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="origin" className="space-y-4">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-primary" />
+              Origem do Tráfego (atribuição first-touch por sessão)
+            </h3>
+
+            {!trafficOrigin || trafficOrigin.channels.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Sem dados de origem neste período. Os novos acessos passarão a ser classificados automaticamente.
+              </p>
+            ) : (
+              <div className="space-y-6">
+                {/* Cards por canal */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">
+                    Canais
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    {trafficOrigin.channels.map((c) => {
+                      const total = trafficOrigin.channels.reduce((acc, x) => acc + x.sessions, 0);
+                      const pct = total > 0 ? ((c.sessions / total) * 100).toFixed(1) : '0';
+                      const labels: Record<string, string> = {
+                        direct: 'Direto',
+                        organic: 'Busca orgânica',
+                        social: 'Redes sociais',
+                        referral: 'Referência',
+                        paid: 'Pago',
+                        email: 'E-mail',
+                        desconhecido: 'Desconhecido',
+                      };
+                      return (
+                        <Card key={c.key} className="p-4">
+                          <p className="text-xs text-muted-foreground uppercase">{labels[c.key] || c.key}</p>
+                          <p className="text-2xl font-bold">{c.sessions}</p>
+                          <p className="text-xs text-primary">{pct}%</p>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Top referenciadores */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">
+                    Top sites referenciadores
+                  </h4>
+                  {trafficOrigin.referrers.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Nenhum referenciador externo registrado.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-2">Domínio</th>
+                            <th className="text-right p-2">Sessões</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {trafficOrigin.referrers.map((r) => (
+                            <tr key={r.key} className="border-b hover:bg-muted/50">
+                              <td className="p-2 font-mono text-sm">{r.key}</td>
+                              <td className="text-right p-2">{r.sessions}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* Campanhas UTM */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">
+                    Campanhas (UTM source / campaign)
+                  </h4>
+                  {trafficOrigin.campaigns.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhuma campanha rastreada. Use parâmetros <code>?utm_source=...&amp;utm_medium=...&amp;utm_campaign=...</code> em links de divulgação para medir aqui.
+                    </p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-2">Source / Campaign</th>
+                            <th className="text-right p-2">Sessões</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {trafficOrigin.campaigns.map((c) => (
+                            <tr key={c.key} className="border-b hover:bg-muted/50">
+                              <td className="p-2 font-mono text-sm">{c.key}</td>
+                              <td className="text-right p-2">{c.sessions}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </Card>
         </TabsContent>
 
