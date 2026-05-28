@@ -34,6 +34,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
   const [step, setStep] = useState<Step>(1);
   const [canal, setCanal] = useState<Canal | null>(null);
   const [selectedLists, setSelectedLists] = useState<Set<string>>(new Set());
+  const [selectedRegions, setSelectedRegions] = useState<Set<string>>(new Set());
   const [contacts, setContacts] = useState<PressContact[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(false);
 
@@ -51,7 +52,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
   // reset ao abrir
   useEffect(() => {
     if (open) {
-      setStep(1); setCanal(null); setSelectedLists(new Set()); setContacts([]);
+      setStep(1); setCanal(null); setSelectedLists(new Set()); setSelectedRegions(new Set()); setContacts([]);
       setNome(''); setSubject(DEFAULT_EMAIL_SUBJECT); setBody(DEFAULT_EMAIL_BODY);
       setEmailResult(null); setWaCampaignId(null); setWaSends({});
       reloadLists();
@@ -78,10 +79,32 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
     const next = new Set(selectedLists);
     next.has(id) ? next.delete(id) : next.add(id);
     setSelectedLists(next);
+    setSelectedRegions(new Set()); // reset filtro de região ao mudar listas
   };
 
-  const totalElegiveis = contacts.length;
-  const preview = contacts[0];
+  const toggleRegion = (r: string) => {
+    const next = new Set(selectedRegions);
+    next.has(r) ? next.delete(r) : next.add(r);
+    setSelectedRegions(next);
+  };
+
+  // contagem por região (sobre o universo de contatos resolvidos das listas)
+  const regionCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const c of contacts) {
+      const r = (c.regiao ?? '').trim() || 'Sem região';
+      m.set(r, (m.get(r) ?? 0) + 1);
+    }
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [contacts]);
+
+  const filteredContacts = useMemo(() => {
+    if (selectedRegions.size === 0) return contacts;
+    return contacts.filter(c => selectedRegions.has(((c.regiao ?? '').trim() || 'Sem região')));
+  }, [contacts, selectedRegions]);
+
+  const totalElegiveis = filteredContacts.length;
+  const preview = filteredContacts[0];
 
   // === SEND EMAIL ===
   const dispararEmail = async () => {
@@ -113,7 +136,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
       const { data, error } = await supabase.functions.invoke('send-press-email', {
         body: {
           campaign_id: campaign.id,
-          contact_ids: contacts.map(c => c.id),
+          contact_ids: filteredContacts.map(c => c.id),
           subject, html: body,
         },
       });
@@ -148,10 +171,10 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
     }
     setWaCampaignId(data.id);
     await supabase.from('press_sends').insert(
-      contacts.map(c => ({ campaign_id: data.id, contact_id: c.id, canal: 'whatsapp', status: 'pendente' }))
+      filteredContacts.map(c => ({ campaign_id: data.id, contact_id: c.id, canal: 'whatsapp', status: 'pendente' }))
     );
     const initial: Record<string, 'pendente'> = {};
-    contacts.forEach(c => initial[c.id] = 'pendente');
+    filteredContacts.forEach(c => initial[c.id] = 'pendente');
     setWaSends(initial);
   };
 
@@ -253,6 +276,53 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
                 ))}
               </div>
             )}
+
+            {/* FILTRO POR REGIÃO */}
+            {selectedLists.size > 0 && regionCounts.length > 0 && (
+              <Card className="p-3 space-y-2">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="text-xs uppercase font-bold">
+                    Filtrar por região <span className="text-muted-foreground font-normal normal-case">(opcional — nenhuma selecionada = todas)</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedRegions(new Set(regionCounts.map(([r]) => r)))}
+                    >
+                      Marcar todas
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setSelectedRegions(new Set())}
+                      disabled={selectedRegions.size === 0}
+                    >
+                      Limpar
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {regionCounts.map(([r, n]) => {
+                    const active = selectedRegions.has(r);
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => toggleRegion(r)}
+                        className={`px-3 py-1.5 rounded-full border-2 text-xs font-bold uppercase transition-colors ${
+                          active
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-transparent border-border hover:border-primary'
+                        }`}
+                      >
+                        {r} <span className="font-mono opacity-70">({n})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
           </div>
         )}
 
@@ -350,7 +420,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
                   <Button size="sm" variant="outline" onClick={waFinish}>Encerrar</Button>
                 </div>
                 <div className="max-h-[300px] overflow-y-auto divide-y">
-                  {contacts.map(c => {
+                  {filteredContacts.map(c => {
                     const status = waSends[c.id] ?? 'pendente';
                     return (
                       <div key={c.id} className="py-2 flex items-center gap-2 text-sm">
