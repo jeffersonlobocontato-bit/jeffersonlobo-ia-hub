@@ -66,15 +66,18 @@ function socialImageUrl(image?: string | null): string {
 }
 
 function writeSharePages(posts: BlogPostRow[]) {
-  const destinations = [
-    { dir: resolve("public/noticia"), path: (slug: string) => `${BASE_URL}/noticia/${slug}/` },
-    { dir: resolve("public/share/blog"), path: (slug: string) => `${BASE_URL}/share/blog/${slug}/` },
-  ];
+  // A hospedagem da Lovable serve arquivos .html planos, mas não resolve
+  // index.html em diretórios — qualquer path terminado em "/" cai no fallback
+  // da SPA e retorna o index.html genérico. Por isso geramos arquivos planos
+  // public/noticia/{slug}.html que o crawler do WhatsApp/LinkedIn consegue ler.
+  const flatDir = resolve("public/noticia");
+  rmSync(flatDir, { recursive: true, force: true });
+  mkdirSync(flatDir, { recursive: true });
 
-  for (const destination of destinations) {
-    rmSync(destination.dir, { recursive: true, force: true });
-    mkdirSync(destination.dir, { recursive: true });
-  }
+  // Mantemos também o formato antigo em pasta como fallback para links já compartilhados.
+  const legacyDir = resolve("public/share/blog");
+  rmSync(legacyDir, { recursive: true, force: true });
+  mkdirSync(legacyDir, { recursive: true });
 
   for (const post of posts.filter((p) => p.slug)) {
     const postUrl = `${BASE_URL}/blog/${post.slug}`;
@@ -82,11 +85,8 @@ function writeSharePages(posts: BlogPostRow[]) {
     const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ""));
     const image = escapeHtml(socialImageUrl(post.cover_image));
     const imageAlt = escapeHtml(post.cover_alt || post.title);
-    for (const destination of destinations) {
-      const shareUrl = destination.path(post.slug);
-      const dir = resolve(destination.dir, post.slug);
-      mkdirSync(dir, { recursive: true });
-      writeFileSync(resolve(dir, "index.html"), `<!doctype html>
+    const shareUrl = `${BASE_URL}/noticia/${post.slug}.html`;
+    const html = `<!doctype html>
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8" />
@@ -111,8 +111,13 @@ function writeSharePages(posts: BlogPostRow[]) {
 <script>window.location.replace(${JSON.stringify(postUrl)});</script>
 </head>
 <body><a href="${postUrl}">${title}</a></body>
-</html>`);
-    }
+</html>`;
+
+    writeFileSync(resolve(flatDir, `${post.slug}.html`), html);
+
+    const legacyPostDir = resolve(legacyDir, post.slug);
+    mkdirSync(legacyPostDir, { recursive: true });
+    writeFileSync(resolve(legacyPostDir, "index.html"), html);
   }
 }
 
