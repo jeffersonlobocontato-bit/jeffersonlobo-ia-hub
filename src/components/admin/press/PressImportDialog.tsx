@@ -191,16 +191,16 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
 
           {result && (
             <div className="border-2 border-primary bg-primary/10 p-3 text-sm">
-              ✓ {result.inserted + result.updated} contatos importados/atualizados, {result.skipped} ignorados.
+              ✓ Lista <strong>{result.listName}</strong> criada com {result.inserted + result.updated} contatos ({result.skipped} ignorados).
             </div>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Fechar</Button>
-          <Button onClick={doImport} disabled={!valid.length || importing}>
+          <Button onClick={doImport} disabled={!valid.length || importing || !listName.trim()}>
             {importing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-            Importar {valid.length} contatos
+            Criar lista com {valid.length} contatos
           </Button>
         </DialogFooter>
       </DialogContent>
