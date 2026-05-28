@@ -1,62 +1,54 @@
+# Recomendações estratégicas conectadas aos serviços
 
-# Recalibrar LPs comerciais — paleta executiva
+## Objetivo
+Cada bloco do Plano de Ação 30/60/90 já entrega ações táticas. Vamos somar uma linha curta de "caminho de influência" que conecta a competência ao tipo de entrega que o Jefferson faz — posicionada como **orientação de carreira / o que você pode propor à sua liderança**, nunca como venda. O leitor sai com clareza de qual conversa levar para dentro da empresa, e o nome do Jefferson aparece como referência natural, não como CTA.
 
-Você tem razão. A combinação lilás + sky + pêssego + mint virou arco-íris pastel e mata a credibilidade. Precisamos voltar à disciplina brutalista executiva: **muito preto, muito branco, amarelo como ÚNICO acento de marca, e zero pastéis**.
+## Princípios de tom
+- Falar do **papel da pessoa** (PF) ou da **liderança** (PJ) como agente de mudança — não do Jefferson como vendedor.
+- Verbo de ação no leitor: "proponha", "sugira ao seu time", "leve essa pauta para…".
+- O nome dos formatos (palestra, imersão, workshop, consultoria, mentoria) aparece como *opção de caminho*, não como oferta.
+- Uma frase só por bloco. Nunca repetir o mesmo formato para todas as competências — varia conforme o gap.
 
-## Princípio
+## Mapa competência → caminho sugerido
 
-Contraste vem de **preto vs. branco vs. amarelo**, não de variar a cor de cada seção. Cada bloco se diferencia por **densidade, tipografia e estrutura** — não por trocar o tom de fundo.
-
-## Sistema de superfícies (novo)
-
-Remover todos os tokens `--surface-{lilac,sky,peach,mint,coral,cream}` das LPs comerciais e usar apenas 3 superfícies:
-
-1. **`bg-background`** (off-white quase branco) — superfície padrão
-2. **`bg-foreground`** (preto sólido) — blocos de impacto / autoridade
-3. **`bg-primary`** (amarelo) — usado com PARCIMÔNIA: kicker pill, CTA final, badges pontuais
-
-Sem azul, sem rosa, sem verde, sem lilás em nenhum lugar.
-
-## Mudanças por seção em `CommercialLanding.tsx`
-
-| Seção | Antes | Depois |
+| Competência | Caminho PF (profissional) | Caminho PJ (liderança) |
 |---|---|---|
-| HERO | `bg-surface-lilac` | `bg-background` + grid sutil amarelo + faixa preta inferior |
-| Para quem | `bg-surface-sky` com cards multicor | `bg-foreground` (preto) com cards brancos e ícone amarelo |
-| O que entrega | `bg-foreground` (mantém) | Mantém preto, mas remove cor secundária laranja — só amarelo |
-| Formatos | `bg-surface-cream` + badges multicor | `bg-background` com badges todas pretas, exceto a "destaque" amarela |
-| FAQ | `bg-surface-peach` | `bg-background` com divisores pretos espessos |
-| CTA final | `bg-primary` (amarelo) | Mantém amarelo — único momento de cor "cheia" |
+| Estratégia | "Indique uma palestra executiva de IA para alinhar a visão do C-level." | "Uma keynote estratégica acelera o alinhamento de visão antes do roadmap." |
+| Processos | "Proponha uma imersão prática para mapear processos com seu time." | "Workshop hands-on de redesenho de processos com IA destrava resultados rápidos." |
+| Dados | "Sugira uma consultoria de diagnóstico de dados antes de escalar IA." | "Consultoria estratégica de dados evita stacks caras sem fundação." |
+| Ferramentas | "Leve um workshop de ferramentas de IA generativa para sua área." | "Workshop de adoção guiada reduz o custo de teste-e-erro entre times." |
+| Pessoas/Skills | "Proponha uma palestra de sensibilização + trilha de capacitação." | "Programa de champions + palestras internas formam multiplicadores." |
+| Ética/Compliance | "Indique uma palestra sobre IA responsável para jurídico e liderança." | "Imersão de ética e compliance protege a marca antes do incidente." |
+| Segurança | "Sugira um diagnóstico de segurança em uso de IA antes de adoção em massa." | "Consultoria de segurança em IA define guardrails antes do shadow AI explodir." |
+| Governança | "Proponha à diretoria uma consultoria para estruturar governança de IA." | "Consultoria de governança formaliza papéis, comitês e políticas de IA." |
 
-Resultado: ritmo **branco → preto → branco → preto → branco → amarelo**. Sóbrio, executivo, com contraste real.
+Tabela vive no código (`src/lib/teste-ia-pdf.ts`) como constante tipada — fácil de o Jefferson editar depois.
 
-## Cards e badges
+## O que muda no PDF
 
-- Cards: sempre `bg-card` (branco) sobre fundo preto, ou `bg-foreground` (preto) sobre fundo branco — nunca pastel.
-- Badges de duração nos Formatos: todas `bg-foreground text-background`, exceto uma em destaque por LP em `bg-primary`.
-- Ícones de check: removível o roxo/coral — usar apenas amarelo sobre preto ou preto sobre amarelo.
+**Bloco "Plano de Ação 30/60/90"** — para cada uma das 3 competências priorizadas, depois das ações 30/60 e antes da 90 (ou ao final do bloco), uma faixa nova:
 
-## Tipografia e peso visual
+```
+COMO LEVAR ADIANTE
+{frase do mapa acima, escolhida pela finalidade PF/PJ}
+```
 
-Para compensar a perda de cor, aumentar peso visual com:
-- Bordas pretas mais grossas em blocos-chave (`border-2` → `border-[3px]` em hero e CTA)
-- Sombras offset mais marcadas (`shadow-[6px_6px_0_...]`)
-- Mais uppercase Arial Black nos títulos de seção
+Estilo visual:
+- Faixa fina cinza-grafite (`--secondary`) com letra amarela `COMO LEVAR ADIANTE` (caps, 8pt, bold)
+- Texto da sugestão em off-white, 9.5pt, italic, sem nome "Jefferson" (já está assinado no final)
+- Altura ~12mm, sem competir com as caixas 30/60/90
 
-## Tokens em `index.css`
+**Página final (carta + assinatura)** — manter como está. A assinatura já fecha o relatório pessoalmente; o pitch atual continua válido como recap.
 
-Manter os tokens `--surface-*` definidos (podem ser úteis em outras páginas como o blog), mas **não usá-los nas LPs comerciais**. Atualizar a memória `mem://design/color-surfaces` deixando explícito: pastéis NÃO entram em páginas comerciais/executivas.
+## Detalhes técnicos
+- Arquivo único alterado: `src/lib/teste-ia-pdf.ts`
+- Nova constante `caminhoPorCompetencia: Record<string, { pf: string; pj: string }>`
+- Função helper `pickCaminho(competenciaKey, finalidade)` com fallback genérico
+- Renderização inserida dentro do `planoAcao.forEach` existente, reaproveitando `ensureSpace` e a paleta já presente (`252,211,77` amarelo / `30,30,30` grafite)
+- Zero mudanças em banco, edge functions ou UI do dashboard
+- Sem dependências novas
 
-## Memória
-
-- Atualizar `mem://design/color-surfaces`: pastéis proibidos em LPs comerciais.
-- Adicionar nova memória `mem://style/executive-palette`: regra "preto + off-white + amarelo, zero pastéis em contexto B2B/executivo".
-
-## Arquivos afetados
-
-- `src/components/CommercialLanding.tsx` (reescrita das classes de fundo e dos arrays de paleta dos cards)
-- `mem://design/color-surfaces` (revisão)
-- `mem://style/executive-palette` (novo)
-- `mem://index.md` (referência)
-
-Sem mudanças em backend, rotas ou conteúdo — só presentation.
+## Fora do escopo
+- Não personaliza por setor/indústria (só por gap + finalidade)
+- Não adiciona link/CTA clicável dentro do bloco (mantém o tom de orientação)
+- Não toca no dashboard web do teste — só no PDF gerado
