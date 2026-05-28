@@ -51,7 +51,7 @@ export const PressContactsTable = ({ selectedIds, setSelectedIds, contacts, relo
       }
       return true;
     });
-  }, [contacts, search, regiao, meio, municipio, hasEmail, hasWa, hideOptOut]);
+  }, [contacts, search, regioesSel, meio, municipio, hasEmail, hasWa, hideOptOut]);
 
   const allSelected = filtered.length > 0 && filtered.every(c => selectedIds.has(c.id));
   const toggleAll = () => {
