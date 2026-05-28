@@ -57,7 +57,7 @@ const Header = () => {
             </span>
             <span className="flex flex-col leading-none">
               <span className="text-lg font-black uppercase">Jefferson Lobo</span>
-              <span className="text-[10px] font-bold uppercase text-muted-foreground">AI strategist · speaker · author</span>
+              <span className="text-[11px] font-bold uppercase text-foreground/80">AI strategist · speaker · author</span>
             </span>
           </Link>
 
