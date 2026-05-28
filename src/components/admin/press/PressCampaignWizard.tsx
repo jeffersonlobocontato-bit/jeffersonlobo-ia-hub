@@ -335,6 +335,53 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
                 </div>
               </Card>
             )}
+
+            {/* SELEÇÃO DE VEÍCULOS */}
+            {filteredContacts.length > 0 && (
+              <Card className="p-3 space-y-2">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="text-xs uppercase font-bold">
+                    Veículos ({finalContacts.length}/{filteredContacts.length} selecionados)
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" onClick={() => setExcludedIds(new Set())}>
+                      Marcar todos
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setExcludedIds(new Set(filteredContacts.map(c => c.id)))}
+                      disabled={finalContacts.length === 0}
+                    >
+                      Desmarcar todos
+                    </Button>
+                  </div>
+                </div>
+                <div className="max-h-[260px] overflow-y-auto divide-y border rounded">
+                  {filteredContacts.map(c => {
+                    const checked = !excludedIds.has(c.id);
+                    return (
+                      <label
+                        key={c.id}
+                        className="flex items-center gap-3 px-3 py-2 text-sm cursor-pointer hover:bg-muted/50"
+                      >
+                        <Checkbox checked={checked} onCheckedChange={() => toggleContact(c.id)} />
+                        <div className="min-w-0 flex-1">
+                          <div className="font-medium truncate">{c.veiculo}</div>
+                          <div className="text-xs text-muted-foreground truncate">
+                            {c.contato ?? 'redação'}
+                            {c.municipio ? ` · ${c.municipio}` : ''}
+                            {c.regiao ? ` · ${c.regiao}` : ''}
+                            {' · '}
+                            {canal === 'email' ? c.email : c.whatsapp}
+                          </div>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
           </div>
         )}
 
