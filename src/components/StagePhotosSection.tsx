@@ -17,30 +17,28 @@ const StagePhotoCard = ({
   imgClassName?: string;
 }) => (
   <figure
-    className={`group relative overflow-hidden border border-foreground/10 bg-foreground transition-all duration-300 hover:border-foreground/30 ${className}`}
+    className={`group relative overflow-hidden border border-white/10 bg-black transition-all duration-300 hover:border-primary/60 ${className}`}
   >
     <img
       src={photo.image_url}
       alt={photo.caption || photo.event_name || 'Jefferson Lobo no palco'}
-      className={`${imgClassName} transition-transform duration-700 group-hover:scale-[1.03]`}
+      className={`${imgClassName} transition-transform duration-700 group-hover:scale-[1.04]`}
       loading="lazy"
     />
-    {/* Gradiente escuro para garantir legibilidade da legenda */}
-    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-foreground via-foreground/70 to-transparent" />
+    {/* Degradê preto executivo da base ao topo */}
+    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-3/4 bg-gradient-to-t from-black via-black/85 via-40% to-transparent" />
     {(photo.event_name || photo.caption) && (
       <figcaption className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
-        <div className="border-l-2 border-primary pl-3">
-          {photo.event_name && (
-            <div className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.18em] text-background/70">
-              {photo.event_name}
-            </div>
-          )}
-          {photo.caption && (
-            <div className="mt-1 text-sm sm:text-base font-bold text-background leading-snug">
-              {photo.caption}
-            </div>
-          )}
-        </div>
+        {photo.event_name && (
+          <span className="inline-block bg-primary px-2.5 py-1 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.16em] text-primary-foreground shadow-[3px_3px_0_rgba(0,0,0,0.6)] mb-2.5">
+            {photo.event_name}
+          </span>
+        )}
+        {photo.caption && (
+          <div className="text-base sm:text-lg font-black uppercase text-white leading-tight tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+            {photo.caption}
+          </div>
+        )}
       </figcaption>
     )}
   </figure>
