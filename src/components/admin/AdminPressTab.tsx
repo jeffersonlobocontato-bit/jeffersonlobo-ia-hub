@@ -31,14 +31,13 @@ export const AdminPressTab = () => {
 
   return (
     <div className="space-y-4">
-      <Card className="p-3 border-l-4 border-yellow-500 bg-yellow-500/10 text-sm">
+      <Card className="p-3 border-l-4 border-green-500 bg-green-500/10 text-sm">
         <div className="flex gap-2">
-          <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+          <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
           <div>
-            <strong>Email em massa:</strong> não está disponível ainda. O Lovable Emails é só transacional (1-a-1).
-            Para disparo de email para a base de imprensa, precisamos plugar um conector de marketing (recomendo <strong>Brevo</strong>:
-            300 emails/dia grátis, conector nativo no Lovable). Me avise para habilitarmos.
-            Por enquanto, <strong>WhatsApp 1-a-1</strong> está 100% funcional abaixo.
+            <strong>Email em massa ativo:</strong> conectado ao <strong>Brevo</strong> (300 emails/dia no plano Free).
+            Remetente: <code>contato@jeffersonlobo.tech</code>. Para máxima entregabilidade, valide SPF/DKIM
+            do domínio no painel do Brevo. <strong>WhatsApp 1-a-1</strong> também disponível.
           </div>
         </div>
       </Card>
@@ -46,7 +45,8 @@ export const AdminPressTab = () => {
       <Tabs defaultValue="base">
         <TabsList>
           <TabsTrigger value="base">Base de Contatos ({contacts.length})</TabsTrigger>
-          <TabsTrigger value="campanha">Campanha WhatsApp ({selectedIds.size} selecionados)</TabsTrigger>
+          <TabsTrigger value="whatsapp">WhatsApp ({selectedIds.size})</TabsTrigger>
+          <TabsTrigger value="email">Email ({selectedIds.size})</TabsTrigger>
         </TabsList>
         <TabsContent value="base" className="mt-4">
           {loading ? <p className="text-muted-foreground">Carregando...</p> : (
@@ -58,8 +58,14 @@ export const AdminPressTab = () => {
             />
           )}
         </TabsContent>
-        <TabsContent value="campanha" className="mt-4">
+        <TabsContent value="whatsapp" className="mt-4">
           <PressCampaignsTab
+            selectedContacts={selectedContacts}
+            onClearSelection={() => setSelectedIds(new Set())}
+          />
+        </TabsContent>
+        <TabsContent value="email" className="mt-4">
+          <PressEmailCampaignTab
             selectedContacts={selectedContacts}
             onClearSelection={() => setSelectedIds(new Set())}
           />
