@@ -71,6 +71,7 @@ export const AdminAnalyticsTab = () => {
   const [timeSeriesData, setTimeSeriesData] = useState<TimeSeriesData[]>([]);
   const [ctaStats, setCtaStats] = useState<CTAStat[]>([]);
   const [conversionFunnel, setConversionFunnel] = useState<ConversionFunnel | null>(null);
+  const [trafficOrigin, setTrafficOrigin] = useState<TrafficOrigin | null>(null);
   const [selectedPage, setSelectedPage] = useState<string>('/');
   const [loading, setLoading] = useState(true);
 
