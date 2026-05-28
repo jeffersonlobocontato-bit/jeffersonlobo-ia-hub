@@ -18,6 +18,7 @@ export const AdminPressTab = () => {
   const [importOpen, setImportOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
   const [showBase, setShowBase] = useState(false);
+  const [baseSelected, setBaseSelected] = useState<Set<string>>(new Set());
   const { lists, loading: loadingLists, reload: reloadLists } = usePressLists();
 
   const load = async () => {
