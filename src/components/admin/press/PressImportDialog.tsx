@@ -116,24 +116,40 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
           )}
 
           {rows.length > 0 && (
-            <div className="border-2 border-primary p-4 bg-muted/30">
-              <div className="grid grid-cols-3 gap-4 text-center mb-3">
+            <div className="border-2 border-primary p-4 bg-muted/30 space-y-3">
+              <div className="grid grid-cols-3 gap-4 text-center">
                 <Stat label="Linhas lidas" value={rows.length} />
                 <Stat label="Válidos" value={valid.length} good />
                 <Stat label="Inválidos" value={invalid} bad={invalid > 0} />
+              </div>
+              <div className="border-t border-border pt-3">
+                <div className="text-xs font-bold uppercase mb-2 text-muted-foreground">Canais de disparo (entre os válidos)</div>
+                <div className="grid grid-cols-4 gap-2 text-center text-xs">
+                  <Channel label="📧 Email" value={withEmail} />
+                  <Channel label="📱 WhatsApp" value={withWhats} />
+                  <Channel label="📧+📱 Ambos" value={withBoth} />
+                  <Channel label="Só email" value={onlyEmail} alt /> 
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-center text-xs mt-2">
+                  <Channel label="Só WhatsApp" value={onlyWhats} alt />
+                  <Channel label="Sem nenhum (inválidos)" value={invalid} bad />
+                </div>
               </div>
               {invalid > 0 && (
                 <details className="text-xs">
                   <summary className="cursor-pointer font-bold uppercase">Ver {invalid} linhas com erro</summary>
                   <ul className="mt-2 space-y-1 max-h-40 overflow-auto">
-                    {rows.filter(r => r._errors.length).slice(0, 50).map((r, i) => (
-                      <li key={i} className="text-destructive">Linha {r._row}: {r._errors.join('; ')} — {r.veiculo || '(sem veículo)'}</li>
+                    {rows.filter(r => r._errors.length).slice(0, 100).map((r, i) => (
+                      <li key={i} className="text-destructive">
+                        Linha {r._row}: {r._errors.join('; ')} — {r.veiculo || '(sem veículo)'}
+                        {r.telefone && <span className="text-muted-foreground"> · tem telefone fixo: {r.telefone}</span>}
+                      </li>
                     ))}
                   </ul>
                 </details>
               )}
-              <p className="mt-3 text-xs text-muted-foreground">
-                Duplicados serão atualizados (por email ou WhatsApp). Tags existentes não são apagadas — a importação só sobrescreve os campos da planilha.
+              <p className="text-xs text-muted-foreground">
+                Inválidos = linhas <strong>sem email E sem WhatsApp</strong> (telefone fixo sozinho não permite disparo). Duplicados serão atualizados por email ou WhatsApp.
               </p>
             </div>
           )}
