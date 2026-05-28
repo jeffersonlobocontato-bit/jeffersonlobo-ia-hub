@@ -1,4 +1,24 @@
 import jsPDF from "jspdf";
+import signatureUrl from "@/assets/jefferson-signature.png";
+
+// Pré-carrega a assinatura como dataURL para uso síncrono no jsPDF
+let signatureDataUrl: string | null = null;
+(async () => {
+  try {
+    const res = await fetch(signatureUrl);
+    const blob = await res.blob();
+    signatureDataUrl = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+  } catch (e) {
+    console.warn("Falha ao carregar assinatura:", e);
+  }
+})();
+
+
 
 export type Finalidade = "PF" | "PJ" | string;
 
@@ -417,6 +437,24 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
     pdf.text(lines, M, cy);
     cy += lines.length * 5 + 2;
   });
+
+  // Assinatura manuscrita (sobre o fundo escuro, antes da caixa de contato)
+  if (signatureDataUrl) {
+    cy += 4;
+    const sigW = 55;
+    const sigH = sigW * (216 / 673); // mantém proporção original
+    try {
+      pdf.addImage(signatureDataUrl, "PNG", M, cy, sigW, sigH);
+    } catch (e) {
+      console.warn("Falha ao inserir assinatura no PDF:", e);
+    }
+    cy += sigH + 1;
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(9);
+    pdf.setTextColor(180, 180, 180);
+    pdf.text("Jefferson Lobo · Estrategista de IA", M, cy);
+    cy += 6;
+  }
 
   // Caixa de contato
   cy += 6;
