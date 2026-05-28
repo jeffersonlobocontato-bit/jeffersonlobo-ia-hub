@@ -14,7 +14,7 @@ import {
 import { PressRichEditor } from './PressRichEditor';
 import { fetchContactsForLists, usePressLists, type PressList } from '@/hooks/usePressLists';
 import {
-  type PressContact, renderTemplate, htmlToWhatsAppMarkdown, buildWhatsappLink,
+  type PressContact, renderTemplate, htmlToWhatsAppMarkdown,
 } from '@/lib/press-utils';
 
 type Props = { open: boolean; onOpenChange: (o: boolean) => void };
