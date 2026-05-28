@@ -108,8 +108,8 @@ export const AdminPressTab = () => {
           {loading ? <p className="text-muted-foreground">Carregando...</p> : (
             <PressContactsTable
               contacts={contacts}
-              selectedIds={new Set()}
-              setSelectedIds={() => {}}
+              selectedIds={baseSelected}
+              setSelectedIds={setBaseSelected}
               reload={() => { load(); reloadLists(); }}
             />
           )}
