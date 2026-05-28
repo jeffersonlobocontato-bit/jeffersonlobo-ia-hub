@@ -14,6 +14,11 @@ import { Card } from '@/components/ui/card';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
 
+const shareVersionFromDate = (value?: string | null) => {
+  const digits = (value || new Date().toISOString()).replace(/\D/g, '').slice(0, 12);
+  return digits || new Date().toISOString().replace(/\D/g, '').slice(0, 8);
+};
+
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: post, isLoading, error } = useBlogPost(slug);
@@ -83,11 +88,11 @@ const BlogPost = () => {
     ],
   };
 
-  // URL de compartilhamento: arquivo .html plano gerado em build-time.
-  // A hospedagem serve arquivos .html físicos com prioridade sobre o fallback
-  // da SPA, então crawlers (WhatsApp/LinkedIn/X) leem og:title/og:image reais
-  // antes do JS redirecionar humanos para /blog/:slug.
-  const shareUrl = `${SITE_URL}/noticia/${post.slug}.html`;
+  // URL de compartilhamento: arquivo .html plano e versionado no caminho.
+  // Não usamos ?v=2 porque alguns scrapers/caches tratam query string como
+  // fallback genérico da SPA e acabam puxando a imagem institucional do site.
+  const shareVersion = shareVersionFromDate(post.updated_at || post.published_at || post.date);
+  const shareUrl = `${SITE_URL}/noticia/${post.slug}-${shareVersion}.html`;
   const sharePayload = encodeURIComponent(shareUrl);
 
   return (
