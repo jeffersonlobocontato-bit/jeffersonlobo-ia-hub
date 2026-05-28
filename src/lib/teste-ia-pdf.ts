@@ -1,4 +1,6 @@
 import jsPDF from "jspdf";
+import signatureDataUrl from "@/assets/jefferson-signature.png?inline";
+
 
 export type Finalidade = "PF" | "PJ" | string;
 
