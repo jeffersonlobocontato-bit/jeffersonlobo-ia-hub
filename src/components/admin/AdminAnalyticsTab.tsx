@@ -393,6 +393,112 @@ export const AdminAnalyticsTab = () => {
           </Card>
         </TabsContent>
 
+        <TabsContent value="origin" className="space-y-4">
+          <Card className="p-6">
+            <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <Globe className="w-5 h-5 text-primary" />
+              Origem do Tráfego (atribuição first-touch por sessão)
+            </h3>
+
+            {!trafficOrigin || trafficOrigin.channels.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Sem dados de origem neste período. Os novos acessos passarão a ser classificados automaticamente.
+              </p>
+            ) : (
+              <div className="space-y-6">
+                {/* Cards por canal */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">
+                    Canais
+                  </h4>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                    {trafficOrigin.channels.map((c) => {
+                      const total = trafficOrigin.channels.reduce((acc, x) => acc + x.sessions, 0);
+                      const pct = total > 0 ? ((c.sessions / total) * 100).toFixed(1) : '0';
+                      const labels: Record<string, string> = {
+                        direct: 'Direto',
+                        organic: 'Busca orgânica',
+                        social: 'Redes sociais',
+                        referral: 'Referência',
+                        paid: 'Pago',
+                        email: 'E-mail',
+                        desconhecido: 'Desconhecido',
+                      };
+                      return (
+                        <Card key={c.key} className="p-4">
+                          <p className="text-xs text-muted-foreground uppercase">{labels[c.key] || c.key}</p>
+                          <p className="text-2xl font-bold">{c.sessions}</p>
+                          <p className="text-xs text-primary">{pct}%</p>
+                        </Card>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Top referenciadores */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">
+                    Top sites referenciadores
+                  </h4>
+                  {trafficOrigin.referrers.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">Nenhum referenciador externo registrado.</p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-2">Domínio</th>
+                            <th className="text-right p-2">Sessões</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {trafficOrigin.referrers.map((r) => (
+                            <tr key={r.key} className="border-b hover:bg-muted/50">
+                              <td className="p-2 font-mono text-sm">{r.key}</td>
+                              <td className="text-right p-2">{r.sessions}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+
+                {/* Campanhas UTM */}
+                <div>
+                  <h4 className="text-sm font-semibold mb-3 text-muted-foreground uppercase tracking-wider">
+                    Campanhas (UTM source / campaign)
+                  </h4>
+                  {trafficOrigin.campaigns.length === 0 ? (
+                    <p className="text-sm text-muted-foreground">
+                      Nenhuma campanha rastreada. Use parâmetros <code>?utm_source=...&amp;utm_medium=...&amp;utm_campaign=...</code> em links de divulgação para medir aqui.
+                    </p>
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <table className="w-full">
+                        <thead>
+                          <tr className="border-b">
+                            <th className="text-left p-2">Source / Campaign</th>
+                            <th className="text-right p-2">Sessões</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {trafficOrigin.campaigns.map((c) => (
+                            <tr key={c.key} className="border-b hover:bg-muted/50">
+                              <td className="p-2 font-mono text-sm">{c.key}</td>
+                              <td className="text-right p-2">{c.sessions}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </Card>
+        </TabsContent>
+
         <TabsContent value="funnel" className="space-y-4">
           <Card className="p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
