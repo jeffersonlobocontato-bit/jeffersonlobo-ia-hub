@@ -13,7 +13,7 @@ import { calcReadingMinutes, isInternalPost } from '@/lib/blog-utils';
 import { Card } from '@/components/ui/card';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
-const SOCIAL_PREVIEW_VERSION = 'img3';
+const SOCIAL_PREVIEW_VERSION = 'img4';
 
 const shareVersionFromDate = (value?: string | null) => {
   const digits = (value || new Date().toISOString()).replace(/\D/g, '').slice(0, 12);

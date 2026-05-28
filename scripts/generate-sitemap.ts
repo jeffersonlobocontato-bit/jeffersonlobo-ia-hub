@@ -3,10 +3,11 @@
 import { mkdirSync, rmSync, writeFileSync } from "fs";
 import { Buffer } from "buffer";
 import { resolve } from "path";
+import sharp from "sharp";
 
 const BASE_URL = "https://jeffersonlobo.tech";
 const FALLBACK_IMAGE = "https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp";
-const SOCIAL_PREVIEW_VERSION = "img3";
+const SOCIAL_PREVIEW_VERSION = "img4";
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://cgydeldzhnfyexphaheq.supabase.co";
 const SUPABASE_KEY =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
@@ -71,14 +72,6 @@ function socialImageUrl(image?: string | null): string {
   return image;
 }
 
-function imageExtension(contentType: string, imageUrl: string): "jpg" | "png" | "webp" {
-  if (contentType.includes("webp")) return "webp";
-  if (contentType.includes("png")) return "png";
-  if (/\.webp($|\?)/i.test(imageUrl)) return "webp";
-  if (/\.png($|\?)/i.test(imageUrl)) return "png";
-  return "jpg";
-}
-
 async function cacheSocialImage(post: BlogPostRow, shareVersion: string): Promise<string> {
   if (!post.cover_image) return FALLBACK_IMAGE;
 
@@ -100,9 +93,11 @@ async function cacheSocialImage(post: BlogPostRow, shareVersion: string): Promis
     return sourceUrl;
   }
 
-  const ext = imageExtension(contentType, sourceUrl);
-  const filename = `${post.slug}-${shareVersion}.${ext}`;
-  const bytes = Buffer.from(await response.arrayBuffer());
+  const filename = `${post.slug}-${shareVersion}.jpg`;
+  const bytes = await sharp(Buffer.from(await response.arrayBuffer()))
+    .resize(1200, 630, { fit: "cover" })
+    .jpeg({ quality: 82, progressive: false, mozjpeg: true })
+    .toBuffer();
   writeFileSync(resolve("public/og", filename), bytes);
   return `${BASE_URL}/og/${filename}`;
 }
