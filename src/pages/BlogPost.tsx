@@ -82,13 +82,11 @@ const BlogPost = () => {
     ],
   };
 
-  // URL de compartilhamento: aponta para a edge function `blog-share` que
-  // entrega HTML estático com og:title, og:description e og:image reais da
-  // notícia para crawlers (WhatsApp, LinkedIn, X) e redireciona humanos para
-  // /blog/:slug. Esta é a única URL confiável porque a hospedagem da SPA
-  // serve o index.html genérico em /noticia/ e /share/ (fallback do router).
-  // O parâmetro `v` força o WhatsApp a refazer o scrape (invalida cache antigo).
-  const shareUrl = `https://cgydeldzhnfyexphaheq.supabase.co/functions/v1/blog-share/${post.slug}?v=3`;
+  // URL de compartilhamento: arquivo .html plano gerado em build-time.
+  // A hospedagem serve arquivos .html físicos com prioridade sobre o fallback
+  // da SPA, então crawlers (WhatsApp/LinkedIn/X) leem og:title/og:image reais
+  // antes do JS redirecionar humanos para /blog/:slug.
+  const shareUrl = `${SITE_URL}/noticia/${post.slug}.html`;
   const sharePayload = encodeURIComponent(shareUrl);
 
   return (
