@@ -14,3 +14,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://jeffersonlobo.tech/sitemap.xml
+
