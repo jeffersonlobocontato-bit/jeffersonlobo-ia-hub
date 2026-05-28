@@ -91,9 +91,9 @@ const Auth = () => {
       
       <Card className="w-full max-w-md relative z-10 border-primary/20 bg-background/95 backdrop-blur">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">
-            Jefferson Lobo
-          </CardTitle>
+          <h1 className="text-3xl font-bold text-primary">
+            Entrar — Jefferson Lobo
+          </h1>
           <CardDescription>
             Acesse sua conta ou crie uma nova
           </CardDescription>

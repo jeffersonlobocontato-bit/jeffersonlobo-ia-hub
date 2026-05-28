@@ -62,9 +62,9 @@ const ResetPassword = () => {
       
       <Card className="w-full max-w-md relative z-10 border-primary/20 bg-background/95 backdrop-blur">
         <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-primary">
+          <h1 className="text-3xl font-bold text-primary">
             Redefinir Senha
-          </CardTitle>
+          </h1>
           <CardDescription>
             Digite sua nova senha
           </CardDescription>
