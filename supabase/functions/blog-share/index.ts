@@ -58,9 +58,8 @@ function socialImageUrl(image?: string | null): string {
   return image
 }
 
-function renderHtml(post: any): string {
+function renderHtml(post: any, shareUrl: string): string {
   const url = `${SITE_URL}/blog/${post.slug}`
-  const shareUrl = `${SITE_URL}/share/blog/${post.slug}`
   const title = escapeHtml(post.title)
   const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ''))
   const image = escapeHtml(socialImageUrl(post.cover_image))
