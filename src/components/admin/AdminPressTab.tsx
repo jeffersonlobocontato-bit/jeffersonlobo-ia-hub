@@ -54,16 +54,7 @@ export const AdminPressTab = () => {
       </Card>
 
       <div className="flex flex-wrap gap-2">
-        <Button
-          size="lg"
-          onClick={() => {
-            if (lists.length === 0) {
-              toast({ title: 'Nenhuma lista', description: 'Importe um XLSX primeiro para criar uma lista.', variant: 'destructive' });
-              return;
-            }
-            setWizardOpen(true);
-          }}
-        >
+        <Button size="lg" onClick={() => setWizardOpen(true)}>
           <Plus className="w-4 h-4 mr-1" /> Novo disparo
         </Button>
         <Button size="lg" variant="outline" onClick={() => setImportOpen(true)}>
