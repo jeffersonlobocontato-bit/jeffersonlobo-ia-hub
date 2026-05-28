@@ -48,9 +48,12 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
   const onlyWhats = withWhats - withBoth;
 
   const doImport = async () => {
+    if (!listName.trim()) {
+      toast({ title: 'Dê um nome à lista', description: 'Toda importação cria uma lista.', variant: 'destructive' });
+      return;
+    }
     setImporting(true);
     try {
-      // upsert por email (chave única). Para os sem email, insere usando whatsapp como chave única.
       const withEmail = valid.filter(r => r.email);
       const withoutEmail = valid.filter(r => !r.email && r.whatsapp);
 
@@ -60,6 +63,7 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
       };
 
       let inserted = 0, updated = 0;
+      const contactIds: string[] = [];
 
       if (withEmail.length) {
         const payload = withEmail.map(stripMeta);
@@ -69,6 +73,7 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
           .select('id');
         if (error) throw error;
         inserted += data?.length ?? 0;
+        data?.forEach(d => contactIds.push(d.id));
       }
       if (withoutEmail.length) {
         const payload = withoutEmail.map(stripMeta);
@@ -78,10 +83,27 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
           .select('id');
         if (error) throw error;
         updated += data?.length ?? 0;
+        data?.forEach(d => contactIds.push(d.id));
       }
 
-      setResult({ inserted, updated, skipped: invalid });
-      toast({ title: 'Importação concluída', description: `${inserted + updated} contatos processados, ${invalid} ignorados.` });
+      // Cria a lista e vincula os contatos
+      const { data: list, error: lErr } = await supabase
+        .from('press_lists')
+        .insert({ nome: listName.trim() })
+        .select('id, nome')
+        .single();
+      if (lErr || !list) throw lErr ?? new Error('falha ao criar lista');
+
+      if (contactIds.length) {
+        const memberships = contactIds.map(id => ({ list_id: list.id, contact_id: id }));
+        const { error: mErr } = await supabase
+          .from('press_list_members')
+          .upsert(memberships, { onConflict: 'list_id,contact_id', ignoreDuplicates: true });
+        if (mErr) throw mErr;
+      }
+
+      setResult({ inserted, updated, skipped: invalid, listName: list.nome });
+      toast({ title: 'Importação concluída', description: `Lista "${list.nome}" criada com ${contactIds.length} contatos.` });
       onDone();
     } catch (e: any) {
       toast({ title: 'Erro no import', description: e.message, variant: 'destructive' });
