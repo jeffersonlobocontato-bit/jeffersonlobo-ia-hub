@@ -52,7 +52,10 @@ const AdminStagePhotosTab = () => {
         caption: item.caption,
         display_order: item.display_order,
         active: item.active,
-      })
+        focal_x: item.focal_x,
+        focal_y: item.focal_y,
+        zoom: item.zoom,
+      } as any)
       .eq('id', item.id);
     if (error) toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
     else toast({ title: 'Foto atualizada' });
