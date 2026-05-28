@@ -20,8 +20,8 @@ All colors MUST be HSL.
     --primary: 49 100% 50%;
     --primary-foreground: 0 0% 6%;
 
-    --secondary: 23 100% 56%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 0 0% 18%;
+    --secondary-foreground: 42 100% 96%;
 
     --muted: 48 33% 94%;
     --muted-foreground: 0 0% 34%;
@@ -40,13 +40,13 @@ All colors MUST be HSL.
 
     --tech-dark: 0 0% 4%;
     --tech-blue: 49 100% 50%;
-    --tech-purple: 23 100% 56%;
+    --tech-purple: 0 0% 18%;
     --tech-glow-blue: 49 100% 62%;
-    --tech-glow-purple: 23 100% 64%;
+    --tech-glow-purple: 0 0% 28%;
     --surface-strong: 0 0% 8%;
-    --surface-soft: 0 0% 12%;
+    --surface-soft: 0 0% 14%;
     --brand-gold: 49 100% 50%;
-    --brand-orange: 23 100% 56%;
+    --brand-orange: 0 0% 18%;
     --brand-cream: 42 100% 96%;
 
     /* Surfaces coloridas para módulos (estilo StartSe) — fundo geral branco, módulos com cor */
@@ -71,7 +71,7 @@ All colors MUST be HSL.
     --primary: 49 100% 50%;
     --primary-foreground: 0 0% 6%;
 
-    --secondary: 23 100% 56%;
+    --secondary: 0 0% 22%;
     --secondary-foreground: 42 100% 96%;
 
     --muted: 0 0% 12%;
