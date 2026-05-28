@@ -219,6 +219,15 @@ const AdminStagePhotosTab = () => {
                   placeholder="Ex.: Keynote para conselho e diretoria"
                 />
               </div>
+
+              <StagePhotoCropEditor
+                imageUrl={item.image_url}
+                focalX={item.focal_x}
+                focalY={item.focal_y}
+                zoom={item.zoom}
+                onChange={(next) => update(item.id, next)}
+              />
+
               <Button size="sm" className="w-full" onClick={() => save(item)}>
                 Salvar alterações
               </Button>
