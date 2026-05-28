@@ -20,15 +20,15 @@ const processMessageContent = (content: string) => {
     if (match) {
       const linkText = match[1];
       return (
-        <Button
+        <button
           key={index}
-          size="sm"
-          className="my-2 bg-green-600 hover:bg-green-700 text-white"
+          type="button"
+          className="my-2 inline-flex w-full max-w-full items-start gap-2 rounded-md bg-green-600 px-3 py-2 text-left text-xs font-medium text-white hover:bg-green-700 whitespace-normal break-words"
           onClick={() => window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank')}
         >
-          <MessageCircle className="w-3 h-3 mr-2" />
-          {linkText}
-        </Button>
+          <MessageCircle className="w-3 h-3 mt-0.5 shrink-0" />
+          <span className="flex-1 break-words">{linkText}</span>
+        </button>
       );
     }
     return <ReactMarkdown key={index}>{part}</ReactMarkdown>;
