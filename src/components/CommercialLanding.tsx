@@ -18,19 +18,53 @@ import { ArrowRight, Check, Sparkles } from "lucide-react";
 const SITE_URL = "https://jeffersonlobo.tech";
 
 export interface CommercialLandingProps {
-  slug: string; // ex: "palestras-ia"
+  slug: string;
   kicker: string;
   h1: string;
   h1Highlight?: string;
   subtitle: string;
   seoTitle: string;
   seoDescription: string;
-  serviceType: string; // schema.org Service type label
+  serviceType: string;
   forWho: string[];
   deliverables: { title: string; description: string }[];
   formats: { name: string; duration: string; description: string }[];
   faq: { q: string; a: string }[];
   ctaLabel?: string;
+}
+
+// Pílula de kicker brutalista (amarelo sólido + borda preta)
+function Kicker({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-block bg-primary text-primary-foreground font-black uppercase text-xs tracking-widest px-3 py-1.5 border-2 border-foreground shadow-[3px_3px_0_hsl(var(--foreground))]">
+      {children}
+    </span>
+  );
+}
+
+// Cabeçalho de seção com linha amarela
+function SectionHead({
+  kicker,
+  title,
+  invert = false,
+}: {
+  kicker: string;
+  title: string;
+  invert?: boolean;
+}) {
+  return (
+    <div className="text-center mb-14 flex flex-col items-center gap-4">
+      <Kicker>{kicker}</Kicker>
+      <h2
+        className={`display-title text-3xl md:text-5xl tracking-tight ${
+          invert ? "text-background" : "text-foreground"
+        }`}
+      >
+        {title}
+      </h2>
+      <div className="h-1.5 w-20 bg-primary" />
+    </div>
+  );
 }
 
 export default function CommercialLanding(props: CommercialLandingProps) {
@@ -94,9 +128,10 @@ export default function CommercialLanding(props: CommercialLandingProps) {
       <main className="flex-1 pt-24">
         {/* HERO */}
         <section className="relative overflow-hidden bg-background py-20 md:py-28">
-          <div className="absolute inset-0 z-0 bg-brand-grid opacity-35" />
-          <div className="container mx-auto px-4 relative z-10 max-w-4xl text-center space-y-6">
-            <div className="section-kicker">{props.kicker}</div>
+          <div className="absolute inset-0 z-0 bg-brand-grid opacity-60" />
+          <div className="absolute inset-x-0 bottom-0 h-2 bg-foreground z-10" />
+          <div className="container mx-auto px-4 relative z-10 max-w-4xl text-center space-y-6 flex flex-col items-center">
+            <Kicker>{props.kicker}</Kicker>
             <h1 className="display-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground">
               {props.h1}{" "}
               {props.h1Highlight && (
@@ -122,88 +157,106 @@ export default function CommercialLanding(props: CommercialLandingProps) {
 
         <LogosBarSection />
 
-        {/* PARA QUEM */}
+        {/* PARA QUEM — fundo creme */}
+        <section className="bg-muted py-20 border-y-2 border-foreground">
+          <div className="container mx-auto px-4 max-w-5xl">
+            <SectionHead
+              kicker="Para quem é"
+              title="Feito para lideranças que precisam de resultado real"
+            />
+            <div className="grid md:grid-cols-2 gap-5">
+              {props.forWho.map((item, i) => {
+                const accent = i % 3 === 1; // 1 a cada 3 em laranja
+                return (
+                  <Card
+                    key={i}
+                    className={`border-2 border-foreground bg-card rounded-none shadow-[5px_5px_0_hsl(var(--foreground))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_hsl(var(--foreground))] transition-all`}
+                  >
+                    <CardContent className="p-6 flex gap-4 items-start">
+                      <div
+                        className={`shrink-0 inline-flex h-9 w-9 items-center justify-center border-2 border-foreground ${
+                          accent ? "bg-secondary" : "bg-primary"
+                        }`}
+                      >
+                        <Check className="w-5 h-5 text-foreground" />
+                      </div>
+                      <span className="text-foreground font-bold uppercase text-sm leading-relaxed">
+                        {item}
+                      </span>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* O QUE ENTREGA — bloco PRETO de impacto */}
+        <section className="bg-foreground py-24 relative overflow-hidden">
+          <div className="absolute inset-0 bg-brand-grid opacity-10" />
+          <div className="container mx-auto px-4 max-w-5xl relative z-10">
+            <SectionHead
+              kicker="O que você leva"
+              title="Entregas concretas, não slides genéricos"
+              invert
+            />
+            <div className="grid md:grid-cols-3 gap-6">
+              {props.deliverables.map((d, i) => {
+                const accent = i === 1;
+                return (
+                  <Card
+                    key={i}
+                    className={`rounded-none border-2 ${
+                      accent ? "border-secondary" : "border-primary"
+                    } bg-background/5 backdrop-blur shadow-[6px_6px_0_hsl(var(--primary))] ${
+                      accent ? "shadow-[6px_6px_0_hsl(var(--secondary))]" : ""
+                    } hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all`}
+                  >
+                    <CardContent className="p-6 space-y-4">
+                      <div
+                        className={`inline-flex h-12 w-12 items-center justify-center border-2 ${
+                          accent
+                            ? "border-secondary bg-secondary"
+                            : "border-primary bg-primary"
+                        }`}
+                      >
+                        <Sparkles className="w-6 h-6 text-foreground" />
+                      </div>
+                      <h3 className="text-lg font-black uppercase text-background tracking-tight">
+                        {d.title}
+                      </h3>
+                      <p className="text-sm text-background/75 leading-relaxed">
+                        {d.description}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* FORMATOS — volta ao claro */}
         <section className="bg-background py-20">
           <div className="container mx-auto px-4 max-w-5xl">
-            <div className="text-center mb-12">
-              <div className="section-kicker">Para quem é</div>
-              <h2 className="display-title text-3xl md:text-5xl mt-3">
-                Feito para lideranças que precisam de resultado real
-              </h2>
-            </div>
-            <div className="grid md:grid-cols-2 gap-4">
-              {props.forWho.map((item, i) => (
-                <Card
-                  key={i}
-                  className="border-2 border-primary/30 bg-card shadow-[4px_4px_0_hsl(var(--primary))]"
-                >
-                  <CardContent className="p-6 flex gap-3 items-start">
-                    <Check className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                    <span className="text-foreground font-bold uppercase text-sm leading-relaxed">
-                      {item}
-                    </span>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* O QUE ENTREGA */}
-        <section className="bg-background py-20 border-t border-primary/10">
-          <div className="container mx-auto px-4 max-w-5xl">
-            <div className="text-center mb-12">
-              <div className="section-kicker">O que você leva</div>
-              <h2 className="display-title text-3xl md:text-5xl mt-3">
-                Entregas concretas, não slides genéricos
-              </h2>
-            </div>
-            <div className="grid md:grid-cols-3 gap-6">
-              {props.deliverables.map((d, i) => (
-                <Card
-                  key={i}
-                  className="border-2 border-secondary/30 bg-card shadow-[4px_4px_0_hsl(var(--secondary))]"
-                >
-                  <CardContent className="p-6 space-y-3">
-                    <div className="inline-flex h-10 w-10 items-center justify-center border-2 border-secondary bg-secondary/10">
-                      <Sparkles className="w-5 h-5 text-secondary" />
-                    </div>
-                    <h3 className="text-lg font-black uppercase text-foreground">
-                      {d.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {d.description}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* FORMATOS */}
-        <section className="bg-background py-20 border-t border-primary/10">
-          <div className="container mx-auto px-4 max-w-5xl">
-            <div className="text-center mb-12">
-              <div className="section-kicker">Formatos disponíveis</div>
-              <h2 className="display-title text-3xl md:text-5xl mt-3">
-                Adaptado ao seu contexto
-              </h2>
-            </div>
+            <SectionHead
+              kicker="Formatos disponíveis"
+              title="Adaptado ao seu contexto"
+            />
             <div className="space-y-4">
               {props.formats.map((f, i) => (
                 <Card
                   key={i}
-                  className="border-2 border-primary/30 bg-card hover:shadow-[6px_6px_0_hsl(var(--primary))] transition-shadow"
+                  className="rounded-none border-2 border-foreground bg-card shadow-[5px_5px_0_hsl(var(--foreground))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_hsl(var(--foreground))] transition-all"
                 >
                   <CardContent className="p-6 grid md:grid-cols-[1fr_auto] gap-4 items-center">
                     <div>
-                      <h3 className="text-xl font-black uppercase text-foreground mb-1">
+                      <h3 className="text-xl font-black uppercase text-foreground mb-1 tracking-tight">
                         {f.name}
                       </h3>
                       <p className="text-sm text-muted-foreground">{f.description}</p>
                     </div>
-                    <div className="text-xs uppercase font-bold text-secondary border border-secondary/40 bg-secondary/10 px-3 py-1 w-fit">
+                    <div className="text-xs uppercase font-black text-foreground border-2 border-foreground bg-primary px-4 py-2 w-fit shadow-[3px_3px_0_hsl(var(--foreground))]">
                       {f.duration}
                     </div>
                   </CardContent>
@@ -216,22 +269,21 @@ export default function CommercialLanding(props: CommercialLandingProps) {
         <TrustBarSection />
         <StagePhotosSection />
 
-        {/* FAQ */}
-        <section className="bg-background py-20 border-t border-primary/10">
+        {/* FAQ — fundo creme */}
+        <section className="bg-muted py-20 border-y-2 border-foreground">
           <div className="container mx-auto px-4 max-w-3xl">
-            <div className="text-center mb-12">
-              <div className="section-kicker">Perguntas frequentes</div>
-              <h2 className="display-title text-3xl md:text-5xl mt-3">
-                Dúvidas comuns
-              </h2>
-            </div>
+            <SectionHead kicker="Perguntas frequentes" title="Dúvidas comuns" />
             <Accordion type="single" collapsible className="w-full">
               {props.faq.map((f, i) => (
-                <AccordionItem key={i} value={`item-${i}`}>
-                  <AccordionTrigger className="text-left font-bold uppercase">
+                <AccordionItem
+                  key={i}
+                  value={`item-${i}`}
+                  className="border-b-2 border-foreground"
+                >
+                  <AccordionTrigger className="text-left font-black uppercase text-foreground hover:no-underline">
                     {f.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-muted-foreground leading-relaxed">
+                  <AccordionContent className="text-muted-foreground leading-relaxed text-base">
                     {f.a}
                   </AccordionContent>
                 </AccordionItem>
@@ -240,16 +292,22 @@ export default function CommercialLanding(props: CommercialLandingProps) {
           </div>
         </section>
 
-        {/* CTA FINAL */}
-        <section className="bg-background py-24 border-t border-primary/10">
-          <div className="container mx-auto px-4 max-w-3xl text-center space-y-6">
-            <h2 className="display-title text-3xl md:text-5xl text-foreground">
-              Pronto para o próximo passo?
+        {/* CTA FINAL — bloco AMARELO de fechamento */}
+        <section className="bg-primary py-24 border-t-2 border-foreground relative overflow-hidden">
+          <div className="absolute inset-0 bg-brand-grid opacity-20" />
+          <div className="container mx-auto px-4 max-w-3xl text-center space-y-6 relative z-10 flex flex-col items-center">
+            <Kicker>Próximo passo</Kicker>
+            <h2 className="display-title text-4xl md:text-6xl text-primary-foreground tracking-tight">
+              Pronto para começar?
             </h2>
-            <p className="text-lg text-muted-foreground">
+            <p className="text-lg md:text-xl text-primary-foreground/85 font-bold max-w-xl">
               Conte o contexto da sua empresa e eu volto com formatos, datas e investimento em até 24h.
             </p>
-            <Button asChild size="lg">
+            <Button
+              asChild
+              size="lg"
+              className="bg-foreground text-background hover:bg-foreground/90 border-2 border-foreground shadow-[5px_5px_0_hsl(var(--background))] font-black"
+            >
               <a href="/#briefing">
                 {props.ctaLabel || "Solicitar proposta"}
                 <ArrowRight className="ml-2 w-4 h-4" />
