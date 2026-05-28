@@ -198,7 +198,7 @@ async function fetchBlogPosts(): Promise<BlogPostRow[]> {
 
 async function main() {
   const blogPosts = await fetchBlogPosts();
-  writeSharePages(blogPosts);
+  await writeSharePages(blogPosts);
 
   const entries: SitemapEntry[] = [
     { path: "/", lastmod: today, changefreq: "weekly", priority: "1.0" },
