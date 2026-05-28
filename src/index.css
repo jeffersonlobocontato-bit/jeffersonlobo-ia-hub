@@ -118,6 +118,14 @@ All colors MUST be HSL.
     background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--surface-strong)));
   }
 
+  /* Superfícies coloridas para módulos */
+  .bg-surface-cream { background-color: hsl(var(--surface-cream)); }
+  .bg-surface-peach { background-color: hsl(var(--surface-peach)); }
+  .bg-surface-mint  { background-color: hsl(var(--surface-mint));  }
+  .bg-surface-sky   { background-color: hsl(var(--surface-sky));   }
+  .bg-surface-lilac { background-color: hsl(var(--surface-lilac)); }
+  .bg-surface-coral { background-color: hsl(var(--surface-coral)); }
+
   .section-kicker {
     @apply inline-flex items-center gap-2 border border-primary/40 bg-primary/10 px-3 py-1 text-xs font-bold uppercase text-primary;
   }
