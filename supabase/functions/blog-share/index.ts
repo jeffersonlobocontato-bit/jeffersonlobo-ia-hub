@@ -11,10 +11,11 @@ const SITE_URL = 'https://jeffersonlobo.tech'
 const FALLBACK_IMAGE =
   'https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp'
 
-const htmlHeaders = {
-  'content-type': 'text/html; charset=utf-8',
-  'cache-control': 'public, max-age=60, s-maxage=300',
-}
+const htmlHeaders = new Headers({
+  'Content-Type': 'text/html; charset=utf-8',
+  'Cache-Control': 'public, max-age=60, s-maxage=300',
+  'X-Robots-Tag': 'noindex',
+})
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -57,9 +58,8 @@ function socialImageUrl(image?: string | null): string {
   return image
 }
 
-function renderHtml(post: any): string {
+function renderHtml(post: any, shareUrl: string): string {
   const url = `${SITE_URL}/blog/${post.slug}`
-  const shareUrl = `${SITE_URL}/share/blog/${post.slug}`
   const title = escapeHtml(post.title)
   const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ''))
   const image = escapeHtml(socialImageUrl(post.cover_image))
@@ -139,7 +139,9 @@ Deno.serve(async (req) => {
       })
     }
 
-    return new Response(renderHtml(post), {
+    // og:url usa a URL real desta função (https), que é o que o crawler está visitando
+    const shareUrl = `https://${url.host}${url.pathname}?slug=${post.slug}`
+    return new Response(renderHtml(post, shareUrl), {
       status: 200,
       headers: htmlHeaders,
     })
