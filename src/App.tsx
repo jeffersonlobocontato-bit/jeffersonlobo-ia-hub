@@ -13,6 +13,7 @@ import ResetPassword from "./pages/ResetPassword";
 import TesteIA from "./pages/TesteIA";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import Unsubscribe from "./pages/Unsubscribe";
+import Imprensa from "./pages/Imprensa";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import NotFound from "./pages/NotFound";
@@ -34,6 +35,7 @@ const App = () => (
               <Route path="/teste-ia" element={<TesteIA />} />
               <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
+              <Route path="/imprensa" element={<Imprensa />} />
               <Route path="/blog" element={<BlogIndex />} />
               <Route path="/blog/:slug" element={<BlogPost />} />
               <Route
