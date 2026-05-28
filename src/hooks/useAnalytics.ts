@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
+import { getTrafficAttribution } from '@/lib/traffic-source';
 
 // Generate or retrieve session ID
 const getSessionId = (): string => {
