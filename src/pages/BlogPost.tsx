@@ -82,11 +82,10 @@ const BlogPost = () => {
     ],
   };
 
-  // URL de compartilhamento aponta direto para a edge function que serve OG tags
-  // corretas (título, descrição e cover image) para crawlers do WhatsApp/LinkedIn/X.
-  // Humanos são redirecionados via JS para /blog/:slug.
-  const shareUrl = `https://cgydeldzhnfyexphaheq.supabase.co/functions/v1/blog-share?slug=${post.slug}`;
-  const sharePayload = encodeURIComponent(`${post.title} — ${shareUrl}`);
+  // URL estática de compartilhamento: crawlers do WhatsApp/LinkedIn/X leem
+  // este HTML público com OG tags antes do JavaScript redirecionar humanos.
+  const shareUrl = `${SITE_URL}/share/blog/${post.slug}/index.html`;
+  const sharePayload = encodeURIComponent(shareUrl);
 
   return (
     <div className="min-h-screen bg-background">
