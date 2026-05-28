@@ -104,8 +104,8 @@ Deno.serve(async (req) => {
         skipped++;
         await admin.from("press_sends").upsert({
           campaign_id, contact_id: c.id, canal: "email",
-          status: "pulado", erro: c.opt_out ? "opt_out" : "sem_email",
-        }, { onConflict: "campaign_id,contact_id,canal" });
+          status: "pulado", error: c.opt_out ? "opt_out" : "sem_email",
+        }, { onConflict: "campaign_id,contact_id" });
         continue;
       }
       try {
@@ -130,25 +130,26 @@ Deno.serve(async (req) => {
         const data = await r.json();
         if (!r.ok) {
           failed++;
-          errors.push({ id: c.id, error: `[${r.status}] ${JSON.stringify(data).slice(0, 200)}` });
+          const errMsg = `${r.status}: ${data?.message || data?.code || "erro"}`;
+          errors.push({ id: c.id, error: errMsg });
           await admin.from("press_sends").upsert({
             campaign_id, contact_id: c.id, canal: "email",
-            status: "falhou", erro: `${r.status}: ${data?.message || data?.code || "erro"}`,
-          }, { onConflict: "campaign_id,contact_id,canal" });
+            status: "erro", error: errMsg,
+          }, { onConflict: "campaign_id,contact_id" });
         } else {
           sent++;
           await admin.from("press_sends").upsert({
             campaign_id, contact_id: c.id, canal: "email",
-            status: "enviado", provider_id: data?.messageId || null, enviado_em: new Date().toISOString(),
-          }, { onConflict: "campaign_id,contact_id,canal" });
+            status: "enviado", message_id: data?.messageId || null, sent_at: new Date().toISOString(),
+          }, { onConflict: "campaign_id,contact_id" });
         }
       } catch (e) {
-        failed++;
         const msg = e instanceof Error ? e.message : "erro";
+        failed++;
         errors.push({ id: c.id, error: msg });
         await admin.from("press_sends").upsert({
-          campaign_id, contact_id: c.id, canal: "email", status: "falhou", erro: msg,
-        }, { onConflict: "campaign_id,contact_id,canal" });
+          campaign_id, contact_id: c.id, canal: "email", status: "erro", error: msg,
+        }, { onConflict: "campaign_id,contact_id" });
       }
       // throttle suave (~3/s)
       await new Promise((res) => setTimeout(res, 350));
