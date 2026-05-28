@@ -39,7 +39,7 @@ export const PressContactsTable = ({ selectedIds, setSelectedIds, contacts, relo
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
     return contacts.filter(c => {
-      if (regiao && c.regiao !== regiao) return false;
+      if (regioesSel.size > 0 && !regioesSel.has(c.regiao ?? '')) return false;
       if (meio && c.meio !== meio) return false;
       if (municipio && !c.municipio?.toLowerCase().includes(municipio.toLowerCase())) return false;
       if (hasEmail && !c.email) return false;
