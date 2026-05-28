@@ -1,6 +1,7 @@
 // Runs before `vite dev` and `vite build` (predev/prebuild hooks); writes public/sitemap.xml.
 // Pulls blog posts from Supabase to include /blog/:slug URLs.
 import { mkdirSync, rmSync, writeFileSync } from "fs";
+import { Buffer } from "buffer";
 import { resolve } from "path";
 
 const BASE_URL = "https://jeffersonlobo.tech";
@@ -69,12 +70,48 @@ function socialImageUrl(image?: string | null): string {
   return image;
 }
 
+function imageExtension(contentType: string, imageUrl: string): "jpg" | "png" | "webp" {
+  if (contentType.includes("webp")) return "webp";
+  if (contentType.includes("png")) return "png";
+  if (/\.webp($|\?)/i.test(imageUrl)) return "webp";
+  if (/\.png($|\?)/i.test(imageUrl)) return "png";
+  return "jpg";
+}
+
+async function cacheSocialImage(post: BlogPostRow, shareVersion: string): Promise<string> {
+  if (!post.cover_image) return FALLBACK_IMAGE;
+
+  const sourceUrl = socialImageUrl(post.cover_image);
+  const response = await fetch(sourceUrl, {
+    headers: {
+      "user-agent": "facebookexternalhit/1.1 (+https://www.facebook.com/externalhit_uatext.php)",
+    },
+  });
+
+  if (!response.ok) {
+    console.warn(`share image: failed for ${post.slug} (${response.status})`);
+    return sourceUrl;
+  }
+
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.startsWith("image/")) {
+    console.warn(`share image: invalid content type for ${post.slug}: ${contentType}`);
+    return sourceUrl;
+  }
+
+  const ext = imageExtension(contentType, sourceUrl);
+  const filename = `${post.slug}-${shareVersion}.${ext}`;
+  const bytes = Buffer.from(await response.arrayBuffer());
+  writeFileSync(resolve("public/og", filename), bytes);
+  return `${BASE_URL}/og/${filename}`;
+}
+
 function shareVersionFromDate(value?: string | null): string {
   const digits = (value || today).replace(/\D/g, "").slice(0, 12);
   return digits || today.replace(/\D/g, "");
 }
 
-function writeSharePages(posts: BlogPostRow[]) {
+async function writeSharePages(posts: BlogPostRow[]) {
   // A hospedagem da Lovable serve arquivos .html planos, mas não resolve
   // index.html em diretórios — qualquer path terminado em "/" cai no fallback
   // da SPA e retorna o index.html genérico. Por isso geramos arquivos planos
@@ -88,13 +125,17 @@ function writeSharePages(posts: BlogPostRow[]) {
   rmSync(legacyDir, { recursive: true, force: true });
   mkdirSync(legacyDir, { recursive: true });
 
+  const ogDir = resolve("public/og");
+  rmSync(ogDir, { recursive: true, force: true });
+  mkdirSync(ogDir, { recursive: true });
+
   for (const post of posts.filter((p) => p.slug)) {
     const postUrl = `${BASE_URL}/blog/${post.slug}`;
     const title = escapeHtml(post.title);
     const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ""));
-    const image = escapeHtml(socialImageUrl(post.cover_image));
     const imageAlt = escapeHtml(post.cover_alt || post.title);
     const shareVersion = shareVersionFromDate(post.updated_at || post.date);
+    const image = escapeHtml(await cacheSocialImage(post, shareVersion));
     const versionedShareUrl = `${BASE_URL}/noticia/${post.slug}-${shareVersion}.html`;
     const legacyShareUrl = `${BASE_URL}/noticia/${post.slug}.html`;
     const renderHtml = (shareUrl: string) => `<!doctype html>
@@ -157,7 +198,7 @@ async function fetchBlogPosts(): Promise<BlogPostRow[]> {
 
 async function main() {
   const blogPosts = await fetchBlogPosts();
-  writeSharePages(blogPosts);
+  await writeSharePages(blogPosts);
 
   const entries: SitemapEntry[] = [
     { path: "/", lastmod: today, changefreq: "weekly", priority: "1.0" },
