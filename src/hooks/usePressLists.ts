@@ -43,13 +43,13 @@ export const usePressLists = () => {
 
   const load = useCallback(async () => {
     setLoading(true);
+    const baseList = await loadBaseList();
     const { data: listRows } = await supabase
       .from('press_lists')
       .select('id, nome, descricao, created_at')
       .order('created_at', { ascending: false });
 
     if (!listRows?.length) {
-      const baseList = await loadBaseList();
       setLists(baseList ? [baseList] : []);
       setLoading(false);
       return;
@@ -71,7 +71,8 @@ export const usePressLists = () => {
       if (c.whatsapp) stats[m.list_id].com_whatsapp++;
     }
 
-    setLists(listRows.map(l => ({ ...l, ...stats[l.id] })));
+    const realLists = listRows.map(l => ({ ...l, ...stats[l.id] }));
+    setLists(baseList ? [baseList, ...realLists] : realLists);
     setLoading(false);
   }, []);
 
