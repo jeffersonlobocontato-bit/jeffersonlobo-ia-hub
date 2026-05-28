@@ -157,8 +157,8 @@ export default function CommercialLanding(props: CommercialLandingProps) {
 
         <LogosBarSection />
 
-        {/* PARA QUEM — fundo creme */}
-        <section className="bg-muted py-20 border-y-2 border-foreground">
+        {/* PARA QUEM — fundo SKY azul claro */}
+        <section className="bg-surface-sky py-20 border-y-2 border-foreground">
           <div className="container mx-auto px-4 max-w-5xl">
             <SectionHead
               kicker="Para quem é"
@@ -166,17 +166,21 @@ export default function CommercialLanding(props: CommercialLandingProps) {
             />
             <div className="grid md:grid-cols-2 gap-5">
               {props.forWho.map((item, i) => {
-                const accent = i % 3 === 1; // 1 a cada 3 em laranja
+                const palette = [
+                  { icon: "bg-primary", card: "bg-card" },
+                  { icon: "bg-secondary", card: "bg-surface-cream" },
+                  { icon: "bg-surface-mint", card: "bg-card" },
+                  { icon: "bg-surface-coral", card: "bg-card" },
+                ];
+                const p = palette[i % palette.length];
                 return (
                   <Card
                     key={i}
-                    className={`border-2 border-foreground bg-card rounded-none shadow-[5px_5px_0_hsl(var(--foreground))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_hsl(var(--foreground))] transition-all`}
+                    className={`border-2 border-foreground ${p.card} rounded-none shadow-[5px_5px_0_hsl(var(--foreground))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_hsl(var(--foreground))] transition-all`}
                   >
                     <CardContent className="p-6 flex gap-4 items-start">
                       <div
-                        className={`shrink-0 inline-flex h-9 w-9 items-center justify-center border-2 border-foreground ${
-                          accent ? "bg-secondary" : "bg-primary"
-                        }`}
+                        className={`shrink-0 inline-flex h-9 w-9 items-center justify-center border-2 border-foreground ${p.icon}`}
                       >
                         <Check className="w-5 h-5 text-foreground" />
                       </div>
