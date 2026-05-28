@@ -53,7 +53,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
   // reset ao abrir
   useEffect(() => {
     if (open) {
-      setStep(1); setCanal(null); setSelectedLists(new Set()); setSelectedRegions(new Set()); setContacts([]);
+      setStep(1); setCanal(null); setSelectedLists(new Set()); setSelectedRegions(new Set()); setExcludedIds(new Set()); setContacts([]);
       setNome(''); setSubject(DEFAULT_EMAIL_SUBJECT); setBody(DEFAULT_EMAIL_BODY);
       setEmailResult(null); setWaCampaignId(null); setWaSends({});
       reloadLists();
