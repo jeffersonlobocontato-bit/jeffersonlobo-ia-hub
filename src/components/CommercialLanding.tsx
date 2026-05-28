@@ -126,10 +126,9 @@ export default function CommercialLanding(props: CommercialLandingProps) {
       <Header />
 
       <main className="flex-1 pt-24">
-        {/* HERO */}
-        <section className="relative overflow-hidden bg-surface-lilac py-20 md:py-28 border-b-2 border-foreground">
-          <div className="absolute inset-0 z-0 bg-brand-grid opacity-60" />
-          <div className="absolute inset-x-0 bottom-0 h-2 bg-foreground z-10" />
+        {/* HERO — off-white sóbrio com grid amarelo sutil */}
+        <section className="relative overflow-hidden bg-background py-20 md:py-28 border-b-[3px] border-foreground">
+          <div className="absolute inset-0 z-0 bg-brand-grid opacity-40" />
           <div className="container mx-auto px-4 relative z-10 max-w-4xl text-center space-y-6 flex flex-col items-center">
             <Kicker>{props.kicker}</Kicker>
             <h1 className="display-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground">
@@ -157,91 +156,67 @@ export default function CommercialLanding(props: CommercialLandingProps) {
 
         <LogosBarSection />
 
-        {/* PARA QUEM — fundo SKY azul claro */}
-        <section className="bg-surface-sky py-20 border-y-2 border-foreground">
+        {/* PARA QUEM — bloco PRETO, cards brancos */}
+        <section className="bg-foreground py-20 border-y-[3px] border-foreground">
           <div className="container mx-auto px-4 max-w-5xl">
             <SectionHead
               kicker="Para quem é"
               title="Feito para lideranças que precisam de resultado real"
+              invert
             />
             <div className="grid md:grid-cols-2 gap-5">
-              {props.forWho.map((item, i) => {
-                const palette = [
-                  { icon: "bg-primary", card: "bg-card" },
-                  { icon: "bg-secondary", card: "bg-surface-cream" },
-                  { icon: "bg-surface-mint", card: "bg-card" },
-                  { icon: "bg-surface-coral", card: "bg-card" },
-                ];
-                const p = palette[i % palette.length];
-                return (
-                  <Card
-                    key={i}
-                    className={`border-2 border-foreground ${p.card} rounded-none shadow-[5px_5px_0_hsl(var(--foreground))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_hsl(var(--foreground))] transition-all`}
-                  >
-                    <CardContent className="p-6 flex gap-4 items-start">
-                      <div
-                        className={`shrink-0 inline-flex h-9 w-9 items-center justify-center border-2 border-foreground ${p.icon}`}
-                      >
-                        <Check className="w-5 h-5 text-foreground" />
-                      </div>
-                      <span className="text-foreground font-bold uppercase text-sm leading-relaxed">
-                        {item}
-                      </span>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+              {props.forWho.map((item, i) => (
+                <Card
+                  key={i}
+                  className="border-2 border-primary bg-card rounded-none shadow-[6px_6px_0_hsl(var(--primary))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_hsl(var(--primary))] transition-all"
+                >
+                  <CardContent className="p-6 flex gap-4 items-start">
+                    <div className="shrink-0 inline-flex h-9 w-9 items-center justify-center border-2 border-foreground bg-primary">
+                      <Check className="w-5 h-5 text-foreground" />
+                    </div>
+                    <span className="text-foreground font-bold uppercase text-sm leading-relaxed">
+                      {item}
+                    </span>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* O QUE ENTREGA — bloco PRETO de impacto */}
-        <section className="bg-foreground py-24 relative overflow-hidden">
-          <div className="absolute inset-0 bg-brand-grid opacity-10" />
+        {/* O QUE ENTREGA — branco com cards pretos */}
+        <section className="bg-background py-24 relative overflow-hidden border-b-[3px] border-foreground">
+          <div className="absolute inset-0 bg-brand-grid opacity-25" />
           <div className="container mx-auto px-4 max-w-5xl relative z-10">
             <SectionHead
               kicker="O que você leva"
               title="Entregas concretas, não slides genéricos"
-              invert
             />
             <div className="grid md:grid-cols-3 gap-6">
-              {props.deliverables.map((d, i) => {
-                const accent = i === 1;
-                return (
-                  <Card
-                    key={i}
-                    className={`rounded-none border-2 ${
-                      accent ? "border-secondary" : "border-primary"
-                    } bg-background/5 backdrop-blur shadow-[6px_6px_0_hsl(var(--primary))] ${
-                      accent ? "shadow-[6px_6px_0_hsl(var(--secondary))]" : ""
-                    } hover:translate-x-[-2px] hover:translate-y-[-2px] transition-all`}
-                  >
-                    <CardContent className="p-6 space-y-4">
-                      <div
-                        className={`inline-flex h-12 w-12 items-center justify-center border-2 ${
-                          accent
-                            ? "border-secondary bg-secondary"
-                            : "border-primary bg-primary"
-                        }`}
-                      >
-                        <Sparkles className="w-6 h-6 text-foreground" />
-                      </div>
-                      <h3 className="text-lg font-black uppercase text-background tracking-tight">
-                        {d.title}
-                      </h3>
-                      <p className="text-sm text-background/75 leading-relaxed">
-                        {d.description}
-                      </p>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+              {props.deliverables.map((d, i) => (
+                <Card
+                  key={i}
+                  className="rounded-none border-2 border-foreground bg-foreground shadow-[6px_6px_0_hsl(var(--primary))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_hsl(var(--primary))] transition-all"
+                >
+                  <CardContent className="p-6 space-y-4">
+                    <div className="inline-flex h-12 w-12 items-center justify-center border-2 border-primary bg-primary">
+                      <Sparkles className="w-6 h-6 text-foreground" />
+                    </div>
+                    <h3 className="text-lg font-black uppercase text-background tracking-tight">
+                      {d.title}
+                    </h3>
+                    <p className="text-sm text-background/75 leading-relaxed">
+                      {d.description}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
             </div>
           </div>
         </section>
 
-        {/* FORMATOS — fundo CREME */}
-        <section className="bg-surface-cream py-20 border-y-2 border-foreground">
+        {/* FORMATOS — branco, badges pretas (uma amarela em destaque) */}
+        <section className="bg-background py-20 border-b-[3px] border-foreground">
           <div className="container mx-auto px-4 max-w-5xl">
             <SectionHead
               kicker="Formatos disponíveis"
@@ -249,8 +224,10 @@ export default function CommercialLanding(props: CommercialLandingProps) {
             />
             <div className="space-y-4">
               {props.formats.map((f, i) => {
-                const badges = ["bg-primary", "bg-secondary", "bg-surface-mint", "bg-surface-sky"];
-                const badge = badges[i % badges.length];
+                const highlight = i === 1; // um único destaque amarelo por LP
+                const badge = highlight
+                  ? "bg-primary text-foreground"
+                  : "bg-foreground text-background";
                 return (
                   <Card
                     key={i}
@@ -263,7 +240,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
                         </h3>
                         <p className="text-sm text-muted-foreground">{f.description}</p>
                       </div>
-                      <div className={`text-xs uppercase font-black text-foreground border-2 border-foreground ${badge} px-4 py-2 w-fit shadow-[3px_3px_0_hsl(var(--foreground))]`}>
+                      <div className={`text-xs uppercase font-black border-2 border-foreground ${badge} px-4 py-2 w-fit shadow-[3px_3px_0_hsl(var(--foreground))]`}>
                         {f.duration}
                       </div>
                     </CardContent>
@@ -277,8 +254,8 @@ export default function CommercialLanding(props: CommercialLandingProps) {
         <TrustBarSection />
         <StagePhotosSection />
 
-        {/* FAQ — fundo PÊSSEGO */}
-        <section className="bg-surface-peach py-20 border-y-2 border-foreground">
+        {/* FAQ — branco com divisores pretos espessos */}
+        <section className="bg-background py-20 border-y-[3px] border-foreground">
           <div className="container mx-auto px-4 max-w-3xl">
             <SectionHead kicker="Perguntas frequentes" title="Dúvidas comuns" />
             <Accordion type="single" collapsible className="w-full">
@@ -300,8 +277,8 @@ export default function CommercialLanding(props: CommercialLandingProps) {
           </div>
         </section>
 
-        {/* CTA FINAL — bloco AMARELO de fechamento */}
-        <section className="bg-primary py-24 border-t-2 border-foreground relative overflow-hidden">
+        {/* CTA FINAL — único bloco em amarelo cheio */}
+        <section className="bg-primary py-24 border-t-[3px] border-foreground relative overflow-hidden">
           <div className="absolute inset-0 bg-brand-grid opacity-20" />
           <div className="container mx-auto px-4 max-w-3xl text-center space-y-6 relative z-10 flex flex-col items-center">
             <Kicker>Próximo passo</Kicker>
