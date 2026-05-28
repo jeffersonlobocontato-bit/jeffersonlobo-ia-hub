@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus, RefreshCw, Upload, ArrowUp, ArrowDown } from 'lucide-react';
+import { StagePhotoCropEditor } from './StagePhotoCropEditor';
 
 type StagePhoto = {
   id: string;
@@ -15,6 +16,9 @@ type StagePhoto = {
   caption: string | null;
   display_order: number;
   active: boolean | null;
+  focal_x: number;
+  focal_y: number;
+  zoom: number;
 };
 
 const AdminStagePhotosTab = () => {
@@ -30,7 +34,12 @@ const AdminStagePhotosTab = () => {
       .select('*')
       .order('display_order');
     if (error) toast({ title: 'Erro ao carregar', description: error.message, variant: 'destructive' });
-    setItems((data ?? []) as StagePhoto[]);
+    setItems(((data ?? []) as any[]).map((r) => ({
+      ...r,
+      focal_x: r.focal_x ?? 50,
+      focal_y: r.focal_y ?? 50,
+      zoom: r.zoom ?? 1,
+    })) as StagePhoto[]);
     setLoading(false);
   };
 
@@ -48,7 +57,10 @@ const AdminStagePhotosTab = () => {
         caption: item.caption,
         display_order: item.display_order,
         active: item.active,
-      })
+        focal_x: item.focal_x,
+        focal_y: item.focal_y,
+        zoom: item.zoom,
+      } as any)
       .eq('id', item.id);
     if (error) toast({ title: 'Erro ao salvar', description: error.message, variant: 'destructive' });
     else toast({ title: 'Foto atualizada' });
@@ -207,6 +219,15 @@ const AdminStagePhotosTab = () => {
                   placeholder="Ex.: Keynote para conselho e diretoria"
                 />
               </div>
+
+              <StagePhotoCropEditor
+                imageUrl={item.image_url}
+                focalX={item.focal_x}
+                focalY={item.focal_y}
+                zoom={item.zoom}
+                onChange={(next) => update(item.id, next)}
+              />
+
               <Button size="sm" className="w-full" onClick={() => save(item)}>
                 Salvar alterações
               </Button>
