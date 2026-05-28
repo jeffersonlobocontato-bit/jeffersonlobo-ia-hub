@@ -4,7 +4,7 @@ import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, FunnelChart, Funnel, LabelList } from 'recharts';
-import { Users, Eye, Clock, MousePointer, TrendingUp, Activity } from 'lucide-react';
+import { Users, Eye, Clock, MousePointer, TrendingUp, Activity, Globe } from 'lucide-react';
 import { Heatmap } from './Heatmap';
 
 interface AnalyticsSummary {
