@@ -1,6 +1,8 @@
 import { useCallback, useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 
+export const BASE_PRESS_LIST_ID = '__base_completa_segmentada__';
+
 export type PressList = {
   id: string;
   nome: string;
@@ -9,6 +11,30 @@ export type PressList = {
   total: number;
   com_email: number;
   com_whatsapp: number;
+  virtual?: boolean;
+};
+
+const loadBaseList = async (): Promise<PressList | null> => {
+  const { data } = await supabase
+    .from('press_contacts')
+    .select('email, whatsapp, opt_out, created_at')
+    .order('created_at', { ascending: false })
+    .limit(5000);
+
+  const contacts = (data ?? []) as Array<{ email: string | null; whatsapp: string | null; opt_out: boolean | null; created_at: string | null }>;
+  if (!contacts.length) return null;
+
+  const eligible = contacts.filter(c => !c.opt_out);
+  return {
+    id: BASE_PRESS_LIST_ID,
+    nome: 'Base completa segmentada',
+    descricao: 'Todos os contatos importados, filtráveis por região e veículo',
+    created_at: contacts[0]?.created_at ?? new Date().toISOString(),
+    total: eligible.length,
+    com_email: eligible.filter(c => !!c.email).length,
+    com_whatsapp: eligible.filter(c => !!c.whatsapp).length,
+    virtual: true,
+  };
 };
 
 export const usePressLists = () => {
@@ -23,7 +49,8 @@ export const usePressLists = () => {
       .order('created_at', { ascending: false });
 
     if (!listRows?.length) {
-      setLists([]);
+      const baseList = await loadBaseList();
+      setLists(baseList ? [baseList] : []);
       setLoading(false);
       return;
     }
@@ -59,6 +86,23 @@ export const fetchContactsForLists = async (
   canal: 'email' | 'whatsapp',
 ) => {
   if (!listIds.length) return [];
+
+  if (listIds.includes(BASE_PRESS_LIST_ID)) {
+    const { data } = await supabase
+      .from('press_contacts')
+      .select('*')
+      .order('regiao', { ascending: true })
+      .order('municipio', { ascending: true })
+      .limit(5000);
+
+    return ((data ?? []) as any[]).filter(c => {
+      if (!c || c.opt_out) return false;
+      if (canal === 'email' && !c.email) return false;
+      if (canal === 'whatsapp' && !c.whatsapp) return false;
+      return true;
+    });
+  }
+
   const { data } = await supabase
     .from('press_list_members')
     .select('contact_id, press_contacts!inner(*)')
