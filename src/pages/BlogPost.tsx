@@ -158,6 +158,9 @@ const BlogPost = () => {
         {post.cover_image && <meta name="twitter:image" content={post.cover_image} />}
         <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
+        {faqJsonLd && (
+          <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
+        )}
       </Helmet>
 
       <ReadingProgress />
