@@ -136,6 +136,10 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
             <label className="text-sm font-bold uppercase">2. Selecione o arquivo (.xlsx ou .csv)</label>
             <Input type="file" accept=".xlsx,.xls,.csv" onChange={onFile} className="mt-2" />
           </div>
+
+          {sheetNames.length > 1 && (
+            <div>
+              <label className="text-sm font-bold uppercase">3. Aba da planilha</label>
               <select
                 className="mt-2 w-full border border-input rounded-md px-3 py-2 bg-background"
                 value={selectedSheet}
