@@ -71,6 +71,53 @@ const competenciaLabels: Record<string, string> = {
   governanca: "Governança",
 };
 
+// Caminhos de influência por competência — orientação sutil, NÃO pitch de venda.
+// O leitor é o agente: "proponha", "sugira", "leve a pauta para…".
+const caminhoPorCompetencia: Record<string, { pf: string; pj: string }> = {
+  estrategia: {
+    pf: "Proponha à sua liderança uma palestra executiva de IA para alinhar a visão antes de qualquer roadmap.",
+    pj: "Uma keynote estratégica com referência externa acelera o alinhamento do C-level antes do roadmap.",
+  },
+  processos: {
+    pf: "Sugira ao seu time uma imersão prática para mapear e redesenhar processos com IA.",
+    pj: "Workshop hands-on de redesenho de processos com IA destrava ganhos rápidos e mensuráveis.",
+  },
+  dados: {
+    pf: "Indique uma consultoria de diagnóstico de dados antes da empresa escalar iniciativas de IA.",
+    pj: "Consultoria estratégica de dados evita stacks caras sem fundação — diagnóstico primeiro, ferramenta depois.",
+  },
+  ferramentas: {
+    pf: "Leve para sua área um workshop de ferramentas de IA generativa aplicado ao dia a dia.",
+    pj: "Workshop de adoção guiada reduz custo de teste-e-erro e padroniza o uso entre times.",
+  },
+  pessoas: {
+    pf: "Proponha uma palestra de sensibilização seguida de trilha de capacitação para o time.",
+    pj: "Programa de champions + palestras internas forma multiplicadores e acelera adoção cultural.",
+  },
+  etica: {
+    pf: "Indique uma palestra sobre IA responsável para jurídico, RH e liderança.",
+    pj: "Imersão de ética e compliance em IA protege a marca antes do primeiro incidente público.",
+  },
+  seguranca: {
+    pf: "Sugira um diagnóstico de segurança em uso de IA antes da adoção em massa.",
+    pj: "Consultoria de segurança define guardrails antes do shadow AI virar exposição de dados.",
+  },
+  governanca: {
+    pf: "Proponha à diretoria uma consultoria para estruturar a governança de IA da empresa.",
+    pj: "Consultoria de governança formaliza papéis, comitês e políticas — base para escalar com segurança.",
+  },
+};
+
+function pickCaminho(competenciaKey: string, finalidade: Finalidade): string {
+  const c = caminhoPorCompetencia[competenciaKey];
+  if (!c) {
+    return finalidade === "PJ"
+      ? "Vale considerar um programa sob medida (palestra, workshop ou consultoria) para acelerar esse avanço com sua equipe."
+      : "Vale propor à sua liderança um programa sob medida — palestra, workshop ou consultoria — para acelerar esse avanço.";
+  }
+  return finalidade === "PJ" ? c.pj : c.pf;
+}
+
 function pickAcoes(rec: PdfRecommendation, finalidade: Finalidade) {
   const isPJ = finalidade === "PJ";
   return {
