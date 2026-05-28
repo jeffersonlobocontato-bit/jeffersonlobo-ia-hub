@@ -276,6 +276,53 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
                 ))}
               </div>
             )}
+
+            {/* FILTRO POR REGIÃO */}
+            {selectedLists.size > 0 && regionCounts.length > 0 && (
+              <Card className="p-3 space-y-2">
+                <div className="flex items-center justify-between flex-wrap gap-2">
+                  <div className="text-xs uppercase font-bold">
+                    Filtrar por região <span className="text-muted-foreground font-normal normal-case">(opcional — nenhuma selecionada = todas)</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => setSelectedRegions(new Set(regionCounts.map(([r]) => r)))}
+                    >
+                      Marcar todas
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => setSelectedRegions(new Set())}
+                      disabled={selectedRegions.size === 0}
+                    >
+                      Limpar
+                    </Button>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {regionCounts.map(([r, n]) => {
+                    const active = selectedRegions.has(r);
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        onClick={() => toggleRegion(r)}
+                        className={`px-3 py-1.5 rounded-full border-2 text-xs font-bold uppercase transition-colors ${
+                          active
+                            ? 'bg-primary text-primary-foreground border-primary'
+                            : 'bg-transparent border-border hover:border-primary'
+                        }`}
+                      >
+                        {r} <span className="font-mono opacity-70">({n})</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </Card>
+            )}
           </div>
         )}
 
