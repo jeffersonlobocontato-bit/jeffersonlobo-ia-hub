@@ -9,6 +9,12 @@ import { TesteIADashboard } from "@/components/teste-ia/TesteIADashboard";
 type Etapa = "gate" | "questionario" | "resultado";
 const STORAGE_KEY = "ia_maturity_progress_v1";
 
+const isEtapa = (value: unknown): value is Etapa =>
+  value === "gate" || value === "questionario" || value === "resultado";
+
+const isUuid = (value: unknown): value is string =>
+  typeof value === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+
 export default function TesteIA() {
   const [etapa, setEtapa] = useState<Etapa>("gate");
   const [leadId, setLeadId] = useState<string>("");
@@ -26,14 +32,19 @@ export default function TesteIA() {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const saved = JSON.parse(raw);
-        if (saved.leadId && saved.etapa && saved.accessToken) {
+        const savedEtapa = isEtapa(saved.etapa) ? saved.etapa : "gate";
+        if (savedEtapa !== "gate" && isUuid(saved.leadId) && isUuid(saved.accessToken)) {
           setLeadId(saved.leadId);
           setAccessToken(saved.accessToken);
           setFinalidade(saved.finalidade || "PF");
-          setEtapa(saved.etapa);
+          setEtapa(savedEtapa);
+        } else {
+          localStorage.removeItem(STORAGE_KEY);
         }
       }
-    } catch {}
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+    }
   }, []);
 
   // Persist progress
@@ -73,16 +84,38 @@ export default function TesteIA() {
           />
         )}
         {etapa === "questionario" && (
-          <TesteIAQuestionario
-            leadId={leadId}
-            accessToken={accessToken}
-            finalidade={finalidade}
-            onComplete={() => setEtapa("resultado")}
-            onRestart={resetProgress}
-          />
+          isUuid(leadId) && isUuid(accessToken) ? (
+            <TesteIAQuestionario
+              leadId={leadId}
+              accessToken={accessToken}
+              finalidade={finalidade}
+              onComplete={() => setEtapa("resultado")}
+              onRestart={resetProgress}
+            />
+          ) : (
+            <TesteIAGate
+              onComplete={(id, tipo, token) => {
+                setLeadId(id);
+                setAccessToken(token);
+                setFinalidade(tipo);
+                setEtapa("questionario");
+              }}
+            />
+          )
         )}
         {etapa === "resultado" && (
-          <TesteIADashboard leadId={leadId} accessToken={accessToken} onRestart={resetProgress} />
+          isUuid(leadId) && isUuid(accessToken) ? (
+            <TesteIADashboard leadId={leadId} accessToken={accessToken} onRestart={resetProgress} />
+          ) : (
+            <TesteIAGate
+              onComplete={(id, tipo, token) => {
+                setLeadId(id);
+                setAccessToken(token);
+                setFinalidade(tipo);
+                setEtapa("questionario");
+              }}
+            />
+          )
         )}
       </main>
       <Footer />
