@@ -438,6 +438,24 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
     cy += lines.length * 5 + 2;
   });
 
+  // Assinatura manuscrita (sobre o fundo escuro, antes da caixa de contato)
+  if (signatureDataUrl) {
+    cy += 4;
+    const sigW = 55;
+    const sigH = sigW * (216 / 673); // mantém proporção original
+    try {
+      pdf.addImage(signatureDataUrl, "PNG", M, cy, sigW, sigH);
+    } catch (e) {
+      console.warn("Falha ao inserir assinatura no PDF:", e);
+    }
+    cy += sigH + 1;
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(9);
+    pdf.setTextColor(180, 180, 180);
+    pdf.text("Jefferson Lobo · Estrategista de IA", M, cy);
+    cy += 6;
+  }
+
   // Caixa de contato
   cy += 6;
   const boxH = 66;
