@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useId, cloneElement, isValidElement, Children } from 'react';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -214,11 +214,18 @@ const BriefingForm = () => {
   );
 };
 
-const Field = ({ label, children }: { label: string; children: React.ReactNode }) => (
-  <div className="space-y-1.5">
-    <Label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</Label>
-    {children}
-  </div>
-);
+const Field = ({ label, children }: { label: string; children: React.ReactNode }) => {
+  const id = useId();
+  const child = Children.only(children);
+  const enhanced = isValidElement(child)
+    ? cloneElement(child as React.ReactElement<any>, { id: (child.props as any).id ?? id })
+    : child;
+  return (
+    <div className="space-y-1.5">
+      <Label htmlFor={id} className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</Label>
+      {enhanced}
+    </div>
+  );
+};
 
 export default BriefingForm;
