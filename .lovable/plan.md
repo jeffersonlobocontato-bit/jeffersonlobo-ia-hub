@@ -1,121 +1,108 @@
 
-## Contexto
+# Módulo Imprensa — Mensageria Email + WhatsApp
 
-O blog já está completo:
-- Tabela `blog_posts`, página `/blog`, página `/blog/:slug`, seção na home com últimos posts
-- Admin com editor markdown, capa, SEO title/description, tags
-- `Article` + `BreadcrumbList` JSON-LD em cada post; `Person` rico sitewide
-- Sitemap dinâmico via `scripts/generate-sitemap.ts`, robots, OG/Twitter cards
+## Stack decidida
+- **Email**: Lovable Emails (nativo, já com fila/retry/logs). Precisa configurar domínio remetente (ex.: `notify.jeffersonlobo.tech`) — passo único.
+- **WhatsApp**: link `wa.me` 1-a-1 assistido. Zero custo, zero risco de banimento, tom certo para imprensa. Arquitetura preparada para plugar Twilio/Meta Cloud API depois sem reescrever.
+- **Compliance básico**: rodapé com descadastro no email + flag `opt_out` + supressão automática.
 
-Vamos focar apenas no que falta para **GEO** (indexação por ChatGPT, Perplexity, Gemini, Claude).
+## Base que será importada (planilha auditada)
 
-## O que vai mudar
+- **988 contatos** • 8 regiões (Campos Gerais, etc.) • 311 municípios • 847 veículos
+- Aba **BASE COMPLETA** usada como fonte única (497 com email, 708 com WhatsApp)
+- Schema da tabela `press_contacts` espelha exatamente as colunas da planilha:
 
-### 1. Permitir explicitamente crawlers de IA (`public/robots.txt`)
-Hoje o robots tem `Allow: /` genérico. LLMs usam User-Agents próprios que muitos sites bloqueiam por padrão — vamos liberar de forma explícita pra deixar claro que o conteúdo é indexável:
-
-```
-User-agent: GPTBot
-Allow: /
-
-User-agent: OAI-SearchBot
-Allow: /
-
-User-agent: ChatGPT-User
-Allow: /
-
-User-agent: PerplexityBot
-Allow: /
-
-User-agent: Perplexity-User
-Allow: /
-
-User-agent: ClaudeBot
-Allow: /
-
-User-agent: Claude-Web
-Allow: /
-
-User-agent: Google-Extended
-Allow: /
-
-User-agent: Applebot-Extended
-Allow: /
-
-User-agent: CCBot
-Allow: /
+```text
+press_contacts
+  id                uuid pk
+  regiao            text          -- "Campos Gerais", "Norte", ...
+  focal             text          -- responsável regional (Fábio, etc.)
+  municipio         text
+  censo_ibge_2022   integer       -- população (útil para priorizar)
+  veiculo           text          -- nome do veículo
+  meio              text          -- Rádio | TV | Internet | Facebook | Impresso
+  contato           text          -- nome da pessoa (pode ser NULL)
+  cargo             text          -- Diretor, Redação, Repórter...
+  telefone          text (E.164)
+  whatsapp          text (E.164)
+  email             text          -- lower(trim), index único parcial
+  endereco          text
+  site              text
+  tags              text[]        -- liberdade para o admin segmentar
+  opt_out           bool default false
+  notas             text
+  created_at, updated_at
 ```
 
-### 2. Criar `public/llms.txt`
-Padrão emergente (llmstxt.org) que LLMs leem para mapear o site. Arquivo estático no formato:
+Constraints: ao menos um entre `email` e `whatsapp` obrigatório; emails únicos (case-insensitive).
 
-```
-# Jefferson Lobo
-> Palestrante, autor e consultor em IA aplicada a negócios, marketing e lideranças.
+## Entregas (MVP)
 
-## Blog
-- [Título do post](https://jeffersonlobo.tech/blog/slug): excerpt curto
-- ...
+### 1. Nova aba "Imprensa" no /admin
+- Tabela com busca livre + filtros por **região, município, veículo, meio, cargo, focal, tags, tem email, tem whatsapp, opt-out**.
+- CRUD completo de contato.
+- **Importar XLSX/CSV**: upload → detecta automaticamente os headers da planilha que você acabou de mandar (REGIAO, MUNICÍPIO, VEÍCULO, MEIO, CONTATO, CARGO, TELEFONE, WHATSAPP, EMAIL, ENDEREÇO, SITE, CENSO_IBGE_2022, FOCAL) → preview com contagem de novos/duplicados/inválidos → confirma → bulk insert com upsert por email/whatsapp.
+- Normalização no import: telefone/WhatsApp → E.164 (regex tira `.`, `+`, espaços; assume Brasil se faltar DDI), email → lowercase/trim, valida regex.
+- Exportar CSV da seleção atual.
 
-## Páginas principais
-- [Palestras](https://jeffersonlobo.tech/palestras): ...
-- [Teste de Maturidade em IA](https://jeffersonlobo.tech/teste-ia): ...
-```
+### 2. Campanhas de Email
+- Editor: assunto, corpo (markdown), preview ao vivo.
+- **Variáveis**: `{{contato}}`, `{{primeiro_nome}}`, `{{veiculo}}`, `{{municipio}}`, `{{regiao}}`, `{{cargo}}`. Fallback automático ("Olá redação do {{veiculo}}") quando `contato` for NULL.
+- **Segmentação**: usa os mesmos filtros da tabela + seleção manual via checkbox.
+- Disparo via `enqueue_email` (infra Lovable Emails já existe no projeto, vi `enqueue_email` nas funções DB) com `template_name = 'press_campaign'` e header de unsubscribe.
+- Rodapé automático com link `/unsubscribe?token=...` reaproveitando `email_unsubscribe_tokens`.
+- Métricas: total enviado / falhas / suprimidos / opt-outs, lendo `email_send_log` filtrado.
 
-Gerado dinamicamente pelo mesmo `scripts/generate-sitemap.ts` (já roda em `predev`/`prebuild`), puxando os posts ativos do Supabase.
+### 3. Campanhas de WhatsApp (modo manual assistido)
+- Editor com as mesmas variáveis.
+- Lista filtrada de contatos com WhatsApp válido → botão **"Abrir WhatsApp"** em cada linha gera `https://wa.me/<E164>?text=<mensagem renderizada>`.
+- Modo "fila": botão "próximo" abre o WhatsApp em nova aba, marca o atual como `enviado` em `press_sends`, e avança automaticamente.
+- Contador de progresso (enviados / pendentes) por campanha.
 
-### 3. TL;DR / Resumo executivo no topo de cada post (`BlogPost.tsx`)
-LLMs priorizam o início do conteúdo. Vamos renderizar um bloco "TL;DR" visualmente destacado logo após o cabeçalho, alimentado pelo campo `excerpt` (já existe) ou pelo `subtitle`. Sem nova coluna no banco. HTML semântico (`<aside aria-label="Resumo">`) pra IA pegar fácil.
+### 4. Métricas e histórico
+- Aba "Histórico" lista campanhas (tipo, data, filtro, total alvo, enviados, falhas).
+- Drill-down por campanha mostra cada contato e status.
 
-### 4. Sumário automático com âncoras (`BlogContent.tsx`)
-Gerar índice (`<nav>` no início do post) com âncoras pros `<h2>`/`<h3>` do markdown. Ajuda LLMs a entender estrutura e aumenta dwell time. Pequeno componente `BlogTOC` calculado a partir do markdown.
+## Tabelas novas (RLS admin-only)
 
-### 5. JSON-LD: enriquecer `Article` (`BlogPost.tsx`)
-Adicionar campos que LLMs valorizam:
-- `wordCount` (calculado do markdown)
-- `inLanguage: "pt-BR"`
-- `isAccessibleForFree: true`
-- `about` (array de Things com nome = tags principais)
-- `speakable` (`SpeakableSpecification` apontando pro título e TL;DR) — sinal para assistentes de voz e LLMs
-
-### 6. FAQ opcional por post (somente quando o admin preencher)
-Adicionar coluna `faq jsonb` em `blog_posts` (array `[{q, a}]`). No admin, campo opcional. Quando preenchido:
-- Renderiza seção `<section aria-label="Perguntas frequentes">` no final do post
-- Injeta `FAQPage` JSON-LD adicional
-
-Migration:
-```sql
-ALTER TABLE public.blog_posts ADD COLUMN IF NOT EXISTS faq jsonb DEFAULT '[]'::jsonb;
+```text
+press_contacts      (988 registros vindos da planilha)
+press_campaigns     id, tipo('email'|'whatsapp'), assunto, corpo,
+                    filtros jsonb, status, created_by, sent_at
+press_sends         id, campaign_id, contact_id, canal, status,
+                    message_id (correlaciona email_send_log),
+                    sent_at, error
 ```
 
-### 7. Indexação do `/blog` (índice) — `BlogIndex.tsx`
-Adicionar `CollectionPage` + `ItemList` JSON-LD listando todos os posts. Sinal claro pra LLMs de que `/blog` é o hub.
+Todas com policies `has_role(auth.uid(),'admin')` + GRANTs corretos.
 
-## O que NÃO vai mudar
-- Visual da seção `BlogSection` na home (já está OK)
-- Estrutura da página `/blog` e `/blog/:slug` (só adições pontuais)
-- Admin (apenas + um campo opcional de FAQ)
-- Sitemap, robots já existem — apenas estendidos
-- Schema Person sitewide (já está rico)
+## Edge Function
 
-## Arquivos afetados
+- `send-press-email`: recebe `campaign_id`, busca contatos do filtro com email válido e `opt_out=false`, renderiza variáveis, enfileira no `auth_emails`/`transactional_emails` via `enqueue_email`, registra `press_sends` com `message_id`.
 
-```
-public/robots.txt                         (editar — adicionar UAs de IA)
-scripts/generate-sitemap.ts               (estender — gerar também llms.txt)
-src/pages/BlogPost.tsx                    (TL;DR, Article enriquecido)
-src/components/blog/BlogContent.tsx       (sumário com âncoras)
-src/components/blog/BlogTOC.tsx           (novo)
-src/components/blog/BlogFAQ.tsx           (novo, condicional)
-src/pages/BlogIndex.tsx                   (CollectionPage JSON-LD)
-src/components/admin/AdminBlogTab.tsx     (campo FAQ opcional)
-supabase/migrations/<timestamp>_blog_faq.sql  (coluna faq jsonb)
+## Fluxo do usuário
+
+```text
+1. Admin → aba Imprensa → "Importar planilha"
+2. Upload de mailing_imprensa_LIMPO.xlsx → preview → confirmar
+   → 988 contatos importados, deduplicados por email/whatsapp
+3. Filtra (ex.: REGIAO = Campos Gerais, MEIO = Rádio)
+4. "Nova campanha" → Email
+5. Escreve assunto + corpo com {{primeiro_nome}}, {{veiculo}}
+6. "Disparar" → fila processa, métricas atualizam
+7. Para WhatsApp: mesma campanha mas tipo whatsapp →
+   abre 1-a-1 pelo wa.me, marca enviado automaticamente
 ```
 
-## Resultado esperado
-- LLMs (ChatGPT, Perplexity, Gemini, Claude) com permissão explícita e mapa do site (`llms.txt`)
-- Cada post otimizado para "snippet de IA": TL;DR no topo, sumário, FAQ schema quando aplicável
-- Article JSON-LD mais rico (wordCount, language, speakable, about)
-- `/blog` reconhecido como hub editorial via CollectionPage
+## Fora do MVP (deixar para v2)
+- Tracking de abertura/clique (Lovable Emails não fornece nativo — exigiria migrar para Brevo/Resend).
+- WhatsApp em massa automatizado (Twilio + Meta Cloud API + templates aprovados).
+- Agendamento e A/B test.
+- Webhook de respostas do WhatsApp.
 
-Sem mudanças visuais radicais — é otimização técnica.
+## Pré-requisitos antes de construir
+1. Configurar domínio remetente do email (será solicitado via diálogo nativo do Lovable assim que entrarmos em build).
+2. Confirmar este plano.
+
+Aprova para entrar em build?
+

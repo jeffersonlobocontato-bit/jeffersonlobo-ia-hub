@@ -938,6 +938,174 @@ export type Database = {
         }
         Relationships: []
       }
+      press_campaigns: {
+        Row: {
+          assunto: string | null
+          corpo: string
+          created_at: string
+          created_by: string | null
+          filtros: Json
+          id: string
+          nome: string
+          sent_at: string | null
+          status: string
+          tipo: string
+          total_alvo: number
+          total_enviado: number
+          total_erro: number
+          updated_at: string
+        }
+        Insert: {
+          assunto?: string | null
+          corpo: string
+          created_at?: string
+          created_by?: string | null
+          filtros?: Json
+          id?: string
+          nome: string
+          sent_at?: string | null
+          status?: string
+          tipo: string
+          total_alvo?: number
+          total_enviado?: number
+          total_erro?: number
+          updated_at?: string
+        }
+        Update: {
+          assunto?: string | null
+          corpo?: string
+          created_at?: string
+          created_by?: string | null
+          filtros?: Json
+          id?: string
+          nome?: string
+          sent_at?: string | null
+          status?: string
+          tipo?: string
+          total_alvo?: number
+          total_enviado?: number
+          total_erro?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      press_contacts: {
+        Row: {
+          cargo: string | null
+          censo_ibge_2022: number | null
+          contato: string | null
+          created_at: string
+          email: string | null
+          endereco: string | null
+          focal: string | null
+          id: string
+          meio: string | null
+          municipio: string | null
+          notas: string | null
+          opt_out: boolean
+          regiao: string | null
+          site: string | null
+          tags: string[] | null
+          telefone: string | null
+          updated_at: string
+          veiculo: string
+          whatsapp: string | null
+        }
+        Insert: {
+          cargo?: string | null
+          censo_ibge_2022?: number | null
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          focal?: string | null
+          id?: string
+          meio?: string | null
+          municipio?: string | null
+          notas?: string | null
+          opt_out?: boolean
+          regiao?: string | null
+          site?: string | null
+          tags?: string[] | null
+          telefone?: string | null
+          updated_at?: string
+          veiculo: string
+          whatsapp?: string | null
+        }
+        Update: {
+          cargo?: string | null
+          censo_ibge_2022?: number | null
+          contato?: string | null
+          created_at?: string
+          email?: string | null
+          endereco?: string | null
+          focal?: string | null
+          id?: string
+          meio?: string | null
+          municipio?: string | null
+          notas?: string | null
+          opt_out?: boolean
+          regiao?: string | null
+          site?: string | null
+          tags?: string[] | null
+          telefone?: string | null
+          updated_at?: string
+          veiculo?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
+      press_sends: {
+        Row: {
+          campaign_id: string
+          canal: string
+          contact_id: string
+          created_at: string
+          error: string | null
+          id: string
+          message_id: string | null
+          sent_at: string | null
+          status: string
+        }
+        Insert: {
+          campaign_id: string
+          canal: string
+          contact_id: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          message_id?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Update: {
+          campaign_id?: string
+          canal?: string
+          contact_id?: string
+          created_at?: string
+          error?: string | null
+          id?: string
+          message_id?: string | null
+          sent_at?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "press_campaigns"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "press_sends_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "press_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scroll_events: {
         Row: {
           created_at: string
