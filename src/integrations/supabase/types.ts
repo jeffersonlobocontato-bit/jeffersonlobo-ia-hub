@@ -1055,6 +1055,66 @@ export type Database = {
         }
         Relationships: []
       }
+      press_list_members: {
+        Row: {
+          contact_id: string
+          created_at: string
+          list_id: string
+        }
+        Insert: {
+          contact_id: string
+          created_at?: string
+          list_id: string
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string
+          list_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_list_members_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "press_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "press_list_members_list_id_fkey"
+            columns: ["list_id"]
+            isOneToOne: false
+            referencedRelation: "press_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      press_lists: {
+        Row: {
+          created_at: string
+          created_by: string | null
+          descricao: string | null
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string | null
+          descricao?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       press_sends: {
         Row: {
           campaign_id: string

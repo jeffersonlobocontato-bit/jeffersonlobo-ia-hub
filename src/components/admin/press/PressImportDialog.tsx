@@ -12,12 +12,13 @@ type Props = { open: boolean; onOpenChange: (o: boolean) => void; onDone: () => 
 
 export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
   const { toast } = useToast();
+  const [listName, setListName] = useState('');
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [sheetNames, setSheetNames] = useState<string[]>([]);
   const [selectedSheet, setSelectedSheet] = useState<string>('');
   const [workbook, setWorkbook] = useState<XLSX.WorkBook | null>(null);
   const [importing, setImporting] = useState(false);
-  const [result, setResult] = useState<{ inserted: number; updated: number; skipped: number } | null>(null);
+  const [result, setResult] = useState<{ inserted: number; updated: number; skipped: number; listName: string } | null>(null);
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,9 +48,12 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
   const onlyWhats = withWhats - withBoth;
 
   const doImport = async () => {
+    if (!listName.trim()) {
+      toast({ title: 'Dê um nome à lista', description: 'Toda importação cria uma lista.', variant: 'destructive' });
+      return;
+    }
     setImporting(true);
     try {
-      // upsert por email (chave única). Para os sem email, insere usando whatsapp como chave única.
       const withEmail = valid.filter(r => r.email);
       const withoutEmail = valid.filter(r => !r.email && r.whatsapp);
 
@@ -59,6 +63,7 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
       };
 
       let inserted = 0, updated = 0;
+      const contactIds: string[] = [];
 
       if (withEmail.length) {
         const payload = withEmail.map(stripMeta);
@@ -68,6 +73,7 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
           .select('id');
         if (error) throw error;
         inserted += data?.length ?? 0;
+        data?.forEach(d => contactIds.push(d.id));
       }
       if (withoutEmail.length) {
         const payload = withoutEmail.map(stripMeta);
@@ -77,10 +83,27 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
           .select('id');
         if (error) throw error;
         updated += data?.length ?? 0;
+        data?.forEach(d => contactIds.push(d.id));
       }
 
-      setResult({ inserted, updated, skipped: invalid });
-      toast({ title: 'Importação concluída', description: `${inserted + updated} contatos processados, ${invalid} ignorados.` });
+      // Cria a lista e vincula os contatos
+      const { data: list, error: lErr } = await supabase
+        .from('press_lists')
+        .insert({ nome: listName.trim() })
+        .select('id, nome')
+        .single();
+      if (lErr || !list) throw lErr ?? new Error('falha ao criar lista');
+
+      if (contactIds.length) {
+        const memberships = contactIds.map(id => ({ list_id: list.id, contact_id: id }));
+        const { error: mErr } = await supabase
+          .from('press_list_members')
+          .upsert(memberships, { onConflict: 'list_id,contact_id', ignoreDuplicates: true });
+        if (mErr) throw mErr;
+      }
+
+      setResult({ inserted, updated, skipped: invalid, listName: list.nome });
+      toast({ title: 'Importação concluída', description: `Lista "${list.nome}" criada com ${contactIds.length} contatos.` });
       onDone();
     } catch (e: any) {
       toast({ title: 'Erro no import', description: e.message, variant: 'destructive' });
@@ -98,13 +121,25 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-bold uppercase">1. Selecione o arquivo (.xlsx ou .csv)</label>
+            <label className="text-sm font-bold uppercase">1. Nome da lista</label>
+            <Input
+              value={listName}
+              onChange={e => setListName(e.target.value)}
+              placeholder="Ex: ADJORI-PR Out/2026, Rádios Litoral, Jornalistas Tech..."
+              className="mt-2"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Toda importação cria uma lista. O disparo é feito por lista (uma ou várias).
+            </p>
+          </div>
+          <div>
+            <label className="text-sm font-bold uppercase">2. Selecione o arquivo (.xlsx ou .csv)</label>
             <Input type="file" accept=".xlsx,.xls,.csv" onChange={onFile} className="mt-2" />
           </div>
 
           {sheetNames.length > 1 && (
             <div>
-              <label className="text-sm font-bold uppercase">2. Aba da planilha</label>
+              <label className="text-sm font-bold uppercase">3. Aba da planilha</label>
               <select
                 className="mt-2 w-full border border-input rounded-md px-3 py-2 bg-background"
                 value={selectedSheet}
@@ -156,16 +191,16 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
 
           {result && (
             <div className="border-2 border-primary bg-primary/10 p-3 text-sm">
-              ✓ {result.inserted + result.updated} contatos importados/atualizados, {result.skipped} ignorados.
+              ✓ Lista <strong>{result.listName}</strong> criada com {result.inserted + result.updated} contatos ({result.skipped} ignorados).
             </div>
           )}
         </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)}>Fechar</Button>
-          <Button onClick={doImport} disabled={!valid.length || importing}>
+          <Button onClick={doImport} disabled={!valid.length || importing || !listName.trim()}>
             {importing ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Upload className="w-4 h-4 mr-2" />}
-            Importar {valid.length} contatos
+            Criar lista com {valid.length} contatos
           </Button>
         </DialogFooter>
       </DialogContent>

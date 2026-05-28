@@ -150,3 +150,31 @@ export function buildWhatsappLink(contact: PressContact, message: string): strin
   const txt = renderTemplate(message, contact);
   return `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(txt)}`;
 }
+
+/** Converte HTML do editor rico para o "markdown" aceito pelo WhatsApp.
+ *  WhatsApp aceita *negrito*, _itálico_, ~tachado~ e ```mono```. Listas viram texto. Imagens viram URL. */
+export function htmlToWhatsAppMarkdown(html: string): string {
+  if (!html) return '';
+  let s = html;
+  // normaliza quebras
+  s = s.replace(/<br\s*\/?>/gi, '\n');
+  s = s.replace(/<\/(p|div|h[1-6]|li)>/gi, '\n');
+  // imagens -> URL inline
+  s = s.replace(/<img[^>]*src="([^"]+)"[^>]*>/gi, '$1\n');
+  // links -> "texto (url)"
+  s = s.replace(/<a[^>]*href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi, '$2 ($1)');
+  // formatação
+  s = s.replace(/<(strong|b)>([\s\S]*?)<\/\1>/gi, '*$2*');
+  s = s.replace(/<(em|i)>([\s\S]*?)<\/\1>/gi, '_$2_');
+  s = s.replace(/<(s|del|strike)>([\s\S]*?)<\/\1>/gi, '~$2~');
+  s = s.replace(/<code>([\s\S]*?)<\/code>/gi, '```$1```');
+  // listas: prefixa cada <li> com "• "
+  s = s.replace(/<li[^>]*>/gi, '• ');
+  // remove demais tags
+  s = s.replace(/<[^>]+>/g, '');
+  // decodifica entidades básicas
+  s = s.replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  // colapsa múltiplas quebras
+  s = s.replace(/\n{3,}/g, '\n\n').trim();
+  return s;
+}
