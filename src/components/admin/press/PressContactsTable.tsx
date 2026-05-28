@@ -92,11 +92,41 @@ export const PressContactsTable = ({ selectedIds, setSelectedIds, contacts, relo
             <Input value={search} onChange={e => setSearch(e.target.value)} placeholder="veículo, contato, email..." />
           </div>
           <div>
-            <label className="text-xs uppercase font-bold">Região</label>
-            <select className="h-10 border border-input rounded-md px-2 bg-background" value={regiao} onChange={e => setRegiao(e.target.value)}>
-              <option value="">Todas</option>
-              {regioes.map(r => <option key={r} value={r}>{r}</option>)}
-            </select>
+            <label className="text-xs uppercase font-bold block">Região</label>
+            <details className="relative">
+              <summary className="h-10 border border-input rounded-md px-3 bg-background cursor-pointer flex items-center gap-2 list-none min-w-[180px]">
+                {regioesSel.size === 0 ? 'Todas' : `${regioesSel.size} selecionada(s)`}
+                <span className="ml-auto opacity-50">▾</span>
+              </summary>
+              <div className="absolute z-20 mt-1 w-64 max-h-72 overflow-auto bg-popover border rounded-md shadow-lg p-1">
+                <label className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-muted rounded bg-muted/40 font-bold uppercase text-xs">
+                  <Checkbox
+                    checked={regioesSel.size === regioes.length && regioes.length > 0 ? true : regioesSel.size === 0 ? false : 'indeterminate'}
+                    onCheckedChange={() => {
+                      if (regioesSel.size === regioes.length) setRegioesSel(new Set());
+                      else setRegioesSel(new Set(regioes));
+                    }}
+                  />
+                  Selecionar todas
+                </label>
+                {regioes.map(r => {
+                  const checked = regioesSel.has(r);
+                  return (
+                    <label key={r} className="flex items-center gap-2 px-2 py-1.5 text-sm cursor-pointer hover:bg-muted rounded">
+                      <Checkbox
+                        checked={checked}
+                        onCheckedChange={() => {
+                          const next = new Set(regioesSel);
+                          checked ? next.delete(r) : next.add(r);
+                          setRegioesSel(next);
+                        }}
+                      />
+                      {r}
+                    </label>
+                  );
+                })}
+              </div>
+            </details>
           </div>
           <div>
             <label className="text-xs uppercase font-bold">Meio</label>
