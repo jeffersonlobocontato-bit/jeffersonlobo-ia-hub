@@ -148,7 +148,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
       const { data, error } = await supabase.functions.invoke('send-press-email', {
         body: {
           campaign_id: campaign.id,
-          contact_ids: filteredContacts.map(c => c.id),
+          contact_ids: finalContacts.map(c => c.id),
           subject, html: body,
         },
       });
@@ -183,10 +183,10 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
     }
     setWaCampaignId(data.id);
     await supabase.from('press_sends').insert(
-      filteredContacts.map(c => ({ campaign_id: data.id, contact_id: c.id, canal: 'whatsapp', status: 'pendente' }))
+      finalContacts.map(c => ({ campaign_id: data.id, contact_id: c.id, canal: 'whatsapp', status: 'pendente' }))
     );
     const initial: Record<string, 'pendente'> = {};
-    filteredContacts.forEach(c => initial[c.id] = 'pendente');
+    finalContacts.forEach(c => initial[c.id] = 'pendente');
     setWaSends(initial);
   };
 
@@ -432,7 +432,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
                   <Button size="sm" variant="outline" onClick={waFinish}>Encerrar</Button>
                 </div>
                 <div className="max-h-[300px] overflow-y-auto divide-y">
-                  {filteredContacts.map(c => {
+                  {finalContacts.map(c => {
                     const status = waSends[c.id] ?? 'pendente';
                     return (
                       <div key={c.id} className="py-2 flex items-center gap-2 text-sm">
