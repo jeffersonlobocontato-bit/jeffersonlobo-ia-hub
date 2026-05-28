@@ -40,6 +40,11 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
 
   const valid = rows.filter(r => r._errors.length === 0);
   const invalid = rows.length - valid.length;
+  const withEmail = valid.filter(r => !!r.email).length;
+  const withWhats = valid.filter(r => !!r.whatsapp).length;
+  const withBoth = valid.filter(r => !!r.email && !!r.whatsapp).length;
+  const onlyEmail = withEmail - withBoth;
+  const onlyWhats = withWhats - withBoth;
 
   const doImport = async () => {
     setImporting(true);
