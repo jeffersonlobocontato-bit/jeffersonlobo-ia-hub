@@ -49,7 +49,7 @@ function socialImageUrl(image?: string | null): string {
       url.pathname = url.pathname.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/')
       url.searchParams.set('width', '1200')
       url.searchParams.set('height', '630')
-      url.searchParams.set('resize', 'contain')
+      url.searchParams.set('resize', 'cover')
       url.searchParams.set('quality', '80')
       return url.toString()
     }

@@ -55,8 +55,12 @@ function socialImageUrl(image?: string | null): string {
       url.pathname = url.pathname.replace("/storage/v1/object/public/", "/storage/v1/render/image/public/");
       url.searchParams.set("width", "1200");
       url.searchParams.set("height", "630");
-      url.searchParams.set("resize", "contain");
+      // cover (não contain) — preenche 1200x630 sem letterbox transparente,
+      // que o WhatsApp/Facebook ignoram como og:image inválido.
+      url.searchParams.set("resize", "cover");
       url.searchParams.set("quality", "80");
+      // .jpg → garante sem canal alfa; muitos crawlers descartam PNG com transparência
+      url.searchParams.set("format", "origin");
       return url.toString();
     }
   } catch {
