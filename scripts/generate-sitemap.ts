@@ -202,6 +202,9 @@ async function main() {
   const entries: SitemapEntry[] = [
     { path: "/", lastmod: today, changefreq: "weekly", priority: "1.0" },
     { path: "/blog", lastmod: today, changefreq: "weekly", priority: "0.9" },
+    { path: "/palestras-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
+    { path: "/workshop-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
+    { path: "/consultoria-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/teste-ia", lastmod: today, changefreq: "monthly", priority: "0.8" },
     { path: "/imprensa", lastmod: today, changefreq: "monthly", priority: "0.6" },
     { path: "/politica-privacidade", lastmod: today, changefreq: "yearly", priority: "0.3" },
