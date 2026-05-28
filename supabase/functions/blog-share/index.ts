@@ -11,11 +11,13 @@ const SITE_URL = 'https://jeffersonlobo.tech'
 const FALLBACK_IMAGE =
   'https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp'
 
-const htmlHeaders = new Headers({
-  'Content-Type': 'text/html; charset=utf-8',
-  'Cache-Control': 'public, max-age=60, s-maxage=300',
-  'X-Robots-Tag': 'noindex',
-})
+function htmlResponseHeaders(): Record<string, string> {
+  return {
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'public, max-age=60, s-maxage=300',
+    'x-robots-tag': 'noindex',
+  }
+}
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
