@@ -59,7 +59,6 @@ export const PressCampaignsTab = ({ selectedContacts, onClearSelection }: Props)
     setSends(s => ({ ...s, [contact.id]: 'enviado' }));
     await supabase.from('press_sends').update({ status: 'enviado', sent_at: new Date().toISOString() })
       .eq('campaign_id', campaignId).eq('contact_id', contact.id);
-    await supabase.rpc as any;
     await supabase.from('press_campaigns')
       .update({ total_enviado: done + 1 })
       .eq('id', campaignId);
