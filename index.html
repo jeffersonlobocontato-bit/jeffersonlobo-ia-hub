@@ -33,19 +33,44 @@
 
     <link rel="icon" type="image/x-icon" href="https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/uploads/1762375789748-ChatGPT Image 5 de nov. de 2025, 17_48_06.png" />
 
-    <!-- Structured Data: Person + Service + WebSite -->
+    <!-- Structured Data: Person + Service + WebSite + FAQPage -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
       "@graph": [
         {
           "@type": "Person",
+          "@id": "https://jeffersonlobo.tech/#person",
           "name": "Jefferson Lobo",
           "url": "https://jeffersonlobo.tech",
-          "jobTitle": "Palestrante e Estrategista de Inteligência Artificial",
+          "image": "https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp",
+          "jobTitle": "Gerente Executivo de Marketing | Palestrante e Estrategista de Inteligência Artificial",
+          "description": "Palestrante, autor e consultor em Inteligência Artificial aplicada a marketing, negócios e lideranças.",
+          "worksFor": {
+            "@type": "Organization",
+            "name": "Sistema Fiep",
+            "url": "https://www.fiepr.org.br"
+          },
+          "knowsAbout": [
+            "Inteligência Artificial",
+            "IA Generativa",
+            "Marketing com IA",
+            "Agentes de IA",
+            "Orquestração de fluxos com IA",
+            "Estratégia de IA para lideranças",
+            "Transformação digital",
+            "Cultura e governança de IA"
+          ],
+          "nationality": "BR",
+          "address": {
+            "@type": "PostalAddress",
+            "addressLocality": "Curitiba",
+            "addressRegion": "PR",
+            "addressCountry": "BR"
+          },
           "sameAs": [
             "https://www.linkedin.com/in/jeffersonlobo",
-            "https://jeffersonlobo.tech"
+            "https://www.instagram.com/jeffersonlobooficial"
           ],
           "email": "contato@jeffersonlobo.tech",
           "telephone": "+55-45-99986-4213"
@@ -54,9 +79,9 @@
           "@type": "Service",
           "name": "Palestras e Consultoria em Inteligência Artificial",
           "serviceType": "Palestras e Consultoria em Inteligência Artificial",
-          "provider": { "@type": "Person", "name": "Jefferson Lobo" },
+          "provider": { "@id": "https://jeffersonlobo.tech/#person" },
           "areaServed": "BR",
-          "description": "Keynotes, workshops e consultoria estratégica em IA para empresas, lideranças e times.",
+          "description": "Keynotes, workshops corporativos e consultoria estratégica em IA generativa para empresas, lideranças e times de marketing.",
           "url": "https://jeffersonlobo.tech/#palestras"
         },
         {
@@ -64,12 +89,58 @@
           "name": "Jefferson Lobo",
           "url": "https://jeffersonlobo.tech",
           "inLanguage": "pt-BR",
-          "publisher": { "@type": "Person", "name": "Jefferson Lobo" }
+          "publisher": { "@id": "https://jeffersonlobo.tech/#person" }
+        },
+        {
+          "@type": "FAQPage",
+          "mainEntity": [
+            {
+              "@type": "Question",
+              "name": "Quem é Jefferson Lobo?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Jefferson Lobo é palestrante, autor e consultor brasileiro especializado em Inteligência Artificial aplicada a marketing, negócios e lideranças. Atua como Gerente Executivo de Marketing do Sistema Fiep e é referência nacional em IA generativa para o ambiente corporativo."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Quais palestras Jefferson Lobo ministra?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Keynotes e workshops sobre IA generativa para lideranças, agentes de IA com DNA autoral, orquestração de fluxos de marketing com IA, maturidade em IA para empresas e governança de IA no ambiente corporativo."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Como contratar Jefferson Lobo para uma palestra ou consultoria?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "O contato é feito pelo site jeffersonlobo.tech, na seção de briefing, pelo e-mail contato@jeffersonlobo.tech ou pelo telefone +55 45 99986-4213. Atende empresas em todo o Brasil, presencialmente e online."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Jefferson Lobo oferece diagnóstico de maturidade em IA?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Sim. O Teste de Maturidade em IA está disponível gratuitamente em https://jeffersonlobo.tech/teste-ia e gera um diagnóstico do nível de maturidade da empresa ou time em Inteligência Artificial."
+              }
+            },
+            {
+              "@type": "Question",
+              "name": "Qual é a tese principal de Jefferson Lobo sobre IA no marketing?",
+              "acceptedAnswer": {
+                "@type": "Answer",
+                "text": "Defende que o marketing com IA entrou na fase da orquestração de fluxos, na qual marcas precisam construir agentes de IA com identidade autoral (DNA de marca), em vez de depender de prompts genéricos e ferramentas isoladas."
+              }
+            }
+          ]
         }
       ]
     }
     </script>
   </head>
+
 
   <body>
     <div id="root"></div>
