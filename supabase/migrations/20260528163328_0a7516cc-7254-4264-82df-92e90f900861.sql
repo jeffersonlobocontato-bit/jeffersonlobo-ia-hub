@@ -1,0 +1,1 @@
+UPDATE public.hero_content SET cta_primary = 'AVALIE GRÁTIS SEU DOMÍNIO EM IA';
