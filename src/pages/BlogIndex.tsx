@@ -22,13 +22,36 @@ const BlogIndex = () => {
     '@type': 'Blog',
     name: 'Blog Jefferson Lobo',
     url: `${SITE_URL}/blog`,
+    inLanguage: 'pt-BR',
     blogPost: posts.map((p: any) => ({
       '@type': 'BlogPosting',
       headline: p.title,
       url: `${SITE_URL}/blog/${p.slug}`,
       datePublished: p.published_at || p.date,
       image: p.cover_image || undefined,
+      author: { '@type': 'Person', name: 'Jefferson Lobo' },
     })),
+  };
+
+  const collectionPageJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CollectionPage',
+    name: 'Blog Jefferson Lobo',
+    url: `${SITE_URL}/blog`,
+    inLanguage: 'pt-BR',
+    description:
+      'Artigos sobre Inteligência Artificial, estratégia, marketing e lideranças por Jefferson Lobo.',
+    mainEntity: {
+      '@type': 'ItemList',
+      itemListOrder: 'https://schema.org/ItemListOrderDescending',
+      numberOfItems: posts.length,
+      itemListElement: posts.map((p: any, i: number) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        url: `${SITE_URL}/blog/${p.slug}`,
+        name: p.title,
+      })),
+    },
   };
 
   return (
@@ -45,7 +68,9 @@ const BlogIndex = () => {
         <meta property="og:description" content="Insights sobre IA, tecnologia e inovação." />
         <meta property="og:url" content={`${SITE_URL}/blog`} />
         <script type="application/ld+json">{JSON.stringify(blogListJsonLd)}</script>
+        <script type="application/ld+json">{JSON.stringify(collectionPageJsonLd)}</script>
       </Helmet>
+
 
       <Header />
 

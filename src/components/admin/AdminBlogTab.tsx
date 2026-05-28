@@ -160,6 +160,13 @@ export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminB
                 <Label>Publicado</Label>
               </div>
 
+              {/* FAQ opcional — gera FAQPage schema.org no post, ótimo para GEO/Google */}
+              <FaqEditor
+                value={Array.isArray(post.faq) ? post.faq : []}
+                onChange={(faq) => patch(post.id, { faq })}
+              />
+
+
               <button
                 type="button"
                 onClick={() => setSeoOpen((s) => ({ ...s, [post.id]: !s[post.id] }))}
