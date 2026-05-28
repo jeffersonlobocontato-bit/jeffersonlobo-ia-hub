@@ -79,10 +79,32 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
     const next = new Set(selectedLists);
     next.has(id) ? next.delete(id) : next.add(id);
     setSelectedLists(next);
+    setSelectedRegions(new Set()); // reset filtro de região ao mudar listas
   };
 
-  const totalElegiveis = contacts.length;
-  const preview = contacts[0];
+  const toggleRegion = (r: string) => {
+    const next = new Set(selectedRegions);
+    next.has(r) ? next.delete(r) : next.add(r);
+    setSelectedRegions(next);
+  };
+
+  // contagem por região (sobre o universo de contatos resolvidos das listas)
+  const regionCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const c of contacts) {
+      const r = (c.regiao ?? '').trim() || 'Sem região';
+      m.set(r, (m.get(r) ?? 0) + 1);
+    }
+    return [...m.entries()].sort((a, b) => b[1] - a[1]);
+  }, [contacts]);
+
+  const filteredContacts = useMemo(() => {
+    if (selectedRegions.size === 0) return contacts;
+    return contacts.filter(c => selectedRegions.has(((c.regiao ?? '').trim() || 'Sem região')));
+  }, [contacts, selectedRegions]);
+
+  const totalElegiveis = filteredContacts.length;
+  const preview = filteredContacts[0];
 
   // === SEND EMAIL ===
   const dispararEmail = async () => {
