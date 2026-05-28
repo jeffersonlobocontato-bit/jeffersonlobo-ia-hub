@@ -157,7 +157,7 @@ Deno.serve(async (req) => {
 
     // Atualiza contadores da campanha
     await admin.from("press_campaigns").update({
-      total_enviado: sent, total_falhou: failed, status: "concluido", concluido_em: new Date().toISOString(),
+      total_enviado: sent, total_erro: failed, status: "concluida", sent_at: new Date().toISOString(),
     }).eq("id", campaign_id);
 
     return new Response(JSON.stringify({ sent, skipped, failed, errors }), {
