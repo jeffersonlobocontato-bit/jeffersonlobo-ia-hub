@@ -22,7 +22,7 @@ type Props = {
 export const PressContactsTable = ({ selectedIds, setSelectedIds, contacts, reload }: Props) => {
   const { toast } = useToast();
   const [search, setSearch] = useState('');
-  const [regiao, setRegiao] = useState<string>('');
+  const [regioesSel, setRegioesSel] = useState<Set<string>>(new Set());
   const [meio, setMeio] = useState<string>('');
   const [municipio, setMunicipio] = useState<string>('');
   const [hasEmail, setHasEmail] = useState(false);
