@@ -1,0 +1,2 @@
+CREATE UNIQUE INDEX IF NOT EXISTS press_contacts_email_key ON public.press_contacts (email) WHERE email IS NOT NULL;
+CREATE UNIQUE INDEX IF NOT EXISTS press_contacts_whatsapp_key ON public.press_contacts (whatsapp) WHERE whatsapp IS NOT NULL;
