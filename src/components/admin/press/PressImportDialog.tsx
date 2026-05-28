@@ -121,13 +121,21 @@ export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
 
         <div className="space-y-4">
           <div>
-            <label className="text-sm font-bold uppercase">1. Selecione o arquivo (.xlsx ou .csv)</label>
+            <label className="text-sm font-bold uppercase">1. Nome da lista</label>
+            <Input
+              value={listName}
+              onChange={e => setListName(e.target.value)}
+              placeholder="Ex: ADJORI-PR Out/2026, Rádios Litoral, Jornalistas Tech..."
+              className="mt-2"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Toda importação cria uma lista. O disparo é feito por lista (uma ou várias).
+            </p>
+          </div>
+          <div>
+            <label className="text-sm font-bold uppercase">2. Selecione o arquivo (.xlsx ou .csv)</label>
             <Input type="file" accept=".xlsx,.xls,.csv" onChange={onFile} className="mt-2" />
           </div>
-
-          {sheetNames.length > 1 && (
-            <div>
-              <label className="text-sm font-bold uppercase">2. Aba da planilha</label>
               <select
                 className="mt-2 w-full border border-input rounded-md px-3 py-2 bg-background"
                 value={selectedSheet}
