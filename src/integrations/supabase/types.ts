@@ -1003,13 +1003,21 @@ export type Database = {
           duration_seconds: number | null
           id: string
           ip_address: string | null
+          landing_page: string | null
           page_path: string
           page_title: string | null
           referrer: string | null
+          referrer_domain: string | null
           screen_height: number | null
           screen_width: number | null
           session_id: string
+          traffic_source: string | null
           user_agent: string | null
+          utm_campaign: string | null
+          utm_content: string | null
+          utm_medium: string | null
+          utm_source: string | null
+          utm_term: string | null
         }
         Insert: {
           city?: string | null
@@ -1018,13 +1026,21 @@ export type Database = {
           duration_seconds?: number | null
           id?: string
           ip_address?: string | null
+          landing_page?: string | null
           page_path: string
           page_title?: string | null
           referrer?: string | null
+          referrer_domain?: string | null
           screen_height?: number | null
           screen_width?: number | null
           session_id: string
+          traffic_source?: string | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Update: {
           city?: string | null
@@ -1033,13 +1049,21 @@ export type Database = {
           duration_seconds?: number | null
           id?: string
           ip_address?: string | null
+          landing_page?: string | null
           page_path?: string
           page_title?: string | null
           referrer?: string | null
+          referrer_domain?: string | null
           screen_height?: number | null
           screen_width?: number | null
           session_id?: string
+          traffic_source?: string | null
           user_agent?: string | null
+          utm_campaign?: string | null
+          utm_content?: string | null
+          utm_medium?: string | null
+          utm_source?: string | null
+          utm_term?: string | null
         }
         Relationships: []
       }

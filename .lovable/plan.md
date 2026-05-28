@@ -1,34 +1,42 @@
-# Resolver pendências de SEO
+## Objetivo
+Saber de onde vêm os visitantes: tráfego direto, orgânico (Google), redes sociais (LinkedIn, Instagram), referência (outros sites) e campanhas pagas/marcadas com UTM.
 
-Duas pendências restam da auditoria:
+## O que muda
 
-## 1. Google Search Console (indexação)
+### 1. Banco (`site_analytics`)
+Adicionar colunas (migration):
+- `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content` (text, nullable)
+- `referrer_domain` (text) — domínio limpo do referrer (ex.: `linkedin.com`)
+- `traffic_source` (text) — canal classificado: `direct`, `organic`, `social`, `referral`, `paid`, `email`
+- `landing_page` (text) — primeira página da sessão
+- Índices em `traffic_source`, `utm_source`, `referrer_domain` e `created_at` para acelerar agregações.
 
-Conectar o GSC para validar o domínio `jeffersonlobo.tech`, submeter o sitemap e habilitar dados de busca.
+### 2. Captura (`src/hooks/useAnalytics.ts`)
+- Ler UTMs da URL no primeiro pageview da sessão e persistir em `sessionStorage` (atribuição "first touch" da sessão).
+- Extrair domínio do `document.referrer`.
+- Classificar `traffic_source`:
+  - UTM presente → `paid` se `utm_medium` em (cpc, paid, ads) senão `utm_medium` (email/social/...)
+  - Referrer de buscadores (google, bing, duckduckgo, yahoo) → `organic`
+  - Referrer de social (linkedin, instagram, facebook, x/twitter, youtube, tiktok, whatsapp, t.co, lnkd.in) → `social`
+  - Referrer interno (mesmo host) → ignorar (mantém origem da sessão)
+  - Sem referrer → `direct`
+  - Outros → `referral`
+- Enviar esses campos no `insert` do `site_analytics`.
 
-Passos:
-- Disparar `standard_connectors--connect` com `google_search_console` — você autoriza o OAuth pelo modal
-- Após conectar: gerar token META de verificação, injetar a tag `<meta name="google-site-verification" ...>` no `index.html`, chamar verify e adicionar o site `https://jeffersonlobo.tech/` no GSC
-- Submeter `https://jeffersonlobo.tech/sitemap.xml`
+### 3. Admin (`src/components/admin/AdminAnalyticsTab.tsx`)
+Nova seção "Origem do Tráfego":
+- Cards com contagem por canal (direct/organic/social/referral/paid/email) no período selecionado.
+- Tabela "Top referenciadores" (referrer_domain → sessões).
+- Tabela "Campanhas UTM" (utm_source / utm_campaign → sessões).
+- Filtro por intervalo de datas reaproveitando o que já existe na aba.
 
-## 2. Contraste (Lighthouse, acessibilidade)
+## Detalhes técnicos
+- Migration aplica `ALTER TABLE` e `CREATE INDEX`; sem mexer em RLS/grants existentes.
+- Classificação roda 100% no cliente — sem custo de edge function.
+- Linhas antigas ficam com `traffic_source = null`; o dashboard ignora nulls ou mostra "desconhecido".
+- Nenhum dado pessoal novo é coletado (só URL/referrer, igual ao que já é capturado).
 
-O scanner achou texto com contraste abaixo de 4.5:1 na versão publicada. Os suspeitos no design brutalist são:
-
-- `text-[10px] font-bold uppercase text-muted-foreground` no subtítulo do logo (Header.tsx) — texto muito pequeno com cor muted
-- Possíveis usos de `text-muted-foreground` sobre fundos com baixo contraste em CTAs e cards
-
-Plano:
-- Auditar componentes de alto tráfego (Header, Hero, Footer, BlogSection, ContactSection, TrustBarSection) procurando `text-muted-foreground`, `opacity-*`, e cores arbitrárias (`text-gray-*`) sobre fundos claros/escuros
-- Trocar por `text-foreground` ou aumentar peso/tamanho onde aplicável, mantendo a identidade brutalista (preto/amarelo/laranja)
-- Especificamente: subtítulo do logo passa de `text-muted-foreground` para `text-foreground/80` e tamanho `text-[11px]`
-
-## Após implementar
-
-Publicar o app (o aviso de contraste vem da versão publicada) e rodar nova auditoria para confirmar.
-
----
-
-**Confirme antes de prosseguir:**
-- Posso disparar o modal de conexão do Google Search Console agora?
-- Posso ajustar o contraste do subtítulo do logo + revisar usos de `text-muted-foreground` em componentes de marketing?
+## Fora de escopo
+- Atribuição multi-touch entre sessões.
+- Geolocalização por IP (requer edge function — posso fazer depois se quiser).
+- Integração com GA4/GSC dentro do admin (o GSC já está conectado externamente).
