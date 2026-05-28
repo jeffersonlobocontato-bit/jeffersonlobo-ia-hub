@@ -533,7 +533,7 @@ const Admin = () => {
             <AdminBriefingsTab />
           </TabsContent>
 
-          <TabsContent value="imprensa">
+          <TabsContent value="imprensa" forceMount className="data-[state=inactive]:hidden">
             <AdminPressTab />
           </TabsContent>
 
