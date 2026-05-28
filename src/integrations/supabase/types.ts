@@ -1107,9 +1107,12 @@ export type Database = {
           created_at: string | null
           display_order: number
           event_name: string | null
+          focal_x: number
+          focal_y: number
           id: string
           image_position: string | null
           image_url: string
+          zoom: number
         }
         Insert: {
           active?: boolean | null
@@ -1117,9 +1120,12 @@ export type Database = {
           created_at?: string | null
           display_order?: number
           event_name?: string | null
+          focal_x?: number
+          focal_y?: number
           id?: string
           image_position?: string | null
           image_url: string
+          zoom?: number
         }
         Update: {
           active?: boolean | null
@@ -1127,9 +1133,12 @@ export type Database = {
           created_at?: string | null
           display_order?: number
           event_name?: string | null
+          focal_x?: number
+          focal_y?: number
           id?: string
           image_position?: string | null
           image_url?: string
+          zoom?: number
         }
         Relationships: []
       }
