@@ -41,6 +41,13 @@ interface FunnelStage {
   description?: string;
 }
 
+interface SourceStat { key: string; sessions: number; }
+interface TrafficOrigin {
+  channels: SourceStat[];
+  referrers: SourceStat[];
+  campaigns: SourceStat[];
+}
+
 interface ConversionFunnel {
   totalVisitors: number;
   viewedHero: number;
