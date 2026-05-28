@@ -45,15 +45,24 @@ export const useAnalytics = () => {
 
   // Track page view
   const trackPageView = useCallback(async () => {
+    const attribution = getTrafficAttribution();
     const analytics = {
       session_id: sessionId,
       page_path: location.pathname,
       page_title: document.title,
-      referrer: document.referrer,
+      referrer: attribution.referrer,
       user_agent: navigator.userAgent,
       screen_width: window.screen.width,
       screen_height: window.screen.height,
       duration_seconds: 0,
+      utm_source: attribution.utm_source,
+      utm_medium: attribution.utm_medium,
+      utm_campaign: attribution.utm_campaign,
+      utm_term: attribution.utm_term,
+      utm_content: attribution.utm_content,
+      referrer_domain: attribution.referrer_domain,
+      traffic_source: attribution.traffic_source,
+      landing_page: attribution.landing_page,
     };
 
     await supabase.from('site_analytics').insert(analytics);
