@@ -179,3 +179,10 @@ const Stat = ({ label, value, good, bad }: { label: string; value: number; good?
     <div className="text-xs uppercase text-muted-foreground">{label}</div>
   </div>
 );
+
+const Channel = ({ label, value, alt, bad }: { label: string; value: number; alt?: boolean; bad?: boolean }) => (
+  <div className={`border p-2 ${bad ? 'border-destructive bg-destructive/10' : alt ? 'border-border' : 'border-primary bg-primary/10'}`}>
+    <div className={`text-lg font-black ${bad ? 'text-destructive' : ''}`}>{value}</div>
+    <div className="text-[10px] uppercase text-muted-foreground leading-tight">{label}</div>
+  </div>
+);
