@@ -151,7 +151,47 @@ export const AdminAnalyticsTab = () => {
           .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
 
         setTimeSeriesData(timeSeries);
+
+        // Traffic origin — first-touch por sessão
+        const seenSessions = new Set<string>();
+        const channelMap = new Map<string, Set<string>>();
+        const referrerMap = new Map<string, Set<string>>();
+        const campaignMap = new Map<string, Set<string>>();
+        const sorted = [...analyticsData].sort(
+          (a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime()
+        );
+        for (const row of sorted) {
+          if (seenSessions.has(row.session_id)) continue;
+          seenSessions.add(row.session_id);
+          const channel = (row as any).traffic_source || 'desconhecido';
+          if (!channelMap.has(channel)) channelMap.set(channel, new Set());
+          channelMap.get(channel)!.add(row.session_id);
+
+          const refDom = (row as any).referrer_domain;
+          if (refDom) {
+            if (!referrerMap.has(refDom)) referrerMap.set(refDom, new Set());
+            referrerMap.get(refDom)!.add(row.session_id);
+          }
+
+          const utmSource = (row as any).utm_source;
+          const utmCampaign = (row as any).utm_campaign;
+          if (utmSource || utmCampaign) {
+            const key = `${utmSource || '—'} / ${utmCampaign || '—'}`;
+            if (!campaignMap.has(key)) campaignMap.set(key, new Set());
+            campaignMap.get(key)!.add(row.session_id);
+          }
+        }
+        const toStats = (m: Map<string, Set<string>>): SourceStat[] =>
+          Array.from(m.entries())
+            .map(([key, set]) => ({ key, sessions: set.size }))
+            .sort((a, b) => b.sessions - a.sessions);
+        setTrafficOrigin({
+          channels: toStats(channelMap),
+          referrers: toStats(referrerMap).slice(0, 15),
+          campaigns: toStats(campaignMap).slice(0, 15),
+        });
       }
+
 
       // Load CTA stats
       const { data: ctaData } = await supabase
