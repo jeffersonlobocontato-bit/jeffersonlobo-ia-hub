@@ -1258,6 +1258,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_maturity_lead: {
+        Args: {
+          p_email: string
+          p_finalidade: string
+          p_nome: string
+          p_whatsapp: string
+        }
+        Returns: {
+          access_token: string
+          id: string
+        }[]
+      }
       delete_email: {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
