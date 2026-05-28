@@ -6,6 +6,7 @@ import { resolve } from "path";
 
 const BASE_URL = "https://jeffersonlobo.tech";
 const FALLBACK_IMAGE = "https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp";
+const SOCIAL_PREVIEW_VERSION = "img3";
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://cgydeldzhnfyexphaheq.supabase.co";
 const SUPABASE_KEY =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
@@ -108,7 +109,7 @@ async function cacheSocialImage(post: BlogPostRow, shareVersion: string): Promis
 
 function shareVersionFromDate(value?: string | null): string {
   const digits = (value || today).replace(/\D/g, "").slice(0, 12);
-  return digits || today.replace(/\D/g, "");
+  return `${digits || today.replace(/\D/g, "")}-${SOCIAL_PREVIEW_VERSION}`;
 }
 
 async function writeSharePages(posts: BlogPostRow[]) {
@@ -136,6 +137,7 @@ async function writeSharePages(posts: BlogPostRow[]) {
     const imageAlt = escapeHtml(post.cover_alt || post.title);
     const shareVersion = shareVersionFromDate(post.updated_at || post.date);
     const image = escapeHtml(await cacheSocialImage(post, shareVersion));
+    const imageType = image.includes(".webp") ? "image/webp" : image.includes(".png") ? "image/png" : "image/jpeg";
     const versionedShareUrl = `${BASE_URL}/noticia/${post.slug}-${shareVersion}.html`;
     const legacyShareUrl = `${BASE_URL}/noticia/${post.slug}.html`;
     const renderHtml = (shareUrl: string) => `<!doctype html>
@@ -152,7 +154,9 @@ async function writeSharePages(posts: BlogPostRow[]) {
 <meta property="og:title" content="${title}" />
 <meta property="og:description" content="${description}" />
 <meta property="og:image" content="${image}" />
+<meta property="og:image:url" content="${image}" />
 <meta property="og:image:secure_url" content="${image}" />
+<meta property="og:image:type" content="${imageType}" />
 <meta property="og:image:alt" content="${imageAlt}" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
