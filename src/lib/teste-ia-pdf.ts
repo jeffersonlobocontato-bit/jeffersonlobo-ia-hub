@@ -71,6 +71,53 @@ const competenciaLabels: Record<string, string> = {
   governanca: "Governança",
 };
 
+// Caminhos de influência por competência — orientação sutil, NÃO pitch de venda.
+// O leitor é o agente: "proponha", "sugira", "leve a pauta para…".
+const caminhoPorCompetencia: Record<string, { pf: string; pj: string }> = {
+  estrategia: {
+    pf: "Proponha à sua liderança uma palestra executiva de IA para alinhar a visão antes de qualquer roadmap.",
+    pj: "Uma keynote estratégica com referência externa acelera o alinhamento do C-level antes do roadmap.",
+  },
+  processos: {
+    pf: "Sugira ao seu time uma imersão prática para mapear e redesenhar processos com IA.",
+    pj: "Workshop hands-on de redesenho de processos com IA destrava ganhos rápidos e mensuráveis.",
+  },
+  dados: {
+    pf: "Indique uma consultoria de diagnóstico de dados antes da empresa escalar iniciativas de IA.",
+    pj: "Consultoria estratégica de dados evita stacks caras sem fundação — diagnóstico primeiro, ferramenta depois.",
+  },
+  ferramentas: {
+    pf: "Leve para sua área um workshop de ferramentas de IA generativa aplicado ao dia a dia.",
+    pj: "Workshop de adoção guiada reduz custo de teste-e-erro e padroniza o uso entre times.",
+  },
+  pessoas: {
+    pf: "Proponha uma palestra de sensibilização seguida de trilha de capacitação para o time.",
+    pj: "Programa de champions + palestras internas forma multiplicadores e acelera adoção cultural.",
+  },
+  etica: {
+    pf: "Indique uma palestra sobre IA responsável para jurídico, RH e liderança.",
+    pj: "Imersão de ética e compliance em IA protege a marca antes do primeiro incidente público.",
+  },
+  seguranca: {
+    pf: "Sugira um diagnóstico de segurança em uso de IA antes da adoção em massa.",
+    pj: "Consultoria de segurança define guardrails antes do shadow AI virar exposição de dados.",
+  },
+  governanca: {
+    pf: "Proponha à diretoria uma consultoria para estruturar a governança de IA da empresa.",
+    pj: "Consultoria de governança formaliza papéis, comitês e políticas — base para escalar com segurança.",
+  },
+};
+
+function pickCaminho(competenciaKey: string, finalidade: Finalidade): string {
+  const c = caminhoPorCompetencia[competenciaKey];
+  if (!c) {
+    return finalidade === "PJ"
+      ? "Vale considerar um programa sob medida (palestra, workshop ou consultoria) para acelerar esse avanço com sua equipe."
+      : "Vale propor à sua liderança um programa sob medida — palestra, workshop ou consultoria — para acelerar esse avanço.";
+  }
+  return finalidade === "PJ" ? c.pj : c.pf;
+}
+
 function pickAcoes(rec: PdfRecommendation, finalidade: Finalidade) {
   const isPJ = finalidade === "PJ";
   return {
@@ -304,6 +351,34 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
         y += blockH + 3;
       });
+
+      // Caminho de influência — orientação sutil conectando o gap a uma ação
+      // que o leitor pode propor dentro da empresa. Tom: carreira, não venda.
+      const caminhoTxt = pickCaminho(p.key, lead.finalidade);
+      if (caminhoTxt) {
+        const caminhoLines = pdf.splitTextToSize(caminhoTxt, CONTENT_W - 8);
+        const caminhoH = Math.max(14, caminhoLines.length * 4.5 + 9);
+        ensureSpace(caminhoH + 4);
+
+        // Fundo grafite
+        pdf.setFillColor(30, 30, 30);
+        pdf.rect(M, y, CONTENT_W, caminhoH, "F");
+        // Faixa amarela à esquerda
+        pdf.setFillColor(252, 211, 77);
+        pdf.rect(M, y, 2, caminhoH, "F");
+
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(7.5);
+        pdf.setTextColor(252, 211, 77);
+        pdf.text("COMO LEVAR ADIANTE", M + 6, y + 5.5);
+
+        pdf.setFont("helvetica", "italic");
+        pdf.setFontSize(9);
+        pdf.setTextColor(235, 235, 235);
+        pdf.text(caminhoLines, M + 6, y + 10);
+
+        y += caminhoH + 4;
+      }
 
       y += 6;
     });
