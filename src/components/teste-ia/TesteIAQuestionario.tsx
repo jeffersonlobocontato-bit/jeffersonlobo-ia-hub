@@ -126,7 +126,7 @@ export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplet
       else if (scoreGeral < 4.0) nivelMaturidade = "Em evolução";
       else nivelMaturidade = "Avançado";
 
-      await supabase.rpc("finalize_maturity_lead", {
+      const { data: finalized, error: finalizeError } = await supabase.rpc("finalize_maturity_lead", {
         p_id: leadId,
         p_token: accessToken,
         p_respostas: arr as any,
@@ -137,6 +137,10 @@ export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplet
         p_competencias: competencias as any,
         p_nivel_maturidade: nivelMaturidade,
       });
+
+      if (finalizeError) throw finalizeError;
+      const finalizedRow = Array.isArray(finalized) ? finalized[0] : finalized;
+      if (!finalizedRow?.success) throw new Error("finalize_failed");
 
 
       toast.success("Teste finalizado! Veja seu resultado.");
