@@ -86,9 +86,11 @@ export const AdminPressTab = () => {
                       {new Date(l.created_at).toLocaleDateString('pt-BR')}
                     </div>
                   </div>
-                  <Button size="icon" variant="ghost" onClick={() => deleteList(l.id, l.nome)} title="Excluir lista">
-                    <Trash2 className="w-3 h-3" />
-                  </Button>
+                  {!l.virtual && (
+                    <Button size="icon" variant="ghost" onClick={() => deleteList(l.id, l.nome)} title="Excluir lista">
+                      <Trash2 className="w-3 h-3" />
+                    </Button>
+                  )}
                 </div>
                 <div className="flex gap-3 mt-3 text-xs">
                   <Badge variant="outline" className="font-mono">{l.total} total</Badge>
