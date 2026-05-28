@@ -127,7 +127,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
 
       <main className="flex-1 pt-24">
         {/* HERO */}
-        <section className="relative overflow-hidden bg-background py-20 md:py-28">
+        <section className="relative overflow-hidden bg-surface-lilac py-20 md:py-28 border-b-2 border-foreground">
           <div className="absolute inset-0 z-0 bg-brand-grid opacity-60" />
           <div className="absolute inset-x-0 bottom-0 h-2 bg-foreground z-10" />
           <div className="container mx-auto px-4 relative z-10 max-w-4xl text-center space-y-6 flex flex-col items-center">
