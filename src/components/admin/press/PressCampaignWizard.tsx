@@ -34,6 +34,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
   const [step, setStep] = useState<Step>(1);
   const [canal, setCanal] = useState<Canal | null>(null);
   const [selectedLists, setSelectedLists] = useState<Set<string>>(new Set());
+  const [selectedRegions, setSelectedRegions] = useState<Set<string>>(new Set());
   const [contacts, setContacts] = useState<PressContact[]>([]);
   const [loadingContacts, setLoadingContacts] = useState(false);
 
