@@ -45,6 +45,9 @@ const Admin = () => {
   const [trustStats, setTrustStats] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<string>(() => {
+    try { return sessionStorage.getItem('admin:activeTab') || 'hero'; } catch { return 'hero'; }
+  });
 
   useEffect(() => {
     if (user) {
@@ -430,7 +433,14 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <TelegramTestCard />
-        <Tabs defaultValue="hero" className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={(v) => {
+            setActiveTab(v);
+            try { sessionStorage.setItem('admin:activeTab', v); } catch {}
+          }}
+          className="w-full"
+        >
 
           <TabsList className="inline-flex w-full mb-8 overflow-x-auto">
             <TabsTrigger value="hero">Hero</TabsTrigger>
