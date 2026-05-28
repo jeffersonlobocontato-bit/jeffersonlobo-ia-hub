@@ -82,9 +82,11 @@ const BlogPost = () => {
     ],
   };
 
-  // URL estática de compartilhamento: crawlers do WhatsApp/LinkedIn/X leem
-  // este HTML público com OG tags antes do JavaScript redirecionar humanos.
-  const shareUrl = `${SITE_URL}/noticia/${post.slug}/`;
+  // URL de compartilhamento: arquivo .html plano gerado em build-time.
+  // A hospedagem serve arquivos .html físicos com prioridade sobre o fallback
+  // da SPA, então crawlers (WhatsApp/LinkedIn/X) leem og:title/og:image reais
+  // antes do JS redirecionar humanos para /blog/:slug.
+  const shareUrl = `${SITE_URL}/noticia/${post.slug}.html`;
   const sharePayload = encodeURIComponent(shareUrl);
 
   return (

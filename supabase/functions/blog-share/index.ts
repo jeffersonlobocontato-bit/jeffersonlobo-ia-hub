@@ -11,11 +11,13 @@ const SITE_URL = 'https://jeffersonlobo.tech'
 const FALLBACK_IMAGE =
   'https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp'
 
-const htmlHeaders = new Headers({
-  'Content-Type': 'text/html; charset=utf-8',
-  'Cache-Control': 'public, max-age=60, s-maxage=300',
-  'X-Robots-Tag': 'noindex',
-})
+function htmlResponseHeaders(): Record<string, string> {
+  return {
+    'content-type': 'text/html; charset=utf-8',
+    'cache-control': 'public, max-age=60, s-maxage=300',
+    'x-robots-tag': 'noindex',
+  }
+}
 
 const supabase = createClient(
   Deno.env.get('SUPABASE_URL')!,
@@ -119,7 +121,7 @@ Deno.serve(async (req) => {
     if (!slug || !/^[a-z0-9-]{1,200}$/.test(slug)) {
       return new Response(notFoundHtml(), {
         status: 404,
-        headers: htmlHeaders,
+        headers: htmlResponseHeaders(),
       })
     }
 
@@ -135,7 +137,7 @@ Deno.serve(async (req) => {
     if (error || !post) {
       return new Response(notFoundHtml(), {
         status: 404,
-        headers: htmlHeaders,
+        headers: htmlResponseHeaders(),
       })
     }
 
@@ -143,13 +145,13 @@ Deno.serve(async (req) => {
     const shareUrl = `https://${url.host}${url.pathname}?slug=${post.slug}`
     return new Response(renderHtml(post, shareUrl), {
       status: 200,
-      headers: htmlHeaders,
+      headers: htmlResponseHeaders(),
     })
   } catch (e) {
     console.error('blog-share error', e)
     return new Response(notFoundHtml(), {
       status: 500,
-      headers: htmlHeaders,
+      headers: htmlResponseHeaders(),
     })
   }
 })
