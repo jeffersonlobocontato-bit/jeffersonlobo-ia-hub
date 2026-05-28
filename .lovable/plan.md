@@ -1,108 +1,86 @@
+## Objetivo
 
-# Módulo Imprensa — Mensageria Email + WhatsApp
+Substituir o painel atual (3 abas separadas, dependentes de seleção manual na tabela) por um fluxo guiado de "Novo disparo" em 4 passos: escolher tipo → escolher listas → escrever conteúdo → revisar e disparar.
 
-## Stack decidida
-- **Email**: Lovable Emails (nativo, já com fila/retry/logs). Precisa configurar domínio remetente (ex.: `notify.jeffersonlobo.tech`) — passo único.
-- **WhatsApp**: link `wa.me` 1-a-1 assistido. Zero custo, zero risco de banimento, tom certo para imprensa. Arquitetura preparada para plugar Twilio/Meta Cloud API depois sem reescrever.
-- **Compliance básico**: rodapé com descadastro no email + flag `opt_out` + supressão automática.
+## Conceito de "Lista"
 
-## Base que será importada (planilha auditada)
+Cada importação de XLSX vira uma **lista nomeada**. Contatos podem pertencer a várias listas (relação N:N). A base global continua existindo para edição/inspeção, mas o disparo passa a ser feito sempre via listas (uma ou mais).
 
-- **988 contatos** • 8 regiões (Campos Gerais, etc.) • 311 municípios • 847 veículos
-- Aba **BASE COMPLETA** usada como fonte única (497 com email, 708 com WhatsApp)
-- Schema da tabela `press_contacts` espelha exatamente as colunas da planilha:
+## Mudanças no banco
 
-```text
-press_contacts
-  id                uuid pk
-  regiao            text          -- "Campos Gerais", "Norte", ...
-  focal             text          -- responsável regional (Fábio, etc.)
-  municipio         text
-  censo_ibge_2022   integer       -- população (útil para priorizar)
-  veiculo           text          -- nome do veículo
-  meio              text          -- Rádio | TV | Internet | Facebook | Impresso
-  contato           text          -- nome da pessoa (pode ser NULL)
-  cargo             text          -- Diretor, Redação, Repórter...
-  telefone          text (E.164)
-  whatsapp          text (E.164)
-  email             text          -- lower(trim), index único parcial
-  endereco          text
-  site              text
-  tags              text[]        -- liberdade para o admin segmentar
-  opt_out           bool default false
-  notas             text
-  created_at, updated_at
-```
+Novas tabelas:
 
-Constraints: ao menos um entre `email` e `whatsapp` obrigatório; emails únicos (case-insensitive).
+- `press_lists` — `id`, `nome`, `descricao`, `total_contatos`, `created_by`, `created_at`
+- `press_list_members` — `list_id`, `contact_id` (PK composta)
 
-## Entregas (MVP)
+Política: admin gerencia tudo, sem acesso público. GRANTs para `authenticated` e `service_role`.
 
-### 1. Nova aba "Imprensa" no /admin
-- Tabela com busca livre + filtros por **região, município, veículo, meio, cargo, focal, tags, tem email, tem whatsapp, opt-out**.
-- CRUD completo de contato.
-- **Importar XLSX/CSV**: upload → detecta automaticamente os headers da planilha que você acabou de mandar (REGIAO, MUNICÍPIO, VEÍCULO, MEIO, CONTATO, CARGO, TELEFONE, WHATSAPP, EMAIL, ENDEREÇO, SITE, CENSO_IBGE_2022, FOCAL) → preview com contagem de novos/duplicados/inválidos → confirma → bulk insert com upsert por email/whatsapp.
-- Normalização no import: telefone/WhatsApp → E.164 (regex tira `.`, `+`, espaços; assume Brasil se faltar DDI), email → lowercase/trim, valida regex.
-- Exportar CSV da seleção atual.
+No `PressImportDialog`: passa a exigir um **nome de lista** antes do upload. Após import, todos os contatos importados são vinculados via `press_list_members`. Mantém o upsert por email/whatsapp para não duplicar contato global, mas sempre cria membership na lista nova.
 
-### 2. Campanhas de Email
-- Editor: assunto, corpo (markdown), preview ao vivo.
-- **Variáveis**: `{{contato}}`, `{{primeiro_nome}}`, `{{veiculo}}`, `{{municipio}}`, `{{regiao}}`, `{{cargo}}`. Fallback automático ("Olá redação do {{veiculo}}") quando `contato` for NULL.
-- **Segmentação**: usa os mesmos filtros da tabela + seleção manual via checkbox.
-- Disparo via `enqueue_email` (infra Lovable Emails já existe no projeto, vi `enqueue_email` nas funções DB) com `template_name = 'press_campaign'` e header de unsubscribe.
-- Rodapé automático com link `/unsubscribe?token=...` reaproveitando `email_unsubscribe_tokens`.
-- Métricas: total enviado / falhas / suprimidos / opt-outs, lendo `email_send_log` filtrado.
+## Mudanças no app
 
-### 3. Campanhas de WhatsApp (modo manual assistido)
-- Editor com as mesmas variáveis.
-- Lista filtrada de contatos com WhatsApp válido → botão **"Abrir WhatsApp"** em cada linha gera `https://wa.me/<E164>?text=<mensagem renderizada>`.
-- Modo "fila": botão "próximo" abre o WhatsApp em nova aba, marca o atual como `enviado` em `press_sends`, e avança automaticamente.
-- Contador de progresso (enviados / pendentes) por campanha.
+### Reorganização da aba Imprensa (`AdminPressTab`)
 
-### 4. Métricas e histórico
-- Aba "Histórico" lista campanhas (tipo, data, filtro, total alvo, enviados, falhas).
-- Drill-down por campanha mostra cada contato e status.
-
-## Tabelas novas (RLS admin-only)
+Duas seções principais, sem sub-abas:
 
 ```text
-press_contacts      (988 registros vindos da planilha)
-press_campaigns     id, tipo('email'|'whatsapp'), assunto, corpo,
-                    filtros jsonb, status, created_by, sent_at
-press_sends         id, campaign_id, contact_id, canal, status,
-                    message_id (correlaciona email_send_log),
-                    sent_at, error
+┌─────────────────────────────────────────────┐
+│  [+ NOVO DISPARO]      [Importar XLSX]      │
+├─────────────────────────────────────────────┤
+│  LISTAS                                     │
+│  ┌─────────┬─────────┬─────────┐            │
+│  │ ADJORI  │ Rádios  │ Norte   │ ...        │
+│  │ 234 ✉   │ 88 ✉    │ 412 ✉   │            │
+│  └─────────┴─────────┴─────────┘            │
+├─────────────────────────────────────────────┤
+│  BASE COMPLETA (988)        [ver tabela]    │
+└─────────────────────────────────────────────┘
 ```
 
-Todas com policies `has_role(auth.uid(),'admin')` + GRANTs corretos.
+### Wizard "Novo disparo" (`PressCampaignWizard.tsx`)
 
-## Edge Function
+Modal em 4 passos:
 
-- `send-press-email`: recebe `campaign_id`, busca contatos do filtro com email válido e `opt_out=false`, renderiza variáveis, enfileira no `auth_emails`/`transactional_emails` via `enqueue_email`, registra `press_sends` com `message_id`.
+1. **Tipo** — dois cards grandes: WhatsApp / Email
+2. **Listas** — grid de cards de listas com checkbox (multi-seleção). Mostra total único de contatos elegíveis (com email/whatsapp + sem opt-out) à medida que seleciona. Botão "ver contatos" abre drawer com a união.
+3. **Conteúdo** — editor rico dedicado + campos auxiliares (nome interno, assunto se email)
+4. **Revisar** — preview no primeiro contato + total + botão "Disparar para N"
 
-## Fluxo do usuário
+### Novo editor dedicado (`PressRichEditor.tsx`)
 
-```text
-1. Admin → aba Imprensa → "Importar planilha"
-2. Upload de mailing_imprensa_LIMPO.xlsx → preview → confirmar
-   → 988 contatos importados, deduplicados por email/whatsapp
-3. Filtra (ex.: REGIAO = Campos Gerais, MEIO = Rádio)
-4. "Nova campanha" → Email
-5. Escreve assunto + corpo com {{primeiro_nome}}, {{veiculo}}
-6. "Disparar" → fila processa, métricas atualizam
-7. Para WhatsApp: mesma campanha mas tipo whatsapp →
-   abre 1-a-1 pelo wa.me, marca enviado automaticamente
-```
+Baseado em Tiptap (mesma stack do blog), mas toolbar focada em disparo:
 
-## Fora do MVP (deixar para v2)
-- Tracking de abertura/clique (Lovable Emails não fornece nativo — exigiria migrar para Brevo/Resend).
-- WhatsApp em massa automatizado (Twilio + Meta Cloud API + templates aprovados).
-- Agendamento e A/B test.
-- Webhook de respostas do WhatsApp.
+- Negrito, itálico, sublinhado, tachado
+- Lista, lista numerada
+- Link, imagem (upload para bucket `blog-covers` existente ou outro a criar)
+- Inserir variável (`{{primeiro_nome}}`, `{{veiculo}}`, etc.) via dropdown
+- **Sem** H2/H3 nem blockquote (email não precisa)
 
-## Pré-requisitos antes de construir
-1. Configurar domínio remetente do email (será solicitado via diálogo nativo do Lovable assim que entrarmos em build).
-2. Confirmar este plano.
+Exporta HTML para email. Para WhatsApp, converte em markdown WA (`**texto**` → `*texto*`, `_texto_`, `~texto~`, listas em texto puro, imagens viram link).
 
-Aprova para entrar em build?
+### Refatorações
 
+- `PressContactsTable` permanece para edição da base, mas perde a coluna de checkbox de seleção (não é mais ponto de partida do disparo).
+- `PressCampaignsTab` (WA) e `PressEmailCampaignTab` viram páginas internas do wizard, não abas.
+- `send-press-email` edge function: aceita `list_ids` opcional além de `contact_ids` para resolver no servidor (defesa em profundidade contra divergência cliente/servidor). Lógica de envio inalterada.
+
+## Arquivos afetados
+
+Criar:
+- `supabase/migrations/...` (tabelas + grants + policies)
+- `src/components/admin/press/PressCampaignWizard.tsx`
+- `src/components/admin/press/PressRichEditor.tsx`
+- `src/components/admin/press/PressListsGrid.tsx`
+- `src/hooks/usePressLists.ts`
+
+Editar:
+- `src/components/admin/AdminPressTab.tsx` (nova estrutura)
+- `src/components/admin/press/PressImportDialog.tsx` (campo "nome da lista" obrigatório, criar membership)
+- `src/components/admin/press/PressContactsTable.tsx` (remover seleção)
+- `src/lib/press-utils.ts` (helper htmlToWhatsAppMarkdown)
+
+## Fora de escopo
+
+- Edição manual de membership (adicionar/remover contato de lista pela UI) — fica para um próximo passo se precisar.
+- Agendamento de disparo.
+- Histórico visual de campanhas (já existe em `press_campaigns`, podemos expor depois).
