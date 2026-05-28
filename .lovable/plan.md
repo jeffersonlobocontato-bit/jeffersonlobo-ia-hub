@@ -1,42 +1,52 @@
-## Objetivo
-Saber de onde vêm os visitantes: tráfego direto, orgânico (Google), redes sociais (LinkedIn, Instagram), referência (outros sites) e campanhas pagas/marcadas com UTM.
+## Diagnóstico
 
-## O que muda
+Você está certo: a `/palestras-ia` está visualmente fria e plana. Os problemas que vejo no screenshot são:
 
-### 1. Banco (`site_analytics`)
-Adicionar colunas (migration):
-- `utm_source`, `utm_medium`, `utm_campaign`, `utm_term`, `utm_content` (text, nullable)
-- `referrer_domain` (text) — domínio limpo do referrer (ex.: `linkedin.com`)
-- `traffic_source` (text) — canal classificado: `direct`, `organic`, `social`, `referral`, `paid`, `email`
-- `landing_page` (text) — primeira página da sessão
-- Índices em `traffic_source`, `utm_source`, `referrer_domain` e `created_at` para acelerar agregações.
+1. **Todas as seções usam `bg-background` (branco 98%)** — não há alternância de fundos, o olho desliza sem âncoras. Vira uma única "parede branca" do hero até o FAQ.
+2. **Sem seção escura** — a identidade brutalista do site (preto + amarelo + laranja) some completamente nas landings. A home tem blocos pretos que dão peso; aqui não tem nenhum.
+3. **Cards muito tímidos** — `border-primary/30` + `shadow-[4px_4px_0]` ficam quase invisíveis sobre fundo branco. A sombra brutalista pede borda preta sólida e fundo contrastante.
+4. **Bento "Provocando Lideranças Brasil afora"** aparece praticamente vazio — caixas amarelas com texto invisível (provavelmente herdou estilo de outro contexto).
+5. **Tipografia uniforme em peso** — sem variação de escala/cor entre kicker, H2 e corpo. Falta hierarquia que puxe a leitura.
+6. **Zero acentos de cor quentes** no meio do scroll — o laranja (`--secondary`) só aparece em ícones minúsculos.
 
-### 2. Captura (`src/hooks/useAnalytics.ts`)
-- Ler UTMs da URL no primeiro pageview da sessão e persistir em `sessionStorage` (atribuição "first touch" da sessão).
-- Extrair domínio do `document.referrer`.
-- Classificar `traffic_source`:
-  - UTM presente → `paid` se `utm_medium` em (cpc, paid, ads) senão `utm_medium` (email/social/...)
-  - Referrer de buscadores (google, bing, duckduckgo, yahoo) → `organic`
-  - Referrer de social (linkedin, instagram, facebook, x/twitter, youtube, tiktok, whatsapp, t.co, lnkd.in) → `social`
-  - Referrer interno (mesmo host) → ignorar (mantém origem da sessão)
-  - Sem referrer → `direct`
-  - Outros → `referral`
-- Enviar esses campos no `insert` do `site_analytics`.
+## Plano de correção (somente UI — sem mexer em conteúdo/copy)
 
-### 3. Admin (`src/components/admin/AdminAnalyticsTab.tsx`)
-Nova seção "Origem do Tráfego":
-- Cards com contagem por canal (direct/organic/social/referral/paid/email) no período selecionado.
-- Tabela "Top referenciadores" (referrer_domain → sessões).
-- Tabela "Campanhas UTM" (utm_source / utm_campaign → sessões).
-- Filtro por intervalo de datas reaproveitando o que já existe na aba.
+Alvo: `src/components/CommercialLanding.tsx` (template usado pelas 3 landings, então corrige as 3 de uma vez).
 
-## Detalhes técnicos
-- Migration aplica `ALTER TABLE` e `CREATE INDEX`; sem mexer em RLS/grants existentes.
-- Classificação roda 100% no cliente — sem custo de edge function.
-- Linhas antigas ficam com `traffic_source = null`; o dashboard ignora nulls ou mostra "desconhecido".
-- Nenhum dado pessoal novo é coletado (só URL/referrer, igual ao que já é capturado).
+### 1. Ritmo de fundos (alternância)
+Sequência proposta de cima para baixo:
+- Hero: mantém claro com `bg-brand-grid` reforçado
+- LogosBar: claro
+- **"Para quem"**: fundo `bg-muted` (creme suave) — quebra do branco
+- **"O que entrega"**: **fundo preto** (`bg-foreground`) com cards em fundo escuro e títulos amarelos → vira o bloco de impacto da página
+- **"Formatos"**: volta ao claro com `bg-background`
+- TrustBar + StagePhotos: mantém
+- **FAQ**: `bg-muted` novamente
+- **CTA final**: **fundo amarelo** (`bg-primary`) com texto preto — finalização brutalista forte
 
-## Fora de escopo
-- Atribuição multi-touch entre sessões.
-- Geolocalização por IP (requer edge function — posso fazer depois se quiser).
-- Integração com GA4/GSC dentro do admin (o GSC já está conectado externamente).
+### 2. Cards mais brutalistas
+- Borda preta sólida 2px (`border-foreground`) em vez de `border-primary/30`
+- Sombra mais agressiva: `shadow-[6px_6px_0_hsl(var(--foreground))]`
+- No bloco escuro: cards `bg-background/5` com borda amarela e sombra amarela
+
+### 3. Hierarquia tipográfica
+- Kickers em pílula amarela sólida (não só texto)
+- H2 com tamanho maior e `tracking-tight`
+- Adicionar uma linha divisória amarela curta abaixo dos H2
+
+### 4. Acentos de cor
+- Ícones `Sparkles` e `Check` ganham fundo amarelo sólido (não translúcido)
+- Pelo menos um card de cada grid usa o laranja (`--secondary`) como destaque para criar "cor quente" no meio do scroll
+
+### 5. CTA final em amarelo
+Bloco final com `bg-primary` + texto preto + botão preto invertido → cria um "ponto de chegada" visual forte.
+
+### Não vou mexer agora
+- Conteúdo/copy das 3 landings (PalestrasIA, WorkshopIA, ConsultoriaIA)
+- Bento "Provocando Lideranças" (parece ser outro componente herdado — se quiser, atacamos depois em chamada separada)
+- Tokens globais do `index.css` (manter consistência com o resto do site)
+
+### Resultado esperado
+Mesma estrutura e copy, mas com ritmo claro→creme→**preto**→claro→creme→**amarelo**, dando temperatura, peso brutalista e âncoras de leitura ao longo do scroll.
+
+Aprovar para eu implementar?
