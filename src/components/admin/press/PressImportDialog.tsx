@@ -12,12 +12,13 @@ type Props = { open: boolean; onOpenChange: (o: boolean) => void; onDone: () => 
 
 export const PressImportDialog = ({ open, onOpenChange, onDone }: Props) => {
   const { toast } = useToast();
+  const [listName, setListName] = useState('');
   const [rows, setRows] = useState<ImportRow[]>([]);
   const [sheetNames, setSheetNames] = useState<string[]>([]);
   const [selectedSheet, setSelectedSheet] = useState<string>('');
   const [workbook, setWorkbook] = useState<XLSX.WorkBook | null>(null);
   const [importing, setImporting] = useState(false);
-  const [result, setResult] = useState<{ inserted: number; updated: number; skipped: number } | null>(null);
+  const [result, setResult] = useState<{ inserted: number; updated: number; skipped: number; listName: string } | null>(null);
 
   const onFile = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
