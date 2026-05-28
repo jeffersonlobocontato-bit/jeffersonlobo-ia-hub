@@ -1,17 +1,34 @@
-O problema agora está claro: o link `https://jeffersonlobo.tech/noticia/...` está retornando o `index.html` genérico da SPA publicada, não o HTML estático da notícia. Por isso o WhatsApp usa a imagem e o título do site. O arquivo estático existe no projeto, mas a hospedagem não está servindo esse arquivo nessa rota.
+# Resolver pendências de SEO
 
-Plano de correção:
+Duas pendências restam da auditoria:
 
-1. Remover a dependência da rota estática `/noticia/[slug]/index.html`, porque ela está sendo engolida pelo fallback da SPA na publicação atual.
-2. Usar o endpoint `blog-share` como fonte única do preview social, mas corrigido para ficar profissional:
-   - `og:title` = título real da notícia
-   - `og:description` = resumo real da notícia
-   - `og:image` = capa real da notícia em 1200x630
-   - `og:url` = URL amigável publicada, não domínio técnico
-   - HTML simples com link de fallback para humanos
-   - headers corretos: `Content-Type: text/html; charset=utf-8`
-3. Alterar o botão de WhatsApp para compartilhar diretamente a URL do endpoint `blog-share`, porque é a única URL que sabemos que crawlers estão conseguindo acessar agora.
-4. Evitar que a mensagem escrita no WhatsApp force o preview genérico: compartilhar só a URL, como sites de notícia fazem.
-5. Validar com uma requisição simulando crawler do WhatsApp e confirmar no HTML bruto que aparecem `og:title` e `og:image` da notícia, antes de concluir.
+## 1. Google Search Console (indexação)
 
-Observação importante: o visual final no WhatsApp depende do cache do próprio WhatsApp. Não usar `?v=2` na URL compartilhada: esse parâmetro pode fazer alguns scrapers/caches tratarem o link como fallback genérico e puxarem a imagem institucional do site. A correção segura é versionar o caminho do arquivo, por exemplo `/noticia/slug-20260527.html`, mantendo o `.html` físico com Open Graph próprio da matéria.
+Conectar o GSC para validar o domínio `jeffersonlobo.tech`, submeter o sitemap e habilitar dados de busca.
+
+Passos:
+- Disparar `standard_connectors--connect` com `google_search_console` — você autoriza o OAuth pelo modal
+- Após conectar: gerar token META de verificação, injetar a tag `<meta name="google-site-verification" ...>` no `index.html`, chamar verify e adicionar o site `https://jeffersonlobo.tech/` no GSC
+- Submeter `https://jeffersonlobo.tech/sitemap.xml`
+
+## 2. Contraste (Lighthouse, acessibilidade)
+
+O scanner achou texto com contraste abaixo de 4.5:1 na versão publicada. Os suspeitos no design brutalist são:
+
+- `text-[10px] font-bold uppercase text-muted-foreground` no subtítulo do logo (Header.tsx) — texto muito pequeno com cor muted
+- Possíveis usos de `text-muted-foreground` sobre fundos com baixo contraste em CTAs e cards
+
+Plano:
+- Auditar componentes de alto tráfego (Header, Hero, Footer, BlogSection, ContactSection, TrustBarSection) procurando `text-muted-foreground`, `opacity-*`, e cores arbitrárias (`text-gray-*`) sobre fundos claros/escuros
+- Trocar por `text-foreground` ou aumentar peso/tamanho onde aplicável, mantendo a identidade brutalista (preto/amarelo/laranja)
+- Especificamente: subtítulo do logo passa de `text-muted-foreground` para `text-foreground/80` e tamanho `text-[11px]`
+
+## Após implementar
+
+Publicar o app (o aviso de contraste vem da versão publicada) e rodar nova auditoria para confirmar.
+
+---
+
+**Confirme antes de prosseguir:**
+- Posso disparar o modal de conexão do Google Search Console agora?
+- Posso ajustar o contraste do subtítulo do logo + revisar usos de `text-muted-foreground` em componentes de marketing?
