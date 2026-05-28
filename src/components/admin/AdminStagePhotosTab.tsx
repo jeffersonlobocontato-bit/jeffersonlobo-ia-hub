@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { useToast } from '@/hooks/use-toast';
 import { Trash2, Plus, RefreshCw, Upload, ArrowUp, ArrowDown } from 'lucide-react';
+import { StagePhotoCropEditor } from './StagePhotoCropEditor';
 
 type StagePhoto = {
   id: string;
@@ -15,6 +16,9 @@ type StagePhoto = {
   caption: string | null;
   display_order: number;
   active: boolean | null;
+  focal_x: number;
+  focal_y: number;
+  zoom: number;
 };
 
 const AdminStagePhotosTab = () => {
