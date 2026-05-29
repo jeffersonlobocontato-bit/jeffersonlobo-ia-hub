@@ -38,3 +38,9 @@ verify_jwt = false
 
 [functions.blog-share]
 verify_jwt = false
+
+[functions.track-press-open]
+verify_jwt = false
+
+[functions.track-press-click]
+verify_jwt = false
