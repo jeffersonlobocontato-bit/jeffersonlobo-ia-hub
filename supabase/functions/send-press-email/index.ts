@@ -179,10 +179,8 @@ Deno.serve(async (req) => {
       await new Promise((res) => setTimeout(res, 160));
     }
 
-    // Atualiza contadores da campanha
-    await admin.from("press_campaigns").update({
-      total_enviado: sent, total_erro: failed, status: "concluida", sent_at: new Date().toISOString(),
-    }).eq("id", campaign_id);
+    // Não atualizamos status da campanha aqui: o cliente pode disparar vários lotes
+    // e só ele sabe quando o último terminou. Contadores são consolidados pelo cliente.
 
     return new Response(JSON.stringify({ sent, skipped, failed, errors }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },

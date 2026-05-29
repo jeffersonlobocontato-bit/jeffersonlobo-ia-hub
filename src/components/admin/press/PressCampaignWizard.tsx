@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
@@ -32,8 +32,9 @@ const DEFAULT_EMAIL_SUBJECT = `Pauta para {{veiculo}} — {{primeiro_nome}}, pos
 const DEFAULT_EMAIL_BODY = `<p>Olá <strong>{{primeiro_nome}}</strong>,</p><p>Sou Jefferson Lobo, especialista em IA. Estou enviando uma pauta que pode interessar à <strong>{{veiculo}}</strong>:</p><p><em>[descreva sua pauta aqui]</em></p><p>Posso compartilhar mais detalhes?</p><p>Abraço,<br>Jefferson Lobo</p>`;
 const DEFAULT_WA_BODY = `<p>Olá <strong>{{primeiro_nome}}</strong>! Sou Jefferson Lobo, especialista em IA. Tenho uma pauta que pode interessar à <strong>{{veiculo}}</strong>: <em>[seu assunto aqui]</em>. Posso compartilhar mais detalhes?</p>`;
 
-const BATCH_LIMIT = 280;
-const CHUNK_SIZE = 90; // edge function aceita máx 100 por chamada
+const DEFAULT_CHUNK_SIZE = 100; // edge function aceita máx 100 por chamada
+const DEFAULT_PAUSE_SEC = 30;
+const MAX_CHUNK_SIZE = 100;
 
 export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const { toast } = useToast();
@@ -56,6 +57,12 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
 
   const [sending, setSending] = useState(false);
   const [emailResult, setEmailResult] = useState<{ sent: number; skipped: number; failed: number; errors?: { id: string; error: string }[]; progress?: string } | null>(null);
+  const [chunkSize, setChunkSize] = useState<number>(DEFAULT_CHUNK_SIZE);
+  const [pauseSec, setPauseSec] = useState<number>(DEFAULT_PAUSE_SEC);
+  const [cancelRequested, setCancelRequested] = useState(false);
+  const cancelRef = useRef(false);
+  const [pauseCountdown, setPauseCountdown] = useState<number>(0);
+  const [currentBatch, setCurrentBatch] = useState<{ index: number; total: number } | null>(null);
 
   // WA-only state
   const [waCampaignId, setWaCampaignId] = useState<string | null>(null);
@@ -94,6 +101,19 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     if (canal === 'email') setBody(DEFAULT_EMAIL_BODY);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canal]);
+
+  // alerta se fechar aba durante disparo
+  useEffect(() => {
+    if (!sending) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'Disparo em andamento. Sair vai interromper o envio.';
+      return e.returnValue;
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [sending]);
+
 
   // resolve contatos quando passa pro step 3 (revisar usa step 4)
   useEffect(() => {
@@ -147,22 +167,31 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const totalElegiveis = finalContacts.length;
   const preview = finalContacts[0];
 
-  // === SEND EMAIL ===
+  // === SEND EMAIL (chunked + pause) ===
   const dispararEmail = async () => {
     if (!nome.trim() || !subject.trim() || !body.trim()) {
       toast({ title: 'Preencha nome, assunto e corpo', variant: 'destructive' }); return;
     }
-    if (totalElegiveis > BATCH_LIMIT) {
-      toast({
-        title: 'Lote acima do limite (300/dia Brevo Free)',
-        description: `Selecione listas com no máximo ${BATCH_LIMIT} contatos por disparo (você tem ${totalElegiveis}).`,
-        variant: 'destructive',
-      });
-      return;
-    }
-    if (!confirm(`Disparar email para ${totalElegiveis} contatos via Brevo? Isso não pode ser desfeito.`)) return;
+    const size = Math.min(MAX_CHUNK_SIZE, Math.max(1, Math.floor(chunkSize) || DEFAULT_CHUNK_SIZE));
+    const pause = Math.max(0, Math.floor(pauseSec) || 0);
+    const totalChunks = Math.ceil(totalElegiveis / size);
 
-    setSending(true); setEmailResult(null);
+    if (!confirm(
+      `Disparar email para ${totalElegiveis} contatos via Brevo?\n\n` +
+      `Será enviado em ${totalChunks} lote${totalChunks > 1 ? 's' : ''} de até ${size}, ` +
+      `com pausa de ${pause}s entre eles.\n\nMantenha esta aba aberta até concluir.`
+    )) return;
+
+    setSending(true);
+    cancelRef.current = false;
+    setCancelRequested(false);
+    setEmailResult(null);
+    setCurrentBatch({ index: 0, total: totalChunks });
+
+    let campaignId: string | null = null;
+    let totSent = 0, totFailed = 0, totSkipped = 0;
+    const allErrors: { id: string; error: string }[] = [];
+
     try {
       const { data: campaign, error: cErr } = await supabase
         .from('press_campaigns')
@@ -173,43 +202,71 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
         })
         .select('id').single();
       if (cErr || !campaign) throw new Error(cErr?.message || 'falha ao criar campanha');
+      campaignId = campaign.id as string;
 
       const ids = finalContacts.map(c => c.id);
       const chunks: string[][] = [];
-      for (let i = 0; i < ids.length; i += CHUNK_SIZE) chunks.push(ids.slice(i, i + CHUNK_SIZE));
-
-      let totSent = 0, totFailed = 0, totSkipped = 0;
-      const allErrors: { id: string; error: string }[] = [];
+      for (let i = 0; i < ids.length; i += size) chunks.push(ids.slice(i, i + size));
 
       for (let i = 0; i < chunks.length; i++) {
+        if (cancelRef.current) break;
+        setCurrentBatch({ index: i + 1, total: chunks.length });
+
         const { data, error } = await supabase.functions.invoke('send-press-email', {
-          body: {
-            campaign_id: campaign.id,
-            contact_ids: chunks[i],
-            subject, html: body,
-          },
+          body: { campaign_id: campaignId, contact_ids: chunks[i], subject, html: body },
         });
-        if (error) throw error;
-        totSent += data?.sent ?? 0;
-        totFailed += data?.failed ?? 0;
-        totSkipped += data?.skipped ?? 0;
-        if (Array.isArray(data?.errors)) allErrors.push(...data.errors);
-        setEmailResult({ sent: totSent, failed: totFailed, skipped: totSkipped, errors: allErrors, progress: `${i + 1}/${chunks.length}` });
+        if (error) {
+          // não derruba a campanha inteira: registra e segue
+          allErrors.push({ id: '*', error: `lote ${i + 1}: ${error.message ?? 'erro'}` });
+        } else {
+          totSent += data?.sent ?? 0;
+          totFailed += data?.failed ?? 0;
+          totSkipped += data?.skipped ?? 0;
+          if (Array.isArray(data?.errors)) allErrors.push(...data.errors);
+        }
+        setEmailResult({
+          sent: totSent, failed: totFailed, skipped: totSkipped, errors: allErrors,
+          progress: `${i + 1}/${chunks.length}`,
+        });
+
+        // persiste totais parciais (dashboard pode acompanhar em tempo real)
+        await supabase.from('press_campaigns').update({
+          total_enviado: totSent, total_erro: totFailed,
+        }).eq('id', campaignId);
+
+        // pausa entre lotes (não no último)
+        if (i < chunks.length - 1 && pause > 0 && !cancelRef.current) {
+          for (let s = pause; s > 0; s--) {
+            if (cancelRef.current) break;
+            setPauseCountdown(s);
+            await new Promise(res => setTimeout(res, 1000));
+          }
+          setPauseCountdown(0);
+        }
       }
 
-      // Garante contadores finais consolidados (edge function só sabe do próprio lote)
       await supabase.from('press_campaigns').update({
-        total_enviado: totSent, total_erro: totFailed, status: 'concluida', sent_at: new Date().toISOString(),
-      }).eq('id', campaign.id);
+        total_enviado: totSent, total_erro: totFailed,
+        status: cancelRef.current ? 'cancelada' : 'concluida',
+        sent_at: new Date().toISOString(),
+      }).eq('id', campaignId);
 
       toast({
-        title: 'Disparo finalizado',
-        description: `${totSent} enviados · ${totFailed} erros · ${totSkipped} pulados (${chunks.length} lote${chunks.length > 1 ? 's' : ''})`,
+        title: cancelRef.current ? 'Disparo cancelado' : 'Disparo finalizado',
+        description: `${totSent} enviados · ${totFailed} erros · ${totSkipped} pulados`,
       });
     } catch (e) {
+      if (campaignId) {
+        await supabase.from('press_campaigns').update({
+          total_enviado: totSent, total_erro: totFailed, status: 'erro',
+        }).eq('id', campaignId);
+      }
       toast({ title: 'Erro no disparo', description: e instanceof Error ? e.message : 'erro', variant: 'destructive' });
     } finally {
       setSending(false);
+      setPauseCountdown(0);
+      setCurrentBatch(null);
+      setCancelRequested(false);
     }
   };
 
@@ -521,19 +578,67 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
             )}
 
             {/* ACTION BAR */}
-            {canal === 'email' && !emailResult && (
-              <Button onClick={dispararEmail} disabled={sending || totalElegiveis === 0} className="w-full" size="lg">
-                {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
-                {sending ? 'Disparando...' : `Disparar para ${totalElegiveis} contatos`}
-              </Button>
-            )}
-            {canal === 'email' && emailResult && (
-              <div className="flex gap-2">
-                <Badge className="bg-primary"><Mail className="w-3 h-3 mr-1" />{emailResult.sent} enviados</Badge>
-                <Badge variant="destructive">{emailResult.failed} erros</Badge>
-                <Badge variant="secondary">{emailResult.skipped} pulados</Badge>
-                <Button className="ml-auto" variant="outline" onClick={() => onOpenChange(false)}>Fechar</Button>
-              </div>
+            {canal === 'email' && (
+              <>
+                {!sending && !emailResult && (
+                  <Card className="p-3 grid grid-cols-2 gap-3 bg-muted/30">
+                    <label className="text-xs space-y-1">
+                      <div className="font-bold uppercase text-muted-foreground">Tamanho do lote (máx {MAX_CHUNK_SIZE})</div>
+                      <Input type="number" min={1} max={MAX_CHUNK_SIZE} value={chunkSize}
+                        onChange={e => setChunkSize(Number(e.target.value))} />
+                    </label>
+                    <label className="text-xs space-y-1">
+                      <div className="font-bold uppercase text-muted-foreground">Pausa entre lotes (s)</div>
+                      <Input type="number" min={0} max={600} value={pauseSec}
+                        onChange={e => setPauseSec(Number(e.target.value))} />
+                    </label>
+                    <div className="col-span-2 text-xs text-muted-foreground">
+                      {totalElegiveis} contatos → {Math.ceil(totalElegiveis / Math.max(1, chunkSize))} lote(s).
+                      Mantenha esta aba aberta até concluir.
+                    </div>
+                  </Card>
+                )}
+
+                {sending && currentBatch && (
+                  <Card className="p-3 space-y-2 border-2 border-primary">
+                    <div className="flex items-center justify-between gap-2 text-sm">
+                      <div className="font-bold">
+                        Lote {currentBatch.index}/{currentBatch.total}
+                        {pauseCountdown > 0 && <span className="ml-2 text-muted-foreground font-normal">· próximo em {pauseCountdown}s</span>}
+                      </div>
+                      <Button size="sm" variant="destructive" onClick={() => { cancelRef.current = true; setCancelRequested(true); }} disabled={cancelRequested}>
+                        {cancelRequested ? 'Cancelando...' : 'Cancelar'}
+                      </Button>
+                    </div>
+                    <div className="h-2 bg-muted rounded overflow-hidden">
+                      <div className="h-full bg-primary transition-all" style={{ width: `${(currentBatch.index / currentBatch.total) * 100}%` }} />
+                    </div>
+                    {emailResult && (
+                      <div className="flex gap-2 flex-wrap text-xs">
+                        <Badge className="bg-primary">{emailResult.sent} enviados</Badge>
+                        <Badge variant="destructive">{emailResult.failed} erros</Badge>
+                        <Badge variant="secondary">{emailResult.skipped} pulados</Badge>
+                      </div>
+                    )}
+                  </Card>
+                )}
+
+                {!sending && !emailResult && (
+                  <Button onClick={dispararEmail} disabled={totalElegiveis === 0} className="w-full" size="lg">
+                    <Send className="w-4 h-4 mr-2" />
+                    Disparar para {totalElegiveis} contatos
+                  </Button>
+                )}
+
+                {!sending && emailResult && (
+                  <div className="flex gap-2 flex-wrap">
+                    <Badge className="bg-primary"><Mail className="w-3 h-3 mr-1" />{emailResult.sent} enviados</Badge>
+                    <Badge variant="destructive">{emailResult.failed} erros</Badge>
+                    <Badge variant="secondary">{emailResult.skipped} pulados</Badge>
+                    <Button className="ml-auto" variant="outline" onClick={() => onOpenChange(false)}>Fechar</Button>
+                  </div>
+                )}
+              </>
             )}
 
             {canal === 'whatsapp' && !waCampaignId && (
