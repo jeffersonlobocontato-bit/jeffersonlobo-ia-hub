@@ -20,6 +20,7 @@ import ConsultoriaIA from "./pages/ConsultoriaIA";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import PressReleaseOG from "./pages/PressReleaseOG";
+import PressCampaignKiosk from "./pages/admin/PressCampaignKiosk";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
