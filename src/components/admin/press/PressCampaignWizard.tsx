@@ -87,6 +87,7 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
       setAlreadySentLockIds(sentSet);
       setContacts([]);
       setEmailResult(null); setWaCampaignId(null); setWaSends({});
+      setTitulo(''); setMediaUrl(null); setMediaTipo('nenhum'); setLinkDestino(''); setOgResult(null);
       if (prefill) {
         setCanal(prefill.canal);
         setNome(prefill.nome);
