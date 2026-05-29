@@ -330,6 +330,8 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
 
   const sanitizePhone = (n: string) => (n ?? '').replace(/\D/g, '');
   const buildWaLink = (c: PressContact) =>
+    buildWhatsappDirectLink(c.whatsapp, buildWaText(c));
+  const buildWaFallbackLink = (c: PressContact) =>
     `https://wa.me/${sanitizePhone(c.whatsapp)}?text=${encodeURIComponent(buildWaText(c))}`;
 
   const waMarkSent = async (c: PressContact, opts?: { skipOpen?: boolean }) => {
