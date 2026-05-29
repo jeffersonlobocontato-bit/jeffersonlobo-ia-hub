@@ -165,11 +165,12 @@ export const PressCampaignDashboard = () => {
     const rows = selectedCampaign === 'all' ? segments : segments.filter(s => s.campaign_id === selectedCampaign);
     const agg = new Map<string, { meio: string; enviados: number; aberturas_unicas: number; aberturas_totais: number }>();
     for (const r of rows) {
-      const cur = agg.get(r.meio) ?? { meio: r.meio, enviados: 0, aberturas_unicas: 0, aberturas_totais: 0 };
+      const key = normalizeMeio(r.meio);
+      const cur = agg.get(key) ?? { meio: key, enviados: 0, aberturas_unicas: 0, aberturas_totais: 0 };
       cur.enviados += r.enviados;
       cur.aberturas_unicas += r.aberturas_unicas;
       cur.aberturas_totais += r.aberturas_totais;
-      agg.set(r.meio, cur);
+      agg.set(key, cur);
     }
     return Array.from(agg.values()).sort((a, b) => b.enviados - a.enviados);
   }, [segments, selectedCampaign]);
