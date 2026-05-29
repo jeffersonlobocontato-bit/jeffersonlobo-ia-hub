@@ -12,9 +12,11 @@ import {
   ExternalLink, SkipForward, Loader2,
 } from 'lucide-react';
 import { PressRichEditor } from './PressRichEditor';
+import { CampaignMediaUploader, type MediaTipo } from './CampaignMediaUploader';
 import { fetchContactsForLists, usePressLists, type PressList } from '@/hooks/usePressLists';
 import {
   type PressContact, renderTemplate, htmlToWhatsAppMarkdown,
+  composeWhatsAppMessage, slugify,
 } from '@/lib/press-utils';
 
 export type WizardPrefill = {
