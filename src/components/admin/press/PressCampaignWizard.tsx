@@ -293,12 +293,20 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     if (!nome.trim() || !body.trim()) {
       toast({ title: 'Preencha nome e mensagem', variant: 'destructive' }); return;
     }
+    // gera slug curto se houver título (para a página /imprensa/r/:slug)
+    const baseSlug = titulo.trim() ? slugify(titulo) : slugify(nome);
+    const linkSlug = baseSlug ? `${baseSlug}-${Math.random().toString(36).slice(2, 6)}` : null;
     const { data, error } = await supabase
       .from('press_campaigns')
       .insert({
         tipo: 'whatsapp', nome: nome.trim(), corpo: body,
         total_alvo: totalElegiveis, status: 'em_envio',
         filtros: { list_ids: [...selectedLists] },
+        titulo: titulo.trim() || null,
+        media_url: mediaUrl,
+        media_tipo: mediaTipo,
+        link_destino: linkDestino.trim() || null,
+        link_slug: linkSlug,
       })
       .select('id').single();
     if (error || !data) {
@@ -313,9 +321,16 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     setWaSends(initial);
   };
 
+  const buildWaText = (c: PressContact): string => composeWhatsAppMessage({
+    titulo,
+    bodyMarkdown: htmlToWhatsAppMarkdown(body),
+    link: linkDestino,
+    contact: c,
+  });
+
   const waMarkSent = async (c: PressContact) => {
     if (!waCampaignId) return;
-    const waText = htmlToWhatsAppMarkdown(renderTemplate(body, c));
+    const waText = buildWaText(c);
     const link = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(waText)}`;
     window.open(link, '_blank', 'noopener,noreferrer');
     setWaSends(s => ({ ...s, [c.id]: 'enviado' }));
