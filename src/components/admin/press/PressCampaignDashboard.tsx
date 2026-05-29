@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 export const CANON_MEIO_OPTIONS = [
   'Rádio', 'TV', 'Jornal Impresso', 'Portal de Notícias',
-  'Revista', 'Redes Sociais', 'Podcast', 'Agência',
+  'Revista', 'Redes Sociais', 'Podcast', 'Agência', 'Órgãos Públicos',
 ] as const;
 
 type CampaignStat = {
@@ -70,7 +70,7 @@ const _strip = (s: string) => s.toLowerCase()
   .replace(/\s+/g, ' ')
   .trim();
 
-type Canon = 'Rádio' | 'TV' | 'Jornal Impresso' | 'Portal de Notícias' | 'Revista' | 'Redes Sociais' | 'Podcast' | 'Agência';
+type Canon = 'Rádio' | 'TV' | 'Jornal Impresso' | 'Portal de Notícias' | 'Revista' | 'Redes Sociais' | 'Podcast' | 'Agência' | 'Órgãos Públicos';
 
 function _detectCanons(raw: string): Canon[] {
   const t = ` ${_strip(raw)} `;
@@ -87,6 +87,10 @@ function _detectCanons(raw: string): Canon[] {
   if (/\bpodcast\b/.test(t)) found.add('Podcast');
   // Agência
   if (/\b(agencia|assessoria)\b/.test(t)) found.add('Agência');
+  // Órgãos Públicos
+  if (/\b(prefeitura|camara|cmara|secretaria|governo|ministerio|ministrio|orgao|orgaos|publico|publica|gov|tribunal|assembleia|assemblia|senado|congresso|alesp|alerj|federal|estadual|municipal)\b/.test(t)) {
+    found.add('Órgãos Públicos');
+  }
   // Redes Sociais
   if (/\b(facebook|fb|instagram|insta|ig|youtube|yt|tiktok|twitter|x|linkedin|telegram|rede social|redes sociais|social)\b/.test(t)) {
     found.add('Redes Sociais');
@@ -109,6 +113,8 @@ export function normalizeMeio(meio: string | null | undefined, veiculo?: string 
   }
 
   // Regras de combinação
+  // Órgãos Públicos prevalece (ex.: "Portal da Prefeitura" => Órgãos Públicos)
+  if (canons.includes('Órgãos Públicos')) return 'Órgãos Públicos';
   if (canons.includes('Rádio')) return 'Rádio';
   if (canons.includes('TV')) return 'TV';
   // Redes Sociais combinado com Portal/Blog vira Redes Sociais
