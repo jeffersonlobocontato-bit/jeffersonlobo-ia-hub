@@ -234,12 +234,12 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
 
       await supabase.from('press_campaigns').update({
         total_enviado: totSent, total_erro: totFailed,
-        status: cancelRequested ? 'cancelada' : 'concluida',
+        status: cancelRef.current ? 'cancelada' : 'concluida',
         sent_at: new Date().toISOString(),
       }).eq('id', campaignId);
 
       toast({
-        title: cancelRequested ? 'Disparo cancelado' : 'Disparo finalizado',
+        title: cancelRef.current ? 'Disparo cancelado' : 'Disparo finalizado',
         description: `${totSent} enviados · ${totFailed} erros · ${totSkipped} pulados`,
       });
     } catch (e) {
