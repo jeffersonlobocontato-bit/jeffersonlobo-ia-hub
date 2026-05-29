@@ -292,31 +292,34 @@ export const PressCampaignDashboard = () => {
                 <th className="p-2 text-right">Alvo</th>
                 <th className="p-2 text-right">Enviados</th>
                 <th className="p-2 text-right">Erros</th>
-                <th className="p-2 text-right">Abert. únicas</th>
-                <th className="p-2 text-right">Total abert.</th>
-                <th className="p-2 text-right">Taxa</th>
+                <th className="p-2 text-right">Abert.</th>
+                <th className="p-2 text-right">Cliques</th>
+                <th className="p-2 text-right">% clique</th>
                 <th className="p-2"></th>
               </tr>
             </thead>
             <tbody>
               {campaigns.length === 0 ? (
                 <tr><td colSpan={10} className="p-8 text-center text-muted-foreground">Nenhuma campanha ainda.</td></tr>
-              ) : campaigns.map(c => (
-                <tr key={c.campaign_id} className="border-t hover:bg-muted/30">
-                  <td className="p-2 font-medium">{c.nome}</td>
-                  <td className="p-2"><Badge variant="outline">{c.tipo}</Badge></td>
-                  <td className="p-2 text-xs">{fmtDate(c.sent_at || c.created_at)}</td>
-                  <td className="p-2 text-right font-mono">{c.total_alvo}</td>
-                  <td className="p-2 text-right font-mono">{c.enviados}</td>
-                  <td className="p-2 text-right font-mono text-red-600">{c.erros || ''}</td>
-                  <td className="p-2 text-right font-mono">{c.aberturas_unicas}</td>
-                  <td className="p-2 text-right font-mono text-muted-foreground">{c.aberturas_totais}</td>
-                  <td className="p-2 text-right font-bold">{pct(c.aberturas_unicas, c.enviados)}</td>
-                  <td className="p-2 text-right">
-                    <Button size="sm" variant="outline" onClick={() => setOpenDetail(c)}>Ver</Button>
-                  </td>
-                </tr>
-              ))}
+              ) : campaigns.map(c => {
+                const ck = clicksByCampaign[c.campaign_id] ?? { unicos: 0, totais: 0 };
+                return (
+                  <tr key={c.campaign_id} className="border-t hover:bg-muted/30">
+                    <td className="p-2 font-medium">{c.nome}</td>
+                    <td className="p-2"><Badge variant="outline">{c.tipo}</Badge></td>
+                    <td className="p-2 text-xs">{fmtDate(c.sent_at || c.created_at)}</td>
+                    <td className="p-2 text-right font-mono">{c.total_alvo}</td>
+                    <td className="p-2 text-right font-mono">{c.enviados}</td>
+                    <td className="p-2 text-right font-mono text-red-600">{c.erros || ''}</td>
+                    <td className="p-2 text-right font-mono">{c.aberturas_unicas}</td>
+                    <td className="p-2 text-right font-mono font-bold">{ck.unicos}</td>
+                    <td className="p-2 text-right font-bold">{pct(ck.unicos, c.enviados)}</td>
+                    <td className="p-2 text-right">
+                      <Button size="sm" variant="outline" onClick={() => setOpenDetail(c)}>Ver</Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </Card>
