@@ -42,8 +42,11 @@ function render(tpl: string, c: Contact): string {
   return tpl.replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (_, k) => vars[k.toLowerCase()] ?? "");
 }
 
-function wrapHtml(body: string, contact: Contact): string {
+function wrapHtml(body: string, contact: Contact, trackingPixelUrl: string | null): string {
   const optOutLink = `mailto:${SENDER_EMAIL}?subject=Remover%20do%20mailing&body=Por%20favor%20remover%20${encodeURIComponent(contact.email || "")}%20da%20lista.`;
+  const pixel = trackingPixelUrl
+    ? `<img src="${trackingPixelUrl}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0;" />`
+    : "";
   return `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#111;line-height:1.5;max-width:640px;margin:0 auto;padding:24px;">
 ${body}
 <hr style="border:none;border-top:1px solid #ddd;margin:32px 0 16px;">
@@ -58,6 +61,7 @@ Consultor em Marketing e IA
 Você está recebendo este email como contato de imprensa de <strong>${contact.veiculo}</strong>${contact.municipio ? " — " + contact.municipio : ""}.<br>
 Para não receber mais comunicações, <a href="${optOutLink}" style="color:#666;">clique aqui para solicitar remoção</a>.
 </p>
+${pixel}
 </body></html>`;
 }
 
@@ -106,6 +110,7 @@ Deno.serve(async (req) => {
 
     let sent = 0, skipped = 0, failed = 0;
     const errors: { id: string; error: string }[] = [];
+    const TRACK_BASE = `${SUPABASE_URL}/functions/v1/track-press-open`;
 
     for (const c of (contacts as Contact[]) ?? []) {
       if (!c.email || c.opt_out) {
@@ -117,9 +122,22 @@ Deno.serve(async (req) => {
         continue;
       }
       try {
+        // Pre-insert para obter send_id (usado no pixel de rastreio)
+        const { data: pendingRow, error: pErr } = await admin
+          .from("press_sends")
+          .upsert(
+            { campaign_id, contact_id: c.id, canal: "email", status: "pendente", error: null },
+            { onConflict: "campaign_id,contact_id" }
+          )
+          .select("id")
+          .single();
+        if (pErr || !pendingRow) throw pErr || new Error("falha ao registrar envio");
+        const sendId = pendingRow.id as string;
+        const pixelUrl = `${TRACK_BASE}?s=${sendId}`;
+
         const renderedSubject = render(subject, c);
         const renderedBody = render(html, c);
-        const finalHtml = wrapHtml(renderedBody, c);
+        const finalHtml = wrapHtml(renderedBody, c, pixelUrl);
 
         const r = await fetch(`${GATEWAY_URL}/smtp/email`, {
           method: "POST",
@@ -140,16 +158,14 @@ Deno.serve(async (req) => {
           failed++;
           const errMsg = `${r.status}: ${data?.message || data?.code || "erro"}`;
           errors.push({ id: c.id, error: errMsg });
-          await admin.from("press_sends").upsert({
-            campaign_id, contact_id: c.id, canal: "email",
+          await admin.from("press_sends").update({
             status: "erro", error: errMsg,
-          }, { onConflict: "campaign_id,contact_id" });
+          }).eq("id", sendId);
         } else {
           sent++;
-          await admin.from("press_sends").upsert({
-            campaign_id, contact_id: c.id, canal: "email",
-            status: "enviado", message_id: data?.messageId || null, sent_at: new Date().toISOString(),
-          }, { onConflict: "campaign_id,contact_id" });
+          await admin.from("press_sends").update({
+            status: "enviado", message_id: data?.messageId || null, sent_at: new Date().toISOString(), error: null,
+          }).eq("id", sendId);
         }
       } catch (e) {
         const msg = e instanceof Error ? e.message : "erro";
