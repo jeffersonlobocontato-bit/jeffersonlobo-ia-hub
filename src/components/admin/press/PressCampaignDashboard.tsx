@@ -754,3 +754,148 @@ const ContactHistoryDialog = ({ contact, onClose }: { contact: ContactEng; onClo
     </Dialog>
   );
 };
+
+// ───── Edição de segmento (reclassificação manual) ──────────────────────
+
+type EditableContact = {
+  id: string;
+  veiculo: string;
+  contato: string | null;
+  email: string | null;
+  municipio: string | null;
+  regiao: string | null;
+  meio: string | null;
+  newMeio: string; // valor escolhido pelo usuário (canônico) ou '' para limpar
+};
+
+const SegmentEditDialog = ({
+  segment, onClose, onSaved,
+}: { segment: string; onClose: () => void; onSaved: () => void }) => {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [rows, setRows] = useState<EditableContact[]>([]);
+  const [q, setQ] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      setLoading(true);
+      const { data } = await supabase
+        .from('press_contacts')
+        .select('id,veiculo,contato,email,municipio,regiao,meio')
+        .order('veiculo', { ascending: true });
+      const all = (data ?? []) as any[];
+      const filtered = all.filter(c => normalizeMeio(c.meio, c.veiculo) === segment);
+      // Default newMeio: se o segmento clicado é canônico, sugere ele mesmo.
+      const suggested = (CANON_MEIO_OPTIONS as readonly string[]).includes(segment) ? segment : '';
+      setRows(filtered.map(c => ({ ...c, newMeio: suggested })));
+      setLoading(false);
+    })();
+  }, [segment]);
+
+  const filtered = useMemo(() => {
+    if (!q) return rows;
+    const s = q.toLowerCase();
+    return rows.filter(r => `${r.veiculo} ${r.contato ?? ''} ${r.email ?? ''} ${r.municipio ?? ''} ${r.meio ?? ''}`.toLowerCase().includes(s));
+  }, [rows, q]);
+
+  const applyAll = (value: string) => {
+    setRows(prev => prev.map(r => ({ ...r, newMeio: value })));
+  };
+
+  const save = async () => {
+    const updates = rows.filter(r => r.newMeio && r.newMeio !== r.meio);
+    if (updates.length === 0) {
+      toast.info('Nenhuma alteração para salvar.');
+      return;
+    }
+    setSaving(true);
+    let ok = 0, fail = 0;
+    for (const u of updates) {
+      const { error } = await supabase
+        .from('press_contacts')
+        .update({ meio: u.newMeio })
+        .eq('id', u.id);
+      if (error) fail++; else ok++;
+    }
+    setSaving(false);
+    if (fail > 0) toast.error(`${ok} salvos, ${fail} com erro.`);
+    else toast.success(`${ok} veículos reclassificados.`);
+    onSaved();
+  };
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Reclassificar segmento: {segment}</DialogTitle>
+          <div className="text-xs text-muted-foreground">
+            {rows.length} veículo(s) atualmente classificados nesta categoria. Ajuste individualmente ou aplique em lote.
+          </div>
+        </DialogHeader>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Input placeholder="Buscar veículo, contato, email…" value={q} onChange={(e) => setQ(e.target.value)} className="h-8 w-[260px]" />
+          <div className="flex items-center gap-2 ml-auto">
+            <span className="text-xs text-muted-foreground">Aplicar a todos:</span>
+            <Select onValueChange={applyAll}>
+              <SelectTrigger className="h-8 w-[200px] text-xs"><SelectValue placeholder="Escolher categoria…" /></SelectTrigger>
+              <SelectContent>
+                {CANON_MEIO_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="overflow-x-auto border rounded">
+          <table className="w-full text-xs">
+            <thead className="bg-muted/50">
+              <tr className="text-left">
+                <th className="p-2">Veículo</th>
+                <th className="p-2">Contato</th>
+                <th className="p-2">Município / Região</th>
+                <th className="p-2">Meio atual</th>
+                <th className="p-2 w-[200px]">Nova categoria</th>
+              </tr>
+            </thead>
+            <tbody>
+              {loading ? (
+                <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">Carregando veículos…</td></tr>
+              ) : filtered.length === 0 ? (
+                <tr><td colSpan={5} className="p-8 text-center text-muted-foreground">Nenhum veículo nesta categoria.</td></tr>
+              ) : filtered.map(r => (
+                <tr key={r.id} className="border-t">
+                  <td className="p-2 font-medium">{r.veiculo}</td>
+                  <td className="p-2">
+                    <div>{r.contato || '—'}</div>
+                    <div className="text-[10px] text-muted-foreground font-mono">{r.email || '—'}</div>
+                  </td>
+                  <td className="p-2 text-[11px]">{r.municipio || '—'}{r.regiao ? ` / ${r.regiao}` : ''}</td>
+                  <td className="p-2 text-[11px] text-muted-foreground">{r.meio || <em>(vazio)</em>}</td>
+                  <td className="p-2">
+                    <Select
+                      value={r.newMeio}
+                      onValueChange={(v) => setRows(prev => prev.map(x => x.id === r.id ? { ...x, newMeio: v } : x))}
+                    >
+                      <SelectTrigger className="h-7 text-xs"><SelectValue placeholder="Manter" /></SelectTrigger>
+                      <SelectContent>
+                        {CANON_MEIO_OPTIONS.map(o => <SelectItem key={o} value={o}>{o}</SelectItem>)}
+                      </SelectContent>
+                    </Select>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="flex justify-end gap-2 pt-2">
+          <Button variant="outline" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button onClick={save} disabled={saving || loading}>
+            <Save className="w-3 h-3 mr-1" />
+            {saving ? 'Salvando…' : 'Salvar alterações'}
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
