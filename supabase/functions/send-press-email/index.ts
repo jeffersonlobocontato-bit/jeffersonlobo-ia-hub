@@ -138,6 +138,7 @@ Deno.serve(async (req) => {
     let sent = 0, skipped = 0, failed = 0;
     const errors: { id: string; error: string }[] = [];
     const TRACK_BASE = `${SUPABASE_URL}/functions/v1/track-press-open`;
+    const CLICK_BASE = `${SUPABASE_URL}/functions/v1/track-press-click`;
 
     for (const c of (contacts as Contact[]) ?? []) {
       if (!c.email || c.opt_out) {
@@ -163,8 +164,9 @@ Deno.serve(async (req) => {
         const pixelUrl = `${TRACK_BASE}?s=${sendId}`;
 
         const renderedSubject = render(subject, c);
-        const renderedBody = render(html, c);
+        const renderedBody = rewriteLinks(render(html, c), sendId, CLICK_BASE);
         const finalHtml = wrapHtml(renderedBody, c, pixelUrl);
+
 
         const r = await fetch(`${GATEWAY_URL}/smtp/email`, {
           method: "POST",
