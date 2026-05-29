@@ -55,7 +55,7 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const [alreadySentLockIds, setAlreadySentLockIds] = useState<Set<string>>(new Set());
 
   const [sending, setSending] = useState(false);
-  const [emailResult, setEmailResult] = useState<{ sent: number; skipped: number; failed: number } | null>(null);
+  const [emailResult, setEmailResult] = useState<{ sent: number; skipped: number; failed: number; errors?: { id: string; error: string }[]; progress?: string } | null>(null);
 
   // WA-only state
   const [waCampaignId, setWaCampaignId] = useState<string | null>(null);
