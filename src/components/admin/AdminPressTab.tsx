@@ -7,7 +7,8 @@ import { CheckCircle2, Plus, Upload, Trash2, Users, Mail, MessageCircle } from '
 import type { PressContact } from '@/lib/press-utils';
 import { PressContactsTable } from './press/PressContactsTable';
 import { PressImportDialog } from './press/PressImportDialog';
-import { PressCampaignWizard } from './press/PressCampaignWizard';
+import { PressCampaignWizard, type WizardPrefill } from './press/PressCampaignWizard';
+import { PressCampaignHistory, type CampaignPrefill } from './press/PressCampaignHistory';
 import { usePressLists } from '@/hooks/usePressLists';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,6 +18,8 @@ export const AdminPressTab = () => {
   const [loading, setLoading] = useState(true);
   const [importOpen, setImportOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardPrefill, setWizardPrefill] = useState<WizardPrefill | null>(null);
+  const [historyKey, setHistoryKey] = useState(0);
   const [showBase, setShowBase] = useState(false);
   const [baseSelected, setBaseSelected] = useState<Set<string>>(new Set());
   const { lists, loading: loadingLists, reload: reloadLists } = usePressLists();
