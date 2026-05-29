@@ -7,7 +7,7 @@ import sharp from "sharp";
 
 const BASE_URL = "https://jeffersonlobo.tech";
 const FALLBACK_IMAGE = "https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp";
-const SOCIAL_PREVIEW_VERSION = "img4";
+const SOCIAL_PREVIEW_VERSION = "img5";
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://cgydeldzhnfyexphaheq.supabase.co";
 const SUPABASE_KEY =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
