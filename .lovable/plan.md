@@ -1,52 +1,49 @@
-## Diagnóstico
+## Objetivo
 
-Verifiquei os logs HTTP da edge function `send-press-email` e confirmei o problema:
+No painel "Análise por segmento e região", agrupar as variações de `meio` (e do `veiculo` quando o `meio` for vazio/ambíguo) em categorias canônicas via análise semântica no front, sem alterar dados no banco.
 
-- A função foi chamada **2 vezes** e **ambas retornaram HTTP 400** em ~1.3s
-- 400 só acontece em dois pontos da função: `invalid_input` (campaign_id / subject / html / contact_ids vazios) ou `max_100_per_batch`
-- Os logs textuais da função estão vazios (só boot/shutdown) → não dá pra saber **qual** dos dois disparou
-- **Nenhuma campanha nova** foi criada no banco — significa que o disparo abortou no primeiro lote e provavelmente você apagou a campanha vazia
+## Categorias canônicas e regras
 
-Como o wizard já chunka em lotes de no máximo 100 (245 vira 100/100/45), `max_100` é improvável. Suspeita principal: `subject` ou `html` chegando vazios na função (algum problema de estado/serialização) ou `campaign_id` perdido entre o insert e o invoke.
+| Canônico | Casos absorvidos |
+|---|---|
+| **Portal de Notícias** | "portal de notícias", "portal", "site", "internet", "web", "blog", "online", "digital" |
+| **Jornal Impresso** | "jornal impresso", "jornal", "impresso", "periódico" |
+| **Rádio** | "rádio", "radio", "rádio comunitária", "fm", "am", "webradio" |
+| **TV** | "tv", "televisão", "canal" |
+| **Revista** | "revista", "magazine" |
+| **Redes Sociais** | "facebook", "instagram", "youtube", "tiktok", "x", "twitter", "linkedin", "telegram", "redes sociais", "rede social", "social" |
+| **Podcast** | "podcast" |
+| **Agência** | "agência", "agencia", "assessoria" |
+| **Outros** | nada bate (mantém o rótulo original entre parênteses para inspeção) |
 
-Além disso, encontrei um **bug colateral**: no `catch` do disparo, o wizard tenta `UPDATE press_campaigns SET status='erro'`, mas o CHECK constraint só aceita `rascunho | em_envio | concluida | cancelada`. Esse update falha silenciosamente e a campanha fica travada em `em_envio`.
+### Regras de combinação (quando o campo tem múltiplos termos, ex.: "Rádio e Portal")
+Aplicar em ordem (primeiro match vence):
+1. Contém Rádio + qualquer outro → **Rádio**
+2. Contém TV + qualquer outro → **TV**
+3. Contém Redes Sociais isolado ou combinado com Portal/Blog → **Redes Sociais** somente se NÃO houver Rádio/TV
+4. Jornal Impresso + Portal → manter **separado** como "Jornal Impresso + Portal" (conflito real entre mídia física e digital, conforme orientação de manter separado quando há divergência)
+5. Demais combinações com 2 canônicos distintos sem regra acima → **separado** como "A + B" ordenado alfabeticamente
 
-## O que vou fazer
+### Fallback semântico
+Quando `meio` for `null`/vazio/"—", analisar `veiculo` com a mesma tabela de keywords (ex.: "Rádio Difusora FM" → Rádio; "Portal G1" → Portal de Notícias; "Blog do Fulano" → Portal de Notícias).
 
-### 1. Instrumentar `send-press-email/index.ts`
-Antes de retornar 400, logar exatamente o que a função recebeu (sem expor HTML inteiro):
+Normalização: lowercase + remoção de acentos + remoção de pontuação antes de comparar.
 
-```ts
-if (!campaign_id || !subject || !html || contact_ids.length === 0) {
-  console.error("invalid_input", {
-    has_campaign_id: !!campaign_id,
-    subject_len: subject.length,
-    html_len: html.length,
-    contacts_count: contact_ids.length,
-  });
-  return new Response(JSON.stringify({
-    error: "invalid_input",
-    detail: { has_campaign_id: !!campaign_id, subject_len: subject.length, html_len: html.length, contacts_count: contact_ids.length }
-  }), { status: 400, ... });
-}
-```
+## Implementação (1 arquivo, frontend only)
 
-E também retornar o `detail` para o cliente para o toast mostrar exatamente qual campo veio vazio.
+**`src/components/admin/press/PressCampaignDashboard.tsx`**
 
-### 2. Corrigir o status inválido no catch do wizard
-Em `PressCampaignWizard.tsx` (linha 261), trocar `status: 'erro'` por `status: 'cancelada'` — alinhado ao CHECK constraint. Assim a campanha não fica órfã em `em_envio` se o disparo falhar.
+1. Criar helper `normalizeMeio(meio: string | null, veiculo?: string): string` no topo do arquivo com a tabela de regras acima.
+2. No `useMemo` de `segFiltered` (linhas 104–115), trocar a chave de agregação `r.meio` por `normalizeMeio(r.meio)`. Como a view `press_segment_stats` não traz `veiculo`, o fallback semântico para linhas com `meio` vazio usará só `meio` aqui — suficiente para a maioria.
+3. Na tabela "Ranking de leitores" (linha 300), trocar `{c.meio || '—'}` por `{normalizeMeio(c.meio, c.veiculo) || '—'}` para aplicar inclusive o fallback via `veiculo`.
+4. Manter ordenação por `enviados` desc.
 
-### 3. Melhorar a mensagem de erro no toast
-Quando `data?.error === 'invalid_input'`, mostrar o `detail` retornado para você saber na hora qual campo veio vazio.
+## O que NÃO muda
 
-### 4. Redeploy
-`deploy_edge_functions(["send-press-email"])` e te pedir para tentar disparar de novo. Com o log estruturado vou conseguir te dizer em segundos se o problema é `subject`, `html` ou `campaign_id`.
+- Banco de dados, views (`press_segment_stats` etc.), edge functions e import XLSX permanecem intactos.
+- O `meio` original dos contatos continua salvo como está — a normalização é só de exibição/agregação no dashboard.
 
-## Arquivos afetados
+## Fora de escopo (pode virar próximo passo se quiser)
 
-- `supabase/functions/send-press-email/index.ts` — logging + detail no 400
-- `src/components/admin/press/PressCampaignWizard.tsx` — fix `status: 'erro'` → `'cancelada'` + toast melhorado
-
-## Fora do escopo
-
-Não vou mexer na lógica de chunking, throttle ou no fluxo de envio — só diagnóstico + 1 bug do catch. Depois que você retentar e a gente ver o log real, aí faço o fix definitivo.
+- Botão "Aplicar normalização à base" (UPDATE em `press_contacts.meio`).
+- Editar a tabela de regras pela UI.

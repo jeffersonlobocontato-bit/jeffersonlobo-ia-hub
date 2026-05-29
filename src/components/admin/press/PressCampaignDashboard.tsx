@@ -56,6 +56,66 @@ type SendDetail = {
 const pct = (n: number, d: number) => d > 0 ? `${Math.round((n / d) * 100)}%` : '—';
 const fmtDate = (s: string | null) => s ? new Date(s).toLocaleString('pt-BR') : '—';
 
+// Normalização semântica de "meio" -> categorias canônicas.
+// Olha primeiro em `meio`; se vazio/desconhecido, faz fallback no `veiculo`.
+const _strip = (s: string) => s.toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+  .replace(/[^a-z0-9\s+&]/g, ' ')
+  .replace(/\s+/g, ' ')
+  .trim();
+
+type Canon = 'Rádio' | 'TV' | 'Jornal Impresso' | 'Portal de Notícias' | 'Revista' | 'Redes Sociais' | 'Podcast' | 'Agência';
+
+function _detectCanons(raw: string): Canon[] {
+  const t = ` ${_strip(raw)} `;
+  const found = new Set<Canon>();
+  // Rádio
+  if (/\b(radio|fm|am|webradio)\b/.test(t)) found.add('Rádio');
+  // TV
+  if (/\b(tv|televisao|canal)\b/.test(t)) found.add('TV');
+  // Jornal Impresso
+  if (/\b(jornal|impresso|periodico)\b/.test(t)) found.add('Jornal Impresso');
+  // Revista
+  if (/\b(revista|magazine)\b/.test(t)) found.add('Revista');
+  // Podcast
+  if (/\bpodcast\b/.test(t)) found.add('Podcast');
+  // Agência
+  if (/\b(agencia|assessoria)\b/.test(t)) found.add('Agência');
+  // Redes Sociais
+  if (/\b(facebook|fb|instagram|insta|ig|youtube|yt|tiktok|twitter|x|linkedin|telegram|rede social|redes sociais|social)\b/.test(t)) {
+    found.add('Redes Sociais');
+  }
+  // Portal de Notícias (inclui blog/site/web/internet/online/digital/portal)
+  if (/\b(portal|site|web|internet|online|digital|blog)\b/.test(t)) found.add('Portal de Notícias');
+  return Array.from(found);
+}
+
+export function normalizeMeio(meio: string | null | undefined, veiculo?: string | null): string {
+  const sources: string[] = [];
+  if (meio && meio.trim() && meio.trim() !== '—') sources.push(meio);
+  // Fallback: se não detectou nada no meio, tenta no veiculo
+  let canons = sources.length ? _detectCanons(sources.join(' ')) : [];
+  if (canons.length === 0 && veiculo) canons = _detectCanons(veiculo);
+
+  if (canons.length === 0) {
+    const fallback = (meio || veiculo || '').trim();
+    return fallback ? `Outros (${fallback})` : 'Outros';
+  }
+
+  // Regras de combinação
+  if (canons.includes('Rádio')) return 'Rádio';
+  if (canons.includes('TV')) return 'TV';
+  // Redes Sociais combinado com Portal/Blog vira Redes Sociais
+  if (canons.includes('Redes Sociais') && !canons.includes('Jornal Impresso')) return 'Redes Sociais';
+  // Jornal Impresso + Portal: conflito real, manter separado
+  if (canons.includes('Jornal Impresso') && canons.includes('Portal de Notícias')) {
+    return 'Jornal Impresso + Portal';
+  }
+  if (canons.length === 1) return canons[0];
+  // Demais combinações: separar com " + " ordenado
+  return canons.slice().sort().join(' + ');
+}
+
 export const PressCampaignDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [campaigns, setCampaigns] = useState<CampaignStat[]>([]);
@@ -105,11 +165,12 @@ export const PressCampaignDashboard = () => {
     const rows = selectedCampaign === 'all' ? segments : segments.filter(s => s.campaign_id === selectedCampaign);
     const agg = new Map<string, { meio: string; enviados: number; aberturas_unicas: number; aberturas_totais: number }>();
     for (const r of rows) {
-      const cur = agg.get(r.meio) ?? { meio: r.meio, enviados: 0, aberturas_unicas: 0, aberturas_totais: 0 };
+      const key = normalizeMeio(r.meio);
+      const cur = agg.get(key) ?? { meio: key, enviados: 0, aberturas_unicas: 0, aberturas_totais: 0 };
       cur.enviados += r.enviados;
       cur.aberturas_unicas += r.aberturas_unicas;
       cur.aberturas_totais += r.aberturas_totais;
-      agg.set(r.meio, cur);
+      agg.set(key, cur);
     }
     return Array.from(agg.values()).sort((a, b) => b.enviados - a.enviados);
   }, [segments, selectedCampaign]);
@@ -297,7 +358,7 @@ export const PressCampaignDashboard = () => {
                   <td className="p-2 font-mono text-xs">{i + 1}</td>
                   <td className="p-2">{c.contato || '—'}</td>
                   <td className="p-2 text-xs">{c.veiculo}</td>
-                  <td className="p-2 text-xs">{c.meio || '—'}</td>
+                  <td className="p-2 text-xs">{normalizeMeio(c.meio, c.veiculo)}</td>
                   <td className="p-2 text-xs">{c.regiao || '—'}</td>
                   <td className="p-2 text-right font-mono">{c.total_recebidos}</td>
                   <td className="p-2 text-right font-mono">{c.campanhas_abertas}</td>
