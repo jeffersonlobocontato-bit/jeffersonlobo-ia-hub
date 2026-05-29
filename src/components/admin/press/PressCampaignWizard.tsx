@@ -32,8 +32,9 @@ const DEFAULT_EMAIL_SUBJECT = `Pauta para {{veiculo}} — {{primeiro_nome}}, pos
 const DEFAULT_EMAIL_BODY = `<p>Olá <strong>{{primeiro_nome}}</strong>,</p><p>Sou Jefferson Lobo, especialista em IA. Estou enviando uma pauta que pode interessar à <strong>{{veiculo}}</strong>:</p><p><em>[descreva sua pauta aqui]</em></p><p>Posso compartilhar mais detalhes?</p><p>Abraço,<br>Jefferson Lobo</p>`;
 const DEFAULT_WA_BODY = `<p>Olá <strong>{{primeiro_nome}}</strong>! Sou Jefferson Lobo, especialista em IA. Tenho uma pauta que pode interessar à <strong>{{veiculo}}</strong>: <em>[seu assunto aqui]</em>. Posso compartilhar mais detalhes?</p>`;
 
-const BATCH_LIMIT = 280;
-const CHUNK_SIZE = 90; // edge function aceita máx 100 por chamada
+const DEFAULT_CHUNK_SIZE = 100; // edge function aceita máx 100 por chamada
+const DEFAULT_PAUSE_SEC = 30;
+const MAX_CHUNK_SIZE = 100;
 
 export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const { toast } = useToast();
