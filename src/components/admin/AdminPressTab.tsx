@@ -58,7 +58,7 @@ export const AdminPressTab = () => {
       </Card>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="lg" onClick={() => setWizardOpen(true)}>
+        <Button size="lg" onClick={() => { setWizardPrefill(null); setWizardOpen(true); }}>
           <Plus className="w-4 h-4 mr-1" /> Novo disparo
         </Button>
         <Button size="lg" variant="outline" onClick={() => setImportOpen(true)}>
@@ -106,6 +106,21 @@ export const AdminPressTab = () => {
         )}
       </div>
 
+      {/* HISTÓRICO DE DISPAROS */}
+      <PressCampaignHistory
+        key={historyKey}
+        onReuse={(p: CampaignPrefill) => {
+          setWizardPrefill({
+            canal: p.canal,
+            nome: p.nome,
+            subject: p.subject,
+            body: p.body,
+            alreadySentIds: p.alreadySentIds,
+          });
+          setWizardOpen(true);
+        }}
+      />
+
       {/* BASE COMPLETA (collapsible) */}
       {showBase && (
         <div>
@@ -126,8 +141,16 @@ export const AdminPressTab = () => {
         onOpenChange={setImportOpen}
         onDone={() => { load(); reloadLists(); }}
       />
-      <PressCampaignWizard open={wizardOpen} onOpenChange={setWizardOpen} />
+      <PressCampaignWizard
+        open={wizardOpen}
+        onOpenChange={(o) => {
+          setWizardOpen(o);
+          if (!o) { setWizardPrefill(null); setHistoryKey(k => k + 1); }
+        }}
+        prefill={wizardPrefill}
+      />
     </div>
+
   );
 };
 
