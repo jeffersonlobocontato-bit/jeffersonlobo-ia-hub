@@ -151,6 +151,34 @@ export function buildWhatsappLink(contact: PressContact, message: string): strin
   return `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(txt)}`;
 }
 
+/** Monta a mensagem final do WhatsApp: *título*\n\n{corpo}\n\n{link}
+ *  - bodyMarkdown já deve estar em markdown do WhatsApp (use htmlToWhatsAppMarkdown antes)
+ *  - todos os campos passam por renderTemplate com o contato
+ */
+export function composeWhatsAppMessage(opts: {
+  titulo?: string | null;
+  bodyMarkdown: string;
+  link?: string | null;
+  contact: PressContact;
+}): string {
+  const { titulo, bodyMarkdown, link, contact } = opts;
+  const parts: string[] = [];
+  if (titulo && titulo.trim()) parts.push(`*${renderTemplate(titulo.trim(), contact)}*`);
+  if (bodyMarkdown && bodyMarkdown.trim()) parts.push(renderTemplate(bodyMarkdown, contact));
+  if (link && link.trim()) parts.push(renderTemplate(link.trim(), contact));
+  return parts.join('\n\n');
+}
+
+/** Gera slug curto a partir de texto livre (sem acentos, kebab-case, máx 60 chars). */
+export function slugify(input: string): string {
+  return input
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .slice(0, 60);
+}
+
 /** Converte HTML do editor rico para o "markdown" aceito pelo WhatsApp.
  *  WhatsApp aceita *negrito*, _itálico_, ~tachado~ e ```mono```. Listas viram texto. Imagens viram URL. */
 export function htmlToWhatsAppMarkdown(html: string): string {
