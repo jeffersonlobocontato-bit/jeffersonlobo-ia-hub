@@ -19,6 +19,7 @@ import WorkshopIA from "./pages/WorkshopIA";
 import ConsultoriaIA from "./pages/ConsultoriaIA";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
+import PressReleaseOG from "./pages/PressReleaseOG";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -39,6 +40,7 @@ const App = () => (
               <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/imprensa" element={<Imprensa />} />
+              <Route path="/imprensa/r/:slug" element={<PressReleaseOG />} />
               <Route path="/palestras-ia" element={<PalestrasIA />} />
               <Route path="/workshop-ia" element={<WorkshopIA />} />
               <Route path="/consultoria-ia" element={<ConsultoriaIA />} />

@@ -12,9 +12,11 @@ import {
   ExternalLink, SkipForward, Loader2,
 } from 'lucide-react';
 import { PressRichEditor } from './PressRichEditor';
+import { CampaignMediaUploader, type MediaTipo } from './CampaignMediaUploader';
 import { fetchContactsForLists, usePressLists, type PressList } from '@/hooks/usePressLists';
 import {
   type PressContact, renderTemplate, htmlToWhatsAppMarkdown,
+  composeWhatsAppMessage, slugify,
 } from '@/lib/press-utils';
 
 export type WizardPrefill = {
@@ -51,6 +53,13 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const [nome, setNome] = useState('');
   const [subject, setSubject] = useState(DEFAULT_EMAIL_SUBJECT);
   const [body, setBody] = useState(DEFAULT_EMAIL_BODY);
+  // Novos campos: título, mídia, link de destino
+  const [titulo, setTitulo] = useState('');
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+  const [mediaTipo, setMediaTipo] = useState<MediaTipo>('nenhum');
+  const [linkDestino, setLinkDestino] = useState('');
+  const [ogValidating, setOgValidating] = useState(false);
+  const [ogResult, setOgResult] = useState<{ valid: boolean; missing: string[]; og_image?: string | null; og_title?: string | null } | null>(null);
   // Trava o auto-reset do body quando vier de prefill
   const [bodyPrefilled, setBodyPrefilled] = useState(false);
   const [alreadySentLockIds, setAlreadySentLockIds] = useState<Set<string>>(new Set());
@@ -78,6 +87,7 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
       setAlreadySentLockIds(sentSet);
       setContacts([]);
       setEmailResult(null); setWaCampaignId(null); setWaSends({});
+      setTitulo(''); setMediaUrl(null); setMediaTipo('nenhum'); setLinkDestino(''); setOgResult(null);
       if (prefill) {
         setCanal(prefill.canal);
         setNome(prefill.nome);
@@ -283,12 +293,20 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     if (!nome.trim() || !body.trim()) {
       toast({ title: 'Preencha nome e mensagem', variant: 'destructive' }); return;
     }
+    // gera slug curto se houver título (para a página /imprensa/r/:slug)
+    const baseSlug = titulo.trim() ? slugify(titulo) : slugify(nome);
+    const linkSlug = baseSlug ? `${baseSlug}-${Math.random().toString(36).slice(2, 6)}` : null;
     const { data, error } = await supabase
       .from('press_campaigns')
       .insert({
         tipo: 'whatsapp', nome: nome.trim(), corpo: body,
         total_alvo: totalElegiveis, status: 'em_envio',
         filtros: { list_ids: [...selectedLists] },
+        titulo: titulo.trim() || null,
+        media_url: mediaUrl,
+        media_tipo: mediaTipo,
+        link_destino: linkDestino.trim() || null,
+        link_slug: linkSlug,
       })
       .select('id').single();
     if (error || !data) {
@@ -303,9 +321,16 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     setWaSends(initial);
   };
 
+  const buildWaText = (c: PressContact): string => composeWhatsAppMessage({
+    titulo,
+    bodyMarkdown: htmlToWhatsAppMarkdown(body),
+    link: linkDestino,
+    contact: c,
+  });
+
   const waMarkSent = async (c: PressContact) => {
     if (!waCampaignId) return;
-    const waText = htmlToWhatsAppMarkdown(renderTemplate(body, c));
+    const waText = buildWaText(c);
     const link = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(waText)}`;
     window.open(link, '_blank', 'noopener,noreferrer');
     setWaSends(s => ({ ...s, [c.id]: 'enviado' }));
@@ -546,14 +571,82 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
                 <Input value={subject} onChange={e => setSubject(e.target.value)} />
               </div>
             )}
+
+            {canal === 'whatsapp' && (
+              <>
+                <div>
+                  <label className="text-xs uppercase font-bold">Título do release</label>
+                  <Input
+                    value={titulo}
+                    onChange={e => setTitulo(e.target.value.slice(0, 80))}
+                    placeholder="Ex: Jefferson Lobo lança guia gratuito de IA para PMEs"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Vira a primeira linha em <strong>negrito</strong> da mensagem. {titulo.length}/80
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs uppercase font-bold">Mídia (opcional)</label>
+                  <CampaignMediaUploader
+                    mediaUrl={mediaUrl}
+                    mediaTipo={mediaTipo}
+                    onChange={(u, t) => { setMediaUrl(u); setMediaTipo(t); }}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Baixe-a 1× na hora do envio e arraste no WhatsApp Web após "Abrir". Se esquecer, o link abaixo já gera preview rico.
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs uppercase font-bold">Link de destino (opcional)</label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={linkDestino}
+                      onChange={e => setLinkDestino(e.target.value)}
+                      placeholder="https://jeffersonlobo.tech/imprensa/r/..."
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!linkDestino.trim() || ogValidating}
+                      onClick={async () => {
+                        setOgValidating(true); setOgResult(null);
+                        try {
+                          const { data, error } = await supabase.functions.invoke('validate-og-tags', {
+                            body: { url: linkDestino.trim() },
+                          });
+                          if (error) throw error;
+                          setOgResult(data as any);
+                        } catch (e) {
+                          setOgResult({ valid: false, missing: ['erro de rede'] });
+                        } finally {
+                          setOgValidating(false);
+                        }
+                      }}
+                    >
+                      {ogValidating ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Validar preview'}
+                    </Button>
+                  </div>
+                  {ogResult && (
+                    <div className={`text-xs mt-2 p-2 rounded border-l-4 ${ogResult.valid ? 'bg-emerald-500/10 border-emerald-500' : 'bg-amber-500/10 border-amber-500'}`}>
+                      {ogResult.valid ? (
+                        <>✓ Preview rico OK · <strong>{ogResult.og_title}</strong></>
+                      ) : (
+                        <>⚠ Faltam meta tags: {ogResult.missing.join(', ')}. O link vai aparecer "seco" no WhatsApp.</>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
             <div>
               <label className="text-xs uppercase font-bold">
-                {canal === 'email' ? 'Corpo do email' : 'Mensagem WhatsApp'}
+                {canal === 'email' ? 'Corpo do email' : 'Texto de apoio'}
               </label>
               <PressRichEditor value={body} onChange={setBody} />
               {canal === 'whatsapp' && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  WhatsApp converte: negrito → <code>*texto*</code>, itálico → <code>_texto_</code>, tachado → <code>~texto~</code>. Imagens viram link.
+                  Mantenha em até ~700 caracteres. WhatsApp converte: negrito → <code>*texto*</code>, itálico → <code>_texto_</code>.
                 </p>
               )}
             </div>
@@ -578,9 +671,17 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
                 {canal === 'email' ? (
                   <div className="bg-white p-3 rounded text-sm text-black border" dangerouslySetInnerHTML={{ __html: renderTemplate(body, preview) }} />
                 ) : (
-                  <pre className="bg-muted p-3 rounded text-xs whitespace-pre-wrap font-sans">
-                    {htmlToWhatsAppMarkdown(renderTemplate(body, preview))}
-                  </pre>
+                  <div className="bg-[#dcf8c6] p-3 rounded text-sm text-black border max-w-md ml-auto">
+                    {mediaTipo === 'imagem' && mediaUrl && (
+                      <img src={mediaUrl} alt="" className="w-full rounded mb-2" />
+                    )}
+                    {mediaTipo === 'video' && mediaUrl && (
+                      <video src={mediaUrl} className="w-full rounded mb-2" muted />
+                    )}
+                    <pre className="whitespace-pre-wrap font-sans text-xs">
+                      {buildWaText(preview)}
+                    </pre>
+                  </div>
                 )}
               </Card>
             )}
@@ -657,6 +758,26 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
 
             {canal === 'whatsapp' && waCampaignId && (
               <Card className="p-3">
+                {mediaUrl && (
+                  <div className="mb-3 p-2 border-2 border-dashed bg-amber-500/10 flex items-center gap-3">
+                    {mediaTipo === 'imagem'
+                      ? <img src={mediaUrl} alt="" className="w-16 h-16 object-cover border" />
+                      : <video src={mediaUrl} className="w-16 h-16 object-cover border" muted />}
+                    <div className="flex-1 text-xs">
+                      <div className="font-bold uppercase">⚠ Anexar mídia em cada envio</div>
+                      <div className="text-muted-foreground">Baixe 1× e arraste no WhatsApp Web após "Abrir".</div>
+                    </div>
+                    <Button size="sm" variant="outline" type="button" onClick={async () => {
+                      const res = await fetch(mediaUrl); const blob = await res.blob();
+                      const a = document.createElement('a');
+                      a.href = URL.createObjectURL(blob);
+                      a.download = mediaUrl.split('/').pop() ?? 'midia';
+                      a.click();
+                    }}>
+                      Baixar mídia
+                    </Button>
+                  </div>
+                )}
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-sm">
                     <Badge>{Object.values(waSends).filter(s => s === 'enviado').length} enviados</Badge>{' '}

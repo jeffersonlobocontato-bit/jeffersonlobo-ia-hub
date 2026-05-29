@@ -946,11 +946,16 @@ export type Database = {
           created_by: string | null
           filtros: Json
           id: string
+          link_destino: string | null
+          link_slug: string | null
+          media_tipo: string
+          media_url: string | null
           nome: string
           release_group: string | null
           sent_at: string | null
           status: string
           tipo: string
+          titulo: string | null
           total_alvo: number
           total_enviado: number
           total_erro: number
@@ -963,11 +968,16 @@ export type Database = {
           created_by?: string | null
           filtros?: Json
           id?: string
+          link_destino?: string | null
+          link_slug?: string | null
+          media_tipo?: string
+          media_url?: string | null
           nome: string
           release_group?: string | null
           sent_at?: string | null
           status?: string
           tipo: string
+          titulo?: string | null
           total_alvo?: number
           total_enviado?: number
           total_erro?: number
@@ -980,11 +990,16 @@ export type Database = {
           created_by?: string | null
           filtros?: Json
           id?: string
+          link_destino?: string | null
+          link_slug?: string | null
+          media_tipo?: string
+          media_url?: string | null
           nome?: string
           release_group?: string | null
           sent_at?: string | null
           status?: string
           tipo?: string
+          titulo?: string | null
           total_alvo?: number
           total_enviado?: number
           total_erro?: number
@@ -1760,6 +1775,19 @@ export type Database = {
           page_path: string
           unique_visitors: number
           views: number
+        }[]
+      }
+      get_press_release_og: {
+        Args: { p_slug: string }
+        Returns: {
+          corpo: string
+          created_at: string
+          id: string
+          link_destino: string
+          media_tipo: string
+          media_url: string
+          nome: string
+          titulo: string
         }[]
       }
       get_unique_visitors: {
