@@ -170,6 +170,7 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     )) return;
 
     setSending(true);
+    cancelRef.current = false;
     setCancelRequested(false);
     setEmailResult(null);
     setCurrentBatch({ index: 0, total: totalChunks });
