@@ -196,7 +196,7 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
       for (let i = 0; i < ids.length; i += size) chunks.push(ids.slice(i, i + size));
 
       for (let i = 0; i < chunks.length; i++) {
-        if (cancelRequested) break;
+        if (cancelRef.current) break;
         setCurrentBatch({ index: i + 1, total: chunks.length });
 
         const { data, error } = await supabase.functions.invoke('send-press-email', {
