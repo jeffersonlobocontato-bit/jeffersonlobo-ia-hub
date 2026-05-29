@@ -135,11 +135,9 @@ const PressCampaignKiosk = () => {
     contact: c,
   }) : '';
 
-  const openWhatsApp = (c: PressContact) => {
-    const text = buildText(c);
-    const link = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(text)}`;
-    window.open(link, '_blank', 'noopener,noreferrer');
-  };
+  const sanitizePhone = (n: string) => (n ?? '').replace(/\D/g, '');
+  const buildWaLink = (c: PressContact) =>
+    `https://wa.me/${sanitizePhone(c.whatsapp)}?text=${encodeURIComponent(buildText(c))}`;
 
   const markSent = async (c: PressContact) => {
     if (!campaignId) return;
