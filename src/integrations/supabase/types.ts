@@ -1073,6 +1073,41 @@ export type Database = {
         }
         Relationships: []
       }
+      press_email_clicks: {
+        Row: {
+          clicked_at: string
+          id: string
+          ip_hash: string | null
+          send_id: string
+          url: string
+          user_agent: string | null
+        }
+        Insert: {
+          clicked_at?: string
+          id?: string
+          ip_hash?: string | null
+          send_id: string
+          url: string
+          user_agent?: string | null
+        }
+        Update: {
+          clicked_at?: string
+          id?: string
+          ip_hash?: string | null
+          send_id?: string
+          url?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_email_clicks_send_id_fkey"
+            columns: ["send_id"]
+            isOneToOne: false
+            referencedRelation: "press_sends"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       press_email_opens: {
         Row: {
           id: string
