@@ -69,8 +69,10 @@ export const CampaignMediaUploader = ({ mediaUrl, mediaTipo, onChange, disabled,
       a.download = mediaUrl.split('/').pop() ?? 'midia';
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      markDownloaded();
     } catch {
       window.open(mediaUrl, '_blank');
+      markDownloaded();
     }
   };
 
@@ -91,8 +93,10 @@ export const CampaignMediaUploader = ({ mediaUrl, mediaTipo, onChange, disabled,
             <div className="text-muted-foreground truncate">{mediaUrl.split('/').pop()}</div>
           </div>
           <div className="flex flex-col gap-1">
-            <Button size="sm" variant="outline" onClick={downloadMedia} type="button">
-              <Download className="w-3 h-3 mr-1" /> Baixar
+            <Button size="sm" variant={downloaded ? 'outline' : 'default'} onClick={downloadMedia} type="button">
+              {downloaded
+                ? <><Check className="w-3 h-3 mr-1" /> Baixada</>
+                : <><Download className="w-3 h-3 mr-1" /> Baixar</>}
             </Button>
             {!disabled && (
               <Button size="sm" variant="ghost" onClick={remove} type="button">
