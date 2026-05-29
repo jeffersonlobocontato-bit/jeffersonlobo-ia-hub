@@ -758,6 +758,26 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
 
             {canal === 'whatsapp' && waCampaignId && (
               <Card className="p-3">
+                {mediaUrl && (
+                  <div className="mb-3 p-2 border-2 border-dashed bg-amber-500/10 flex items-center gap-3">
+                    {mediaTipo === 'imagem'
+                      ? <img src={mediaUrl} alt="" className="w-16 h-16 object-cover border" />
+                      : <video src={mediaUrl} className="w-16 h-16 object-cover border" muted />}
+                    <div className="flex-1 text-xs">
+                      <div className="font-bold uppercase">⚠ Anexar mídia em cada envio</div>
+                      <div className="text-muted-foreground">Baixe 1× e arraste no WhatsApp Web após "Abrir".</div>
+                    </div>
+                    <Button size="sm" variant="outline" type="button" onClick={async () => {
+                      const res = await fetch(mediaUrl); const blob = await res.blob();
+                      const a = document.createElement('a');
+                      a.href = URL.createObjectURL(blob);
+                      a.download = mediaUrl.split('/').pop() ?? 'midia';
+                      a.click();
+                    }}>
+                      Baixar mídia
+                    </Button>
+                  </div>
+                )}
                 <div className="flex items-center justify-between mb-2">
                   <div className="text-sm">
                     <Badge>{Object.values(waSends).filter(s => s === 'enviado').length} enviados</Badge>{' '}
