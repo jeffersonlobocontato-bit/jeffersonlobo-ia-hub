@@ -113,6 +113,8 @@ export function normalizeMeio(meio: string | null | undefined, veiculo?: string 
   }
 
   // Regras de combinação
+  // Órgãos Públicos prevalece (ex.: "Portal da Prefeitura" => Órgãos Públicos)
+  if (canons.includes('Órgãos Públicos')) return 'Órgãos Públicos';
   if (canons.includes('Rádio')) return 'Rádio';
   if (canons.includes('TV')) return 'TV';
   // Redes Sociais combinado com Portal/Blog vira Redes Sociais
