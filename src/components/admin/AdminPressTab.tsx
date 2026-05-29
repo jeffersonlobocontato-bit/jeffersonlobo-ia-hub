@@ -161,8 +161,8 @@ export const AdminPressTab = () => {
         }}
         prefill={wizardPrefill}
       />
-    </div>
-
+      </TabsContent>
+    </Tabs>
   );
 };
 
