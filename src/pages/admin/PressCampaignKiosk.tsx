@@ -135,11 +135,9 @@ const PressCampaignKiosk = () => {
     contact: c,
   }) : '';
 
-  const openWhatsApp = (c: PressContact) => {
-    const text = buildText(c);
-    const link = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(text)}`;
-    window.open(link, '_blank', 'noopener,noreferrer');
-  };
+  const sanitizePhone = (n: string) => (n ?? '').replace(/\D/g, '');
+  const buildWaLink = (c: PressContact) =>
+    `https://wa.me/${sanitizePhone(c.whatsapp)}?text=${encodeURIComponent(buildText(c))}`;
 
   const markSent = async (c: PressContact) => {
     if (!campaignId) return;
@@ -313,12 +311,21 @@ const PressCampaignKiosk = () => {
             )}
 
             <Button
-              onClick={() => openWhatsApp(currentContact)}
+              asChild
               disabled={!ready || !canSendNow}
               className="w-full h-14 text-base font-black uppercase"
               size="lg"
             >
-              <ExternalLink className="w-5 h-5 mr-2" /> Abrir WhatsApp
+              <a
+                href={ready && canSendNow ? buildWaLink(currentContact) : undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => {
+                  if (!ready || !canSendNow) { e.preventDefault(); return; }
+                }}
+              >
+                <ExternalLink className="w-5 h-5 mr-2" /> Abrir WhatsApp
+              </a>
             </Button>
 
             <div className="grid grid-cols-2 gap-2">

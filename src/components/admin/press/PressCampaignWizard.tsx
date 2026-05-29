@@ -328,11 +328,15 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     contact: c,
   });
 
-  const waMarkSent = async (c: PressContact) => {
+  const sanitizePhone = (n: string) => (n ?? '').replace(/\D/g, '');
+  const buildWaLink = (c: PressContact) =>
+    `https://wa.me/${sanitizePhone(c.whatsapp)}?text=${encodeURIComponent(buildWaText(c))}`;
+
+  const waMarkSent = async (c: PressContact, opts?: { skipOpen?: boolean }) => {
     if (!waCampaignId) return;
-    const waText = buildWaText(c);
-    const link = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(waText)}`;
-    window.open(link, '_blank', 'noopener,noreferrer');
+    if (!opts?.skipOpen) {
+      window.open(buildWaLink(c), '_blank', 'noopener,noreferrer');
+    }
     setWaSends(s => ({ ...s, [c.id]: 'enviado' }));
     await supabase.from('press_sends').update({ status: 'enviado', sent_at: new Date().toISOString() })
       .eq('campaign_id', waCampaignId).eq('contact_id', c.id);
@@ -802,7 +806,16 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
                         {status === 'pendente' && (
                           <div className="flex gap-1">
                             <Button size="sm" variant="ghost" onClick={() => waSkip(c)}><SkipForward className="w-3 h-3" /></Button>
-                            <Button size="sm" onClick={() => waMarkSent(c)}><ExternalLink className="w-3 h-3 mr-1" />Abrir</Button>
+                            <Button size="sm" asChild>
+                              <a
+                                href={buildWaLink(c)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => waMarkSent(c, { skipOpen: true })}
+                              >
+                                <ExternalLink className="w-3 h-3 mr-1" />Abrir
+                              </a>
+                            </Button>
                           </div>
                         )}
                       </div>
