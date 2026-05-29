@@ -70,7 +70,7 @@ const _strip = (s: string) => s.toLowerCase()
   .replace(/\s+/g, ' ')
   .trim();
 
-type Canon = 'Rádio' | 'TV' | 'Jornal Impresso' | 'Portal de Notícias' | 'Revista' | 'Redes Sociais' | 'Podcast' | 'Agência';
+type Canon = 'Rádio' | 'TV' | 'Jornal Impresso' | 'Portal de Notícias' | 'Revista' | 'Redes Sociais' | 'Podcast' | 'Agência' | 'Órgãos Públicos';
 
 function _detectCanons(raw: string): Canon[] {
   const t = ` ${_strip(raw)} `;
