@@ -135,7 +135,8 @@ export const PressCampaignDashboard = () => {
   const [regions, setRegions] = useState<RegRow[]>([]);
   const [munis, setMunis] = useState<MuniRow[]>([]);
   const [contacts, setContacts] = useState<ContactEng[]>([]);
-  const [selectedCampaign, setSelectedCampaign] = useState<string>('all'); // 'all' | campaign_id
+  const [clicksByCampaign, setClicksByCampaign] = useState<Record<string, { unicos: number; totais: number }>>({});
+  const [selectedCampaign, setSelectedCampaign] = useState<string>('all');
   const [openDetail, setOpenDetail] = useState<CampaignStat | null>(null);
   const [openHistory, setOpenHistory] = useState<ContactEng | null>(null);
   const [drillRegion, setDrillRegion] = useState<string | null>(null);
@@ -143,18 +144,33 @@ export const PressCampaignDashboard = () => {
 
   const load = async () => {
     setLoading(true);
-    const [c, s, r, m, e] = await Promise.all([
+    const [c, s, r, m, e, clicks] = await Promise.all([
       supabase.from('press_campaign_stats').select('*').order('created_at', { ascending: false }),
       supabase.from('press_segment_stats').select('*'),
       supabase.from('press_region_stats').select('*'),
       supabase.from('press_municipio_stats').select('*'),
       supabase.from('press_contact_engagement').select('*'),
+      supabase.from('press_email_clicks').select('send_id, press_sends!inner(campaign_id)').limit(10000),
     ]);
     setCampaigns((c.data as CampaignStat[]) ?? []);
     setSegments((s.data as SegRow[]) ?? []);
     setRegions((r.data as RegRow[]) ?? []);
     setMunis((m.data as MuniRow[]) ?? []);
     setContacts((e.data as ContactEng[]) ?? []);
+
+    type ClickRow = { send_id: string; press_sends: { campaign_id: string } | { campaign_id: string }[] | null };
+    const agg: Record<string, { uniqSends: Set<string>; totais: number }> = {};
+    for (const row of ((clicks.data as ClickRow[]) ?? [])) {
+      const ps = row.press_sends;
+      const camp = Array.isArray(ps) ? ps[0]?.campaign_id : ps?.campaign_id;
+      if (!camp) continue;
+      if (!agg[camp]) agg[camp] = { uniqSends: new Set(), totais: 0 };
+      agg[camp].uniqSends.add(row.send_id);
+      agg[camp].totais += 1;
+    }
+    const out: Record<string, { unicos: number; totais: number }> = {};
+    for (const k of Object.keys(agg)) out[k] = { unicos: agg[k].uniqSends.size, totais: agg[k].totais };
+    setClicksByCampaign(out);
     setLoading(false);
   };
 
@@ -165,13 +181,17 @@ export const PressCampaignDashboard = () => {
     const erros = campaigns.reduce((a, c) => a + c.erros, 0);
     const aberturasUnicas = campaigns.reduce((a, c) => a + c.aberturas_unicas, 0);
     const aberturasTotais = campaigns.reduce((a, c) => a + c.aberturas_totais, 0);
+    const cliquesUnicos = Object.values(clicksByCampaign).reduce((a, c) => a + c.unicos, 0);
+    const cliquesTotais = Object.values(clicksByCampaign).reduce((a, c) => a + c.totais, 0);
     return {
       campaigns: campaigns.length,
       enviados, erros, aberturasUnicas, aberturasTotais,
+      cliquesUnicos, cliquesTotais,
       taxaAbertura: pct(aberturasUnicas, enviados),
+      taxaClique: pct(cliquesUnicos, enviados),
       taxaErro: pct(erros, enviados + erros),
     };
-  }, [campaigns]);
+  }, [campaigns, clicksByCampaign]);
 
   // Filtros por campanha selecionada
   const segFiltered = useMemo(() => {
