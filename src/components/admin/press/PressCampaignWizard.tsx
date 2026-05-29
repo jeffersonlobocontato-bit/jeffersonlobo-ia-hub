@@ -578,19 +578,67 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
             )}
 
             {/* ACTION BAR */}
-            {canal === 'email' && !emailResult && (
-              <Button onClick={dispararEmail} disabled={sending || totalElegiveis === 0} className="w-full" size="lg">
-                {sending ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Send className="w-4 h-4 mr-2" />}
-                {sending ? 'Disparando...' : `Disparar para ${totalElegiveis} contatos`}
-              </Button>
-            )}
-            {canal === 'email' && emailResult && (
-              <div className="flex gap-2">
-                <Badge className="bg-primary"><Mail className="w-3 h-3 mr-1" />{emailResult.sent} enviados</Badge>
-                <Badge variant="destructive">{emailResult.failed} erros</Badge>
-                <Badge variant="secondary">{emailResult.skipped} pulados</Badge>
-                <Button className="ml-auto" variant="outline" onClick={() => onOpenChange(false)}>Fechar</Button>
-              </div>
+            {canal === 'email' && (
+              <>
+                {!sending && !emailResult && (
+                  <Card className="p-3 grid grid-cols-2 gap-3 bg-muted/30">
+                    <label className="text-xs space-y-1">
+                      <div className="font-bold uppercase text-muted-foreground">Tamanho do lote (máx {MAX_CHUNK_SIZE})</div>
+                      <Input type="number" min={1} max={MAX_CHUNK_SIZE} value={chunkSize}
+                        onChange={e => setChunkSize(Number(e.target.value))} />
+                    </label>
+                    <label className="text-xs space-y-1">
+                      <div className="font-bold uppercase text-muted-foreground">Pausa entre lotes (s)</div>
+                      <Input type="number" min={0} max={600} value={pauseSec}
+                        onChange={e => setPauseSec(Number(e.target.value))} />
+                    </label>
+                    <div className="col-span-2 text-xs text-muted-foreground">
+                      {totalElegiveis} contatos → {Math.ceil(totalElegiveis / Math.max(1, chunkSize))} lote(s).
+                      Mantenha esta aba aberta até concluir.
+                    </div>
+                  </Card>
+                )}
+
+                {sending && currentBatch && (
+                  <Card className="p-3 space-y-2 border-2 border-primary">
+                    <div className="flex items-center justify-between gap-2 text-sm">
+                      <div className="font-bold">
+                        Lote {currentBatch.index}/{currentBatch.total}
+                        {pauseCountdown > 0 && <span className="ml-2 text-muted-foreground font-normal">· próximo em {pauseCountdown}s</span>}
+                      </div>
+                      <Button size="sm" variant="destructive" onClick={() => { cancelRef.current = true; setCancelRequested(true); }} disabled={cancelRequested}>
+                        {cancelRequested ? 'Cancelando...' : 'Cancelar'}
+                      </Button>
+                    </div>
+                    <div className="h-2 bg-muted rounded overflow-hidden">
+                      <div className="h-full bg-primary transition-all" style={{ width: `${(currentBatch.index / currentBatch.total) * 100}%` }} />
+                    </div>
+                    {emailResult && (
+                      <div className="flex gap-2 flex-wrap text-xs">
+                        <Badge className="bg-primary">{emailResult.sent} enviados</Badge>
+                        <Badge variant="destructive">{emailResult.failed} erros</Badge>
+                        <Badge variant="secondary">{emailResult.skipped} pulados</Badge>
+                      </div>
+                    )}
+                  </Card>
+                )}
+
+                {!sending && !emailResult && (
+                  <Button onClick={dispararEmail} disabled={totalElegiveis === 0} className="w-full" size="lg">
+                    <Send className="w-4 h-4 mr-2" />
+                    Disparar para {totalElegiveis} contatos
+                  </Button>
+                )}
+
+                {!sending && emailResult && (
+                  <div className="flex gap-2 flex-wrap">
+                    <Badge className="bg-primary"><Mail className="w-3 h-3 mr-1" />{emailResult.sent} enviados</Badge>
+                    <Badge variant="destructive">{emailResult.failed} erros</Badge>
+                    <Badge variant="secondary">{emailResult.skipped} pulados</Badge>
+                    <Button className="ml-auto" variant="outline" onClick={() => onOpenChange(false)}>Fechar</Button>
+                  </div>
+                )}
+              </>
             )}
 
             {canal === 'whatsapp' && !waCampaignId && (
