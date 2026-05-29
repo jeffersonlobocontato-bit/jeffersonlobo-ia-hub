@@ -2,7 +2,8 @@ import { useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, X, ImageIcon, Video, Loader2, Download } from 'lucide-react';
+import { Upload, X, ImageIcon, Video, Loader2, Download, Check } from 'lucide-react';
+import { useMediaDownloaded } from '@/hooks/use-media-downloaded';
 
 export type MediaTipo = 'imagem' | 'video' | 'nenhum';
 
@@ -11,6 +12,8 @@ type Props = {
   mediaTipo: MediaTipo;
   onChange: (url: string | null, tipo: MediaTipo) => void;
   disabled?: boolean;
+  /** Quando passado, marca em localStorage que a mídia já foi baixada para essa campanha. */
+  campaignId?: string | null;
 };
 
 const MAX_IMG = 5 * 1024 * 1024;
