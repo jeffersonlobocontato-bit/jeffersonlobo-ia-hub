@@ -42,6 +42,23 @@ function render(tpl: string, c: Contact): string {
   return tpl.replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (_, k) => vars[k.toLowerCase()] ?? "");
 }
 
+function b64url(s: string): string {
+  return btoa(unescape(encodeURIComponent(s)))
+    .replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+// Reescreve href="http(s)://..." para passar pelo track-press-click.
+// Não reescreve mailto:, tel:, âncoras (#...) nem o próprio tracker.
+function rewriteLinks(html: string, sendId: string, clickBase: string): string {
+  return html.replace(/href\s*=\s*"([^"]+)"/gi, (match, raw) => {
+    const url = String(raw).trim();
+    if (!/^https?:\/\//i.test(url)) return match;
+    if (url.startsWith(clickBase)) return match;
+    const wrapped = `${clickBase}?s=${sendId}&u=${b64url(url)}`;
+    return `href="${wrapped}"`;
+  });
+}
+
 function wrapHtml(body: string, contact: Contact, trackingPixelUrl: string | null): string {
   const optOutLink = `mailto:${SENDER_EMAIL}?subject=Remover%20do%20mailing&body=Por%20favor%20remover%20${encodeURIComponent(contact.email || "")}%20da%20lista.`;
   const pixel = trackingPixelUrl
@@ -64,6 +81,7 @@ Para não receber mais comunicações, <a href="${optOutLink}" style="color:#666
 ${pixel}
 </body></html>`;
 }
+
 
 
 Deno.serve(async (req) => {
