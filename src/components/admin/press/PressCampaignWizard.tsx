@@ -671,9 +671,17 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
                 {canal === 'email' ? (
                   <div className="bg-white p-3 rounded text-sm text-black border" dangerouslySetInnerHTML={{ __html: renderTemplate(body, preview) }} />
                 ) : (
-                  <pre className="bg-muted p-3 rounded text-xs whitespace-pre-wrap font-sans">
-                    {htmlToWhatsAppMarkdown(renderTemplate(body, preview))}
-                  </pre>
+                  <div className="bg-[#dcf8c6] p-3 rounded text-sm text-black border max-w-md ml-auto">
+                    {mediaTipo === 'imagem' && mediaUrl && (
+                      <img src={mediaUrl} alt="" className="w-full rounded mb-2" />
+                    )}
+                    {mediaTipo === 'video' && mediaUrl && (
+                      <video src={mediaUrl} className="w-full rounded mb-2" muted />
+                    )}
+                    <pre className="whitespace-pre-wrap font-sans text-xs">
+                      {buildWaText(preview)}
+                    </pre>
+                  </div>
                 )}
               </Card>
             )}
