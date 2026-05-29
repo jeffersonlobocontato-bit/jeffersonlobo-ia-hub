@@ -7,7 +7,8 @@ import { CheckCircle2, Plus, Upload, Trash2, Users, Mail, MessageCircle } from '
 import type { PressContact } from '@/lib/press-utils';
 import { PressContactsTable } from './press/PressContactsTable';
 import { PressImportDialog } from './press/PressImportDialog';
-import { PressCampaignWizard } from './press/PressCampaignWizard';
+import { PressCampaignWizard, type WizardPrefill } from './press/PressCampaignWizard';
+import { PressCampaignHistory, type CampaignPrefill } from './press/PressCampaignHistory';
 import { usePressLists } from '@/hooks/usePressLists';
 import { useToast } from '@/hooks/use-toast';
 
@@ -17,6 +18,8 @@ export const AdminPressTab = () => {
   const [loading, setLoading] = useState(true);
   const [importOpen, setImportOpen] = useState(false);
   const [wizardOpen, setWizardOpen] = useState(false);
+  const [wizardPrefill, setWizardPrefill] = useState<WizardPrefill | null>(null);
+  const [historyKey, setHistoryKey] = useState(0);
   const [showBase, setShowBase] = useState(false);
   const [baseSelected, setBaseSelected] = useState<Set<string>>(new Set());
   const { lists, loading: loadingLists, reload: reloadLists } = usePressLists();
@@ -55,7 +58,7 @@ export const AdminPressTab = () => {
       </Card>
 
       <div className="flex flex-wrap gap-2">
-        <Button size="lg" onClick={() => setWizardOpen(true)}>
+        <Button size="lg" onClick={() => { setWizardPrefill(null); setWizardOpen(true); }}>
           <Plus className="w-4 h-4 mr-1" /> Novo disparo
         </Button>
         <Button size="lg" variant="outline" onClick={() => setImportOpen(true)}>
@@ -103,6 +106,21 @@ export const AdminPressTab = () => {
         )}
       </div>
 
+      {/* HISTÓRICO DE DISPAROS */}
+      <PressCampaignHistory
+        key={historyKey}
+        onReuse={(p: CampaignPrefill) => {
+          setWizardPrefill({
+            canal: p.canal,
+            nome: p.nome,
+            subject: p.subject,
+            body: p.body,
+            alreadySentIds: p.alreadySentIds,
+          });
+          setWizardOpen(true);
+        }}
+      />
+
       {/* BASE COMPLETA (collapsible) */}
       {showBase && (
         <div>
@@ -123,8 +141,16 @@ export const AdminPressTab = () => {
         onOpenChange={setImportOpen}
         onDone={() => { load(); reloadLists(); }}
       />
-      <PressCampaignWizard open={wizardOpen} onOpenChange={setWizardOpen} />
+      <PressCampaignWizard
+        open={wizardOpen}
+        onOpenChange={(o) => {
+          setWizardOpen(o);
+          if (!o) { setWizardPrefill(null); setHistoryKey(k => k + 1); }
+        }}
+        prefill={wizardPrefill}
+      />
     </div>
+
   );
 };
 

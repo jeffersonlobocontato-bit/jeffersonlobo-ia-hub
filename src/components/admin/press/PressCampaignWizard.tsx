@@ -17,7 +17,14 @@ import {
   type PressContact, renderTemplate, htmlToWhatsAppMarkdown,
 } from '@/lib/press-utils';
 
-type Props = { open: boolean; onOpenChange: (o: boolean) => void };
+export type WizardPrefill = {
+  canal: 'email' | 'whatsapp';
+  nome: string;
+  subject: string;
+  body: string;
+  alreadySentIds: string[];
+};
+type Props = { open: boolean; onOpenChange: (o: boolean) => void; prefill?: WizardPrefill | null };
 type Canal = 'email' | 'whatsapp';
 type Step = 1 | 2 | 3 | 4;
 
@@ -27,7 +34,7 @@ const DEFAULT_WA_BODY = `<p>Olá <strong>{{primeiro_nome}}</strong>! Sou Jeffers
 
 const BATCH_LIMIT = 280;
 
-export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
+export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const { toast } = useToast();
   const { lists, loading: loadingLists, reload: reloadLists } = usePressLists();
 
@@ -42,6 +49,9 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
   const [nome, setNome] = useState('');
   const [subject, setSubject] = useState(DEFAULT_EMAIL_SUBJECT);
   const [body, setBody] = useState(DEFAULT_EMAIL_BODY);
+  // Trava o auto-reset do body quando vier de prefill
+  const [bodyPrefilled, setBodyPrefilled] = useState(false);
+  const [alreadySentLockIds, setAlreadySentLockIds] = useState<Set<string>>(new Set());
 
   const [sending, setSending] = useState(false);
   const [emailResult, setEmailResult] = useState<{ sent: number; skipped: number; failed: number } | null>(null);
@@ -50,20 +60,38 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
   const [waCampaignId, setWaCampaignId] = useState<string | null>(null);
   const [waSends, setWaSends] = useState<Record<string, 'pendente' | 'enviado' | 'pulado'>>({});
 
-  // reset ao abrir
+  // reset ao abrir (com suporte a prefill vindo do histórico)
   useEffect(() => {
     if (open) {
-      setStep(1); setCanal(null); setSelectedLists(new Set()); setSelectedRegions(new Set()); setExcludedIds(new Set()); setContacts([]);
-      setNome(''); setSubject(DEFAULT_EMAIL_SUBJECT); setBody(DEFAULT_EMAIL_BODY);
+      const sentSet = new Set(prefill?.alreadySentIds ?? []);
+      setSelectedLists(new Set());
+      setSelectedRegions(new Set());
+      setExcludedIds(new Set(sentSet));
+      setAlreadySentLockIds(sentSet);
+      setContacts([]);
       setEmailResult(null); setWaCampaignId(null); setWaSends({});
+      if (prefill) {
+        setCanal(prefill.canal);
+        setNome(prefill.nome);
+        setSubject(prefill.subject || DEFAULT_EMAIL_SUBJECT);
+        setBody(prefill.body);
+        setBodyPrefilled(true);
+        setStep(2);
+      } else {
+        setStep(1); setCanal(null);
+        setNome(''); setSubject(DEFAULT_EMAIL_SUBJECT); setBody(DEFAULT_EMAIL_BODY);
+        setBodyPrefilled(false);
+      }
       reloadLists();
     }
-  }, [open, reloadLists]);
+  }, [open, prefill, reloadLists]);
 
-  // ao escolher canal: default do body adequado
+  // ao escolher canal: default do body adequado (a não ser que veio prefill)
   useEffect(() => {
+    if (bodyPrefilled) { setBodyPrefilled(false); return; }
     if (canal === 'whatsapp') setBody(DEFAULT_WA_BODY);
     if (canal === 'email') setBody(DEFAULT_EMAIL_BODY);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canal]);
 
   // resolve contatos quando passa pro step 3 (revisar usa step 4)
@@ -355,13 +383,18 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
             {/* SELEÇÃO DE VEÍCULOS */}
             {filteredContacts.length > 0 && (
               <Card className="p-3 space-y-2">
+                {alreadySentLockIds.size > 0 && (
+                  <div className="text-xs bg-amber-500/10 border-l-4 border-amber-500 px-2 py-1.5 rounded">
+                    <strong>Reuso de campanha:</strong> {alreadySentLockIds.size} contato(s) que já receberam este conteúdo estão desmarcados. Você pode reativá-los manualmente, se quiser.
+                  </div>
+                )}
                 <div className="flex items-center justify-between flex-wrap gap-2">
                   <div className="text-xs uppercase font-bold">
                     Veículos ({finalContacts.length}/{filteredContacts.length} selecionados)
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" onClick={() => setExcludedIds(new Set())}>
-                      Marcar todos
+                    <Button size="sm" variant="outline" onClick={() => setExcludedIds(new Set(alreadySentLockIds))}>
+                      Marcar todos {alreadySentLockIds.size > 0 ? '(menos já enviados)' : ''}
                     </Button>
                     <Button
                       size="sm"
@@ -376,6 +409,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
                 <div className="max-h-[260px] overflow-y-auto divide-y border rounded">
                   {filteredContacts.map(c => {
                     const checked = !excludedIds.has(c.id);
+                    const alreadySent = alreadySentLockIds.has(c.id);
                     return (
                       <label
                         key={c.id}
@@ -383,7 +417,10 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
                       >
                         <Checkbox checked={checked} onCheckedChange={() => toggleContact(c.id)} />
                         <div className="min-w-0 flex-1">
-                          <div className="font-medium truncate">{c.veiculo}</div>
+                          <div className="font-medium truncate flex items-center gap-2">
+                            {c.veiculo}
+                            {alreadySent && <Badge variant="outline" className="text-[10px] py-0">já enviado</Badge>}
+                          </div>
                           <div className="text-xs text-muted-foreground truncate">
                             {c.contato ?? 'redação'}
                             {c.municipio ? ` · ${c.municipio}` : ''}
@@ -400,6 +437,7 @@ export const PressCampaignWizard = ({ open, onOpenChange }: Props) => {
             )}
           </div>
         )}
+
 
         {/* STEP 3: CONTEÚDO */}
         {step === 3 && (
