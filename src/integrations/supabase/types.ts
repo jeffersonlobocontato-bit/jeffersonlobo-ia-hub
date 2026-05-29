@@ -1055,6 +1055,38 @@ export type Database = {
         }
         Relationships: []
       }
+      press_email_opens: {
+        Row: {
+          id: string
+          ip_hash: string | null
+          opened_at: string
+          send_id: string
+          user_agent: string | null
+        }
+        Insert: {
+          id?: string
+          ip_hash?: string | null
+          opened_at?: string
+          send_id: string
+          user_agent?: string | null
+        }
+        Update: {
+          id?: string
+          ip_hash?: string | null
+          opened_at?: string
+          send_id?: string
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_email_opens_send_id_fkey"
+            columns: ["send_id"]
+            isOneToOne: false
+            referencedRelation: "press_sends"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       press_list_members: {
         Row: {
           contact_id: string
@@ -1072,6 +1104,13 @@ export type Database = {
           list_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "press_list_members_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "press_contact_engagement"
+            referencedColumns: ["contact_id"]
+          },
           {
             foreignKeyName: "press_list_members_contact_id_fkey"
             columns: ["contact_id"]
@@ -1154,8 +1193,22 @@ export type Database = {
             foreignKeyName: "press_sends_campaign_id_fkey"
             columns: ["campaign_id"]
             isOneToOne: false
+            referencedRelation: "press_campaign_stats"
+            referencedColumns: ["campaign_id"]
+          },
+          {
+            foreignKeyName: "press_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
             referencedRelation: "press_campaigns"
             referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "press_sends_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "press_contact_engagement"
+            referencedColumns: ["contact_id"]
           },
           {
             foreignKeyName: "press_sends_contact_id_fkey"
@@ -1495,7 +1548,118 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      press_campaign_stats: {
+        Row: {
+          aberturas_totais: number | null
+          aberturas_unicas: number | null
+          assunto: string | null
+          campaign_id: string | null
+          created_at: string | null
+          enviados: number | null
+          erros: number | null
+          nome: string | null
+          pulados: number | null
+          sent_at: string | null
+          status: string | null
+          tipo: string | null
+          total_alvo: number | null
+        }
+        Relationships: []
+      }
+      press_contact_engagement: {
+        Row: {
+          campanhas_abertas: number | null
+          contact_id: string | null
+          contato: string | null
+          email: string | null
+          meio: string | null
+          municipio: string | null
+          regiao: string | null
+          total_aberturas: number | null
+          total_recebidos: number | null
+          ultima_abertura: string | null
+          veiculo: string | null
+        }
+        Relationships: []
+      }
+      press_municipio_stats: {
+        Row: {
+          aberturas_totais: number | null
+          aberturas_unicas: number | null
+          campaign_id: string | null
+          enviados: number | null
+          municipio: string | null
+          regiao: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "press_campaign_stats"
+            referencedColumns: ["campaign_id"]
+          },
+          {
+            foreignKeyName: "press_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "press_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      press_region_stats: {
+        Row: {
+          aberturas_totais: number | null
+          aberturas_unicas: number | null
+          campaign_id: string | null
+          enviados: number | null
+          erros: number | null
+          regiao: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "press_campaign_stats"
+            referencedColumns: ["campaign_id"]
+          },
+          {
+            foreignKeyName: "press_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "press_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      press_segment_stats: {
+        Row: {
+          aberturas_totais: number | null
+          aberturas_unicas: number | null
+          campaign_id: string | null
+          enviados: number | null
+          erros: number | null
+          meio: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "press_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "press_campaign_stats"
+            referencedColumns: ["campaign_id"]
+          },
+          {
+            foreignKeyName: "press_sends_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "press_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       create_maturity_lead: {
