@@ -151,6 +151,21 @@ export function buildWhatsappLink(contact: PressContact, message: string): strin
   return `https://wa.me/${contact.whatsapp}?text=${encodeURIComponent(txt)}`;
 }
 
+/**
+ * Link direto para o WhatsApp, evitando o redirect via wa.me → api.whatsapp.com
+ * (que é bloqueado por alguns navegadores/extensões/firewalls com ERR_BLOCKED_BY_RESPONSE).
+ * Em mobile abre o app nativo; em desktop abre o WhatsApp Web direto.
+ */
+export function buildWhatsappDirectLink(phone: string | null | undefined, text: string): string {
+  const digits = String(phone ?? '').replace(/\D/g, '');
+  const msg = encodeURIComponent(text);
+  const isMobile = typeof navigator !== 'undefined'
+    && /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  return isMobile
+    ? `whatsapp://send?phone=${digits}&text=${msg}`
+    : `https://web.whatsapp.com/send?phone=${digits}&text=${msg}&type=phone_number&app_absent=0`;
+}
+
 /** Monta a mensagem final do WhatsApp: *título*\n\n{corpo}\n\n{link}
  *  - bodyMarkdown já deve estar em markdown do WhatsApp (use htmlToWhatsAppMarkdown antes)
  *  - todos os campos passam por renderTemplate com o contato
