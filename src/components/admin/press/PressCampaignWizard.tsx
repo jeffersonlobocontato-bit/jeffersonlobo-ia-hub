@@ -222,9 +222,9 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
         }).eq('id', campaignId);
 
         // pausa entre lotes (não no último)
-        if (i < chunks.length - 1 && pause > 0 && !cancelRequested) {
+        if (i < chunks.length - 1 && pause > 0 && !cancelRef.current) {
           for (let s = pause; s > 0; s--) {
-            if (cancelRequested) break;
+            if (cancelRef.current) break;
             setPauseCountdown(s);
             await new Promise(res => setTimeout(res, 1000));
           }
