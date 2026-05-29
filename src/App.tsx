@@ -55,6 +55,14 @@ const App = () => (
                   </AdminRoute>
                 }
               />
+              <Route
+                path="/admin/press/disparar/:campaignId"
+                element={
+                  <AdminRoute>
+                    <PressCampaignKiosk />
+                  </AdminRoute>
+                }
+              />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
