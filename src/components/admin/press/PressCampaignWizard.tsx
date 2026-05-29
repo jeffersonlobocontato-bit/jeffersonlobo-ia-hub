@@ -53,6 +53,13 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const [nome, setNome] = useState('');
   const [subject, setSubject] = useState(DEFAULT_EMAIL_SUBJECT);
   const [body, setBody] = useState(DEFAULT_EMAIL_BODY);
+  // Novos campos: título, mídia, link de destino
+  const [titulo, setTitulo] = useState('');
+  const [mediaUrl, setMediaUrl] = useState<string | null>(null);
+  const [mediaTipo, setMediaTipo] = useState<MediaTipo>('nenhum');
+  const [linkDestino, setLinkDestino] = useState('');
+  const [ogValidating, setOgValidating] = useState(false);
+  const [ogResult, setOgResult] = useState<{ valid: boolean; missing: string[]; og_image?: string | null; og_title?: string | null } | null>(null);
   // Trava o auto-reset do body quando vier de prefill
   const [bodyPrefilled, setBodyPrefilled] = useState(false);
   const [alreadySentLockIds, setAlreadySentLockIds] = useState<Set<string>>(new Set());
