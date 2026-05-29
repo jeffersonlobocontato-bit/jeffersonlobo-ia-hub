@@ -266,7 +266,7 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     } catch (e) {
       if (campaignId) {
         await supabase.from('press_campaigns').update({
-          total_enviado: totSent, total_erro: totFailed, status: 'erro',
+          total_enviado: totSent, total_erro: totFailed, status: 'cancelada',
         }).eq('id', campaignId);
       }
       toast({ title: 'Erro no disparo', description: e instanceof Error ? e.message : 'erro', variant: 'destructive' });
