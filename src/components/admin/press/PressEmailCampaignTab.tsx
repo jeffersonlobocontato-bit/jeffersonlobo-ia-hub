@@ -22,7 +22,9 @@ const DEFAULT_HTML = `<p>Olá <strong>{{primeiro_nome}}</strong>,</p>
 <p>Posso compartilhar mais detalhes, dados ou marcar uma conversa rápida?</p>
 <p>Abraço,<br>Jefferson Lobo</p>`;
 
-const BATCH_LIMIT = 280; // margem de segurança do limite Brevo Free (300/dia)
+// Limite por disparo: edge function tem timeout ~150s. Com ~250ms/email = 100 cabem com folga.
+// Para enviar mais que isso, divida em múltiplos disparos (ainda dentro do limite Brevo Free de 300/dia).
+const BATCH_LIMIT = 100;
 
 export const PressEmailCampaignTab = ({ selectedContacts, onClearSelection }: Props) => {
   const { toast } = useToast();
