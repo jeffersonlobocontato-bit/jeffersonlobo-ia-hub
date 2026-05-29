@@ -153,22 +153,30 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const totalElegiveis = finalContacts.length;
   const preview = finalContacts[0];
 
-  // === SEND EMAIL ===
+  // === SEND EMAIL (chunked + pause) ===
   const dispararEmail = async () => {
     if (!nome.trim() || !subject.trim() || !body.trim()) {
       toast({ title: 'Preencha nome, assunto e corpo', variant: 'destructive' }); return;
     }
-    if (totalElegiveis > BATCH_LIMIT) {
-      toast({
-        title: 'Lote acima do limite (300/dia Brevo Free)',
-        description: `Selecione listas com no máximo ${BATCH_LIMIT} contatos por disparo (você tem ${totalElegiveis}).`,
-        variant: 'destructive',
-      });
-      return;
-    }
-    if (!confirm(`Disparar email para ${totalElegiveis} contatos via Brevo? Isso não pode ser desfeito.`)) return;
+    const size = Math.min(MAX_CHUNK_SIZE, Math.max(1, Math.floor(chunkSize) || DEFAULT_CHUNK_SIZE));
+    const pause = Math.max(0, Math.floor(pauseSec) || 0);
+    const totalChunks = Math.ceil(totalElegiveis / size);
 
-    setSending(true); setEmailResult(null);
+    if (!confirm(
+      `Disparar email para ${totalElegiveis} contatos via Brevo?\n\n` +
+      `Será enviado em ${totalChunks} lote${totalChunks > 1 ? 's' : ''} de até ${size}, ` +
+      `com pausa de ${pause}s entre eles.\n\nMantenha esta aba aberta até concluir.`
+    )) return;
+
+    setSending(true);
+    setCancelRequested(false);
+    setEmailResult(null);
+    setCurrentBatch({ index: 0, total: totalChunks });
+
+    let campaignId: string | null = null;
+    let totSent = 0, totFailed = 0, totSkipped = 0;
+    const allErrors: { id: string; error: string }[] = [];
+
     try {
       const { data: campaign, error: cErr } = await supabase
         .from('press_campaigns')
@@ -179,43 +187,71 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
         })
         .select('id').single();
       if (cErr || !campaign) throw new Error(cErr?.message || 'falha ao criar campanha');
+      campaignId = campaign.id as string;
 
       const ids = finalContacts.map(c => c.id);
       const chunks: string[][] = [];
-      for (let i = 0; i < ids.length; i += CHUNK_SIZE) chunks.push(ids.slice(i, i + CHUNK_SIZE));
-
-      let totSent = 0, totFailed = 0, totSkipped = 0;
-      const allErrors: { id: string; error: string }[] = [];
+      for (let i = 0; i < ids.length; i += size) chunks.push(ids.slice(i, i + size));
 
       for (let i = 0; i < chunks.length; i++) {
+        if (cancelRequested) break;
+        setCurrentBatch({ index: i + 1, total: chunks.length });
+
         const { data, error } = await supabase.functions.invoke('send-press-email', {
-          body: {
-            campaign_id: campaign.id,
-            contact_ids: chunks[i],
-            subject, html: body,
-          },
+          body: { campaign_id: campaignId, contact_ids: chunks[i], subject, html: body },
         });
-        if (error) throw error;
-        totSent += data?.sent ?? 0;
-        totFailed += data?.failed ?? 0;
-        totSkipped += data?.skipped ?? 0;
-        if (Array.isArray(data?.errors)) allErrors.push(...data.errors);
-        setEmailResult({ sent: totSent, failed: totFailed, skipped: totSkipped, errors: allErrors, progress: `${i + 1}/${chunks.length}` });
+        if (error) {
+          // não derruba a campanha inteira: registra e segue
+          allErrors.push({ id: '*', error: `lote ${i + 1}: ${error.message ?? 'erro'}` });
+        } else {
+          totSent += data?.sent ?? 0;
+          totFailed += data?.failed ?? 0;
+          totSkipped += data?.skipped ?? 0;
+          if (Array.isArray(data?.errors)) allErrors.push(...data.errors);
+        }
+        setEmailResult({
+          sent: totSent, failed: totFailed, skipped: totSkipped, errors: allErrors,
+          progress: `${i + 1}/${chunks.length}`,
+        });
+
+        // persiste totais parciais (dashboard pode acompanhar em tempo real)
+        await supabase.from('press_campaigns').update({
+          total_enviado: totSent, total_erro: totFailed,
+        }).eq('id', campaignId);
+
+        // pausa entre lotes (não no último)
+        if (i < chunks.length - 1 && pause > 0 && !cancelRequested) {
+          for (let s = pause; s > 0; s--) {
+            if (cancelRequested) break;
+            setPauseCountdown(s);
+            await new Promise(res => setTimeout(res, 1000));
+          }
+          setPauseCountdown(0);
+        }
       }
 
-      // Garante contadores finais consolidados (edge function só sabe do próprio lote)
       await supabase.from('press_campaigns').update({
-        total_enviado: totSent, total_erro: totFailed, status: 'concluida', sent_at: new Date().toISOString(),
-      }).eq('id', campaign.id);
+        total_enviado: totSent, total_erro: totFailed,
+        status: cancelRequested ? 'cancelada' : 'concluida',
+        sent_at: new Date().toISOString(),
+      }).eq('id', campaignId);
 
       toast({
-        title: 'Disparo finalizado',
-        description: `${totSent} enviados · ${totFailed} erros · ${totSkipped} pulados (${chunks.length} lote${chunks.length > 1 ? 's' : ''})`,
+        title: cancelRequested ? 'Disparo cancelado' : 'Disparo finalizado',
+        description: `${totSent} enviados · ${totFailed} erros · ${totSkipped} pulados`,
       });
     } catch (e) {
+      if (campaignId) {
+        await supabase.from('press_campaigns').update({
+          total_enviado: totSent, total_erro: totFailed, status: 'erro',
+        }).eq('id', campaignId);
+      }
       toast({ title: 'Erro no disparo', description: e instanceof Error ? e.message : 'erro', variant: 'destructive' });
     } finally {
       setSending(false);
+      setPauseCountdown(0);
+      setCurrentBatch(null);
+      setCancelRequested(false);
     }
   };
 
