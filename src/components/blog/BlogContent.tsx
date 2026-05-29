@@ -5,14 +5,18 @@ import { BlogInlineCTA, InlineCTAType } from './BlogInlineCTA';
 import { splitMarkdownBlocks, pickCtaPositions, slugify } from '@/lib/blog-utils';
 
 // Extrai texto puro de filhos do React/markdown para gerar IDs estáveis em H2/H3
+const extractText = (node: any): string => {
+  if (!node) return '';
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (Array.isArray(node)) return node.map(extractText).join('');
+  if (node.props?.children) return extractText(node.props.children);
+  return '';
+};
+
+const hasLetters = (s: string) => /[\p{L}\p{N}]/u.test(s);
+
 const headingId = (children: any): string => {
-  const text = ((function extract(node: any): string {
-    if (!node) return '';
-    if (typeof node === 'string' || typeof node === 'number') return String(node);
-    if (Array.isArray(node)) return node.map(extract).join('');
-    if (node.props?.children) return extract(node.props.children);
-    return '';
-  })(children) || '').trim();
+  const text = (extractText(children) || '').replace(/\\/g, '').trim();
   return text ? slugify(text) : '';
 };
 
