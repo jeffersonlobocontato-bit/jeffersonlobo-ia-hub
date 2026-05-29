@@ -159,8 +159,8 @@ Deno.serve(async (req) => {
           campaign_id, contact_id: c.id, canal: "email", status: "erro", error: msg,
         }, { onConflict: "campaign_id,contact_id" });
       }
-      // throttle suave (~3/s)
-      await new Promise((res) => setTimeout(res, 350));
+      // throttle ~6/s (Brevo aceita; mantém margem)
+      await new Promise((res) => setTimeout(res, 160));
     }
 
     // Atualiza contadores da campanha
