@@ -571,14 +571,82 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
                 <Input value={subject} onChange={e => setSubject(e.target.value)} />
               </div>
             )}
+
+            {canal === 'whatsapp' && (
+              <>
+                <div>
+                  <label className="text-xs uppercase font-bold">Título do release</label>
+                  <Input
+                    value={titulo}
+                    onChange={e => setTitulo(e.target.value.slice(0, 80))}
+                    placeholder="Ex: Jefferson Lobo lança guia gratuito de IA para PMEs"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Vira a primeira linha em <strong>negrito</strong> da mensagem. {titulo.length}/80
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs uppercase font-bold">Mídia (opcional)</label>
+                  <CampaignMediaUploader
+                    mediaUrl={mediaUrl}
+                    mediaTipo={mediaTipo}
+                    onChange={(u, t) => { setMediaUrl(u); setMediaTipo(t); }}
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Baixe-a 1× na hora do envio e arraste no WhatsApp Web após "Abrir". Se esquecer, o link abaixo já gera preview rico.
+                  </p>
+                </div>
+                <div>
+                  <label className="text-xs uppercase font-bold">Link de destino (opcional)</label>
+                  <div className="flex gap-2">
+                    <Input
+                      value={linkDestino}
+                      onChange={e => setLinkDestino(e.target.value)}
+                      placeholder="https://jeffersonlobo.tech/imprensa/r/..."
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      disabled={!linkDestino.trim() || ogValidating}
+                      onClick={async () => {
+                        setOgValidating(true); setOgResult(null);
+                        try {
+                          const { data, error } = await supabase.functions.invoke('validate-og-tags', {
+                            body: { url: linkDestino.trim() },
+                          });
+                          if (error) throw error;
+                          setOgResult(data as any);
+                        } catch (e) {
+                          setOgResult({ valid: false, missing: ['erro de rede'] });
+                        } finally {
+                          setOgValidating(false);
+                        }
+                      }}
+                    >
+                      {ogValidating ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Validar preview'}
+                    </Button>
+                  </div>
+                  {ogResult && (
+                    <div className={`text-xs mt-2 p-2 rounded border-l-4 ${ogResult.valid ? 'bg-emerald-500/10 border-emerald-500' : 'bg-amber-500/10 border-amber-500'}`}>
+                      {ogResult.valid ? (
+                        <>✓ Preview rico OK · <strong>{ogResult.og_title}</strong></>
+                      ) : (
+                        <>⚠ Faltam meta tags: {ogResult.missing.join(', ')}. O link vai aparecer "seco" no WhatsApp.</>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </>
+            )}
+
             <div>
               <label className="text-xs uppercase font-bold">
-                {canal === 'email' ? 'Corpo do email' : 'Mensagem WhatsApp'}
+                {canal === 'email' ? 'Corpo do email' : 'Texto de apoio'}
               </label>
               <PressRichEditor value={body} onChange={setBody} />
               {canal === 'whatsapp' && (
                 <p className="text-xs text-muted-foreground mt-1">
-                  WhatsApp converte: negrito → <code>*texto*</code>, itálico → <code>_texto_</code>, tachado → <code>~texto~</code>. Imagens viram link.
+                  Mantenha em até ~700 caracteres. WhatsApp converte: negrito → <code>*texto*</code>, itálico → <code>_texto_</code>.
                 </p>
               )}
             </div>
