@@ -48,7 +48,17 @@ export const AdminPressTab = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <Tabs defaultValue="disparos" className="space-y-4">
+      <TabsList>
+        <TabsTrigger value="disparos"><Mail className="w-4 h-4 mr-1" /> Disparos</TabsTrigger>
+        <TabsTrigger value="dashboard"><BarChart3 className="w-4 h-4 mr-1" /> Dashboard</TabsTrigger>
+      </TabsList>
+
+      <TabsContent value="dashboard">
+        <PressCampaignDashboard />
+      </TabsContent>
+
+      <TabsContent value="disparos" className="space-y-4">
       <Card className="p-3 border-l-4 border-green-500 bg-green-500/10 text-sm">
         <div className="flex gap-2">
           <CheckCircle2 className="w-4 h-4 mt-0.5 shrink-0" />
