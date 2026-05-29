@@ -93,8 +93,8 @@ Deno.serve(async (req) => {
     if (!campaign_id || !subject || !html || contact_ids.length === 0) {
       return new Response(JSON.stringify({ error: "invalid_input" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-    if (contact_ids.length > 300) {
-      return new Response(JSON.stringify({ error: "max_300_per_batch" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (contact_ids.length > 100) {
+      return new Response(JSON.stringify({ error: "max_100_per_batch" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
@@ -159,8 +159,8 @@ Deno.serve(async (req) => {
           campaign_id, contact_id: c.id, canal: "email", status: "erro", error: msg,
         }, { onConflict: "campaign_id,contact_id" });
       }
-      // throttle suave (~3/s)
-      await new Promise((res) => setTimeout(res, 350));
+      // throttle ~6/s (Brevo aceita; mantém margem)
+      await new Promise((res) => setTimeout(res, 160));
     }
 
     // Atualiza contadores da campanha
