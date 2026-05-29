@@ -6,7 +6,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Mail, Eye, AlertTriangle, TrendingUp, MapPin, Newspaper, Trophy, History, Download, Info } from 'lucide-react';
+import { Mail, Eye, AlertTriangle, TrendingUp, MapPin, Newspaper, Trophy, History, Download, Info, Save } from 'lucide-react';
+import { toast } from 'sonner';
+
+export const CANON_MEIO_OPTIONS = [
+  'Rádio', 'TV', 'Jornal Impresso', 'Portal de Notícias',
+  'Revista', 'Redes Sociais', 'Podcast', 'Agência',
+] as const;
 
 type CampaignStat = {
   campaign_id: string;
