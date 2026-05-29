@@ -135,7 +135,8 @@ export const PressCampaignDashboard = () => {
   const [regions, setRegions] = useState<RegRow[]>([]);
   const [munis, setMunis] = useState<MuniRow[]>([]);
   const [contacts, setContacts] = useState<ContactEng[]>([]);
-  const [selectedCampaign, setSelectedCampaign] = useState<string>('all'); // 'all' | campaign_id
+  const [clicksByCampaign, setClicksByCampaign] = useState<Record<string, { unicos: number; totais: number }>>({});
+  const [selectedCampaign, setSelectedCampaign] = useState<string>('all');
   const [openDetail, setOpenDetail] = useState<CampaignStat | null>(null);
   const [openHistory, setOpenHistory] = useState<ContactEng | null>(null);
   const [drillRegion, setDrillRegion] = useState<string | null>(null);
@@ -143,18 +144,33 @@ export const PressCampaignDashboard = () => {
 
   const load = async () => {
     setLoading(true);
-    const [c, s, r, m, e] = await Promise.all([
+    const [c, s, r, m, e, clicks] = await Promise.all([
       supabase.from('press_campaign_stats').select('*').order('created_at', { ascending: false }),
       supabase.from('press_segment_stats').select('*'),
       supabase.from('press_region_stats').select('*'),
       supabase.from('press_municipio_stats').select('*'),
       supabase.from('press_contact_engagement').select('*'),
+      supabase.from('press_email_clicks').select('send_id, press_sends!inner(campaign_id)').limit(10000),
     ]);
     setCampaigns((c.data as CampaignStat[]) ?? []);
     setSegments((s.data as SegRow[]) ?? []);
     setRegions((r.data as RegRow[]) ?? []);
     setMunis((m.data as MuniRow[]) ?? []);
     setContacts((e.data as ContactEng[]) ?? []);
+
+    type ClickRow = { send_id: string; press_sends: { campaign_id: string } | { campaign_id: string }[] | null };
+    const agg: Record<string, { uniqSends: Set<string>; totais: number }> = {};
+    for (const row of ((clicks.data as ClickRow[]) ?? [])) {
+      const ps = row.press_sends;
+      const camp = Array.isArray(ps) ? ps[0]?.campaign_id : ps?.campaign_id;
+      if (!camp) continue;
+      if (!agg[camp]) agg[camp] = { uniqSends: new Set(), totais: 0 };
+      agg[camp].uniqSends.add(row.send_id);
+      agg[camp].totais += 1;
+    }
+    const out: Record<string, { unicos: number; totais: number }> = {};
+    for (const k of Object.keys(agg)) out[k] = { unicos: agg[k].uniqSends.size, totais: agg[k].totais };
+    setClicksByCampaign(out);
     setLoading(false);
   };
 
@@ -165,13 +181,17 @@ export const PressCampaignDashboard = () => {
     const erros = campaigns.reduce((a, c) => a + c.erros, 0);
     const aberturasUnicas = campaigns.reduce((a, c) => a + c.aberturas_unicas, 0);
     const aberturasTotais = campaigns.reduce((a, c) => a + c.aberturas_totais, 0);
+    const cliquesUnicos = Object.values(clicksByCampaign).reduce((a, c) => a + c.unicos, 0);
+    const cliquesTotais = Object.values(clicksByCampaign).reduce((a, c) => a + c.totais, 0);
     return {
       campaigns: campaigns.length,
       enviados, erros, aberturasUnicas, aberturasTotais,
+      cliquesUnicos, cliquesTotais,
       taxaAbertura: pct(aberturasUnicas, enviados),
+      taxaClique: pct(cliquesUnicos, enviados),
       taxaErro: pct(erros, enviados + erros),
     };
-  }, [campaigns]);
+  }, [campaigns, clicksByCampaign]);
 
   // Filtros por campanha selecionada
   const segFiltered = useMemo(() => {
@@ -239,21 +259,23 @@ export const PressCampaignDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Cards de visão geral */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
         <StatCard icon={<Mail className="w-4 h-4" />} label="Campanhas" value={totals.campaigns} />
         <StatCard icon={<Mail className="w-4 h-4" />} label="Enviados" value={totals.enviados} />
-        <StatCard icon={<Eye className="w-4 h-4" />} label="Aberturas únicas" value={totals.aberturasUnicas} />
-        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Taxa abertura" value={totals.taxaAbertura} highlight />
-        <StatCard icon={<Eye className="w-4 h-4" />} label="Aberturas totais" value={totals.aberturasTotais} />
+        <StatCard icon={<Eye className="w-4 h-4" />} label="Abert. únicas" value={totals.aberturasUnicas} />
+        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Taxa abert." value={totals.taxaAbertura} />
+        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Cliques únicos" value={totals.cliquesUnicos} highlight />
+        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Taxa clique" value={totals.taxaClique} highlight />
+        <StatCard icon={<Eye className="w-4 h-4" />} label="Cliques totais" value={totals.cliquesTotais} />
         <StatCard icon={<AlertTriangle className="w-4 h-4" />} label="Erros" value={totals.erros} />
       </div>
 
       <Card className="p-3 border-l-4 border-yellow-500 bg-yellow-500/10 text-xs flex gap-2">
         <Info className="w-4 h-4 mt-0.5 shrink-0" />
         <div>
-          Aberturas são detectadas por pixel de rastreio. Clientes que bloqueiam imagens não contam,
-          e serviços como <strong>Apple Mail Privacy Protection</strong> podem inflar o número (pré-carregam imagens).
-          Use como tendência, não número absoluto.
+          <strong>Aberturas</strong> dependem do destinatário carregar imagens (Outlook bloqueia por padrão, Apple Mail infla pré-carregando).
+          <strong> Clique</strong> é a métrica real de interesse — só conta quando alguém abre o email <em>e</em> clica em algum link.
+          Se você tem 0 cliques mas envios saíram, provavelmente os emails foram para spam/promoções, ou a lista não é qualificada para o assunto.
         </div>
       </Card>
 
@@ -270,31 +292,34 @@ export const PressCampaignDashboard = () => {
                 <th className="p-2 text-right">Alvo</th>
                 <th className="p-2 text-right">Enviados</th>
                 <th className="p-2 text-right">Erros</th>
-                <th className="p-2 text-right">Abert. únicas</th>
-                <th className="p-2 text-right">Total abert.</th>
-                <th className="p-2 text-right">Taxa</th>
+                <th className="p-2 text-right">Abert.</th>
+                <th className="p-2 text-right">Cliques</th>
+                <th className="p-2 text-right">% clique</th>
                 <th className="p-2"></th>
               </tr>
             </thead>
             <tbody>
               {campaigns.length === 0 ? (
                 <tr><td colSpan={10} className="p-8 text-center text-muted-foreground">Nenhuma campanha ainda.</td></tr>
-              ) : campaigns.map(c => (
-                <tr key={c.campaign_id} className="border-t hover:bg-muted/30">
-                  <td className="p-2 font-medium">{c.nome}</td>
-                  <td className="p-2"><Badge variant="outline">{c.tipo}</Badge></td>
-                  <td className="p-2 text-xs">{fmtDate(c.sent_at || c.created_at)}</td>
-                  <td className="p-2 text-right font-mono">{c.total_alvo}</td>
-                  <td className="p-2 text-right font-mono">{c.enviados}</td>
-                  <td className="p-2 text-right font-mono text-red-600">{c.erros || ''}</td>
-                  <td className="p-2 text-right font-mono">{c.aberturas_unicas}</td>
-                  <td className="p-2 text-right font-mono text-muted-foreground">{c.aberturas_totais}</td>
-                  <td className="p-2 text-right font-bold">{pct(c.aberturas_unicas, c.enviados)}</td>
-                  <td className="p-2 text-right">
-                    <Button size="sm" variant="outline" onClick={() => setOpenDetail(c)}>Ver</Button>
-                  </td>
-                </tr>
-              ))}
+              ) : campaigns.map(c => {
+                const ck = clicksByCampaign[c.campaign_id] ?? { unicos: 0, totais: 0 };
+                return (
+                  <tr key={c.campaign_id} className="border-t hover:bg-muted/30">
+                    <td className="p-2 font-medium">{c.nome}</td>
+                    <td className="p-2"><Badge variant="outline">{c.tipo}</Badge></td>
+                    <td className="p-2 text-xs">{fmtDate(c.sent_at || c.created_at)}</td>
+                    <td className="p-2 text-right font-mono">{c.total_alvo}</td>
+                    <td className="p-2 text-right font-mono">{c.enviados}</td>
+                    <td className="p-2 text-right font-mono text-red-600">{c.erros || ''}</td>
+                    <td className="p-2 text-right font-mono">{c.aberturas_unicas}</td>
+                    <td className="p-2 text-right font-mono font-bold">{ck.unicos}</td>
+                    <td className="p-2 text-right font-bold">{pct(ck.unicos, c.enviados)}</td>
+                    <td className="p-2 text-right">
+                      <Button size="sm" variant="outline" onClick={() => setOpenDetail(c)}>Ver</Button>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </Card>

@@ -87,6 +87,63 @@ export const PressEmailCampaignTab = ({ selectedContacts, onClearSelection }: Pr
     }
   };
 
+  const handleTestSend = async () => {
+    if (!subject.trim() || !html.trim()) {
+      toast({ title: 'Preencha assunto e corpo antes do teste', variant: 'destructive' }); return;
+    }
+    const email = window.prompt('Email para receber o teste (geralmente o seu):', 'jefferson@jeffersonlobo.tech');
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      toast({ title: 'Email inválido', variant: 'destructive' }); return;
+    }
+    setSending(true); setResult(null);
+    try {
+      // Upsert contato de teste (por email)
+      const { data: existing } = await supabase
+        .from('press_contacts').select('id').eq('email', email.toLowerCase()).maybeSingle();
+      let contactId = existing?.id as string | undefined;
+      if (!contactId) {
+        const { data: created, error: e1 } = await supabase.from('press_contacts').insert({
+          veiculo: 'TESTE INTERNO',
+          contato: 'Teste',
+          email: email.toLowerCase(),
+          meio: 'Teste',
+          tags: ['teste-interno'],
+          opt_out: false,
+        }).select('id').single();
+        if (e1 || !created) throw new Error(e1?.message || 'falha ao criar contato de teste');
+        contactId = created.id;
+      }
+      const { data: campaign, error: cErr } = await supabase
+        .from('press_campaigns')
+        .insert({
+          tipo: 'email',
+          nome: `TESTE — ${new Date().toLocaleString('pt-BR')}`,
+          assunto: subject, corpo: html,
+          total_alvo: 1, status: 'em_envio',
+        })
+        .select('id').single();
+      if (cErr || !campaign) throw new Error(cErr?.message || 'falha ao criar campanha');
+
+      const { data, error } = await supabase.functions.invoke('send-press-email', {
+        body: {
+          campaign_id: campaign.id,
+          contact_ids: [contactId],
+          subject, html,
+        },
+      });
+      if (error) throw error;
+      toast({
+        title: 'Teste disparado',
+        description: `Abra o email em ${email}, clique num link e veja os contadores subirem no dashboard.`,
+      });
+      setResult(data);
+    } catch (e) {
+      toast({ title: 'Erro no teste', description: e instanceof Error ? e.message : 'erro', variant: 'destructive' });
+    } finally {
+      setSending(false);
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card className="p-3 border-l-4 border-blue-500 bg-blue-500/5 text-sm">
@@ -133,9 +190,12 @@ export const PressEmailCampaignTab = ({ selectedContacts, onClearSelection }: Pr
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" onClick={() => setShowPreview(p => !p)} disabled={!preview}>
             <Eye className="w-4 h-4 mr-1" /> {showPreview ? 'Ocultar' : 'Ver'} preview
+          </Button>
+          <Button variant="secondary" onClick={handleTestSend} disabled={sending || !subject.trim() || !html.trim()}>
+            <Send className="w-4 h-4 mr-1" /> Enviar teste pra mim
           </Button>
           <Button onClick={handleSend} disabled={sending || !eligible.length} className="ml-auto">
             <Send className="w-4 h-4 mr-1" />
