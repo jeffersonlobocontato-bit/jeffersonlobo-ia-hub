@@ -1,49 +1,195 @@
+
 ## Objetivo
 
-No painel "Análise por segmento e região", agrupar as variações de `meio` (e do `veiculo` quando o `meio` for vazio/ambíguo) em categorias canônicas via análise semântica no front, sem alterar dados no banco.
+Na aba "Campanha WhatsApp" (`PressCampaignsTab.tsx`), responder em tempo real:
+1. **Posso enviar agora?** (janela horária + cooldown entre envios + cota diária)
+2. **Quantos ainda devo enviar hoje?** (recomendação dinâmica)
+3. **Este contato já recebeu este conteúdo?** (botão "Abrir" desabilitado se sim)
 
-## Categorias canônicas e regras
+Tudo lendo de `press_sends` (sem precisar de nova tabela de log paralela).
 
-| Canônico | Casos absorvidos |
-|---|---|
-| **Portal de Notícias** | "portal de notícias", "portal", "site", "internet", "web", "blog", "online", "digital" |
-| **Jornal Impresso** | "jornal impresso", "jornal", "impresso", "periódico" |
-| **Rádio** | "rádio", "radio", "rádio comunitária", "fm", "am", "webradio" |
-| **TV** | "tv", "televisão", "canal" |
-| **Revista** | "revista", "magazine" |
-| **Redes Sociais** | "facebook", "instagram", "youtube", "tiktok", "x", "twitter", "linkedin", "telegram", "redes sociais", "rede social", "social" |
-| **Podcast** | "podcast" |
-| **Agência** | "agência", "agencia", "assessoria" |
-| **Outros** | nada bate (mantém o rótulo original entre parênteses para inspeção) |
+---
 
-### Regras de combinação (quando o campo tem múltiplos termos, ex.: "Rádio e Portal")
-Aplicar em ordem (primeiro match vence):
-1. Contém Rádio + qualquer outro → **Rádio**
-2. Contém TV + qualquer outro → **TV**
-3. Contém Redes Sociais isolado ou combinado com Portal/Blog → **Redes Sociais** somente se NÃO houver Rádio/TV
-4. Jornal Impresso + Portal → manter **separado** como "Jornal Impresso + Portal" (conflito real entre mídia física e digital, conforme orientação de manter separado quando há divergência)
-5. Demais combinações com 2 canônicos distintos sem regra acima → **separado** como "A + B" ordenado alfabeticamente
+## Parte 1 — Painel de ritmo (RhythmGuard)
 
-### Fallback semântico
-Quando `meio` for `null`/vazio/"—", analisar `veiculo` com a mesma tabela de keywords (ex.: "Rádio Difusora FM" → Rádio; "Portal G1" → Portal de Notícias; "Blog do Fulano" → Portal de Notícias).
+Novo componente `WhatsAppRhythmGuard` renderizado no topo da campanha ativa, com 3 indicadores e 1 CTA.
 
-Normalização: lowercase + remoção de acentos + remoção de pontuação antes de comparar.
+### Regras de cadência (configuráveis no componente, defaults sólidos)
 
-## Implementação (1 arquivo, frontend only)
+| Regra | Default | Por quê |
+|---|---|---|
+| Janela de envio | Seg-Sex, 9h-12h e 14h-18h (America/Sao_Paulo) | Imprensa não responde fora disso e marca como spam |
+| Cooldown entre envios | 25-45s aleatório | Padrão humano; <20s aciona heurística do WhatsApp |
+| Pausa forçada | 5 min a cada 30 envios | Quebra padrão de rajada |
+| Cota diária | 150 envios/dia (configurável) | Limite seguro para número Business pessoal |
+| Cota por hora | 40 envios/hora | Evita rajadas dentro da janela |
+| Aquecimento de campanha | Dia 1 = 60% da cota / Dia 2 = 80% / Dia 3+ = 100% | Calibra reação do número |
 
-**`src/components/admin/press/PressCampaignDashboard.tsx`**
+### Como o componente decide
 
-1. Criar helper `normalizeMeio(meio: string | null, veiculo?: string): string` no topo do arquivo com a tabela de regras acima.
-2. No `useMemo` de `segFiltered` (linhas 104–115), trocar a chave de agregação `r.meio` por `normalizeMeio(r.meio)`. Como a view `press_segment_stats` não traz `veiculo`, o fallback semântico para linhas com `meio` vazio usará só `meio` aqui — suficiente para a maioria.
-3. Na tabela "Ranking de leitores" (linha 300), trocar `{c.meio || '—'}` por `{normalizeMeio(c.meio, c.veiculo) || '—'}` para aplicar inclusive o fallback via `veiculo`.
-4. Manter ordenação por `enviados` desc.
+Faz uma query única ao montar e a cada 5s:
 
-## O que NÃO muda
+```sql
+-- envios do usuário no canal whatsapp nas últimas 24h
+SELECT sent_at FROM press_sends
+WHERE canal = 'whatsapp' AND status = 'enviado'
+  AND sent_at > now() - interval '24 hours'
+ORDER BY sent_at DESC;
+```
 
-- Banco de dados, views (`press_segment_stats` etc.), edge functions e import XLSX permanecem intactos.
-- O `meio` original dos contatos continua salvo como está — a normalização é só de exibição/agregação no dashboard.
+Daí calcula localmente: `lastSentAt`, `sentLastHour`, `sentToday`, `dayOfCampaign` (dias desde `press_campaigns.created_at`).
 
-## Fora de escopo (pode virar próximo passo se quiser)
+### UI do painel (3 cards lado a lado + faixa de status)
 
-- Botão "Aplicar normalização à base" (UPDATE em `press_contacts.meio`).
-- Editar a tabela de regras pela UI.
+```text
+┌──────────────────────────────────────────────────────────────┐
+│ ● LIBERADO PARA ENVIAR   |   próximo em 00:00                │
+│ Janela atual: 14:00–18:00 (3h 22min restantes)               │
+├───────────────┬──────────────────┬───────────────────────────┤
+│ HOJE          │ ÚLTIMA HORA      │ RECOMENDADO AGORA         │
+│  47 / 150     │  18 / 40         │  enviar até 22 nesta hora │
+│  31%          │  45%             │  parar em 18h00           │
+└───────────────┴──────────────────┴───────────────────────────┘
+```
+
+**Estados do banner principal**:
+- 🟢 `LIBERADO` — pode clicar próximo
+- 🟡 `AGUARDE Xs` — cooldown entre envios ativo (mostra contador)
+- 🟠 `PAUSA OBRIGATÓRIA 4:32` — atingiu 30 seguidos, pausa de 5min
+- 🔴 `FORA DA JANELA — volte às 09:00 de seg` — sábado/domingo/madrugada
+- 🔴 `COTA DIÁRIA ATINGIDA — retome amanhã 09:00` — bateu 150
+
+Quando estado ≠ 🟢, **desabilita todos os botões "Abrir" da fila** (via prop `canSendNow`). Tooltip explica o motivo.
+
+### Sino de notificação (opcional, fase 2)
+
+Quando o tab está aberto e cooldown acaba, toca um beep curto e muda título da aba para "▶ Liberado — Campanha". Útil quando você sai para fazer outra coisa entre envios.
+
+---
+
+## Parte 2 — Anti-duplicidade ao reusar campanha
+
+### Dois cenários distintos
+
+**Cenário 2a — "Reabrir esta campanha" (mesma `campaign_id`)**  
+Já temos parcialmente: `press_sends` guarda status por contato. Hoje o componente carrega `sends` apenas do estado local, perde após reload.
+
+Fix: ao montar, se há `campaignId` salvo (vamos persistir em `localStorage`), recarrega o estado de `press_sends`:
+
+```sql
+SELECT contact_id, status FROM press_sends
+WHERE campaign_id = :id;
+```
+
+Hidrata o objeto `sends`. Contatos com `status='enviado'` aparecem com badge "✓ Enviado" e botão "Abrir" desabilitado. Já é o comportamento desejado.
+
+**Cenário 2b — "Nova campanha com mesmo release"** (o que você descreveu)  
+Você cria nova campanha (D+15) com o mesmo release, ou variante dele. Quer bloquear quem já recebeu na onda anterior.
+
+### Solução: agrupar campanhas por release
+
+Adicionar coluna `release_group` (text, opcional) em `press_campaigns`. Quando criar nova campanha, oferece dropdown:
+
+```text
+Esta campanha faz parte de qual release?
+[ Novo release ]  ou  [ Selecionar release existente ▾ ]
+                          ├── Adjori PR — Mai/26
+                          ├── Lançamento Livro
+                          └── ...
+```
+
+Se selecionar release existente, na fila de envio cada contato fica marcado:
+
+| Estado | Botão | Badge |
+|---|---|---|
+| Nunca recebeu este release | ✅ habilitado | — |
+| Recebeu em campanha anterior do mesmo release | ❌ desabilitado | "Recebeu em 12/05 — campanha Adjori v1" |
+| Recebeu nesta campanha | ❌ desabilitado | "✓ Enviado" |
+
+Query que alimenta a fila:
+
+```sql
+-- ids dos contatos que já receberam algo do mesmo release
+SELECT DISTINCT s.contact_id, c.nome, s.sent_at
+FROM press_sends s
+JOIN press_campaigns c ON c.id = s.campaign_id
+WHERE c.release_group = :grupo
+  AND s.canal = 'whatsapp'
+  AND s.status = 'enviado'
+  AND c.id != :campanha_atual;
+```
+
+Resultado vira `Map<contactId, {campanha, data}>` e o componente desabilita os botões.
+
+### Opção "ignorar bloqueio" (escape válido)
+
+Caso especial: você quer **propositalmente** reenviar para alguém (errou texto, quer follow-up direto). Cada linha bloqueada tem link "ignorar bloqueio" que, ao clicar, mostra confirmação:
+
+> Este contato recebeu "Adjori v1" em 12/05. Tem certeza que quer enviar de novo?  
+> [ Cancelar ]  [ Sim, enviar mesmo assim ]
+
+Mantém você no controle, evita só o acidente.
+
+---
+
+## Mudanças técnicas
+
+### Migração (1 coluna, sem breaking change)
+
+```sql
+ALTER TABLE public.press_campaigns
+  ADD COLUMN release_group text;
+
+CREATE INDEX idx_press_campaigns_release_group
+  ON public.press_campaigns(release_group) WHERE release_group IS NOT NULL;
+
+CREATE INDEX idx_press_sends_contact_canal_status
+  ON public.press_sends(contact_id, canal, status)
+  WHERE status = 'enviado';
+```
+
+### Arquivos a criar/editar
+
+**Novos**:
+- `src/components/admin/press/WhatsAppRhythmGuard.tsx` — painel de ritmo
+- `src/components/admin/press/ReleaseGroupPicker.tsx` — dropdown de release na criação
+- `src/lib/whatsapp-rhythm.ts` — funções puras `computeRhythmState(sentTimestamps, now, config)`, `isInWindow(date)`, `getCooldownRemaining()`
+
+**Editados**:
+- `src/components/admin/press/PressCampaignsTab.tsx`
+  - Persistir `campaignId` em `localStorage` (`press_campaign_active`) e recarregar sends ao montar
+  - Renderizar `<WhatsAppRhythmGuard campaignId=... onStateChange=... />` no topo
+  - Carregar `blockedContacts: Map<id, {campanha, data}>` via query do release_group
+  - Desabilitar botão "Abrir" quando `!canSendNow || blockedContacts.has(c.id)`
+  - Tooltip explicando bloqueio
+  - Botão "ignorar bloqueio" com `AlertDialog` de confirmação
+  - Adicionar `<ReleaseGroupPicker>` no formulário de criação
+- `src/components/admin/press/PressCampaignWizard.tsx` (se aplicável a campanhas email também) — mesmo dropdown de release
+
+### Sem necessidade de edge function
+
+Tudo roda no client (admin autenticado, RLS já restringe). Queries são leves (<1KB por refresh, a cada 5s só durante campanha ativa).
+
+---
+
+## Não-objetivos (escopo desta entrega)
+
+- Não criamos sistema de templates A/B (Cenário B do plano anterior fica para depois)
+- Não tocamos no fluxo de email (rastreamento atual de abertura permanece)
+- Não automatizamos via API oficial — segue `wa.me` manual
+- Não criamos bloqueio cross-release (se você fez release X em maio e Y em junho, contato pode receber ambos — bloqueio é só dentro do mesmo `release_group`)
+
+---
+
+## Resultado esperado
+
+Na próxima onda você abre a aba, vê:
+
+> 🟢 **LIBERADO PARA ENVIAR** — próximo em 00:00  
+> Hoje: 12/150 • Última hora: 5/40 • Recomendado: enviar até 35 nesta hora, parar 18h00
+
+E na fila, 47 dos 600 contatos aparecem com:
+
+> ⛔ Recebeu "Adjori v1" em 12/05 — _ignorar bloqueio_
+
+Risco de duplicidade some, risco de banimento por rajada some, e você ganha um sino que avisa quando pode clicar de novo.
