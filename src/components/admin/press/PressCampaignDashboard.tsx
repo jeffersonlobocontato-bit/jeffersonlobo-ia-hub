@@ -358,7 +358,7 @@ export const PressCampaignDashboard = () => {
                   <td className="p-2 font-mono text-xs">{i + 1}</td>
                   <td className="p-2">{c.contato || '—'}</td>
                   <td className="p-2 text-xs">{c.veiculo}</td>
-                  <td className="p-2 text-xs">{c.meio || '—'}</td>
+                  <td className="p-2 text-xs">{normalizeMeio(c.meio, c.veiculo)}</td>
                   <td className="p-2 text-xs">{c.regiao || '—'}</td>
                   <td className="p-2 text-right font-mono">{c.total_recebidos}</td>
                   <td className="p-2 text-right font-mono">{c.campanhas_abertas}</td>
