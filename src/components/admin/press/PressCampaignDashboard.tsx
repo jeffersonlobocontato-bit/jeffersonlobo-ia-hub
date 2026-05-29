@@ -87,6 +87,10 @@ function _detectCanons(raw: string): Canon[] {
   if (/\bpodcast\b/.test(t)) found.add('Podcast');
   // Agência
   if (/\b(agencia|assessoria)\b/.test(t)) found.add('Agência');
+  // Órgãos Públicos
+  if (/\b(prefeitura|camara|cmara|secretaria|governo|ministerio|ministrio|orgao|orgaos|publico|publica|gov|tribunal|assembleia|assemblia|senado|congresso|alesp|alerj|federal|estadual|municipal)\b/.test(t)) {
+    found.add('Órgãos Públicos');
+  }
   // Redes Sociais
   if (/\b(facebook|fb|instagram|insta|ig|youtube|yt|tiktok|twitter|x|linkedin|telegram|rede social|redes sociais|social)\b/.test(t)) {
     found.add('Redes Sociais');
