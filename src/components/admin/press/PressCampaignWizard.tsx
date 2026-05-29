@@ -328,11 +328,15 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     contact: c,
   });
 
-  const waMarkSent = async (c: PressContact) => {
+  const sanitizePhone = (n: string) => (n ?? '').replace(/\D/g, '');
+  const buildWaLink = (c: PressContact) =>
+    `https://wa.me/${sanitizePhone(c.whatsapp)}?text=${encodeURIComponent(buildWaText(c))}`;
+
+  const waMarkSent = async (c: PressContact, opts?: { skipOpen?: boolean }) => {
     if (!waCampaignId) return;
-    const waText = buildWaText(c);
-    const link = `https://wa.me/${c.whatsapp}?text=${encodeURIComponent(waText)}`;
-    window.open(link, '_blank', 'noopener,noreferrer');
+    if (!opts?.skipOpen) {
+      window.open(buildWaLink(c), '_blank', 'noopener,noreferrer');
+    }
     setWaSends(s => ({ ...s, [c.id]: 'enviado' }));
     await supabase.from('press_sends').update({ status: 'enviado', sent_at: new Date().toISOString() })
       .eq('campaign_id', waCampaignId).eq('contact_id', c.id);

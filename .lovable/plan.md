@@ -1,81 +1,47 @@
-# Disparo de WhatsApp — pacote mínimo para operar do celular
+## Problema
 
-Objetivo: deixar você capaz de pegar o celular, abrir uma campanha e disparar com segurança, sem duplicar contato e sem esquecer de anexar a mídia.
+No painel de disparo (modal "Disparar campanha" + tela Kiosk), o botão **ABRIR** chama `window.open('https://wa.me/...')` dentro de um handler React. O iframe de preview do Lovable (e alguns bloqueadores de popup) descartam essas chamadas programáticas silenciosamente — por isso "nada acontece" quando você clica.
 
-## 1. Checklist pré-disparo (item "a")
+A correção padrão é usar uma **âncora `<a>` real** com `href` direto e `target="_blank"`. O navegador trata o clique como navegação nativa do usuário, não como popup script, e libera mesmo dentro do iframe.
 
-Card fixo no topo da fila de envio (`PressCampaignsTab` / detalhe da campanha) com 5 verificações:
+## O que vou alterar
 
-- Mídia carregada (verde se `media_url` existe, cinza se `media_tipo = nenhum`)
-- Link com OG válido (chama `validate-og-tags` 1x quando a campanha abre; cacheia resultado)
-- Janela de horário recomendada (usa `whatsapp-rhythm.ts` — verde dentro da janela, amarelo fora)
-- Próximo disparo liberado (já existe no `WhatsAppRhythmGuard`, vira linha do checklist)
-- Confirmação manual: "Salvei todos os contatos da lista na agenda do celular" (checkbox que persiste em `localStorage` por `campaign_id`)
+Dois lugares onde existe o botão "Abrir WhatsApp":
 
-Botão grande "Começar disparos" só fica ativo quando os 4 automáticos estão verdes e o checkbox manual está marcado. Os itens amarelos (fora de janela) deixam disparar mas com aviso.
-
-## 2. Estado "mídia já baixada" (item "b")
-
-- Adicionar `localStorage` flag `press-media-downloaded:{campaign_id}` quando o usuário clica em "Baixar mídia".
-- Botão muda de "Baixar mídia" → "Mídia baixada ✓ Baixar de novo".
-- Na barra fixa de mídia, mostrar lembrete "Anexe a mídia baixada no WhatsApp antes de colar o texto" apenas enquanto o flag não estiver marcado.
-- Nenhuma mudança de schema — é puro estado de cliente.
-
-## 3. Modo kiosk mobile (item "c")
-
-Nova rota `/admin/press/disparar/:campaignId`, mobile-first, otimizada para uso de celular durante o disparo.
-
-Estrutura da tela:
-
-```text
-┌─────────────────────────────┐
-│ Campanha: Release Maio       │
-│ 12 / 47 enviados   ▓▓░░░░    │
-├─────────────────────────────┤
-│ [Card mídia grande]          │
-│ [Baixar mídia ✓]             │
-├─────────────────────────────┤
-│ Contato 13 de 47             │
-│ Folha de Cuiabá              │
-│ João Silva — Editor          │
-│ +55 65 9xxxx-xxxx            │
-├─────────────────────────────┤
-│ [Preview da mensagem]        │
-│ *Título*                     │
-│ Corpo...                     │
-│ link                         │
-├─────────────────────────────┤
-│ [ABRIR WHATSAPP] (full)      │
-│ [✓ Enviado]  [Pular →]       │
-└─────────────────────────────┘
+### 1. `src/components/admin/press/PressCampaignWizard.tsx` (linha ~805)
+Trocar:
+```tsx
+<Button size="sm" onClick={() => waMarkSent(c)}>
+  <ExternalLink /> Abrir
+</Button>
 ```
+por:
+```tsx
+<Button size="sm" asChild>
+  <a
+    href={`https://wa.me/${c.whatsapp}?text=${encodeURIComponent(buildWaText(c))}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    onClick={() => waMarkSent(c, { skipOpen: true })}
+  >
+    <ExternalLink /> Abrir
+  </a>
+</Button>
+```
+E ajustar `waMarkSent` para aceitar a flag `skipOpen` (quando vier da âncora, só marca como enviado no banco e não tenta abrir de novo).
 
-Comportamento:
-- Mostra 1 contato por vez, ordenado por `press_sends.status = 'pendente'`.
-- "Abrir WhatsApp" abre `wa.me/{whatsapp}?text={mensagem encoded}` em nova aba.
-- "Enviado" grava `press_sends.status = 'enviado'`, `sent_at = now()`, incrementa `press_campaigns.total_enviado`, respeita o ritmo (mostra contador "próximo em Xs" se ainda não liberou).
-- "Pular" pula sem marcar (não conta como enviado nem como erro).
-- Quando todos os contatos pendentes acabam → tela "Disparo concluído" com resumo.
-- Header com botão "Voltar para o painel" e indicador de ritmo (próximo livre / disparos restantes na janela atual).
+### 2. `src/pages/admin/PressCampaignKiosk.tsx` (botão grande "Abrir WhatsApp")
+Mesmo padrão: substituir o `<Button onClick={openWhatsApp}>` por `<Button asChild><a href=... target="_blank">`. Manter o restante do fluxo (checklist, cooldown, marcar como enviado) intacto.
 
-## Arquivos
-
-Novos:
-- `src/pages/admin/PressCampaignKiosk.tsx` — rota kiosk mobile
-- `src/components/admin/press/PreDispatchChecklist.tsx` — card checklist (item a)
-- `src/hooks/use-media-downloaded.ts` — flag localStorage (item b)
-- `src/hooks/use-og-validation.ts` — cache do resultado do `validate-og-tags`
-
-Editados:
-- `src/App.tsx` — registrar `/admin/press/disparar/:campaignId` (admin-only)
-- `src/components/admin/press/PressCampaignsTab.tsx` — injetar `PreDispatchChecklist` no topo e botão "Modo celular" que abre a rota kiosk
-- `src/components/admin/press/CampaignMediaUploader.tsx` (ou onde está o botão "Baixar mídia") — consumir `use-media-downloaded`
-
-Sem mudança de schema, sem migration, sem edge function nova.
+### 3. Pequena defesa extra
+Sanitizar o número de WhatsApp antes de montar a URL (remover espaços, `+`, `-`, parênteses) — alguns contatos importados podem ter formatação que quebra o link `wa.me`.
 
 ## Fora do escopo
 
-- Exportação CSV de quem falta (item "d")
-- Tela de resultado pós-campanha com métricas (item "e")
-- Anexar mídia automaticamente (impossível via `wa.me`)
-- Disparo via API oficial do WhatsApp Business Cloud
+- Não mexo no fluxo de email, no checklist, no cooldown, nem na lógica de gravar `press_sends`.
+- Não toco em RLS, edge functions ou schema.
+
+## Como você testa depois
+
+1. Abre o modal "Disparar campanha" → WhatsApp → clica **Abrir** em um contato. Deve abrir uma nova aba com `wa.me/55...` e a mensagem pronta.
+2. Mesma coisa no **Modo celular** (Kiosk): o botão grande "Abrir WhatsApp" deve abrir o app/WhatsApp Web direto.
