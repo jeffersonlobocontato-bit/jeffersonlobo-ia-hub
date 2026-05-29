@@ -947,6 +947,7 @@ export type Database = {
           filtros: Json
           id: string
           nome: string
+          release_group: string | null
           sent_at: string | null
           status: string
           tipo: string
@@ -963,6 +964,7 @@ export type Database = {
           filtros?: Json
           id?: string
           nome: string
+          release_group?: string | null
           sent_at?: string | null
           status?: string
           tipo: string
@@ -979,6 +981,7 @@ export type Database = {
           filtros?: Json
           id?: string
           nome?: string
+          release_group?: string | null
           sent_at?: string | null
           status?: string
           tipo?: string
