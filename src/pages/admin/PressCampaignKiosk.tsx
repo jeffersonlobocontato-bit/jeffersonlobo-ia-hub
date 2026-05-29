@@ -330,6 +330,18 @@ const PressCampaignKiosk = () => {
               </a>
             </Button>
 
+            {ready && canSendNow && (
+              <a
+                href={buildWaFallbackLink(currentContact)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-center text-[11px] text-muted-foreground underline hover:text-foreground"
+              >
+                Não abriu? Tentar wa.me
+              </a>
+            )}
+
+
             <div className="grid grid-cols-2 gap-2">
               <Button onClick={() => skip(currentContact)} variant="outline" disabled={!ready}>
                 <SkipForward className="w-4 h-4 mr-1" /> Pular
