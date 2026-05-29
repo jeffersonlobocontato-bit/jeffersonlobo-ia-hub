@@ -133,6 +133,7 @@ export const PressCampaignDashboard = () => {
   const [openDetail, setOpenDetail] = useState<CampaignStat | null>(null);
   const [openHistory, setOpenHistory] = useState<ContactEng | null>(null);
   const [drillRegion, setDrillRegion] = useState<string | null>(null);
+  const [editSegment, setEditSegment] = useState<string | null>(null);
 
   const load = async () => {
     setLoading(true);
