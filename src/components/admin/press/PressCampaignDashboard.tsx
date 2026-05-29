@@ -315,7 +315,11 @@ export const PressCampaignDashboard = () => {
         <div className="grid md:grid-cols-2 gap-4">
           <Card className="p-4">
             <h4 className="font-bold mb-3 flex items-center gap-2 text-sm"><Newspaper className="w-4 h-4" /> Por segmento</h4>
-            <RankTable rows={segFiltered.map(s => ({ key: s.meio, label: s.meio, enviados: s.enviados, abertas: s.aberturas_unicas }))} />
+            <RankTable
+              rows={segFiltered.map(s => ({ key: s.meio, label: s.meio, enviados: s.enviados, abertas: s.aberturas_unicas }))}
+              onClickRow={(key) => setEditSegment(key)}
+            />
+            <div className="text-[10px] text-muted-foreground mt-2">Clique numa categoria para revisar e reclassificar manualmente os veículos.</div>
           </Card>
           <Card className="p-4">
             <h4 className="font-bold mb-3 flex items-center gap-2 text-sm"><MapPin className="w-4 h-4" /> Por região</h4>
