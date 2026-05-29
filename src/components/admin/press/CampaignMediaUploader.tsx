@@ -2,7 +2,8 @@ import { useRef, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { Upload, X, ImageIcon, Video, Loader2, Download } from 'lucide-react';
+import { Upload, X, ImageIcon, Video, Loader2, Download, Check } from 'lucide-react';
+import { useMediaDownloaded } from '@/hooks/use-media-downloaded';
 
 export type MediaTipo = 'imagem' | 'video' | 'nenhum';
 
@@ -11,13 +12,16 @@ type Props = {
   mediaTipo: MediaTipo;
   onChange: (url: string | null, tipo: MediaTipo) => void;
   disabled?: boolean;
+  /** Quando passado, marca em localStorage que a mídia já foi baixada para essa campanha. */
+  campaignId?: string | null;
 };
 
 const MAX_IMG = 5 * 1024 * 1024;
 const MAX_VID = 16 * 1024 * 1024;
 
-export const CampaignMediaUploader = ({ mediaUrl, mediaTipo, onChange, disabled }: Props) => {
+export const CampaignMediaUploader = ({ mediaUrl, mediaTipo, onChange, disabled, campaignId }: Props) => {
   const { toast } = useToast();
+  const { downloaded, markDownloaded } = useMediaDownloaded(campaignId ?? null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
@@ -65,8 +69,10 @@ export const CampaignMediaUploader = ({ mediaUrl, mediaTipo, onChange, disabled 
       a.download = mediaUrl.split('/').pop() ?? 'midia';
       a.click();
       setTimeout(() => URL.revokeObjectURL(a.href), 5000);
+      markDownloaded();
     } catch {
       window.open(mediaUrl, '_blank');
+      markDownloaded();
     }
   };
 
@@ -87,8 +93,10 @@ export const CampaignMediaUploader = ({ mediaUrl, mediaTipo, onChange, disabled 
             <div className="text-muted-foreground truncate">{mediaUrl.split('/').pop()}</div>
           </div>
           <div className="flex flex-col gap-1">
-            <Button size="sm" variant="outline" onClick={downloadMedia} type="button">
-              <Download className="w-3 h-3 mr-1" /> Baixar
+            <Button size="sm" variant={downloaded ? 'outline' : 'default'} onClick={downloadMedia} type="button">
+              {downloaded
+                ? <><Check className="w-3 h-3 mr-1" /> Baixada</>
+                : <><Download className="w-3 h-3 mr-1" /> Baixar</>}
             </Button>
             {!disabled && (
               <Button size="sm" variant="ghost" onClick={remove} type="button">

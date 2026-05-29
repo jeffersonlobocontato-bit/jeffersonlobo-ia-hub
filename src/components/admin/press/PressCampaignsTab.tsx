@@ -6,16 +6,18 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { MessageCircle, Send, SkipForward, Check, ExternalLink, ShieldAlert } from 'lucide-react';
+import { MessageCircle, Send, SkipForward, Check, ExternalLink, ShieldAlert, Smartphone } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Link } from 'react-router-dom';
 import type { PressContact } from '@/lib/press-utils';
 import { buildWhatsappLink, renderTemplate } from '@/lib/press-utils';
 import { WhatsAppRhythmGuard } from './WhatsAppRhythmGuard';
 import { ReleaseGroupPicker } from './ReleaseGroupPicker';
+import { PreDispatchChecklist } from './PreDispatchChecklist';
 
 type Props = {
   selectedContacts: PressContact[];
@@ -212,6 +214,34 @@ export const PressCampaignsTab = ({ selectedContacts, onClearSelection }: Props)
           campaignCreatedAt={campaignCreatedAt}
           onStateChange={setCanSendNow}
         />
+      )}
+
+      {campaignId && (
+        <PreDispatchChecklist
+          campaignId={campaignId}
+          campaignCreatedAt={campaignCreatedAt}
+          mediaUrl={null}
+          mediaTipo="nenhum"
+          linkDestino={null}
+        />
+      )}
+
+      {campaignId && (
+        <Card className="p-3 border-2 border-dashed flex items-center justify-between gap-3 flex-wrap">
+          <div className="text-xs">
+            <div className="font-black uppercase flex items-center gap-1">
+              <Smartphone className="w-4 h-4" /> Vai disparar pelo celular?
+            </div>
+            <div className="text-muted-foreground">
+              Abra o modo kiosk: 1 contato por vez, otimizado para tela do celular.
+            </div>
+          </div>
+          <Button asChild variant="default">
+            <Link to={`/admin/press/disparar/${campaignId}`} target="_blank" rel="noopener noreferrer">
+              <Smartphone className="w-4 h-4 mr-2" /> Abrir modo celular
+            </Link>
+          </Button>
+        </Card>
       )}
 
       {campaignId && (

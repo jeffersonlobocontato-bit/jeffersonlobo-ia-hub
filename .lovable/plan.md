@@ -1,90 +1,81 @@
-## Objetivo
+# Disparo de WhatsApp — pacote mínimo para operar do celular
 
-Permitir que cada campanha de WhatsApp tenha **título + mídia (foto/vídeo) + texto + link**, com o melhor equilíbrio entre profissionalismo, velocidade de envio e segurança anti-banimento.
+Objetivo: deixar você capaz de pegar o celular, abrir uma campanha e disparar com segurança, sem duplicar contato e sem esquecer de anexar a mídia.
 
-## Estratégia escolhida (híbrida)
+## 1. Checklist pré-disparo (item "a")
 
-Combinar os dois caminhos mais eficientes:
+Card fixo no topo da fila de envio (`PressCampaignsTab` / detalhe da campanha) com 5 verificações:
 
-1. **Mídia anexada manualmente** (foto ou vídeo) — você baixa 1 vez por campanha e arrasta no WhatsApp Web a cada envio (3-5s extras).
-2. **Link com preview rico via Open Graph** — a página de destino renderiza meta tags dinâmicas, então o link sozinho já mostra imagem grande + título + descrição no WhatsApp, mesmo se você esquecer de anexar a mídia.
+- Mídia carregada (verde se `media_url` existe, cinza se `media_tipo = nenhum`)
+- Link com OG válido (chama `validate-og-tags` 1x quando a campanha abre; cacheia resultado)
+- Janela de horário recomendada (usa `whatsapp-rhythm.ts` — verde dentro da janela, amarelo fora)
+- Próximo disparo liberado (já existe no `WhatsAppRhythmGuard`, vira linha do checklist)
+- Confirmação manual: "Salvei todos os contatos da lista na agenda do celular" (checkbox que persiste em `localStorage` por `campaign_id`)
 
-Resultado: você nunca depende só da mídia anexada (segurança), mas pode reforçar com vídeo/foto quando quiser (impacto).
+Botão grande "Começar disparos" só fica ativo quando os 4 automáticos estão verdes e o checkbox manual está marcado. Os itens amarelos (fora de janela) deixam disparar mas com aviso.
 
-## Escopo da implementação
+## 2. Estado "mídia já baixada" (item "b")
 
-### 1. Schema (migration)
+- Adicionar `localStorage` flag `press-media-downloaded:{campaign_id}` quando o usuário clica em "Baixar mídia".
+- Botão muda de "Baixar mídia" → "Mídia baixada ✓ Baixar de novo".
+- Na barra fixa de mídia, mostrar lembrete "Anexe a mídia baixada no WhatsApp antes de colar o texto" apenas enquanto o flag não estiver marcado.
+- Nenhuma mudança de schema — é puro estado de cliente.
 
-Adicionar à tabela `press_campaigns`:
-- `titulo` (text, vira primeira linha em negrito da mensagem)
-- `media_url` (text, opcional — URL pública no bucket)
-- `media_tipo` (text: `imagem` | `video` | `nenhum`, default `nenhum`)
-- `link_destino` (text, opcional — URL principal para preview rico)
-- `link_slug` (text, opcional — slug curto para a rota `/imprensa/r/:slug`)
+## 3. Modo kiosk mobile (item "c")
 
-Criar bucket público `press-media` com policies admin-only para INSERT/UPDATE/DELETE e SELECT público.
+Nova rota `/admin/press/disparar/:campaignId`, mobile-first, otimizada para uso de celular durante o disparo.
 
-### 2. Wizard de campanha (`PressCampaignWizard.tsx`)
+Estrutura da tela:
 
-Nova etapa "Conteúdo da mensagem" com:
-- Input **Título** (máx 80 chars, contador)
-- Upload de **mídia** (drag-and-drop, valida tipo/tamanho: imagem ≤5MB JPG/PNG, vídeo ≤16MB MP4)
-- Preview da mídia carregada com botão "Remover"
-- Textarea **corpo** (já existe — adicionar contador 700 chars com aviso "vira 'Leia mais' acima")
-- Input **link de destino** + botão "Validar preview" que chama edge function para conferir OG tags
-- Painel lateral "**Preview no WhatsApp**" — bolha verde simulando como vai aparecer (mídia em cima, título negrito, corpo, card de link com OG)
+```text
+┌─────────────────────────────┐
+│ Campanha: Release Maio       │
+│ 12 / 47 enviados   ▓▓░░░░    │
+├─────────────────────────────┤
+│ [Card mídia grande]          │
+│ [Baixar mídia ✓]             │
+├─────────────────────────────┤
+│ Contato 13 de 47             │
+│ Folha de Cuiabá              │
+│ João Silva — Editor          │
+│ +55 65 9xxxx-xxxx            │
+├─────────────────────────────┤
+│ [Preview da mensagem]        │
+│ *Título*                     │
+│ Corpo...                     │
+│ link                         │
+├─────────────────────────────┤
+│ [ABRIR WHATSAPP] (full)      │
+│ [✓ Enviado]  [Pular →]       │
+└─────────────────────────────┘
+```
 
-### 3. UI do envio (`PressCampaignsTab.tsx`)
+Comportamento:
+- Mostra 1 contato por vez, ordenado por `press_sends.status = 'pendente'`.
+- "Abrir WhatsApp" abre `wa.me/{whatsapp}?text={mensagem encoded}` em nova aba.
+- "Enviado" grava `press_sends.status = 'enviado'`, `sent_at = now()`, incrementa `press_campaigns.total_enviado`, respeita o ritmo (mostra contador "próximo em Xs" se ainda não liberou).
+- "Pular" pula sem marcar (não conta como enviado nem como erro).
+- Quando todos os contatos pendentes acabam → tela "Disparo concluído" com resumo.
+- Header com botão "Voltar para o painel" e indicador de ritmo (próximo livre / disparos restantes na janela atual).
 
-No card de cada contato:
-- **Bloco de mídia fixo no topo da lista** (não por contato, é o mesmo para todos): thumbnail grande + nome do arquivo + botão **"Baixar mídia"** (1 clique baixa pro computador)
-- Mensagem montada automaticamente: `*{titulo}*\n\n{corpo}\n\n{link_destino}`
-- Botão **"Abrir WhatsApp"** abre `wa.me/{numero}?text={encoded}`
-- Checkbox opcional **"Lembrar de anexar mídia"** (default ligado) — se marcado, mostra modal de confirmação rápida ao clicar Abrir
-- Botão **"Marcar como enviado"** permanece igual
+## Arquivos
 
-### 4. Página de destino com OG tags
+Novos:
+- `src/pages/admin/PressCampaignKiosk.tsx` — rota kiosk mobile
+- `src/components/admin/press/PreDispatchChecklist.tsx` — card checklist (item a)
+- `src/hooks/use-media-downloaded.ts` — flag localStorage (item b)
+- `src/hooks/use-og-validation.ts` — cache do resultado do `validate-og-tags`
 
-Nova rota pública `/imprensa/r/:slug` (`src/pages/PressReleaseOG.tsx`):
-- Busca a campanha pelo `link_slug` (RPC `get_press_release_og` SECURITY DEFINER, retorna só campos públicos)
-- Renderiza meta tags `og:title`, `og:description`, `og:image`, `og:type=article` dinamicamente via `<Helmet>`
-- Conteúdo visual mínimo: título, mídia, corpo formatado, botão "Falar com Jefferson" — útil para jornalista que clicar
-- Tracker de clique (insert em `cta_events` com `cta_name=press_release_view`)
+Editados:
+- `src/App.tsx` — registrar `/admin/press/disparar/:campaignId` (admin-only)
+- `src/components/admin/press/PressCampaignsTab.tsx` — injetar `PreDispatchChecklist` no topo e botão "Modo celular" que abre a rota kiosk
+- `src/components/admin/press/CampaignMediaUploader.tsx` (ou onde está o botão "Baixar mídia") — consumir `use-media-downloaded`
 
-### 5. Edge function `validate-og-tags`
+Sem mudança de schema, sem migration, sem edge function nova.
 
-Recebe `{ url }`, faz fetch da URL, extrai OG tags com regex/cheerio, retorna `{ valid: boolean, og_title, og_image, og_description, missing: [] }`. Usada pelo botão "Validar preview" do wizard.
+## Fora do escopo
 
-### 6. Documentação visual
-
-Tooltip discreto "?" ao lado do bloco de mídia explicando:
-- "Baixe a mídia 1x. A cada envio, arraste no WhatsApp Web depois que abrir. Se esquecer, o link já mostra preview rico com a mesma imagem."
-
-## Arquivos a criar/editar
-
-**Criar:**
-- `supabase/migrations/{timestamp}_press_campaign_media.sql`
-- `src/pages/PressReleaseOG.tsx`
-- `supabase/functions/validate-og-tags/index.ts`
-- `src/components/admin/press/CampaignMessagePreview.tsx` (preview WhatsApp)
-- `src/components/admin/press/CampaignMediaUploader.tsx`
-
-**Editar:**
-- `src/components/admin/press/PressCampaignWizard.tsx` (nova etapa)
-- `src/components/admin/press/PressCampaignsTab.tsx` (bloco mídia + mensagem montada)
-- `src/App.tsx` (rota `/imprensa/r/:slug`)
-- `src/lib/whatsapp-rhythm.ts` (sem mudanças — só consumir)
-
-## Fora do escopo (deixar para depois)
-
-- Variação A/B de título/corpo
-- Múltiplas mídias por campanha (carrossel)
-- Envio automatizado via API oficial WhatsApp Business
-- Tracking de clique no link via redirecionador (`/r/:slug` → `link_destino` com log) — pode entrar na próxima onda
-
-## Riscos e mitigações
-
-- **Mídia idêntica em 100+ envios consecutivos** → ritmo já implementado (cooldown 25-45s + pausa 5min) protege.
-- **Vídeo pesado eleva risco** → validador limita a 16MB e sugere imagem para listas >50 contatos.
-- **Esquecer de anexar mídia** → OG tags no link garantem visual rico mesmo sem anexo.
-- **Bucket público com mídia sensível** → mídia de release de imprensa é por natureza pública, então OK.
+- Exportação CSV de quem falta (item "d")
+- Tela de resultado pós-campanha com métricas (item "e")
+- Anexar mídia automaticamente (impossível via `wa.me`)
+- Disparo via API oficial do WhatsApp Business Cloud
