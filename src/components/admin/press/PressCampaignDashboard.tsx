@@ -11,7 +11,7 @@ import { toast } from 'sonner';
 
 export const CANON_MEIO_OPTIONS = [
   'Rádio', 'TV', 'Jornal Impresso', 'Portal de Notícias',
-  'Revista', 'Redes Sociais', 'Podcast', 'Agência',
+  'Revista', 'Redes Sociais', 'Podcast', 'Agência', 'Órgãos Públicos',
 ] as const;
 
 type CampaignStat = {
