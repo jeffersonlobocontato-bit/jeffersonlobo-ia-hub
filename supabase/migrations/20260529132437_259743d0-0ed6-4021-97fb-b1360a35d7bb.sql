@@ -1,0 +1,1 @@
+DELETE FROM public.press_email_opens WHERE user_agent = 'AuditTest/1.0';
