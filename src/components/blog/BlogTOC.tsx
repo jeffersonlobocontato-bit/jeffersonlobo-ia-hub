@@ -21,6 +21,7 @@ export const BlogTOC = ({ content }: Props) => {
     const lines = (content || '').split('\n');
     const result: TOCItem[] = [];
     let inCodeBlock = false;
+    const hasLetters = (s: string) => /[\p{L}\p{N}]/u.test(s);
     for (const raw of lines) {
       const line = raw.trim();
       if (line.startsWith('```')) {
@@ -31,11 +32,11 @@ export const BlogTOC = ({ content }: Props) => {
       const m2 = /^##\s+(.+)$/.exec(line);
       const m3 = /^###\s+(.+)$/.exec(line);
       if (m2) {
-        const text = m2[1].replace(/[*_`]/g, '').trim();
-        result.push({ id: slugify(text), text, level: 2 });
+        const text = m2[1].replace(/[*_`\\]/g, '').trim();
+        if (text && hasLetters(text)) result.push({ id: slugify(text), text, level: 2 });
       } else if (m3) {
-        const text = m3[1].replace(/[*_`]/g, '').trim();
-        result.push({ id: slugify(text), text, level: 3 });
+        const text = m3[1].replace(/[*_`\\]/g, '').trim();
+        if (text && hasLetters(text)) result.push({ id: slugify(text), text, level: 3 });
       }
     }
     return result;
