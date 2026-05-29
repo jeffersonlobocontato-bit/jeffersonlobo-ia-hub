@@ -133,9 +133,12 @@ export const PressEmailCampaignTab = ({ selectedContacts, onClearSelection }: Pr
           </p>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-wrap">
           <Button variant="outline" onClick={() => setShowPreview(p => !p)} disabled={!preview}>
             <Eye className="w-4 h-4 mr-1" /> {showPreview ? 'Ocultar' : 'Ver'} preview
+          </Button>
+          <Button variant="secondary" onClick={handleTestSend} disabled={sending || !subject.trim() || !html.trim()}>
+            <Send className="w-4 h-4 mr-1" /> Enviar teste pra mim
           </Button>
           <Button onClick={handleSend} disabled={sending || !eligible.length} className="ml-auto">
             <Send className="w-4 h-4 mr-1" />
