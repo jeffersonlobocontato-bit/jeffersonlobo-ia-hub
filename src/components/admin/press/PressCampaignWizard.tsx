@@ -16,7 +16,7 @@ import { CampaignMediaUploader, type MediaTipo } from './CampaignMediaUploader';
 import { fetchContactsForLists, usePressLists, type PressList } from '@/hooks/usePressLists';
 import {
   type PressContact, renderTemplate, htmlToWhatsAppMarkdown,
-  composeWhatsAppMessage, slugify,
+  composeWhatsAppMessage, slugify, buildWhatsappDirectLink,
 } from '@/lib/press-utils';
 
 export type WizardPrefill = {
