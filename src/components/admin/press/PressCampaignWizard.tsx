@@ -102,6 +102,17 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [canal]);
 
+  // alerta se fechar aba durante disparo
+  useEffect(() => {
+    if (!sending) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = 'Disparo em andamento. Sair vai interromper o envio.';
+      return e.returnValue;
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+
   // resolve contatos quando passa pro step 3 (revisar usa step 4)
   useEffect(() => {
     if (step < 2 || !canal || selectedLists.size === 0) return;
