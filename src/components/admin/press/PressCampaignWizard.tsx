@@ -112,6 +112,8 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
     };
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
+  }, [sending]);
+
 
   // resolve contatos quando passa pro step 3 (revisar usa step 4)
   useEffect(() => {
