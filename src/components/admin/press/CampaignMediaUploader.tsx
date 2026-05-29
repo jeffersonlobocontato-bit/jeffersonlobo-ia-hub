@@ -19,8 +19,9 @@ type Props = {
 const MAX_IMG = 5 * 1024 * 1024;
 const MAX_VID = 16 * 1024 * 1024;
 
-export const CampaignMediaUploader = ({ mediaUrl, mediaTipo, onChange, disabled }: Props) => {
+export const CampaignMediaUploader = ({ mediaUrl, mediaTipo, onChange, disabled, campaignId }: Props) => {
   const { toast } = useToast();
+  const { downloaded, markDownloaded } = useMediaDownloaded(campaignId ?? null);
   const inputRef = useRef<HTMLInputElement>(null);
   const [uploading, setUploading] = useState(false);
 
