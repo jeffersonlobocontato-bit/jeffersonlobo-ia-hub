@@ -33,6 +33,7 @@ const DEFAULT_EMAIL_BODY = `<p>Olá <strong>{{primeiro_nome}}</strong>,</p><p>So
 const DEFAULT_WA_BODY = `<p>Olá <strong>{{primeiro_nome}}</strong>! Sou Jefferson Lobo, especialista em IA. Tenho uma pauta que pode interessar à <strong>{{veiculo}}</strong>: <em>[seu assunto aqui]</em>. Posso compartilhar mais detalhes?</p>`;
 
 const BATCH_LIMIT = 280;
+const CHUNK_SIZE = 90; // edge function aceita máx 100 por chamada
 
 export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const { toast } = useToast();
