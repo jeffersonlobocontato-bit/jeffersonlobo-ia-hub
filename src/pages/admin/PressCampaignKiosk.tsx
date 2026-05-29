@@ -137,6 +137,8 @@ const PressCampaignKiosk = () => {
 
   const sanitizePhone = (n: string) => (n ?? '').replace(/\D/g, '');
   const buildWaLink = (c: PressContact) =>
+    buildWhatsappDirectLink(c.whatsapp, buildText(c));
+  const buildWaFallbackLink = (c: PressContact) =>
     `https://wa.me/${sanitizePhone(c.whatsapp)}?text=${encodeURIComponent(buildText(c))}`;
 
   const markSent = async (c: PressContact) => {
