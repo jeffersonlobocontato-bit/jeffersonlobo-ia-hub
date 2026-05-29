@@ -174,18 +174,37 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
         .select('id').single();
       if (cErr || !campaign) throw new Error(cErr?.message || 'falha ao criar campanha');
 
-      const { data, error } = await supabase.functions.invoke('send-press-email', {
-        body: {
-          campaign_id: campaign.id,
-          contact_ids: finalContacts.map(c => c.id),
-          subject, html: body,
-        },
-      });
-      if (error) throw error;
-      setEmailResult(data);
+      const ids = finalContacts.map(c => c.id);
+      const chunks: string[][] = [];
+      for (let i = 0; i < ids.length; i += CHUNK_SIZE) chunks.push(ids.slice(i, i + CHUNK_SIZE));
+
+      let totSent = 0, totFailed = 0, totSkipped = 0;
+      const allErrors: { id: string; error: string }[] = [];
+
+      for (let i = 0; i < chunks.length; i++) {
+        const { data, error } = await supabase.functions.invoke('send-press-email', {
+          body: {
+            campaign_id: campaign.id,
+            contact_ids: chunks[i],
+            subject, html: body,
+          },
+        });
+        if (error) throw error;
+        totSent += data?.sent ?? 0;
+        totFailed += data?.failed ?? 0;
+        totSkipped += data?.skipped ?? 0;
+        if (Array.isArray(data?.errors)) allErrors.push(...data.errors);
+        setEmailResult({ sent: totSent, failed: totFailed, skipped: totSkipped, errors: allErrors, progress: `${i + 1}/${chunks.length}` });
+      }
+
+      // Garante contadores finais consolidados (edge function só sabe do próprio lote)
+      await supabase.from('press_campaigns').update({
+        total_enviado: totSent, total_erro: totFailed, status: 'concluida', sent_at: new Date().toISOString(),
+      }).eq('id', campaign.id);
+
       toast({
         title: 'Disparo finalizado',
-        description: `${data.sent} enviados · ${data.failed} erros · ${data.skipped} pulados`,
+        description: `${totSent} enviados · ${totFailed} erros · ${totSkipped} pulados (${chunks.length} lote${chunks.length > 1 ? 's' : ''})`,
       });
     } catch (e) {
       toast({ title: 'Erro no disparo', description: e instanceof Error ? e.message : 'erro', variant: 'destructive' });
