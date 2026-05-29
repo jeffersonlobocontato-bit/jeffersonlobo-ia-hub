@@ -16,7 +16,7 @@ import { CampaignMediaUploader, type MediaTipo } from './CampaignMediaUploader';
 import { fetchContactsForLists, usePressLists, type PressList } from '@/hooks/usePressLists';
 import {
   type PressContact, renderTemplate, htmlToWhatsAppMarkdown,
-  composeWhatsAppMessage, slugify,
+  composeWhatsAppMessage, slugify, buildWhatsappDirectLink,
 } from '@/lib/press-utils';
 
 export type WizardPrefill = {
@@ -330,6 +330,8 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
 
   const sanitizePhone = (n: string) => (n ?? '').replace(/\D/g, '');
   const buildWaLink = (c: PressContact) =>
+    buildWhatsappDirectLink(c.whatsapp, buildWaText(c));
+  const buildWaFallbackLink = (c: PressContact) =>
     `https://wa.me/${sanitizePhone(c.whatsapp)}?text=${encodeURIComponent(buildWaText(c))}`;
 
   const waMarkSent = async (c: PressContact, opts?: { skipOpen?: boolean }) => {
@@ -804,18 +806,28 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
                         {status === 'enviado' && <Badge className="bg-primary"><Check className="w-3 h-3 mr-1" />Enviado</Badge>}
                         {status === 'pulado' && <Badge variant="outline">Pulado</Badge>}
                         {status === 'pendente' && (
-                          <div className="flex gap-1">
-                            <Button size="sm" variant="ghost" onClick={() => waSkip(c)}><SkipForward className="w-3 h-3" /></Button>
-                            <Button size="sm" asChild>
-                              <a
-                                href={buildWaLink(c)}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                onClick={() => waMarkSent(c, { skipOpen: true })}
-                              >
-                                <ExternalLink className="w-3 h-3 mr-1" />Abrir
-                              </a>
-                            </Button>
+                          <div className="flex flex-col items-end gap-1">
+                            <div className="flex gap-1">
+                              <Button size="sm" variant="ghost" onClick={() => waSkip(c)}><SkipForward className="w-3 h-3" /></Button>
+                              <Button size="sm" asChild>
+                                <a
+                                  href={buildWaLink(c)}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  onClick={() => waMarkSent(c, { skipOpen: true })}
+                                >
+                                  <ExternalLink className="w-3 h-3 mr-1" />Abrir
+                                </a>
+                              </Button>
+                            </div>
+                            <a
+                              href={buildWaFallbackLink(c)}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] text-muted-foreground underline hover:text-foreground"
+                            >
+                              Não abriu? Tentar wa.me
+                            </a>
                           </div>
                         )}
                       </div>

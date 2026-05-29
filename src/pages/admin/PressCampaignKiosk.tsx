@@ -10,7 +10,7 @@ import {
   Loader2, Clock, ChevronRight,
 } from 'lucide-react';
 import {
-  composeWhatsAppMessage, htmlToWhatsAppMarkdown, type PressContact,
+  composeWhatsAppMessage, htmlToWhatsAppMarkdown, type PressContact, buildWhatsappDirectLink,
 } from '@/lib/press-utils';
 import {
   computeRhythmState, DEFAULT_RHYTHM, formatCountdown, type RhythmState,
@@ -137,6 +137,8 @@ const PressCampaignKiosk = () => {
 
   const sanitizePhone = (n: string) => (n ?? '').replace(/\D/g, '');
   const buildWaLink = (c: PressContact) =>
+    buildWhatsappDirectLink(c.whatsapp, buildText(c));
+  const buildWaFallbackLink = (c: PressContact) =>
     `https://wa.me/${sanitizePhone(c.whatsapp)}?text=${encodeURIComponent(buildText(c))}`;
 
   const markSent = async (c: PressContact) => {
@@ -327,6 +329,18 @@ const PressCampaignKiosk = () => {
                 <ExternalLink className="w-5 h-5 mr-2" /> Abrir WhatsApp
               </a>
             </Button>
+
+            {ready && canSendNow && (
+              <a
+                href={buildWaFallbackLink(currentContact)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block text-center text-[11px] text-muted-foreground underline hover:text-foreground"
+              >
+                Não abriu? Tentar wa.me
+              </a>
+            )}
+
 
             <div className="grid grid-cols-2 gap-2">
               <Button onClick={() => skip(currentContact)} variant="outline" disabled={!ready}>
