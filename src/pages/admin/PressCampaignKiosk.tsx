@@ -10,7 +10,7 @@ import {
   Loader2, Clock, ChevronRight,
 } from 'lucide-react';
 import {
-  composeWhatsAppMessage, htmlToWhatsAppMarkdown, type PressContact,
+  composeWhatsAppMessage, htmlToWhatsAppMarkdown, type PressContact, buildWhatsappDirectLink,
 } from '@/lib/press-utils';
 import {
   computeRhythmState, DEFAULT_RHYTHM, formatCountdown, type RhythmState,
