@@ -57,6 +57,11 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
 
   const [sending, setSending] = useState(false);
   const [emailResult, setEmailResult] = useState<{ sent: number; skipped: number; failed: number; errors?: { id: string; error: string }[]; progress?: string } | null>(null);
+  const [chunkSize, setChunkSize] = useState<number>(DEFAULT_CHUNK_SIZE);
+  const [pauseSec, setPauseSec] = useState<number>(DEFAULT_PAUSE_SEC);
+  const [cancelRequested, setCancelRequested] = useState(false);
+  const [pauseCountdown, setPauseCountdown] = useState<number>(0);
+  const [currentBatch, setCurrentBatch] = useState<{ index: number; total: number } | null>(null);
 
   // WA-only state
   const [waCampaignId, setWaCampaignId] = useState<string | null>(null);
