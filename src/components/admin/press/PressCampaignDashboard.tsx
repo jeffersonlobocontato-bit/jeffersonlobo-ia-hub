@@ -259,21 +259,23 @@ export const PressCampaignDashboard = () => {
   return (
     <div className="space-y-6">
       {/* Cards de visão geral */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-3">
         <StatCard icon={<Mail className="w-4 h-4" />} label="Campanhas" value={totals.campaigns} />
         <StatCard icon={<Mail className="w-4 h-4" />} label="Enviados" value={totals.enviados} />
-        <StatCard icon={<Eye className="w-4 h-4" />} label="Aberturas únicas" value={totals.aberturasUnicas} />
-        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Taxa abertura" value={totals.taxaAbertura} highlight />
-        <StatCard icon={<Eye className="w-4 h-4" />} label="Aberturas totais" value={totals.aberturasTotais} />
+        <StatCard icon={<Eye className="w-4 h-4" />} label="Abert. únicas" value={totals.aberturasUnicas} />
+        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Taxa abert." value={totals.taxaAbertura} />
+        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Cliques únicos" value={totals.cliquesUnicos} highlight />
+        <StatCard icon={<TrendingUp className="w-4 h-4" />} label="Taxa clique" value={totals.taxaClique} highlight />
+        <StatCard icon={<Eye className="w-4 h-4" />} label="Cliques totais" value={totals.cliquesTotais} />
         <StatCard icon={<AlertTriangle className="w-4 h-4" />} label="Erros" value={totals.erros} />
       </div>
 
       <Card className="p-3 border-l-4 border-yellow-500 bg-yellow-500/10 text-xs flex gap-2">
         <Info className="w-4 h-4 mt-0.5 shrink-0" />
         <div>
-          Aberturas são detectadas por pixel de rastreio. Clientes que bloqueiam imagens não contam,
-          e serviços como <strong>Apple Mail Privacy Protection</strong> podem inflar o número (pré-carregam imagens).
-          Use como tendência, não número absoluto.
+          <strong>Aberturas</strong> dependem do destinatário carregar imagens (Outlook bloqueia por padrão, Apple Mail infla pré-carregando).
+          <strong> Clique</strong> é a métrica real de interesse — só conta quando alguém abre o email <em>e</em> clica em algum link.
+          Se você tem 0 cliques mas envios saíram, provavelmente os emails foram para spam/promoções, ou a lista não é qualificada para o assunto.
         </div>
       </Card>
 
