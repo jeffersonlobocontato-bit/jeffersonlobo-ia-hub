@@ -42,8 +42,11 @@ function render(tpl: string, c: Contact): string {
   return tpl.replace(/\{\{\s*([a-z_]+)\s*\}\}/gi, (_, k) => vars[k.toLowerCase()] ?? "");
 }
 
-function wrapHtml(body: string, contact: Contact): string {
+function wrapHtml(body: string, contact: Contact, trackingPixelUrl: string | null): string {
   const optOutLink = `mailto:${SENDER_EMAIL}?subject=Remover%20do%20mailing&body=Por%20favor%20remover%20${encodeURIComponent(contact.email || "")}%20da%20lista.`;
+  const pixel = trackingPixelUrl
+    ? `<img src="${trackingPixelUrl}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0;" />`
+    : "";
   return `<!doctype html><html><body style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#111;line-height:1.5;max-width:640px;margin:0 auto;padding:24px;">
 ${body}
 <hr style="border:none;border-top:1px solid #ddd;margin:32px 0 16px;">
@@ -58,6 +61,7 @@ Consultor em Marketing e IA
 Você está recebendo este email como contato de imprensa de <strong>${contact.veiculo}</strong>${contact.municipio ? " — " + contact.municipio : ""}.<br>
 Para não receber mais comunicações, <a href="${optOutLink}" style="color:#666;">clique aqui para solicitar remoção</a>.
 </p>
+${pixel}
 </body></html>`;
 }
 
