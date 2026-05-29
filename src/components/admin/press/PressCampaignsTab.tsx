@@ -6,16 +6,18 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/hooks/use-toast';
-import { MessageCircle, Send, SkipForward, Check, ExternalLink, ShieldAlert } from 'lucide-react';
+import { MessageCircle, Send, SkipForward, Check, ExternalLink, ShieldAlert, Smartphone } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Link } from 'react-router-dom';
 import type { PressContact } from '@/lib/press-utils';
 import { buildWhatsappLink, renderTemplate } from '@/lib/press-utils';
 import { WhatsAppRhythmGuard } from './WhatsAppRhythmGuard';
 import { ReleaseGroupPicker } from './ReleaseGroupPicker';
+import { PreDispatchChecklist } from './PreDispatchChecklist';
 
 type Props = {
   selectedContacts: PressContact[];
