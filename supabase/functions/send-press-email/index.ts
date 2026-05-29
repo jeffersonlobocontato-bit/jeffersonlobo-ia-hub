@@ -179,11 +179,8 @@ Deno.serve(async (req) => {
       await new Promise((res) => setTimeout(res, 160));
     }
 
-    // Não atualizamos status da campanha aqui: o cliente faz disparos em vários lotes
-    // e só ele sabe quando o último terminou (ou se foi cancelado). Atualizamos apenas
-    // contadores incrementais para acompanhamento em tempo real.
-    await admin.rpc; // no-op preserving prior shape
-    // (Contadores são consolidados pelo cliente entre lotes via UPDATE em press_campaigns.)
+    // Não atualizamos status da campanha aqui: o cliente pode disparar vários lotes
+    // e só ele sabe quando o último terminou. Contadores são consolidados pelo cliente.
 
     return new Response(JSON.stringify({ sent, skipped, failed, errors }), {
       status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" },
