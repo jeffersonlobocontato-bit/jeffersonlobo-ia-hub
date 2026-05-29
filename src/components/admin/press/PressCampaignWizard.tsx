@@ -60,6 +60,7 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
   const [chunkSize, setChunkSize] = useState<number>(DEFAULT_CHUNK_SIZE);
   const [pauseSec, setPauseSec] = useState<number>(DEFAULT_PAUSE_SEC);
   const [cancelRequested, setCancelRequested] = useState(false);
+  const cancelRef = useRef(false);
   const [pauseCountdown, setPauseCountdown] = useState<number>(0);
   const [currentBatch, setCurrentBatch] = useState<{ index: number; total: number } | null>(null);
 
