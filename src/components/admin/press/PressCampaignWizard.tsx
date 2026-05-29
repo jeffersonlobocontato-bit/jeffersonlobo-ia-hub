@@ -216,8 +216,16 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
           body: { campaign_id: campaignId, contact_ids: chunks[i], subject, html: body },
         });
         if (error) {
-          // não derruba a campanha inteira: registra e segue
-          allErrors.push({ id: '*', error: `lote ${i + 1}: ${error.message ?? 'erro'}` });
+          // tenta extrair detalhe da resposta da função (FunctionsHttpError)
+          let detailMsg = error.message ?? 'erro';
+          try {
+            const ctx: any = (error as any).context;
+            if (ctx && typeof ctx.json === 'function') {
+              const parsed = await ctx.json();
+              if (parsed?.error) detailMsg = `${parsed.error}${parsed.detail ? ' · ' + JSON.stringify(parsed.detail) : ''}`;
+            }
+          } catch { /* ignore */ }
+          allErrors.push({ id: '*', error: `lote ${i + 1}: ${detailMsg}` });
         } else {
           totSent += data?.sent ?? 0;
           totFailed += data?.failed ?? 0;
