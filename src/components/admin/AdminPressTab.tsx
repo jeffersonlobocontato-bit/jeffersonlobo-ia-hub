@@ -3,12 +3,14 @@ import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Plus, Upload, Trash2, Users, Mail, MessageCircle } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { CheckCircle2, Plus, Upload, Trash2, Users, Mail, MessageCircle, BarChart3 } from 'lucide-react';
 import type { PressContact } from '@/lib/press-utils';
 import { PressContactsTable } from './press/PressContactsTable';
 import { PressImportDialog } from './press/PressImportDialog';
 import { PressCampaignWizard, type WizardPrefill } from './press/PressCampaignWizard';
 import { PressCampaignHistory, type CampaignPrefill } from './press/PressCampaignHistory';
+import { PressCampaignDashboard } from './press/PressCampaignDashboard';
 import { usePressLists } from '@/hooks/usePressLists';
 import { useToast } from '@/hooks/use-toast';
 
