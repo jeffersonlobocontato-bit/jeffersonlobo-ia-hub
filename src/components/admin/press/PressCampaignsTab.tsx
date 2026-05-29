@@ -217,6 +217,34 @@ export const PressCampaignsTab = ({ selectedContacts, onClearSelection }: Props)
       )}
 
       {campaignId && (
+        <PreDispatchChecklist
+          campaignId={campaignId}
+          campaignCreatedAt={campaignCreatedAt}
+          mediaUrl={null}
+          mediaTipo="nenhum"
+          linkDestino={null}
+        />
+      )}
+
+      {campaignId && (
+        <Card className="p-3 border-2 border-dashed flex items-center justify-between gap-3 flex-wrap">
+          <div className="text-xs">
+            <div className="font-black uppercase flex items-center gap-1">
+              <Smartphone className="w-4 h-4" /> Vai disparar pelo celular?
+            </div>
+            <div className="text-muted-foreground">
+              Abra o modo kiosk: 1 contato por vez, otimizado para tela do celular.
+            </div>
+          </div>
+          <Button asChild variant="default">
+            <Link to={`/admin/press/disparar/${campaignId}`} target="_blank" rel="noopener noreferrer">
+              <Smartphone className="w-4 h-4 mr-2" /> Abrir modo celular
+            </Link>
+          </Button>
+        </Card>
+      )}
+
+      {campaignId && (
         <Card className="p-4">
           <h4 className="font-bold uppercase text-sm mb-3">Fila de envio</h4>
           <TooltipProvider>
