@@ -8,6 +8,7 @@ import sharp from "sharp";
 const BASE_URL = "https://jeffersonlobo.tech";
 const FALLBACK_IMAGE = "https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp";
 const SOCIAL_PREVIEW_VERSION = "img5";
+const LEGACY_SOCIAL_PREVIEW_VERSIONS = ["img4"];
 const SUPABASE_URL = process.env.VITE_SUPABASE_URL || "https://cgydeldzhnfyexphaheq.supabase.co";
 const SUPABASE_KEY =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
@@ -131,6 +132,9 @@ async function writeSharePages(posts: BlogPostRow[]) {
     const description = escapeHtml(truncateText(post.seo_description || post.subtitle || post.excerpt || ""));
     const imageAlt = escapeHtml(post.cover_alt || post.title);
     const shareVersion = shareVersionFromDate(post.updated_at || post.date);
+    const legacyShareVersions = LEGACY_SOCIAL_PREVIEW_VERSIONS.map((version) =>
+      shareVersion.replace(new RegExp(`${SOCIAL_PREVIEW_VERSION}$`), version),
+    );
     const image = escapeHtml(await cacheSocialImage(post, shareVersion));
     const imageType = image.includes(".webp") ? "image/webp" : image.includes(".png") ? "image/png" : "image/jpeg";
     const versionedShareUrl = `${BASE_URL}/noticia/${post.slug}-${shareVersion}.html`;
@@ -165,6 +169,10 @@ async function writeSharePages(posts: BlogPostRow[]) {
 </html>`;
 
     writeFileSync(resolve(flatDir, `${post.slug}-${shareVersion}.html`), renderHtml(versionedShareUrl));
+    for (const legacyShareVersion of legacyShareVersions) {
+      const legacyVersionedShareUrl = `${BASE_URL}/noticia/${post.slug}-${legacyShareVersion}.html`;
+      writeFileSync(resolve(flatDir, `${post.slug}-${legacyShareVersion}.html`), renderHtml(legacyVersionedShareUrl));
+    }
     writeFileSync(resolve(flatDir, `${post.slug}.html`), renderHtml(legacyShareUrl));
 
     const legacyPostDir = resolve(legacyDir, post.slug);
