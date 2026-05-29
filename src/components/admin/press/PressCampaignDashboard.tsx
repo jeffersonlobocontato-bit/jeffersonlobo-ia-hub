@@ -400,6 +400,13 @@ export const PressCampaignDashboard = () => {
           onClose={() => setOpenHistory(null)}
         />
       )}
+      {editSegment && (
+        <SegmentEditDialog
+          segment={editSegment}
+          onClose={() => setEditSegment(null)}
+          onSaved={() => { setEditSegment(null); load(); }}
+        />
+      )}
     </div>
   );
 };
