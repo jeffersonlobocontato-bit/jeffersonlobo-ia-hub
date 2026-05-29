@@ -95,10 +95,19 @@ Deno.serve(async (req) => {
     const subject: string = String(body.subject || "").trim();
     const html: string = String(body.html || "").trim();
     if (!campaign_id || !subject || !html || contact_ids.length === 0) {
-      return new Response(JSON.stringify({ error: "invalid_input" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const detail = {
+        has_campaign_id: !!campaign_id,
+        subject_len: subject.length,
+        html_len: html.length,
+        contacts_count: contact_ids.length,
+        body_keys: Object.keys(body || {}),
+      };
+      console.error("invalid_input", detail);
+      return new Response(JSON.stringify({ error: "invalid_input", detail }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     if (contact_ids.length > 100) {
-      return new Response(JSON.stringify({ error: "max_100_per_batch" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      console.error("max_100_per_batch", { count: contact_ids.length });
+      return new Response(JSON.stringify({ error: "max_100_per_batch", detail: { count: contact_ids.length } }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const admin = createClient(SUPABASE_URL, SERVICE_KEY);
