@@ -806,7 +806,16 @@ export const PressCampaignWizard = ({ open, onOpenChange, prefill }: Props) => {
                         {status === 'pendente' && (
                           <div className="flex gap-1">
                             <Button size="sm" variant="ghost" onClick={() => waSkip(c)}><SkipForward className="w-3 h-3" /></Button>
-                            <Button size="sm" onClick={() => waMarkSent(c)}><ExternalLink className="w-3 h-3 mr-1" />Abrir</Button>
+                            <Button size="sm" asChild>
+                              <a
+                                href={buildWaLink(c)}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                onClick={() => waMarkSent(c, { skipOpen: true })}
+                              >
+                                <ExternalLink className="w-3 h-3 mr-1" />Abrir
+                              </a>
+                            </Button>
                           </div>
                         )}
                       </div>
