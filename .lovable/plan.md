@@ -1,47 +1,42 @@
 ## Diagnóstico
 
-O pixel `track-press-open` funciona — testei e gravou row em `press_email_opens`. O problema de "0 aberturas" é comportamento normal de lista B2B de imprensa:
+O DNS está correto, mas o site continua fora do ar por um motivo diferente do que parecia:
 
-- Outlook corporativo bloqueia imagens remotas → pixel nunca dispara.
-- Apple Mail Privacy Protection mascara aberturas.
-- Brevo Free + domínio com DKIM parcial → muitos vão pra spam.
+- `jeffersonlobo.tech` → `185.158.133.1` ✅
+- `www.jeffersonlobo.tech` → `185.158.133.1` ✅
+- TXT `brevo-code` presente ✅
+- App Lovable (`jeffersonlobo-ia-hub.lovable.app`) responde **200 OK** ✅
 
-Pixel sozinho não é métrica confiável. **Clique** é.
+Porém:
 
-## Mudanças
+- `https://jeffersonlobo.tech` responde **HTTP 421 Misdirected Request** (servido pelo Cloudflare da Lovable)
+- `https://www.jeffersonlobo.tech` falha no **handshake TLS** (sem certificado emitido)
 
-### 1. Nova edge function `track-press-click`
-- GET `?s=<send_id>&u=<url_b64>` → insere em nova tabela `press_email_clicks (id, send_id, url, clicked_at, user_agent, ip_hash)` e responde 302 para a URL original.
-- Mesmo padrão público do `track-press-open` (sem JWT).
-- Adicionar em `supabase/config.toml`: `[functions.track-press-click] verify_jwt = false`.
+**Causa:** o domínio `jeffersonlobo.tech` **não está mais vinculado a este projeto na Lovable**. O 421 é a resposta padrão do edge quando o DNS aponta para o IP da Lovable mas o domínio não consta na lista de domínios do projeto — por isso o certificado do `www` também não é emitido. Provavelmente o domínio foi removido/desconectado em algum momento (ou nunca foi reconectado após alguma alteração), enquanto o DNS na IONOS continuou apontando para cá.
 
-### 2. Migração
-- `CREATE TABLE public.press_email_clicks` (campos acima, FK para `press_sends.id`).
-- GRANT padrão + RLS habilitado + policy só `service_role` (anon não lê, função pública usa service key).
+Isto não é um problema de DNS nem de código — é de configuração do projeto.
 
-### 3. `send-press-email/index.ts`
-- Após `renderTemplate(html, contact)`, varrer `<a href="...">` e reescrever cada `href` para `${SUPABASE_URL}/functions/v1/track-press-click?s=${sendId}&u=${base64url(originalUrl)}`.
-- Não reescrever `mailto:`, âncoras `#`, nem o link de unsubscribe.
-- Manter o pixel atual (não estraga nada e cobre Gmail webmail).
+## O que fazer (você, na Lovable)
 
-### 4. Dashboard `PressCampaignDashboard.tsx`
-- Adicionar card "Cliques únicos" ao lado de "Aberturas".
-- Pequena nota cinza embaixo das métricas: *"Aberturas dependem do cliente de email carregar imagens (Outlook bloqueia). Clique é a métrica real de interesse."*
+1. Abrir **Project Settings → Project → Domains**
+2. Clicar em **Connect Domain** e adicionar `jeffersonlobo.tech`
+3. Repetir e adicionar também `www.jeffersonlobo.tech`
+4. Marcar `jeffersonlobo.tech` como **Primary** (o `www` vai redirecionar para ele)
+5. Como o DNS já está correto, a verificação deve passar em minutos e o SSL é provisionado automaticamente
 
-### 5. Botão "Enviar teste pra mim" no Step 2 de email (`PressEmailCampaignTab.tsx`)
-- Input de email do operador + botão que dispara `send-press-email` com 1 contato fake apontando pro próprio email.
-- Permite validar fim-a-fim (pixel + clique + entrega) antes de disparar pra lista real.
+<presentation-actions>
+<presentation-open-publish>Abrir Publish / Domínios</presentation-open-publish>
+</presentation-actions>
 
-## Fora do escopo
+## Depois que reconectar
 
-- Não mexer no fluxo de WhatsApp.
-- Não trocar Brevo por outro provedor.
-- Não configurar DKIM/SPF (isso é no painel Brevo, fora do código).
-- Não alterar templates de email existentes.
+Eu valido:
+- Status `Active` nos dois domínios
+- `https://jeffersonlobo.tech` retornando 200
+- `https://www.jeffersonlobo.tech` com SSL válido redirecionando para o primary
 
-## Como testar depois
+## Observações
 
-1. Disparar teste pra seu próprio email via novo botão.
-2. Abrir no Gmail web → ver row em `press_email_opens`.
-3. Clicar num link do email → ver row em `press_email_clicks` + redirect correto.
-4. Dashboard mostra ambos os contadores.
+- **Não mexer no DNS da IONOS** — está tudo certo lá. Qualquer mudança agora só atrasa.
+- **Não mexer na delegação `notify.jeffersonlobo.tech`** (email transacional Lovable) — continua isolada e funcionando.
+- Se ao tentar conectar aparecer "domínio já vinculado a outro projeto", me avise: nesse caso é preciso removê-lo do projeto antigo antes.
