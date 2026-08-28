@@ -51,7 +51,7 @@ const HeroSection = () => {
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center md:justify-start overflow-hidden bg-background pt-24"
+      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-24"
     >
       {/* Background Image cinematográfico */}
       <div className="absolute inset-0 z-0">
@@ -62,20 +62,19 @@ const HeroSection = () => {
           height={1080}
           fetchPriority="high"
           decoding="async"
-          className="w-full h-full object-cover object-[50%_18%] md:object-[80%_22%] lg:object-[75%_20%] xl:object-[70%_20%]"
+          className="w-full h-full object-cover object-[50%_18%] md:object-[70%_22%]"
         />
 
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background" />
-        <div className="absolute inset-0 bg-gradient-to-r from-background/90 via-background/70 to-background/30 md:from-background/95 md:via-background/70 md:to-background/40 lg:via-background/75 lg:to-background/55" />
         <div className="absolute inset-0 bg-brand-grid opacity-40" />
       </div>
 
-      {/* Conteúdo: centralizado no mobile, alinhado à esquerda no desktop */}
+      {/* Conteúdo centralizado estilo Rundown */}
       <div className="container mx-auto px-4 z-10 relative">
-        <div className="mx-auto md:mx-0 md:mr-auto max-w-5xl md:max-w-xl lg:max-w-2xl text-center md:text-left space-y-6 md:space-y-8 animate-fade-in">
+        <div className="mx-auto max-w-5xl text-center space-y-8 animate-fade-in">
 
           {/* Roles slash line (Matt Wolfe style) */}
-          <div className="roles-slash justify-center md:justify-start">
+          <div className="roles-slash">
             <span className="role">Palestrante</span>
             <span className="sep">/</span>
             <span className="role">Autor</span>
@@ -84,18 +83,17 @@ const HeroSection = () => {
           </div>
 
           {/* Headline massivo com palavra em highlighter amarelo */}
-          <h1 className="display-title text-[2.5rem] sm:text-5xl md:text-5xl lg:text-6xl xl:text-[4.5rem] tracking-tight break-words hyphens-auto">
+          <h1 className="display-title text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem] tracking-tight break-words hyphens-auto">
             {renderHeadline(displayData.headline)}
           </h1>
 
           {/* Subtitle */}
-          <p className="mx-auto md:mx-0 max-w-xl text-lg sm:text-xl md:text-2xl text-foreground/90 font-medium">
+          <p className="mx-auto max-w-2xl text-lg sm:text-xl md:text-2xl text-foreground/90 font-medium">
             {displayData.subtitle}
           </p>
 
-
           {/* CTAs — palestra é a prioridade de negócio, por isso vem primeiro e com estilo sólido */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-start items-center pt-2">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
             <Button
               size="lg"
               onClick={() => {
@@ -117,7 +115,6 @@ const HeroSection = () => {
 
         </div>
       </div>
-
 
       {/* Scroll Indicator */}
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 animate-bounce hidden md:block">
