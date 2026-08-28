@@ -13,8 +13,8 @@ const HeroSection = () => {
   };
 
   const defaultData = {
-    headline: "IA está redesenhando empresas, carreiras e profissões. Lidere essa transformação.",
-    subtitle: "Diagnóstico, estratégia e implementação de Inteligência Artificial para empresas que querem resultado real — e profissionais que não aceitam ficar para trás.",
+    headline: "O marketing entrou na era da orquestração de fluxos com IA. Eu ensino lideranças a liderar essa virada.",
+    subtitle: "Palestras, imersões e consultoria para empresas que querem sair do prompt avulso e construir agentes de IA com identidade própria — DNA autoral, não commodity.",
     cta_primary: "Fazer Diagnóstico Grátis",
     cta_secondary: "Contratar palestra",
     stat1_number: "127",

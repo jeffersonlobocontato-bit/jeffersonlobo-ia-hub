@@ -41,10 +41,10 @@ const PalestrasSection = () => {
             return (
               <Card
                 key={f.id}
-                className="relative flex flex-col overflow-hidden border-2 border-primary/30 bg-card shadow-[6px_6px_0_hsl(var(--primary))] transition-transform hover:-translate-y-1"
+                className="relative flex flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:-translate-y-1 hover:shadow-md"
               >
                 {f.image_url && (
-                  <div className="relative h-56 md:h-64 w-full overflow-hidden border-b-2 border-primary/30 bg-muted">
+                  <div className="relative h-56 md:h-64 w-full overflow-hidden border-b border-border bg-muted">
                     <img
                       src={f.image_url}
                       alt={f.title}
@@ -56,19 +56,19 @@ const PalestrasSection = () => {
                   </div>
                 )}
                 <div className="flex flex-col flex-1 p-8">
-                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center border-2 border-primary bg-primary/10">
+                <div className="mb-5 inline-flex h-12 w-12 items-center justify-center rounded-full border border-primary/30 bg-primary/10">
                   <Icon className="w-6 h-6 text-primary" />
                 </div>
 
                 {f.kicker && (
-                  <div className="text-xs uppercase tracking-wider text-secondary font-black mb-2">
+                  <div className="text-xs uppercase tracking-wider text-secondary font-semibold mb-2" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
                     {f.kicker}
                   </div>
                 )}
-                <h3 className="text-2xl font-black uppercase text-foreground mb-3">{f.title}</h3>
+                <h3 className="text-2xl text-foreground mb-3">{f.title}</h3>
                 <p className="text-muted-foreground mb-5 text-sm leading-relaxed">{f.description}</p>
 
-                <div className="space-y-2 text-xs font-bold uppercase text-foreground/80 mb-5">
+                <div className="space-y-2 text-xs font-medium uppercase text-foreground/70 mb-5" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
                   {f.audience && (
                     <div>
                       <span className="text-muted-foreground">Para: </span>

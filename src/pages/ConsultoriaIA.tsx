@@ -11,6 +11,7 @@ export default function ConsultoriaIA() {
       seoTitle="Consultoria de Inteligência Artificial — Jefferson Lobo | Estratégia de IA"
       seoDescription="Consultoria estratégica de IA para diretoria e C-level: diagnóstico de maturidade, roadmap, governança e orquestração de fluxos de IA com Jefferson Lobo. Atende todo o Brasil."
       serviceType="Consultoria de Inteligência Artificial"
+      sober
       forWho={[
         "Diretoria e C-level que precisam decidir onde investir em IA nos próximos 12 a 24 meses",
         "Empresas que querem estruturar governança e política interna de uso de IA generativa",

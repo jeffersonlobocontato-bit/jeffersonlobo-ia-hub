@@ -10,9 +10,9 @@ const AboutSection = () => {
   // Fallback data
   const defaultData = {
     name: "Jefferson Lobo",
-    title: "Especialista em IA e Inovação",
-    read_line: "Transformando ideias em realidade através da tecnologia",
-    description: "Com vasta experiência em tecnologia e inovação, dedico-me a explorar o potencial da Inteligência Artificial e seu impacto na sociedade.",
+    title: "Estrategista de IA para marketing e marca",
+    read_line: "IA sem DNA autoral é commodity",
+    description: "Gerente Executivo de Marketing do Sistema Fiep e defensor de uma tese proprietária: o marketing entrou na fase da orquestração de fluxos com IA — em vez de depender de prompts genéricos, marcas precisam construir agentes de IA com identidade própria. É nisso que ajudo lideranças, times de marketing e diretorias em todo o Brasil.",
     profile_image: profileImg
   };
 
@@ -26,7 +26,7 @@ const AboutSection = () => {
         <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
           {/* Profile Image */}
           <div className="relative animate-fade-in">
-            <div className="relative aspect-square max-w-md mx-auto overflow-hidden border border-primary/25 shadow-[16px_16px_0_hsl(var(--primary)/0.18)]">
+            <div className="relative aspect-square max-w-md mx-auto overflow-hidden rounded-2xl border border-border shadow-lg">
               <img
                 src={profileImage}
                 alt="Jefferson Lobo"
@@ -34,7 +34,7 @@ const AboutSection = () => {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 via-15% to-transparent to-35%" />
             </div>
-            <div className="absolute -bottom-5 -right-5 h-3 w-32 bg-secondary" />
+            <div className="absolute -bottom-4 -right-4 h-1 w-28 bg-primary" />
           </div>
 
           {/* About Text */}
@@ -47,11 +47,11 @@ const AboutSection = () => {
                 </span>
               </h2>
             )}
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black uppercase">
+            <h3 className="text-2xl sm:text-3xl md:text-4xl">
               {displayData.title}
             </h3>
             {displayData.read_line && (
-              <p className="border-l-4 border-secondary pl-4 text-xl text-primary font-bold uppercase">
+              <p className="border-l-2 border-primary pl-4 text-xl italic text-primary">
                 {displayData.read_line}
               </p>
             )}
@@ -81,10 +81,10 @@ const AboutSection = () => {
                   className="p-6 transition-all duration-300 hover:-translate-y-2 border-primary/20 bg-card animate-scale-in"
                   style={{ animationDelay: `${index * 100}ms` }}
                 >
-                  <div className="mb-4 flex h-12 w-12 items-center justify-center border border-primary/30 bg-primary text-primary-foreground">
+                  <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-primary-foreground">
                     <IconComponent className="w-6 h-6 text-primary-foreground" />
                   </div>
-                  <h4 className="text-xl font-black uppercase mb-2">{service.title}</h4>
+                  <h4 className="text-xl mb-2">{service.title}</h4>
                   <p className="text-muted-foreground">{service.description}</p>
                 </Card>
               );

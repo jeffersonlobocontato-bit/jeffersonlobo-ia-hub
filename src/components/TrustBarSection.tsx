@@ -17,9 +17,7 @@ const TrustBarSection = () => {
     <section className="border-y border-primary/20 bg-muted/40 py-16">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <p className="text-sm uppercase tracking-wider text-muted-foreground mb-4 font-bold">
-            Confiança e Resultados
-          </p>
+          <p className="section-kicker mb-4">Confiança e resultados</p>
           <h2 className="display-title text-3xl md:text-4xl">
             Impacto comprovado em empresas e profissionais
           </h2>
@@ -31,15 +29,15 @@ const TrustBarSection = () => {
             return (
               <Card
                 key={stat.id}
-                className="p-6 text-center transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card"
+                className="p-6 text-center transition-all duration-300 hover:-translate-y-1 rounded-xl border-border bg-card"
               >
-                <div className="w-12 h-12 mx-auto mb-4 border border-primary/30 bg-primary/10 flex items-center justify-center">
+                <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <IconComponent className="w-6 h-6 text-primary" />
                 </div>
-                <div className="text-3xl font-black text-primary mb-1">
+                <div className="font-serif text-3xl text-primary mb-1">
                   {stat.value}
                 </div>
-                <div className="text-sm text-muted-foreground uppercase font-bold">
+                <div className="text-sm text-muted-foreground font-medium">
                   {stat.label}
                 </div>
               </Card>
