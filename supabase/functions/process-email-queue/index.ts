@@ -111,7 +111,10 @@ Deno.serve(async (req) => {
     )
   }
 
-  const supabase = createClient(supabaseUrl, supabaseServiceKey)
+  // Client sem tipos gerados: as RPCs de fila (read_email_batch, move_to_dlq, etc.)
+  // não existem no types.ts, então tipamos como any para o Deno check não reclamar.
+  // deno-lint-ignore no-explicit-any
+  const supabase: any = createClient(supabaseUrl, supabaseServiceKey)
 
   // 1. Check rate-limit cooldown and read queue config
   const { data: state } = await supabase
