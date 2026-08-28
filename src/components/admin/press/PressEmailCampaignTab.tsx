@@ -151,7 +151,7 @@ export const PressEmailCampaignTab = ({ selectedContacts, onClearSelection }: Pr
           <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
           <div>
             Disparo via <strong>Brevo</strong> (plano Free: <strong>300 emails/dia</strong>). Remetente:{' '}
-            <code>contato@jeffersonlobo.tech</code>. Para entregabilidade ideal, valide SPF/DKIM do domínio
+            <code>lobo@aivozes.com.br</code>. Para entregabilidade ideal, valide SPF/DKIM do domínio
             no painel Brevo (Senders → Domains).
           </div>
         </div>
