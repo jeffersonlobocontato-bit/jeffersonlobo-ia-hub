@@ -27,9 +27,9 @@ const TesteIASection = () => {
   return (
     <section id="teste-ia" className="relative overflow-hidden bg-background py-20 md:py-32">
       <div className="absolute inset-0 -z-10 bg-brand-grid opacity-40" />
-      <div className="absolute left-0 top-0 h-full w-4 bg-primary" />
+      <div className="absolute left-0 top-0 h-full w-1.5 md:w-4 bg-primary" />
 
-      <div className="container mx-auto px-4">
+      <div className="container mx-auto px-5 pl-8 md:pl-14">
         <div className="mx-auto mb-16 grid max-w-6xl gap-10 lg:grid-cols-[1fr_1.1fr] lg:items-end">
           <div className="space-y-6">
             <div className="section-kicker mb-0">
