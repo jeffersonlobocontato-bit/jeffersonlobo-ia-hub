@@ -111,15 +111,44 @@ const AdminContentPipelineTab = () => {
   const runNow = async (fn: 'content-pipeline-fetch' | 'content-pipeline-publish') => {
     setRunning(fn === 'content-pipeline-fetch' ? 'fetch' : 'publish');
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      if (!sessionData.session) {
+        throw new Error('Sessão expirada. Saia e entre novamente no admin antes de rodar o pipeline.');
+      }
       const { data, error } = await supabase.functions.invoke(fn);
-      if (error) throw error;
-      toast({ title: 'Executado', description: JSON.stringify(data) });
+      if (error) {
+        // FunctionsHttpError esconde a mensagem real no corpo da resposta
+        let detail = error.message;
+        const ctx = (error as { context?: Response }).context;
+        if (ctx && typeof ctx.text === 'function') {
+          const body = await ctx.text().catch(() => '');
+          if (body) {
+            try {
+              const parsed = JSON.parse(body);
+              detail = parsed.error || parsed.message || body;
+            } catch {
+              detail = body;
+            }
+          }
+        }
+        throw new Error(detail);
+      }
+      const summary =
+        data && typeof data === 'object' && 'skipped' in (data as Record<string, unknown>)
+          ? `Nada a fazer: ${(data as { reason?: string }).reason ?? 'sem pendências'}`
+          : JSON.stringify(data);
+      toast({ title: 'Executado', description: summary });
       invalidateAll();
     } catch (error) {
-      toast({ title: 'Falhou', description: String(error), variant: 'destructive' });
+      toast({
+        title: 'Falhou',
+        description: error instanceof Error ? error.message : String(error),
+        variant: 'destructive',
+      });
     } finally {
       setRunning(null);
     }
+
   };
 
   const approve = async (post: PendingPost) => {
