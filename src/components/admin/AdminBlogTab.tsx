@@ -84,6 +84,7 @@ interface AdminBlogTabProps {
 
 export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminBlogTabProps) => {
   const [seoOpen, setSeoOpen] = useState<Record<string, boolean>>({});
+  const [openPost, setOpenPost] = useState<Record<string, boolean>>({});
   const patch = (id: string, fields: any) =>
     onUpdate(data.map((p) => (p.id === id ? { ...p, ...fields } : p)));
 
@@ -96,17 +97,34 @@ export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminB
 
       {data.map((post) => {
         const tagsStr = Array.isArray(post.tags) ? post.tags.join(', ') : '';
+        const isOpen = !!openPost[post.id];
         return (
           <Card key={post.id}>
-            <CardHeader>
-              <CardTitle className="text-lg flex justify-between items-center gap-3">
-                <span className="truncate">{post.title}</span>
+            <CardHeader className="py-3">
+              <CardTitle className="text-base flex justify-between items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOpenPost((s) => ({ ...s, [post.id]: !s[post.id] }))}
+                  className="flex items-center gap-2 flex-1 min-w-0 text-left"
+                >
+                  {isOpen ? (
+                    <ChevronUp className="w-4 h-4 shrink-0" />
+                  ) : (
+                    <ChevronDown className="w-4 h-4 shrink-0" />
+                  )}
+                  <span className="truncate">{post.title || '(sem título)'}</span>
+                  {!(post.active ?? true) && (
+                    <span className="text-xs text-muted-foreground shrink-0">rascunho</span>
+                  )}
+                </button>
                 <Button variant="destructive" size="sm" onClick={() => onDelete(post.id)}>
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </CardTitle>
             </CardHeader>
+            {isOpen && (
             <CardContent className="space-y-4">
+
               <div className="space-y-2">
                 <Label>Título</Label>
                 <Input
