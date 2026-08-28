@@ -48,7 +48,7 @@ const NewsletterSection = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="seu@email.com"
-              className="h-14 text-base bg-card border-2 border-border focus-visible:ring-primary"
+              className="h-14 text-base rounded-full bg-card border border-border focus-visible:ring-primary"
             />
             <Button type="submit" size="lg" className="h-14 px-8 whitespace-nowrap">
               <Send className="w-4 h-4 mr-2" />
@@ -56,7 +56,7 @@ const NewsletterSection = () => {
             </Button>
           </form>
 
-          <p className="text-xs sm:text-sm font-bold uppercase tracking-widest text-muted-foreground">
+          <p className="text-xs sm:text-sm font-medium uppercase tracking-widest text-muted-foreground" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
             Junte-se a <span className="text-primary">12.000+</span> líderes que já leem
           </p>
         </div>

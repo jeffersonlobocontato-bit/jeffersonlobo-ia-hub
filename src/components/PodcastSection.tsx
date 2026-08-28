@@ -62,7 +62,7 @@ const PodcastSection = () => {
           {episodes.map((episode) => (
             <Card key={episode.id} className="group transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card">
               <CardHeader>
-                <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors font-black uppercase">
+                <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
                   {episode.title}
                 </CardTitle>
                 <CardDescription className="flex items-center gap-4 text-sm">

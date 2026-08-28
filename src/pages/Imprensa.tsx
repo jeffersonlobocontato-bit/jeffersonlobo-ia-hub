@@ -65,7 +65,7 @@ export default function Imprensa() {
           {/* Quem é */}
           <Card className="mb-6">
             <CardHeader>
-              <h2 className="text-2xl font-black uppercase">Quem é Jefferson Lobo</h2>
+              <h2 className="text-2xl">Quem é Jefferson Lobo</h2>
             </CardHeader>
             <CardContent className="space-y-3 text-muted-foreground">
               <p><strong className="text-foreground">Nome:</strong> Jefferson Lobo</p>
@@ -78,7 +78,7 @@ export default function Imprensa() {
           {/* Bios */}
           <Card className="mb-6">
             <CardHeader>
-              <h2 className="text-2xl font-black uppercase">Bios oficiais</h2>
+              <h2 className="text-2xl">Bios oficiais</h2>
             </CardHeader>
             <CardContent className="space-y-6">
               {[
@@ -88,7 +88,7 @@ export default function Imprensa() {
               ].map((b) => (
                 <div key={b.label}>
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="font-bold uppercase text-sm text-primary">{b.label}</h3>
+                    <h3 className="font-semibold text-sm uppercase tracking-wider text-primary" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{b.label}</h3>
                     <Button size="sm" variant="outline" onClick={() => copy(b.text, b.label)}>
                       <Copy className="w-3 h-3 mr-1" /> Copiar
                     </Button>
@@ -102,7 +102,7 @@ export default function Imprensa() {
           {/* Temas */}
           <Card className="mb-6">
             <CardHeader>
-              <h2 className="text-2xl font-black uppercase">Temas para entrevistas</h2>
+              <h2 className="text-2xl">Temas para entrevistas</h2>
             </CardHeader>
             <CardContent>
               <ul className="grid md:grid-cols-2 gap-2 text-muted-foreground list-disc list-inside">
@@ -121,7 +121,7 @@ export default function Imprensa() {
           {/* Fotos */}
           <Card className="mb-6">
             <CardHeader>
-              <h2 className="text-2xl font-black uppercase">Fotos em alta resolução</h2>
+              <h2 className="text-2xl">Fotos em alta resolução</h2>
             </CardHeader>
             <CardContent className="space-y-4">
               <p className="text-muted-foreground">
@@ -138,7 +138,7 @@ export default function Imprensa() {
           {/* Contato */}
           <Card className="mb-6 border-primary/40">
             <CardHeader>
-              <h2 className="text-2xl font-black uppercase">Contato de imprensa</h2>
+              <h2 className="text-2xl">Contato de imprensa</h2>
             </CardHeader>
             <CardContent className="space-y-3">
               <a href="mailto:contato@jeffersonlobo.tech" className="flex items-center gap-3 text-foreground hover:text-primary">

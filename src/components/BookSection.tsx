@@ -46,20 +46,20 @@ const BookSection = () => {
               <img
                 src={coverImage}
                 alt="Capa do Livro"
-                className="w-full border border-primary/25 shadow-[18px_18px_0_hsl(var(--secondary)/0.18)] hover:scale-[1.01] transition-transform duration-500"
+                className="w-full rounded-lg border border-border shadow-lg hover:scale-[1.01] transition-transform duration-500"
               />
-              <div className="absolute -bottom-5 -right-5 h-3 w-32 bg-primary" />
+              <div className="absolute -bottom-4 -right-4 h-1 w-28 bg-primary" />
             </div>
           </div>
 
           {/* Book Details */}
           <div className="space-y-8 animate-slide-up">
             <div>
-              <h3 className="text-3xl font-black uppercase mb-4">
+              <h3 className="text-3xl mb-4">
                 {displayData.title}
               </h3>
               {displayData.subtitle && (
-                <h4 className="border-l-4 border-secondary pl-4 text-xl text-primary mb-4 font-bold uppercase">{displayData.subtitle}</h4>
+                <h4 className="border-l-2 border-primary pl-4 text-xl italic text-primary mb-4">{displayData.subtitle}</h4>
               )}
               <p className="text-lg text-muted-foreground leading-relaxed">
                 {displayData.description}
@@ -71,7 +71,7 @@ const BookSection = () => {
               <div className="space-y-4">
                 {features.map((feature) => (
                   <div key={feature.id} className="flex items-center gap-3">
-                    <div className="w-8 h-8 border border-primary/30 bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <BookOpen className="w-4 h-4 text-primary" />
                     </div>
                     <span className="text-foreground">{feature.title}</span>

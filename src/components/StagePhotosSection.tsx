@@ -42,12 +42,12 @@ const StagePhotoCard = ({
       {(photo.event_name || photo.caption) && (
         <figcaption className="absolute inset-x-0 bottom-0 p-5 sm:p-6">
           {photo.event_name && (
-            <span className="inline-block bg-primary px-2.5 py-1 text-[10px] sm:text-[11px] font-black uppercase tracking-[0.16em] text-primary-foreground shadow-[3px_3px_0_rgba(0,0,0,0.6)] mb-2.5">
+            <span className="inline-block rounded-full bg-primary px-2.5 py-1 text-[10px] sm:text-[11px] font-semibold uppercase tracking-[0.16em] text-primary-foreground mb-2.5" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
               {photo.event_name}
             </span>
           )}
           {photo.caption && (
-            <div className="text-base sm:text-lg font-black uppercase text-white leading-tight tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+            <div className="text-base sm:text-lg font-serif text-white leading-tight tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
               {photo.caption}
             </div>
           )}

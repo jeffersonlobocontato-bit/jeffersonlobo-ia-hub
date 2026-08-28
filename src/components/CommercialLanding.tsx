@@ -31,18 +31,24 @@ export interface CommercialLandingProps {
   formats: { name: string; duration: string; description: string }[];
   faq: { q: string; a: string }[];
   ctaLabel?: string;
+  /** Registro mais sóbrio para páginas voltadas a diretoria/C-level (ex.: Consultoria) —
+   * mesma estrutura, sem bloco preto/CTA cheio de cor, sombras discretas. */
+  sober?: boolean;
 }
 
-// Pílula de kicker brutalista (amarelo sólido + borda preta)
+// Pílula de kicker editorial (mono, contorno fino)
 function Kicker({ children }: { children: React.ReactNode }) {
   return (
-    <span className="inline-block bg-primary text-primary-foreground font-black uppercase text-xs tracking-widest px-3 py-1.5 border-2 border-foreground shadow-[3px_3px_0_hsl(var(--foreground))]">
+    <span
+      className="inline-block rounded-full border border-primary/30 bg-primary/10 text-primary font-semibold uppercase text-xs tracking-widest px-3 py-1.5"
+      style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+    >
       {children}
     </span>
   );
 }
 
-// Cabeçalho de seção com linha amarela
+// Cabeçalho de seção
 function SectionHead({
   kicker,
   title,
@@ -62,13 +68,14 @@ function SectionHead({
       >
         {title}
       </h2>
-      <div className="h-1.5 w-20 bg-primary" />
+      <div className="h-px w-20 bg-primary/40" />
     </div>
   );
 }
 
 export default function CommercialLanding(props: CommercialLandingProps) {
   const url = `${SITE_URL}/${props.slug}`;
+  const sober = props.sober === true;
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -126,9 +133,9 @@ export default function CommercialLanding(props: CommercialLandingProps) {
       <Header />
 
       <main className="flex-1 pt-24">
-        {/* HERO — off-white sóbrio com grid amarelo sutil */}
-        <section className="relative overflow-hidden bg-background py-20 md:py-28 border-b-[3px] border-foreground">
-          <div className="absolute inset-0 z-0 bg-brand-grid opacity-40" />
+        {/* HERO */}
+        <section className="relative overflow-hidden bg-background py-20 md:py-28 border-b border-border">
+          <div className="absolute inset-0 z-0 bg-brand-grid opacity-20" />
           <div className="container mx-auto px-4 relative z-10 max-w-4xl text-center space-y-6 flex flex-col items-center">
             <Kicker>{props.kicker}</Kicker>
             <h1 className="display-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground">
@@ -156,25 +163,25 @@ export default function CommercialLanding(props: CommercialLandingProps) {
 
         <LogosBarSection />
 
-        {/* PARA QUEM — bloco PRETO, cards brancos */}
-        <section className="bg-foreground py-20 border-y-[3px] border-foreground">
+        {/* PARA QUEM */}
+        <section className={sober ? "bg-muted/40 py-20 border-y border-border" : "bg-foreground py-20 border-y border-foreground/10"}>
           <div className="container mx-auto px-4 max-w-5xl">
             <SectionHead
               kicker="Para quem é"
               title="Feito para lideranças que precisam de resultado real"
-              invert
+              invert={!sober}
             />
             <div className="grid md:grid-cols-2 gap-5">
               {props.forWho.map((item, i) => (
                 <Card
                   key={i}
-                  className="border-2 border-primary bg-card rounded-none shadow-[6px_6px_0_hsl(var(--primary))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_hsl(var(--primary))] transition-all"
+                  className="rounded-xl border border-border bg-card shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all"
                 >
                   <CardContent className="p-6 flex gap-4 items-start">
-                    <div className="shrink-0 inline-flex h-9 w-9 items-center justify-center border-2 border-foreground bg-primary">
-                      <Check className="w-5 h-5 text-foreground" />
+                    <div className="shrink-0 inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary">
+                      <Check className="w-5 h-5 text-primary-foreground" />
                     </div>
-                    <span className="text-foreground font-bold uppercase text-sm leading-relaxed">
+                    <span className="text-foreground text-sm leading-relaxed">
                       {item}
                     </span>
                   </CardContent>
@@ -184,9 +191,9 @@ export default function CommercialLanding(props: CommercialLandingProps) {
           </div>
         </section>
 
-        {/* O QUE ENTREGA — branco com cards pretos */}
-        <section className="bg-background py-24 relative overflow-hidden border-b-[3px] border-foreground">
-          <div className="absolute inset-0 bg-brand-grid opacity-25" />
+        {/* O QUE ENTREGA */}
+        <section className="bg-background py-24 relative overflow-hidden border-b border-border">
+          <div className="absolute inset-0 bg-brand-grid opacity-15" />
           <div className="container mx-auto px-4 max-w-5xl relative z-10">
             <SectionHead
               kicker="O que você leva"
@@ -196,16 +203,16 @@ export default function CommercialLanding(props: CommercialLandingProps) {
               {props.deliverables.map((d, i) => (
                 <Card
                   key={i}
-                  className="rounded-none border-2 border-foreground bg-foreground shadow-[6px_6px_0_hsl(var(--primary))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[8px_8px_0_hsl(var(--primary))] transition-all"
+                  className="rounded-xl border border-border bg-card shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all"
                 >
                   <CardContent className="p-6 space-y-4">
-                    <div className="inline-flex h-12 w-12 items-center justify-center border-2 border-primary bg-primary">
-                      <Sparkles className="w-6 h-6 text-foreground" />
+                    <div className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                      <Sparkles className="w-6 h-6 text-primary" />
                     </div>
-                    <h3 className="text-lg font-black uppercase text-background tracking-tight">
+                    <h3 className="text-lg text-foreground tracking-tight">
                       {d.title}
                     </h3>
-                    <p className="text-sm text-background/75 leading-relaxed">
+                    <p className="text-sm text-muted-foreground leading-relaxed">
                       {d.description}
                     </p>
                   </CardContent>
@@ -215,8 +222,8 @@ export default function CommercialLanding(props: CommercialLandingProps) {
           </div>
         </section>
 
-        {/* FORMATOS — branco, badges pretas (uma amarela em destaque) */}
-        <section className="bg-background py-20 border-b-[3px] border-foreground">
+        {/* FORMATOS */}
+        <section className="bg-background py-20 border-b border-border">
           <div className="container mx-auto px-4 max-w-5xl">
             <SectionHead
               kicker="Formatos disponíveis"
@@ -224,23 +231,23 @@ export default function CommercialLanding(props: CommercialLandingProps) {
             />
             <div className="space-y-4">
               {props.formats.map((f, i) => {
-                const highlight = i === 1; // um único destaque amarelo por LP
+                const highlight = !sober && i === 1; // um único destaque de cor por LP (desativado no registro sóbrio)
                 const badge = highlight
-                  ? "bg-primary text-foreground"
-                  : "bg-foreground text-background";
+                  ? "bg-primary/15 text-primary"
+                  : "bg-muted text-foreground/70";
                 return (
                   <Card
                     key={i}
-                    className="rounded-none border-2 border-foreground bg-card shadow-[5px_5px_0_hsl(var(--foreground))] hover:translate-x-[-2px] hover:translate-y-[-2px] hover:shadow-[7px_7px_0_hsl(var(--foreground))] transition-all"
+                    className="rounded-xl border border-border bg-card shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all"
                   >
                     <CardContent className="p-6 grid md:grid-cols-[1fr_auto] gap-4 items-center">
                       <div>
-                        <h3 className="text-xl font-black uppercase text-foreground mb-1 tracking-tight">
+                        <h3 className="text-xl text-foreground mb-1 tracking-tight">
                           {f.name}
                         </h3>
                         <p className="text-sm text-muted-foreground">{f.description}</p>
                       </div>
-                      <div className={`text-xs uppercase font-black border-2 border-foreground ${badge} px-4 py-2 w-fit shadow-[3px_3px_0_hsl(var(--foreground))]`}>
+                      <div className={`text-xs font-medium uppercase rounded-full ${badge} px-4 py-2 w-fit`} style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
                         {f.duration}
                       </div>
                     </CardContent>
@@ -254,8 +261,8 @@ export default function CommercialLanding(props: CommercialLandingProps) {
         <TrustBarSection />
         <StagePhotosSection />
 
-        {/* FAQ — branco com divisores pretos espessos */}
-        <section className="bg-background py-20 border-y-[3px] border-foreground">
+        {/* FAQ */}
+        <section className="bg-background py-20 border-y border-border">
           <div className="container mx-auto px-4 max-w-3xl">
             <SectionHead kicker="Perguntas frequentes" title="Dúvidas comuns" />
             <Accordion type="single" collapsible className="w-full">
@@ -263,9 +270,9 @@ export default function CommercialLanding(props: CommercialLandingProps) {
                 <AccordionItem
                   key={i}
                   value={`item-${i}`}
-                  className="border-b-2 border-foreground"
+                  className="border-b border-border"
                 >
-                  <AccordionTrigger className="text-left font-black uppercase text-foreground hover:no-underline">
+                  <AccordionTrigger className="text-left font-semibold text-foreground hover:no-underline">
                     {f.q}
                   </AccordionTrigger>
                   <AccordionContent className="text-foreground/80 leading-relaxed text-base">
@@ -277,21 +284,36 @@ export default function CommercialLanding(props: CommercialLandingProps) {
           </div>
         </section>
 
-        {/* CTA FINAL — único bloco em amarelo cheio */}
-        <section className="bg-primary py-24 border-t-[3px] border-foreground relative overflow-hidden">
-          <div className="absolute inset-0 bg-brand-grid opacity-20" />
+        {/* CTA FINAL — cheio de cor nas páginas de palestra/workshop; painel discreto no registro sóbrio */}
+        <section
+          className={
+            sober
+              ? "bg-muted/40 py-24 border-t border-border relative overflow-hidden"
+              : "bg-primary py-24 relative overflow-hidden"
+          }
+        >
+          {!sober && <div className="absolute inset-0 bg-brand-grid opacity-15" />}
           <div className="container mx-auto px-4 max-w-3xl text-center space-y-6 relative z-10 flex flex-col items-center">
             <Kicker>Próximo passo</Kicker>
-            <h2 className="display-title text-4xl md:text-6xl text-primary-foreground tracking-tight">
+            <h2
+              className={`display-title text-4xl md:text-6xl tracking-tight ${
+                sober ? "text-foreground" : "text-primary-foreground"
+              }`}
+            >
               Pronto para começar?
             </h2>
-            <p className="text-lg md:text-xl text-primary-foreground/85 font-bold max-w-xl">
+            <p
+              className={`text-lg md:text-xl max-w-xl ${
+                sober ? "text-muted-foreground" : "text-primary-foreground/85"
+              }`}
+            >
               Conte o contexto da sua empresa e eu volto com formatos, datas e investimento em até 24h.
             </p>
             <Button
               asChild
               size="lg"
-              className="bg-foreground text-background hover:bg-foreground/90 border-2 border-foreground shadow-[5px_5px_0_hsl(var(--background))] font-black"
+              variant={sober ? "default" : "secondary"}
+              className={sober ? "" : "bg-foreground text-background hover:bg-foreground/90"}
             >
               <a href="/#briefing">
                 {props.ctaLabel || "Solicitar proposta"}

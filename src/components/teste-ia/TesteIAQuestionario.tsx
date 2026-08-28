@@ -207,12 +207,12 @@ export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplet
         )}
       </div>
 
-      <Card className="border-2 border-primary/20 bg-card shadow-[18px_18px_0_hsl(var(--secondary)/0.12)]">
+      <Card className="border-border bg-card shadow-md">
         <CardHeader>
-          <CardDescription className="text-xs uppercase tracking-wider font-bold">
+          <CardDescription className="text-xs uppercase tracking-wider font-semibold" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
             {currentQuestion.competencia} • {nivelAtual}
           </CardDescription>
-          <CardTitle className="text-2xl font-black uppercase">{currentQuestion.pergunta}</CardTitle>
+          <CardTitle className="text-2xl font-normal">{currentQuestion.pergunta}</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <RadioGroup
@@ -228,7 +228,7 @@ export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplet
             ].map((option) => (
               <div
                 key={option.value}
-                className="flex items-center space-x-3 p-4 rounded-lg border-2 hover:bg-accent/50 transition-colors cursor-pointer"
+                className="flex items-center space-x-3 p-4 rounded-lg border border-border hover:bg-accent/50 transition-colors cursor-pointer"
                 onClick={() => handleResposta(option.value)}
               >
                 <RadioGroupItem value={option.value.toString()} id={`opt-${option.value}`} />

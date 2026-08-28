@@ -59,14 +59,14 @@ const BlogSection = () => {
                     <img
                       src={post.cover_image}
                       alt={post.cover_alt || post.title}
-                      className="w-full aspect-video object-cover border-b-2 border-foreground"
+                      className="w-full aspect-video object-cover border-b border-border"
                       loading="lazy"
                     />
                   </Link>
                 )}
                 <div className="p-6 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="inline-block px-3 py-1 text-xs font-bold uppercase border border-primary/30 bg-primary/10 text-primary">
+                    <span className="inline-block rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-wider border border-primary/30 bg-primary/10 text-primary" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
                       {post.category}
                     </span>
                     <div className="flex items-center text-sm text-muted-foreground">
@@ -76,7 +76,7 @@ const BlogSection = () => {
                   </div>
 
                   <div className="space-y-2">
-                    <h3 className="text-2xl font-black uppercase hover:text-primary transition-colors">
+                    <h3 className="text-2xl hover:text-primary transition-colors">
                       {internal ? (
                         <Link to={`/blog/${post.slug}`}>{post.title}</Link>
                       ) : (
@@ -147,7 +147,7 @@ const BlogSection = () => {
               href="https://www.linkedin.com/build-relation/newsletter-follow?entityUrn=7216140554995175424"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center border border-border bg-secondary px-8 py-3 text-base font-bold uppercase text-secondary-foreground transition-colors duration-200 hover:opacity-90"
+              className="inline-flex items-center justify-center rounded-full bg-secondary px-8 py-3 text-base font-semibold text-secondary-foreground transition-colors duration-200 hover:opacity-90"
               onClick={() => trackCTA('newsletter_subscribe', 'blog_section')}
             >
               Assinar no LinkedIn

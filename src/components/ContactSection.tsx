@@ -14,8 +14,8 @@ const ContactSection = () => {
             Conte o contexto e eu volto com formatos, datas e investimento. Sem formulário genérico —
             cada proposta é desenhada para o seu público.
           </p>
-          <div className="inline-flex items-center gap-2 border border-secondary/30 bg-secondary/10 px-4 py-2 text-foreground font-bold uppercase">
-            <span className="text-sm">⏰ Apenas 3 vagas disponíveis este mês</span>
+          <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/10 px-4 py-2 text-foreground text-sm font-medium">
+            <span className="text-sm">📅 Agenda por ordem de chegada — briefing antecipado garante mais opções de data</span>
           </div>
         </div>
         <BriefingForm />

@@ -40,17 +40,17 @@ const nodeText = (node: any): string => {
 const mdComponents = {
   h1: ({ node, children, ...p }: any) => {
     if (!hasLetters(extractText(children))) return null;
-    return <h2 id={headingId(children)} className="font-display text-3xl md:text-4xl font-black uppercase mt-16 mb-5 pb-2 border-b border-border scroll-mt-24" {...p}>{children}</h2>;
+    return <h2 id={headingId(children)} className="text-3xl md:text-4xl mt-16 mb-5 pb-2 border-b border-border scroll-mt-24" {...p}>{children}</h2>;
   },
   h2: ({ node, children, ...p }: any) => {
     if (!hasLetters(extractText(children))) return null;
-    return <h2 id={headingId(children)} className="font-display text-2xl md:text-[1.75rem] font-black uppercase mt-14 mb-4 pb-2 border-b border-border scroll-mt-24" {...p}>{children}</h2>;
+    return <h2 id={headingId(children)} className="text-2xl md:text-[1.75rem] mt-14 mb-4 pb-2 border-b border-border scroll-mt-24" {...p}>{children}</h2>;
   },
   h3: ({ node, children, ...p }: any) => {
     if (!hasLetters(extractText(children))) return null;
-    return <h3 id={headingId(children)} className="font-display text-xl md:text-2xl font-bold uppercase mt-10 mb-3 scroll-mt-24" {...p}>{children}</h3>;
+    return <h3 id={headingId(children)} className="text-xl md:text-2xl mt-10 mb-3 scroll-mt-24" {...p}>{children}</h3>;
   },
-  h4: ({ node, ...p }: any) => <h4 className="font-display text-lg font-bold mt-8 mb-2" {...p} />,
+  h4: ({ node, ...p }: any) => <h4 className="font-serif text-lg font-normal mt-8 mb-2" {...p} />,
   p: ({ node, ...p }: any) => <p className="blog-p" {...p} />,
   ul: ({ node, ...p }: any) => <ul className="blog-ul" {...p} />,
   ol: ({ node, ...p }: any) => <ol className="blog-ol" {...p} />,

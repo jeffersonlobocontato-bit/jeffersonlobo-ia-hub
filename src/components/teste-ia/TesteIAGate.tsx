@@ -108,7 +108,7 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
         </p>
 
         {/* Social proof bar */}
-        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 pt-6 text-xs sm:text-sm font-bold uppercase tracking-widest text-muted-foreground">
+        <div className="flex flex-wrap items-center justify-center gap-4 md:gap-8 pt-6 text-xs sm:text-sm font-medium uppercase tracking-widest text-muted-foreground" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
           {totalConcluidos !== null && totalConcluidos > 0 && (
             <span className="flex items-center gap-2">
               <Users className="w-4 h-4 text-primary" />
@@ -132,11 +132,11 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
           { titulo: "Radar por competência", desc: "8 dimensões: estratégia, dados, ferramentas, pessoas..." },
           { titulo: "Plano de ação 30/60/90", desc: "Recomendações práticas para evoluir." },
         ].map((f) => (
-          <div key={f.titulo} className="border-2 border-primary/20 bg-card p-4">
+          <div key={f.titulo} className="rounded-xl border border-border bg-card p-4">
             <div className="flex items-start gap-3">
               <CheckCircle2 className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
               <div>
-                <p className="font-black uppercase text-sm">{f.titulo}</p>
+                <p className="font-semibold text-sm">{f.titulo}</p>
                 <p className="text-xs text-muted-foreground mt-1">{f.desc}</p>
               </div>
             </div>
@@ -144,11 +144,11 @@ export function TesteIAGate({ onComplete }: TesteIAGateProps) {
         ))}
       </div>
 
-      <Card className="border-2 border-primary/20 bg-card shadow-[18px_18px_0_hsl(var(--primary)/0.12)]">
+      <Card className="border-border bg-card shadow-md">
         <CardHeader className="space-y-4">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary" />
-            <CardTitle className="font-black uppercase">Vamos começar!</CardTitle>
+            <CardTitle className="font-normal">Vamos começar!</CardTitle>
           </div>
           <CardDescription>
             Seus dados são tratados conforme a LGPD e usados somente para enviar seu relatório.

@@ -222,7 +222,7 @@ const Field = ({ label, children }: { label: string; children: React.ReactNode }
     : child;
   return (
     <div className="space-y-1.5">
-      <Label htmlFor={id} className="text-xs font-bold uppercase tracking-wider text-muted-foreground">{label}</Label>
+      <Label htmlFor={id} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{label}</Label>
       {enhanced}
     </div>
   );

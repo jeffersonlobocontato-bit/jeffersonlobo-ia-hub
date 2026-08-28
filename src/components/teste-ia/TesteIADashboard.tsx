@@ -302,16 +302,16 @@ export function TesteIADashboard({ leadId, accessToken, onRestart }: TesteIADash
           </CardHeader>
           <CardContent className="space-y-6">
             {planoAcao.map((p, i) => (
-              <div key={p.key} className="border-2 border-border bg-muted/30 p-4 md:p-5 space-y-3">
+              <div key={p.key} className="rounded-xl border border-border bg-muted/30 p-4 md:p-5 space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className="bg-primary text-primary-foreground font-black w-8 h-8 flex items-center justify-center flex-shrink-0">
+                  <div className="bg-primary text-primary-foreground font-semibold rounded-full w-8 h-8 flex items-center justify-center flex-shrink-0">
                     {i + 1}
                   </div>
                   <div className="flex-1">
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground">
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
                       {p.competencia} · Score {p.score.toFixed(1)}/5
                     </p>
-                    <h3 className="font-black uppercase text-base md:text-lg mt-1">{p.rec.titulo}</h3>
+                    <h3 className="text-base md:text-lg mt-1">{p.rec.titulo}</h3>
                     <p className="text-sm text-muted-foreground mt-1">{p.rec.descricao}</p>
                   </div>
                 </div>
@@ -323,8 +323,8 @@ export function TesteIADashboard({ leadId, accessToken, onRestart }: TesteIADash
                   ]
                     .filter((s) => s.t)
                     .map((s) => (
-                      <div key={s.l} className={`border-l-4 ${s.c} pl-3 py-1`}>
-                        <p className="text-[10px] uppercase tracking-widest font-bold text-muted-foreground">{s.l}</p>
+                      <div key={s.l} className={`border-l-2 ${s.c} pl-3 py-1`}>
+                        <p className="text-[10px] uppercase tracking-widest font-semibold text-muted-foreground" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>{s.l}</p>
                         <p className="text-sm">{s.t}</p>
                       </div>
                     ))}

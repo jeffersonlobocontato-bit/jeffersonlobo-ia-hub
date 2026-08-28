@@ -52,35 +52,40 @@ const Header = () => {
                 : 'text-foreground'
             }`}
           >
-            <span className="flex h-11 w-11 items-center justify-center border border-primary bg-primary text-xl font-black uppercase text-primary-foreground shadow-[4px_4px_0_hsl(var(--secondary))] transition-transform group-hover:-translate-y-0.5">
+            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary font-serif text-xl text-primary-foreground shadow-sm transition-transform group-hover:-translate-y-0.5">
               JL
             </span>
             <span className="flex flex-col leading-none">
-              <span className="text-lg font-black uppercase">Jefferson Lobo</span>
-              <span className="text-[11px] font-bold uppercase text-foreground/80">AI strategist · speaker · author</span>
+              <span className="font-serif text-lg text-foreground">Jefferson Lobo</span>
+              <span className="text-[11px] font-medium uppercase tracking-wider text-foreground/60" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Estrategista de IA · palestrante · autor</span>
             </span>
           </Link>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation — ordem alinhada com a ordem real das seções na página */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            {['home', 'palestras', 'sobre', 'livro', 'contato'].map((item) => (
+            {['home', 'palestras', 'sobre', 'contato', 'livro'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
-                className={`text-sm uppercase hover:text-primary transition-colors font-bold ${
-                  isScrolled ? 'text-foreground' : 'text-foreground'
-                }`}
+                className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
+                style={{ fontFamily: "'IBM Plex Mono', monospace" }}
               >
                 {item}
               </button>
             ))}
             <Link
               to="/teste-ia"
-              className={`text-sm uppercase hover:text-primary transition-colors font-bold ${
-                isScrolled ? 'text-foreground' : 'text-foreground'
-              }`}
+              className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             >
               Teste IA
+            </Link>
+            <Link
+              to="/blog"
+              className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Blog
             </Link>
           </nav>
 
@@ -125,11 +130,12 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-6 space-y-4 animate-fade-in bg-background border-t border-primary/20">
-            {['home', 'palestras', 'sobre', 'livro', 'contato'].map((item) => (
+            {['home', 'palestras', 'sobre', 'contato', 'livro'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
-                className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors uppercase font-bold"
+                className="block w-full text-left py-3 text-sm font-medium uppercase tracking-wider text-foreground hover:text-primary transition-colors"
+                style={{ fontFamily: "'IBM Plex Mono', monospace" }}
               >
                 {item}
               </button>
@@ -137,9 +143,18 @@ const Header = () => {
             <Link
               to="/teste-ia"
               onClick={() => setIsMobileMenuOpen(false)}
-              className="block w-full text-left py-3 text-foreground hover:text-primary transition-colors uppercase font-bold"
+              className="block w-full text-left py-3 text-sm font-medium uppercase tracking-wider text-foreground hover:text-primary transition-colors"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             >
               Teste IA
+            </Link>
+            <Link
+              to="/blog"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block w-full text-left py-3 text-sm font-medium uppercase tracking-wider text-foreground hover:text-primary transition-colors"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Blog
             </Link>
             {isAdmin && (
               <Button
