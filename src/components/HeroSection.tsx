@@ -62,7 +62,7 @@ const HeroSection = () => {
           height={1080}
           fetchPriority="high"
           decoding="async"
-          className="w-full h-full object-cover"
+          className="w-full h-full object-cover object-[50%_18%] md:object-[70%_22%]"
         />
 
         <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background" />
