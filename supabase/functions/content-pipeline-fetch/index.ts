@@ -294,8 +294,18 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    // Erros do Postgrest são objetos ({message, details, hint, code}) — sem isso
+    // o log/response virava "[object Object]" e escondia a causa real.
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error !== null
+          ? [(error as any).message, (error as any).details, (error as any).hint, (error as any).code]
+              .filter(Boolean)
+              .join(' | ') || JSON.stringify(error)
+          : String(error);
     console.error('content-pipeline-fetch falhou', message);
+
     await supabase
       .from('content_pipeline_runs')
       .upsert({ run_date: today, status: 'failed', error_message: message }, { onConflict: 'run_date' });
