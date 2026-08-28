@@ -35,6 +35,8 @@ interface PendingPost {
   date: string;
   sources: { name: string; title?: string; url: string; quote?: string }[] | null;
   faq: { q: string; a: string }[] | null;
+  cover_image: string | null;
+  cover_alt: string | null;
 }
 
 interface Source {
@@ -55,7 +57,7 @@ const usePendingPosts = () =>
     queryFn: async () => {
       const { data, error } = await db
         .from('blog_posts')
-        .select('id, title, subtitle, excerpt, content_md, category, author_kind, status, date, sources, faq')
+        .select('id, title, subtitle, excerpt, content_md, category, author_kind, status, date, sources, faq, cover_image, cover_alt')
         .in('status', ['pending_review', 'approved'])
         .not('author_kind', 'is', null)
         .order('date', { ascending: false });
@@ -270,6 +272,13 @@ const AdminContentPipelineTab = () => {
                       </Button>
                     </div>
                   </div>
+
+                  {post.cover_image && (
+                    <div className="space-y-1">
+                      <img src={post.cover_image} alt={post.cover_alt || post.title} className="w-full max-h-64 object-cover rounded-lg border border-border" />
+                      {post.cover_alt && <p className="text-xs text-muted-foreground">{post.cover_alt}</p>}
+                    </div>
+                  )}
 
                   {post.sources && post.sources.length > 0 && (
                     <div className="text-sm text-muted-foreground space-y-1">

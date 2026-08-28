@@ -5,6 +5,9 @@
 // dois como blog_posts com status='pending_review' esperando aprovação no
 // admin. Notifica por Telegram quando a pauta do dia está pronta.
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { signApprovalToken } from '../_shared/approval-token.ts';
+
+const SITE_URL = 'https://jeffersonlobo.tech';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -19,6 +22,7 @@ interface RawItem {
   link: string;
   description: string;
   pubDate: string;
+  imageUrl: string | null;
 }
 
 interface Draft {
@@ -46,14 +50,32 @@ function extractLink(itemXml: string): string {
   return atom ? atom[1] : '';
 }
 
+function extractImage(itemXml: string, descriptionHtml: string): string | null {
+  // Ordem de preferência: enclosure (RSS), media:content/media:thumbnail (comum em feeds
+  // de imprensa e no feed de vídeos do YouTube, que usa a thumbnail do vídeo), depois
+  // primeira <img> embutida na descrição/conteúdo.
+  const enclosure = itemXml.match(/<enclosure[^>]*url=["']([^"']+)["'][^>]*type=["']image[^"']*["']/i)
+    || itemXml.match(/<enclosure[^>]*type=["']image[^"']*["'][^>]*url=["']([^"']+)["']/i);
+  if (enclosure) return enclosure[1];
+
+  const media = itemXml.match(/<media:(?:content|thumbnail)[^>]*url=["']([^"']+)["']/i);
+  if (media) return media[1];
+
+  const imgInDescription = descriptionHtml.match(/<img[^>]*src=["']([^"']+)["']/i);
+  if (imgInDescription) return imgInDescription[1];
+
+  return null;
+}
+
 function parseFeed(xml: string, source: { name: string; person_name: string | null; person_title: string | null }): RawItem[] {
   const items: RawItem[] = [];
   const blocks = xml.match(/<item>([\s\S]*?)<\/item>/gi) || xml.match(/<entry>([\s\S]*?)<\/entry>/gi) || [];
   for (const block of blocks) {
     const title = extractTag(block, 'title');
     const link = extractLink(block);
-    const description = extractTag(block, 'description') || extractTag(block, 'summary') || extractTag(block, 'content');
+    const rawDescription = extractTag(block, 'description') || extractTag(block, 'summary') || extractTag(block, 'content');
     const pubDate = extractTag(block, 'pubDate') || extractTag(block, 'published') || extractTag(block, 'updated');
+    const imageUrl = extractImage(block, rawDescription);
     if (title && link) {
       items.push({
         source: source.name,
@@ -61,12 +83,54 @@ function parseFeed(xml: string, source: { name: string; person_name: string | nu
         personTitle: source.person_title,
         title,
         link,
-        description: description.replace(/<[^>]*>/g, '').slice(0, 600),
+        description: rawDescription.replace(/<[^>]*>/g, '').slice(0, 600),
         pubDate,
+        imageUrl,
       });
     }
   }
   return items;
+}
+
+/** Gera uma imagem realista com a OpenAI (DALL·E) e retorna os bytes PNG. */
+async function generateImage(apiKey: string, prompt: string): Promise<Uint8Array> {
+  const res = await fetch('https://api.openai.com/v1/images/generations', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'dall-e-3',
+      prompt,
+      n: 1,
+      size: '1792x1024',
+      quality: 'standard',
+      style: 'natural',
+      response_format: 'b64_json',
+    }),
+  });
+  if (!res.ok) {
+    const errText = await res.text();
+    throw new Error(`OpenAI images falhou (${res.status}): ${errText.slice(0, 500)}`);
+  }
+  const data = await res.json();
+  const b64 = data.data?.[0]?.b64_json;
+  if (!b64) throw new Error('OpenAI images não retornou imagem');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  return bytes;
+}
+
+/** Sobe uma imagem gerada para o bucket público blog-covers (mesmo bucket do uploader manual do admin). */
+// deno-lint-ignore no-explicit-any
+async function uploadCoverImage(supabase: any, bytes: Uint8Array, filename: string): Promise<string> {
+  const path = `pipeline/${filename}`;
+  const { error } = await supabase.storage.from('blog-covers').upload(path, bytes, {
+    contentType: 'image/png',
+    upsert: true,
+  });
+  if (error) throw error;
+  const { data } = supabase.storage.from('blog-covers').getPublicUrl(path);
+  return data.publicUrl;
 }
 
 function slugify(text: string): string {
@@ -118,6 +182,7 @@ const CURATION_SYSTEM_PROMPT = `Você escreve, em nome de Jefferson Lobo (palest
 Linha editorial: "quando eles falam, o mundo presta atenção". A coluna comenta, com a voz e o ponto de vista autoral de Jefferson (tese de "orquestração de fluxos de IA" e "agentes com DNA autoral"), o que as maiores vozes e empresas de tecnologia do mundo disseram ou lançaram nas últimas 24-48h — nunca copia o texto original, só cita trechos curtos entre aspas com atribuição clara e link para a fonte.
 
 Regras obrigatórias (SEO/AEO/GEO — o mesmo padrão já usado no blog):
+- "title": capitalização de frase normal — só a primeira letra maiúscula e nomes próprios. Nunca "Capitalize Cada Palavra Assim".
 - Português do Brasil, tom analítico e direto, sem hype vazio.
 - "excerpt" tem que funcionar sozinho como resposta direta e completa (é o TL;DR que aparece no topo do artigo e alimenta buscadores de IA) — responda a pergunta antes de justificar, sem gancho vazio tipo "descubra...".
 - Estrutura do content_md: um parágrafo de abertura conectando os temas do dia, depois 3 a 5 seções (## Nome da pessoa/empresa) cada uma comentando um item, citação curta (no máximo 1-2 frases entre aspas) com link markdown para a fonte original, fechando com um parágrafo de síntese ligando tudo à visão de Jefferson sobre IA aplicada a marketing e negócios. Use subtítulos claros (##) — favorece leitura escaneável e citação por mecanismos de busca por IA.
@@ -133,6 +198,7 @@ Este NÃO é um resumo de notícias — é uma opinião/análise original de Jef
 Pode usar 1-2 itens do noticiário do dia (fornecidos) como gancho/contexto para a reflexão, mas o centro do texto é o raciocínio próprio de Jefferson, aplicável a lideranças de marketing e negócios no Brasil.
 
 Regras obrigatórias (SEO/AEO/GEO — o mesmo padrão já usado no blog):
+- "title": capitalização de frase normal — só a primeira letra maiúscula e nomes próprios. Nunca "Capitalize Cada Palavra Assim".
 - Português do Brasil, 600 a 900 palavras, tom de estrategista prático, não genérico.
 - "excerpt" tem que funcionar sozinho como resposta direta e completa (é o TL;DR que aparece no topo do artigo e alimenta buscadores de IA) — resuma a tese do artigo, não um gancho vazio.
 - Estrutura em markdown com 2-4 subtítulos (##), sem repetir o título como H1. Inclua pelo menos uma frase-tese curta e citável (o tipo de frase que um buscador de IA reproduziria como resposta).
@@ -228,6 +294,38 @@ Deno.serve(async (req) => {
     if (!curationDraft.title || !curationDraft.content_md) throw new Error('Rascunho de curadoria veio vazio da OpenAI');
     if (!authoredDraft.title || !authoredDraft.content_md) throw new Error('Rascunho autoral veio vazio da OpenAI');
 
+    // Imagem de capa: a coluna de curadoria sempre sai com foto — reaproveita a imagem da
+    // primeira nota (com crédito à fonte) quando o feed trouxe uma; se não trouxe, gera uma
+    // com IA. O artigo autoral não tem "fonte" natural pra creditar, então vai direto de IA.
+    let curationCover: { url: string; alt: string } | null = null;
+    const topItem = pool[0];
+    try {
+      if (topItem?.imageUrl) {
+        curationCover = { url: topItem.imageUrl, alt: `Foto: ${topItem.source}` };
+      } else {
+        const bytes = await generateImage(
+          openAIApiKey,
+          `Fotografia realista, editorial, para capa de matéria de tecnologia sobre: ${topItem?.title || curationDraft.title}. Sem texto, sem logotipos.`,
+        );
+        const url = await uploadCoverImage(supabase, bytes, `${today}-curadoria.png`);
+        curationCover = { url, alt: 'Imagem gerada por IA' };
+      }
+    } catch (e) {
+      console.warn('capa da coluna de curadoria falhou (segue sem imagem)', e);
+    }
+
+    let authoredCover: { url: string; alt: string } | null = null;
+    try {
+      const bytes = await generateImage(
+        openAIApiKey,
+        `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
+      );
+      const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
+      authoredCover = { url, alt: 'Imagem gerada por IA' };
+    } catch (e) {
+      console.warn('capa do artigo autoral falhou (segue sem imagem)', e);
+    }
+
     const { data: curationPost, error: e1 } = await supabase
       .from('blog_posts')
       .insert({
@@ -235,6 +333,8 @@ Deno.serve(async (req) => {
         subtitle: curationDraft.subtitle || null,
         excerpt: curationDraft.excerpt || curationDraft.title,
         content_md: curationDraft.content_md,
+        cover_image: curationCover?.url || null,
+        cover_alt: curationCover?.alt || null,
         category: 'Vozes que Importam',
         slug: `${slugify(curationDraft.title)}-${today}`,
         date: today,
@@ -258,6 +358,8 @@ Deno.serve(async (req) => {
         subtitle: authoredDraft.subtitle || null,
         excerpt: authoredDraft.excerpt || authoredDraft.title,
         content_md: authoredDraft.content_md,
+        cover_image: authoredCover?.url || null,
+        cover_alt: authoredCover?.alt || null,
         category: 'Inteligência Artificial',
         slug: `${slugify(authoredDraft.title)}-${today}`,
         date: today,
@@ -283,12 +385,25 @@ Deno.serve(async (req) => {
       })
       .eq('id', run.id);
 
+    const approveLink = async (postId: string, action: 'approve' | 'reject') => {
+      const token = await signApprovalToken(serviceKey, postId, action);
+      return `${supabaseUrl}/functions/v1/content-approve?post=${postId}&action=${action}&token=${token}`;
+    };
+
+    const postBlock = async (post: { id: string }, title: string, excerpt: string, label: string) => {
+      const approve = await approveLink(post.id, 'approve');
+      const reject = await approveLink(post.id, 'reject');
+      return (
+        `<b>${title}</b>\n<i>${label}</i>\n${excerpt}\n\n` +
+        `<a href="${approve}">✅ Aprovar</a> · <a href="${reject}">❌ Rejeitar</a> · <a href="${SITE_URL}/admin">Ver/editar no painel</a>`
+      );
+    };
+
     const telegramText =
       `📰 <b>Pauta de hoje pronta para revisão</b>\n\n` +
-      `1️⃣ <b>${curationDraft.title}</b>\n<i>Vozes que Importam</i>\n\n` +
-      `2️⃣ <b>${authoredDraft.title}</b>\n<i>Artigo autoral</i>\n\n` +
-      `Revise e aprove em jeffersonlobo.tech/admin → aba "Pipeline de Conteúdo".\n` +
-      `Se aprovar até 10h, os dois vão ao ar automaticamente nesse horário.`;
+      `${await postBlock(curationPost, curationDraft.title, curationDraft.excerpt, 'Vozes que Importam')}\n\n` +
+      `${await postBlock(authoredPost, authoredDraft.title, authoredDraft.excerpt, 'Artigo autoral')}\n\n` +
+      `Aprovando (por aqui ou pelo painel) até 10h, os dois vão ao ar automaticamente nesse horário.`;
     await supabase.functions.invoke('notify-telegram', { body: { text: telegramText } }).catch((e) => console.warn('telegram falhou', e));
 
     return new Response(
