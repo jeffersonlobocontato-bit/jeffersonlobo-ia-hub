@@ -42,16 +42,16 @@ const TesteIASection = () => {
             <p className="text-lg text-muted-foreground">
               Descubra em poucos minutos o nível de preparação da sua empresa ou da sua carreira para operar com inteligência artificial de verdade.
             </p>
-            <div className="inline-flex items-center gap-2 border border-secondary/30 bg-secondary/10 px-4 py-3 text-sm font-bold uppercase text-foreground">
+            <div className="inline-flex items-center gap-2 rounded-full border border-secondary/30 bg-secondary/10 px-4 py-3 text-sm font-medium text-foreground">
               <Users className="w-4 h-4 text-secondary" />
               <span><span className="text-primary">1.247 profissionais</span> já fizeram o diagnóstico</span>
             </div>
           </div>
 
           <div className="panel-dark p-6 md:p-8">
-            <div className="inline-flex items-center gap-2 border border-primary/30 bg-primary/10 px-4 py-2 text-primary mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-primary mb-6">
             <Brain className="w-4 h-4" />
-              <span className="text-sm font-bold uppercase">O que você recebe</span>
+              <span className="text-sm font-semibold uppercase tracking-wider" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>O que você recebe</span>
             </div>
             <div className="space-y-4 text-sm sm:text-base text-muted-foreground">
               <p>• score geral por nível de maturidade</p>
@@ -66,10 +66,10 @@ const TesteIASection = () => {
           {benefits.map((benefit, index) => (
             <Card key={index} className="border-primary/20 bg-card hover:border-primary/50 transition-colors">
               <CardContent className="pt-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center border border-primary/30 bg-primary/10">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
                   <benefit.icon className="w-6 h-6 text-primary" />
                 </div>
-                <h3 className="text-xl font-black uppercase mb-2">{benefit.title}</h3>
+                <h3 className="text-xl mb-2">{benefit.title}</h3>
                 <p className="text-muted-foreground">{benefit.description}</p>
               </CardContent>
             </Card>

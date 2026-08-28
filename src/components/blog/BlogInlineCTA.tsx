@@ -94,22 +94,21 @@ export const BlogInlineCTA = ({ type, slug }: Props) => {
 
   const inner = (
     <div
-      className={`my-10 p-6 md:p-8 border-2 border-foreground ${c.bg} ${c.text} transition-transform hover:-translate-y-1`}
-      style={{ boxShadow: `8px 8px 0 ${c.shadowColor}` }}
+      className={`my-10 p-6 md:p-8 rounded-2xl shadow-sm hover:shadow-md ${c.bg} ${c.text} transition-all hover:-translate-y-0.5`}
     >
       <div className="flex items-start gap-4">
-        <div className={`shrink-0 p-3 border-2 ${c.border}`}>
+        <div className={`shrink-0 p-3 rounded-full border ${c.border}`}>
           <Icon className="w-6 h-6" />
         </div>
         <div className="flex-1">
-          <div className="text-xs font-bold uppercase tracking-wider opacity-80 mb-2">
+          <div className="text-xs font-semibold uppercase tracking-wider opacity-80 mb-2" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
             {c.kicker}
           </div>
-          <h3 className="text-xl md:text-2xl font-black uppercase leading-tight mb-2">
+          <h3 className="text-xl md:text-2xl leading-tight mb-2">
             {c.title}
           </h3>
           <p className="text-sm md:text-base opacity-90 mb-4">{c.description}</p>
-          <div className={`inline-flex items-center gap-2 font-bold uppercase text-sm border-b-2 ${c.border}`}>
+          <div className={`inline-flex items-center gap-2 font-semibold text-sm border-b ${c.border}`}>
             {c.cta}
             <ArrowRight className="w-4 h-4" />
           </div>

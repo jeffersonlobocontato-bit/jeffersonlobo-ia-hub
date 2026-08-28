@@ -57,7 +57,7 @@ const PressReleaseOG = () => {
   if (notFound || !release) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center bg-background p-6 text-center">
-        <h1 className="text-4xl font-black uppercase mb-4">Release não encontrado</h1>
+        <h1 className="text-4xl mb-4">Release não encontrado</h1>
         <p className="text-muted-foreground mb-6">O link pode ter expirado ou ser inválido.</p>
         <Link to="/imprensa"><Button>Ir para Sala de Imprensa</Button></Link>
       </div>
@@ -91,37 +91,37 @@ const PressReleaseOG = () => {
       </Helmet>
 
       <article className="min-h-screen bg-background text-foreground">
-        <header className="border-b-4 border-foreground bg-primary text-primary-foreground py-3 px-6">
+        <header className="border-b border-border bg-card py-3 px-6">
           <div className="max-w-3xl mx-auto flex items-center justify-between">
-            <Link to="/" className="font-black uppercase text-lg">Jefferson Lobo</Link>
-            <Link to="/imprensa" className="text-xs uppercase font-bold underline">Sala de Imprensa</Link>
+            <Link to="/" className="font-serif text-lg text-foreground">Jefferson Lobo</Link>
+            <Link to="/imprensa" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground underline underline-offset-2" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Sala de Imprensa</Link>
           </div>
         </header>
 
         <div className="max-w-3xl mx-auto px-6 py-10">
-          <h1 className="text-4xl md:text-5xl font-black uppercase leading-tight mb-6">{titulo}</h1>
+          <h1 className="text-4xl md:text-5xl leading-tight mb-6">{titulo}</h1>
 
           {release.media_tipo === 'imagem' && release.media_url && (
             <img
               src={release.media_url}
               alt={titulo}
-              className="w-full mb-8 border-2 border-foreground shadow-[8px_8px_0_hsl(var(--foreground))]"
+              className="w-full mb-8 rounded-lg border border-border shadow-md"
             />
           )}
           {release.media_tipo === 'video' && release.media_url && (
             <video
               src={release.media_url}
               controls
-              className="w-full mb-8 border-2 border-foreground shadow-[8px_8px_0_hsl(var(--foreground))]"
+              className="w-full mb-8 rounded-lg border border-border shadow-md"
             />
           )}
 
           <div
-            className="prose prose-lg max-w-none prose-headings:font-black prose-headings:uppercase"
+            className="prose prose-lg max-w-none"
             dangerouslySetInnerHTML={{ __html: release.corpo }}
           />
 
-          <div className="mt-12 border-t-4 border-foreground pt-8 flex flex-col md:flex-row gap-4">
+          <div className="mt-12 border-t border-border pt-8 flex flex-col md:flex-row gap-4">
             {release.link_destino && (
               <a href={release.link_destino} target="_blank" rel="noopener noreferrer" className="flex-1">
                 <Button size="lg" className="w-full">

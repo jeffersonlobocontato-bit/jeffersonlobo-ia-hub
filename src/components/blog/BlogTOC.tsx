@@ -47,9 +47,9 @@ export const BlogTOC = ({ content }: Props) => {
   return (
     <nav
       aria-label="Sumário do artigo"
-      className="my-8 border-2 border-border bg-muted/40 p-5"
+      className="my-8 rounded-xl border border-border bg-muted/40 p-5"
     >
-      <h2 className="text-xs font-black uppercase tracking-[0.2em] text-muted-foreground mb-3">
+      <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground mb-3" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
         Neste artigo
       </h2>
       <ol className="space-y-1.5 text-sm">

@@ -109,18 +109,18 @@ const BlogIndex = () => {
                     )}
                     <div className="p-6 space-y-3">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="px-3 py-1 border border-primary/30 bg-primary/10 text-primary font-bold uppercase">
+                        <span className="rounded-full px-3 py-1 border border-primary/30 bg-primary/10 text-primary font-semibold uppercase tracking-wider" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
                           {post.category}
                         </span>
                         <span className="flex items-center gap-1 text-muted-foreground">
                           <Calendar className="w-3 h-3" /> {date}
                         </span>
                       </div>
-                      <h2 className="text-xl md:text-2xl font-black uppercase leading-tight">
+                      <h2 className="text-xl md:text-2xl leading-tight">
                         {post.title}
                       </h2>
                       <p className="text-muted-foreground leading-relaxed line-clamp-3">{lead}</p>
-                      <div className="pt-2 inline-flex items-center gap-2 font-bold uppercase text-sm text-primary">
+                      <div className="pt-2 inline-flex items-center gap-2 font-semibold text-sm text-primary">
                         {internal ? (
                           <>Ler artigo completo <ArrowRight className="w-4 h-4" /></>
                         ) : (
