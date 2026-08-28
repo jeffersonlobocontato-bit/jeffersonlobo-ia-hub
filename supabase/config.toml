@@ -44,3 +44,12 @@ verify_jwt = false
 
 [functions.track-press-click]
 verify_jwt = false
+
+[functions.content-pipeline-fetch]
+verify_jwt = true
+
+[functions.content-pipeline-publish]
+verify_jwt = true
+
+[functions.publish-linkedin]
+verify_jwt = true
