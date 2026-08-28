@@ -8,7 +8,7 @@ const corsHeaders = {
 };
 
 const GATEWAY_URL = "https://connector-gateway.lovable.dev/brevo";
-const SENDER_EMAIL = "contato@jeffersonlobo.tech";
+const SENDER_EMAIL = "lobo@aivozes.com.br";
 const SENDER_NAME = "Jefferson Lobo";
 
 type Contact = {

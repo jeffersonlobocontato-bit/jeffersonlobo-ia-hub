@@ -128,7 +128,7 @@ export default function Imprensa() {
                 Fotos oficiais de palco e estúdio estão disponíveis sob solicitação por e-mail. Envie a pauta e o veículo para receber o pacote completo.
               </p>
               <Button asChild>
-                <a href="mailto:contato@jeffersonlobo.tech?subject=Solicita%C3%A7%C3%A3o%20de%20fotos%20em%20alta%20-%20Imprensa">
+                <a href="mailto:lobo@aivozes.com.br?subject=Solicita%C3%A7%C3%A3o%20de%20fotos%20em%20alta%20-%20Imprensa">
                   <Download className="w-4 h-4 mr-2" /> Solicitar pacote de fotos
                 </a>
               </Button>
@@ -141,8 +141,8 @@ export default function Imprensa() {
               <h2 className="text-2xl">Contato de imprensa</h2>
             </CardHeader>
             <CardContent className="space-y-3">
-              <a href="mailto:contato@jeffersonlobo.tech" className="flex items-center gap-3 text-foreground hover:text-primary">
-                <Mail className="w-5 h-5" /> contato@jeffersonlobo.tech
+              <a href="mailto:lobo@aivozes.com.br" className="flex items-center gap-3 text-foreground hover:text-primary">
+                <Mail className="w-5 h-5" /> lobo@aivozes.com.br
               </a>
               <a href="tel:+5545999864213" className="flex items-center gap-3 text-foreground hover:text-primary">
                 <Phone className="w-5 h-5" /> +55 (45) 99986-4213

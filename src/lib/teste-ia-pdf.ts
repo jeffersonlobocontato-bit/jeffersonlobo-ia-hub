@@ -559,7 +559,7 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   pdf.setFont("helvetica", "bold");
   pdf.text("E-mail:", M + 5, ly);
   pdf.setFont("helvetica", "normal");
-  pdf.textWithLink("contato@jeffersonlobo.tech", M + 22, ly, { url: "mailto:contato@jeffersonlobo.tech" });
+  pdf.textWithLink("lobo@aivozes.com.br", M + 22, ly, { url: "mailto:lobo@aivozes.com.br" });
 
   ly += 6;
   pdf.setFont("helvetica", "bold");

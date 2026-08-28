@@ -78,7 +78,7 @@ const BriefingForm = () => {
       supabase.functions.invoke('send-transactional-email', {
         body: {
           templateName: 'briefing-internal-notification',
-          recipientEmail: 'jeffersonlobocontato@gmail.com',
+          recipientEmail: 'lobo@aivozes.com.br',
           idempotencyKey: `briefing-internal-${briefingId}`,
           templateData: { ...data, briefingId },
         },
