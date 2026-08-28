@@ -78,16 +78,15 @@ function slugify(text: string): string {
     .slice(0, 80);
 }
 
-async function draftWithOpenAI(apiKey: string, systemPrompt: string, userPrompt: string): Promise<Draft> {
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+async function draftWithAI(apiKey: string, systemPrompt: string, userPrompt: string): Promise<Draft> {
+  const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
-      temperature: 0.7,
+      model: 'google/gemini-2.5-flash',
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: systemPrompt },
@@ -97,8 +96,9 @@ async function draftWithOpenAI(apiKey: string, systemPrompt: string, userPrompt:
   });
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`OpenAI falhou (${res.status}): ${errText.slice(0, 500)}`);
+    throw new Error(`Gateway de IA falhou (${res.status}): ${errText.slice(0, 500)}`);
   }
+
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content;
   if (!raw) throw new Error('OpenAI não retornou conteúdo');
