@@ -101,7 +101,7 @@ async function draftWithAI(apiKey: string, systemPrompt: string, userPrompt: str
 
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content;
-  if (!raw) throw new Error('OpenAI não retornou conteúdo');
+  if (!raw) throw new Error('O modelo não retornou conteúdo');
   const parsed = JSON.parse(raw);
   return {
     title: String(parsed.title || '').trim(),
