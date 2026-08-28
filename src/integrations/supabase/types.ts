@@ -50,6 +50,7 @@ export type Database = {
       blog_posts: {
         Row: {
           active: boolean | null
+          author_kind: string | null
           category: string
           content_md: string | null
           cover_alt: string | null
@@ -66,6 +67,8 @@ export type Database = {
           seo_description: string | null
           seo_title: string | null
           slug: string
+          sources: Json | null
+          status: string
           subtitle: string | null
           tags: string[] | null
           title: string
@@ -73,6 +76,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean | null
+          author_kind?: string | null
           category: string
           content_md?: string | null
           cover_alt?: string | null
@@ -89,6 +93,8 @@ export type Database = {
           seo_description?: string | null
           seo_title?: string | null
           slug: string
+          sources?: Json | null
+          status?: string
           subtitle?: string | null
           tags?: string[] | null
           title: string
@@ -96,6 +102,7 @@ export type Database = {
         }
         Update: {
           active?: boolean | null
+          author_kind?: string | null
           category?: string
           content_md?: string | null
           cover_alt?: string | null
@@ -112,6 +119,8 @@ export type Database = {
           seo_description?: string | null
           seo_title?: string | null
           slug?: string
+          sources?: Json | null
+          status?: string
           subtitle?: string | null
           tags?: string[] | null
           title?: string
@@ -383,6 +392,99 @@ export type Database = {
           updated_by?: string | null
           whatsapp?: string
           youtube_url?: string | null
+        }
+        Relationships: []
+      }
+      content_pipeline_runs: {
+        Row: {
+          authored_post_id: string | null
+          created_at: string
+          curation_post_id: string | null
+          error_message: string | null
+          id: string
+          raw_items: Json | null
+          run_date: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          authored_post_id?: string | null
+          created_at?: string
+          curation_post_id?: string | null
+          error_message?: string | null
+          id?: string
+          raw_items?: Json | null
+          run_date: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          authored_post_id?: string | null
+          created_at?: string
+          curation_post_id?: string | null
+          error_message?: string | null
+          id?: string
+          raw_items?: Json | null
+          run_date?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_pipeline_runs_authored_post_id_fkey"
+            columns: ["authored_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "content_pipeline_runs_curation_post_id_fkey"
+            columns: ["curation_post_id"]
+            isOneToOne: false
+            referencedRelation: "blog_posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      content_sources: {
+        Row: {
+          active: boolean
+          created_at: string
+          id: string
+          kind: string
+          last_fetch_at: string | null
+          last_fetch_status: string | null
+          name: string
+          person_name: string | null
+          person_title: string | null
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kind?: string
+          last_fetch_at?: string | null
+          last_fetch_status?: string | null
+          name: string
+          person_name?: string | null
+          person_title?: string | null
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          id?: string
+          kind?: string
+          last_fetch_at?: string | null
+          last_fetch_status?: string | null
+          name?: string
+          person_name?: string | null
+          person_title?: string | null
+          updated_at?: string
+          url?: string
         }
         Relationships: []
       }
