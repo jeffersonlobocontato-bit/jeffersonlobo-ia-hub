@@ -287,6 +287,8 @@ export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminB
                 Salvar Post
               </Button>
             </CardContent>
+            )}
+
           </Card>
         );
       })}
