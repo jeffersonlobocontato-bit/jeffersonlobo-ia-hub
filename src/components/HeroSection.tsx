@@ -16,7 +16,7 @@ const HeroSection = () => {
     headline: "IA está redesenhando empresas, carreiras e profissões. Lidere essa transformação.",
     subtitle: "Diagnóstico, estratégia e implementação de Inteligência Artificial para empresas que querem resultado real — e profissionais que não aceitam ficar para trás.",
     cta_primary: "Fazer Diagnóstico Grátis",
-    cta_secondary: "Ver meu método",
+    cta_secondary: "Contratar palestra",
     stat1_number: "127",
     stat1_label: "Palestras realizadas",
     stat2_number: "45+",
@@ -92,25 +92,24 @@ const HeroSection = () => {
             {displayData.subtitle}
           </p>
 
-          {/* CTAs */}
+          {/* CTAs — palestra é a prioridade de negócio, por isso vem primeiro e com estilo sólido */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
-            <Button size="lg" asChild className="text-base sm:text-lg px-8 py-6">
-              <a href="/teste-ia" onClick={() => trackCTA('hero_primary_cta', 'hero_section')}>
-                <BrainCircuit className="mr-2 w-5 h-5" />
-                {displayData.cta_primary}
-              </a>
-            </Button>
             <Button
               size="lg"
-              variant="outline"
               onClick={() => {
-                trackCTA('hero_contratar_palestra', 'hero_section');
+                trackCTA('hero_cta_palestra', 'hero_section');
                 scrollToSection('palestras');
               }}
               className="text-base sm:text-lg px-8 py-6"
             >
-              Contratar palestra
+              {displayData.cta_secondary}
               <ArrowRight className="ml-2 w-5 h-5" />
+            </Button>
+            <Button size="lg" variant="outline" asChild className="text-base sm:text-lg px-8 py-6">
+              <a href="/teste-ia" onClick={() => trackCTA('hero_cta_diagnostico', 'hero_section')}>
+                <BrainCircuit className="mr-2 w-5 h-5" />
+                {displayData.cta_primary}
+              </a>
             </Button>
           </div>
 
