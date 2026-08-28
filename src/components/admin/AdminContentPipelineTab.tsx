@@ -245,7 +245,7 @@ const AdminContentPipelineTab = () => {
             <p className="text-muted-foreground">Nada esperando revisão no momento.</p>
           )}
           {pending.map((post) => (
-            <Collapsible key={post.id} className="border rounded-md overflow-hidden">
+            <Collapsible key={post.id} className="group border rounded-md overflow-hidden">
               <CollapsibleTrigger asChild>
                 <button className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted/50 transition-colors">
                   <div className="flex items-center gap-3 min-w-0">
