@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
@@ -13,7 +14,7 @@ import {
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from '@/components/ui/table';
-import { Play, RefreshCw, Check, X, Trash2, Plus, Send } from 'lucide-react';
+import { ChevronRight, RefreshCw, Check, X, Trash2, Plus, Send } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
@@ -236,68 +237,78 @@ const AdminContentPipelineTab = () => {
       <Card>
         <CardHeader>
           <CardTitle>Aguardando revisão</CardTitle>
-          <CardDescription>Edite direto no rascunho se precisar, depois aprove ou rejeite.</CardDescription>
+          <CardDescription>Clique no título para expandir e editar o conteúdo.</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-2">
           {loadingPosts && <p className="text-muted-foreground">Carregando...</p>}
           {!loadingPosts && pending.length === 0 && (
             <p className="text-muted-foreground">Nada esperando revisão no momento.</p>
           )}
           {pending.map((post) => (
-            <Card key={post.id} className="border-primary/30">
-              <CardHeader className="pb-3">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div>
-                    <Badge variant={post.status === 'approved' ? 'default' : 'secondary'} className="mb-2">
-                      {post.status === 'approved' ? 'Aprovado — aguardando 10h' : 'Pendente'} · {AUTHOR_LABEL[post.author_kind || ''] || post.author_kind}
-                    </Badge>
-                    <CardTitle className="text-lg">{post.title}</CardTitle>
-                    {post.subtitle && <CardDescription>{post.subtitle}</CardDescription>}
+            <Collapsible key={post.id} className="group border rounded-md overflow-hidden">
+              <CollapsibleTrigger asChild>
+                <button className="w-full flex items-center justify-between gap-3 px-4 py-3 text-left hover:bg-muted/50 transition-colors">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <ChevronRight className="w-4 h-4 shrink-0 text-muted-foreground transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                    <span className="font-medium truncate">{post.title}</span>
                   </div>
-                  <div className="flex gap-2">
-                    <Button size="sm" onClick={() => approve(post)} disabled={post.status === 'approved'}>
-                      <Check className="w-4 h-4 mr-1" /> Aprovar
-                    </Button>
-                    <Button size="sm" variant="outline" onClick={() => reject(post)}>
-                      <X className="w-4 h-4 mr-1" /> Rejeitar
-                    </Button>
+                  <Badge variant={post.status === 'approved' ? 'default' : 'secondary'} className="shrink-0">
+                    {post.status === 'approved' ? 'Aprovado' : 'Pendente'} · {AUTHOR_LABEL[post.author_kind || ''] || post.author_kind}
+                  </Badge>
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent>
+                <div className="px-4 pb-4 pt-0 space-y-4 border-t">
+                  <div className="pt-3 space-y-1">
+                    {post.subtitle && <CardDescription>{post.subtitle}</CardDescription>}
+                    <div className="flex gap-2">
+                      <Button size="sm" onClick={() => approve(post)} disabled={post.status === 'approved'}>
+                        <Check className="w-4 h-4 mr-1" /> Aprovar
+                      </Button>
+                      <Button size="sm" variant="outline" onClick={() => reject(post)}>
+                        <X className="w-4 h-4 mr-1" /> Rejeitar
+                      </Button>
+                    </div>
+                  </div>
+
+                  {post.sources && post.sources.length > 0 && (
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <Label className="text-xs uppercase tracking-wider">Fontes citadas</Label>
+                      <ul className="list-disc list-inside">
+                        {post.sources.map((s, i) => (
+                          <li key={i}>
+                            <a href={s.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
+                              {s.name}{s.title ? ` — ${s.title}` : ''}
+                            </a>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  {post.faq && post.faq.length > 0 && (
+                    <div className="text-sm text-muted-foreground space-y-1">
+                      <Label className="text-xs uppercase tracking-wider">FAQ (schema FAQPage)</Label>
+                      <ul className="list-disc list-inside">
+                        {post.faq.map((f, i) => (
+                          <li key={i}><span className="text-foreground">{f.q}</span> — {f.a}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+
+                  <div className="space-y-1">
+                    <Label className="text-xs uppercase tracking-wider">Conteúdo (markdown, editável)</Label>
+                    <Textarea
+                      value={editing[post.id] ?? post.content_md}
+                      onChange={(e) => setEditing((prev) => ({ ...prev, [post.id]: e.target.value }))}
+                      rows={12}
+                      className="font-mono text-sm"
+                    />
                   </div>
                 </div>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                {post.sources && post.sources.length > 0 && (
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <Label className="text-xs uppercase tracking-wider">Fontes citadas</Label>
-                    <ul className="list-disc list-inside">
-                      {post.sources.map((s, i) => (
-                        <li key={i}>
-                          <a href={s.url} target="_blank" rel="noopener noreferrer" className="underline hover:text-primary">
-                            {s.name}{s.title ? ` — ${s.title}` : ''}
-                          </a>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {post.faq && post.faq.length > 0 && (
-                  <div className="text-sm text-muted-foreground space-y-1">
-                    <Label className="text-xs uppercase tracking-wider">FAQ (schema FAQPage)</Label>
-                    <ul className="list-disc list-inside">
-                      {post.faq.map((f, i) => (
-                        <li key={i}><span className="text-foreground">{f.q}</span> — {f.a}</li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                <Label className="text-xs uppercase tracking-wider">Conteúdo (markdown, editável)</Label>
-                <Textarea
-                  value={editing[post.id] ?? post.content_md}
-                  onChange={(e) => setEditing((prev) => ({ ...prev, [post.id]: e.target.value }))}
-                  rows={12}
-                  className="font-mono text-sm"
-                />
-              </CardContent>
-            </Card>
+              </CollapsibleContent>
+            </Collapsible>
           ))}
         </CardContent>
       </Card>
