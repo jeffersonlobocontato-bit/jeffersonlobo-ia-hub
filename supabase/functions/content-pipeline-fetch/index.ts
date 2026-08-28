@@ -220,9 +220,10 @@ Deno.serve(async (req) => {
       .join('\n\n');
 
     const [curationDraft, authoredDraft] = await Promise.all([
-      draftWithOpenAI(openAIApiKey, CURATION_SYSTEM_PROMPT, `Itens coletados hoje:\n\n${poolText}`),
-      draftWithOpenAI(openAIApiKey, AUTHORED_SYSTEM_PROMPT, `Contexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`),
+      draftWithAI(aiApiKey, CURATION_SYSTEM_PROMPT, `Itens coletados hoje:\n\n${poolText}`),
+      draftWithAI(aiApiKey, AUTHORED_SYSTEM_PROMPT, `Contexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`),
     ]);
+
 
     if (!curationDraft.title || !curationDraft.content_md) throw new Error('Rascunho de curadoria veio vazio da OpenAI');
     if (!authoredDraft.title || !authoredDraft.content_md) throw new Error('Rascunho autoral veio vazio da OpenAI');
