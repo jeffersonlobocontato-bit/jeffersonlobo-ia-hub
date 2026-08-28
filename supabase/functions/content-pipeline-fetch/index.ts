@@ -78,16 +78,15 @@ function slugify(text: string): string {
     .slice(0, 80);
 }
 
-async function draftWithOpenAI(apiKey: string, systemPrompt: string, userPrompt: string): Promise<Draft> {
-  const res = await fetch('https://api.openai.com/v1/chat/completions', {
+async function draftWithAI(apiKey: string, systemPrompt: string, userPrompt: string): Promise<Draft> {
+  const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${apiKey}`,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      model: 'gpt-4o',
-      temperature: 0.7,
+      model: 'google/gemini-2.5-flash',
       response_format: { type: 'json_object' },
       messages: [
         { role: 'system', content: systemPrompt },
@@ -97,11 +96,12 @@ async function draftWithOpenAI(apiKey: string, systemPrompt: string, userPrompt:
   });
   if (!res.ok) {
     const errText = await res.text();
-    throw new Error(`OpenAI falhou (${res.status}): ${errText.slice(0, 500)}`);
+    throw new Error(`Gateway de IA falhou (${res.status}): ${errText.slice(0, 500)}`);
   }
+
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content;
-  if (!raw) throw new Error('OpenAI não retornou conteúdo');
+  if (!raw) throw new Error('O modelo não retornou conteúdo');
   const parsed = JSON.parse(raw);
   return {
     title: String(parsed.title || '').trim(),
@@ -146,13 +146,14 @@ Deno.serve(async (req) => {
 
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+  const aiApiKey = Deno.env.get('LOVABLE_API_KEY');
   const supabase = createClient(supabaseUrl, serviceKey);
 
   const today = new Date().toISOString().slice(0, 10);
 
   try {
-    if (!openAIApiKey) throw new Error('OPENAI_API_KEY não configurada nos secrets do projeto');
+    if (!aiApiKey) throw new Error('LOVABLE_API_KEY não configurada nos secrets do projeto');
+
 
     const { data: existingRun } = await supabase
       .from('content_pipeline_runs')
@@ -219,9 +220,10 @@ Deno.serve(async (req) => {
       .join('\n\n');
 
     const [curationDraft, authoredDraft] = await Promise.all([
-      draftWithOpenAI(openAIApiKey, CURATION_SYSTEM_PROMPT, `Itens coletados hoje:\n\n${poolText}`),
-      draftWithOpenAI(openAIApiKey, AUTHORED_SYSTEM_PROMPT, `Contexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`),
+      draftWithAI(aiApiKey, CURATION_SYSTEM_PROMPT, `Itens coletados hoje:\n\n${poolText}`),
+      draftWithAI(aiApiKey, AUTHORED_SYSTEM_PROMPT, `Contexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`),
     ]);
+
 
     if (!curationDraft.title || !curationDraft.content_md) throw new Error('Rascunho de curadoria veio vazio da OpenAI');
     if (!authoredDraft.title || !authoredDraft.content_md) throw new Error('Rascunho autoral veio vazio da OpenAI');
@@ -294,8 +296,18 @@ Deno.serve(async (req) => {
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
+    // Erros do Postgrest são objetos ({message, details, hint, code}) — sem isso
+    // o log/response virava "[object Object]" e escondia a causa real.
+    const message =
+      error instanceof Error
+        ? error.message
+        : typeof error === 'object' && error !== null
+          ? [(error as any).message, (error as any).details, (error as any).hint, (error as any).code]
+              .filter(Boolean)
+              .join(' | ') || JSON.stringify(error)
+          : String(error);
     console.error('content-pipeline-fetch falhou', message);
+
     await supabase
       .from('content_pipeline_runs')
       .upsert({ run_date: today, status: 'failed', error_message: message }, { onConflict: 'run_date' });
