@@ -1,54 +1,8 @@
 import { ExternalLink } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useProductCases, type ProductCase, type ProductCaseMockup } from '@/hooks/useProductCases';
 
-interface Product {
-  name: string;
-  domain: string;
-  category: string;
-  description: string;
-  tags: string[];
-  mockup: 'map' | 'dashboard' | 'chat' | 'news';
-}
-
-const PRODUCTS: Product[] = [
-  {
-    name: 'politiza-ia',
-    domain: 'politiza-ia',
-    category: 'Inteligência territorial',
-    description:
-      'Plataforma de inteligência para campanhas e mobilização política: mapas georreferenciados por município, gestão de equipe de campo em tempo real, diagnóstico de ativos e liderança com apoio de IA.',
-    tags: ['IA territorial', 'Full-stack', 'Multi-módulo'],
-    mockup: 'map',
-  },
-  {
-    name: 'juntosparana399',
-    domain: 'juntosparana',
-    category: 'Análise de dados e propostas',
-    description:
-      'Análise de dados eleitorais e cruzamento territorial com IA: importação e leitura de bases públicas, biblioteca de documentos com agentes vinculados, chat de análise para leitura de propostas e cenários.',
-    tags: ['Agentes de IA', 'Dados eleitorais', 'Dashboards'],
-    mockup: 'dashboard',
-  },
-  {
-    name: 'connect-chat',
-    domain: 'connect-chat',
-    category: 'Relações públicas e mensageria',
-    description:
-      'CRM de imprensa e mensageria com geração de conteúdo assistida por IA: campanhas por WhatsApp e e-mail, relacionamento com jornalistas, releases e automação de disparo segmentado.',
-    tags: ['Conteúdo com IA', 'Automação', 'CRM de imprensa'],
-    mockup: 'chat',
-  },
-  {
-    name: 'vozesparanaenses',
-    domain: 'vozesparanaenses.com.br',
-    category: 'Portal de notícias',
-    description:
-      'Portal de notícias regionais com redação assistida por IA, indexação instantânea em buscadores (IndexNow) e segmentação geográfica por município — publicação e SEO no mesmo fluxo.',
-    tags: ['Redação com IA', 'SEO/GEO', 'Editorial'],
-    mockup: 'news',
-  },
-];
-
-function Mockup({ type }: { type: Product['mockup'] }) {
+function Mockup({ type }: { type: ProductCaseMockup }) {
   if (type === 'map') {
     return (
       <div className="flex h-full">
@@ -123,7 +77,7 @@ function Mockup({ type }: { type: Product['mockup'] }) {
   );
 }
 
-function BrowserFrame({ domain, mockup }: { domain: string; mockup: Product['mockup'] }) {
+function BrowserFrame({ product }: { product: ProductCase }) {
   return (
     <div className="rounded-xl overflow-hidden border border-border shadow-md bg-[#12201E]">
       <div className="flex items-center gap-2 px-3 py-2 bg-black/25 border-b border-white/10">
@@ -134,17 +88,35 @@ function BrowserFrame({ domain, mockup }: { domain: string; mockup: Product['moc
           className="ml-2 truncate rounded px-2 py-0.5 text-[10px] text-white/50 bg-white/5"
           style={{ fontFamily: "'IBM Plex Mono', monospace" }}
         >
-          {domain}
+          {product.domain}
         </span>
       </div>
-      <div className="h-40">
-        <Mockup type={mockup} />
+      <div className="h-40 overflow-hidden">
+        {product.image_url ? (
+          <img
+            src={product.image_url}
+            alt={product.image_alt || `Print do painel do ${product.name}`}
+            className="w-full h-full object-cover"
+            style={{
+              objectPosition: `${product.focal_x}% ${product.focal_y}%`,
+              transform: `scale(${product.zoom})`,
+              transformOrigin: `${product.focal_x}% ${product.focal_y}%`,
+            }}
+            loading="lazy"
+          />
+        ) : (
+          <Mockup type={product.mockup} />
+        )}
       </div>
     </div>
   );
 }
 
 const ProductsSection = () => {
+  const { data: products, isLoading } = useProductCases();
+
+  if (!isLoading && (!products || products.length === 0)) return null;
+
   return (
     <section id="produtos" className="relative overflow-hidden bg-muted/30 py-24">
       <div className="container mx-auto px-4">
@@ -160,31 +132,40 @@ const ProductsSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
-          {PRODUCTS.map((p) => (
-            <div key={p.name} className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-sm hover:shadow-md transition-shadow">
-              <BrowserFrame domain={p.domain} mockup={p.mockup} />
-              <div className="space-y-2">
-                <div
-                  className="text-xs font-semibold uppercase tracking-wider text-primary"
-                  style={{ fontFamily: "'IBM Plex Mono', monospace" }}
-                >
-                  {p.category}
+          {isLoading
+            ? [0, 1, 2, 3].map((i) => (
+                <div key={i} className="rounded-xl border border-border bg-card p-5 space-y-4">
+                  <Skeleton className="h-40 w-full rounded-xl" />
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-6 w-40" />
+                  <Skeleton className="h-12 w-full" />
                 </div>
-                <h3 className="text-xl text-foreground">{p.name}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{p.description}</p>
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {p.tags.map((t) => (
-                    <span
-                      key={t}
-                      className="rounded-full border border-primary/25 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary"
+              ))
+            : products!.map((p) => (
+                <div key={p.id} className="rounded-xl border border-border bg-card p-5 space-y-4 shadow-sm hover:shadow-md transition-shadow">
+                  <BrowserFrame product={p} />
+                  <div className="space-y-2">
+                    <div
+                      className="text-xs font-semibold uppercase tracking-wider text-primary"
+                      style={{ fontFamily: "'IBM Plex Mono', monospace" }}
                     >
-                      {t}
-                    </span>
-                  ))}
+                      {p.category}
+                    </div>
+                    <h3 className="text-xl text-foreground">{p.name}</h3>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{p.description}</p>
+                    <div className="flex flex-wrap gap-1.5 pt-1">
+                      {p.tags.map((t) => (
+                        <span
+                          key={t}
+                          className="rounded-full border border-primary/25 bg-primary/10 px-2.5 py-0.5 text-[11px] font-medium text-primary"
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              ))}
         </div>
 
         <p className="mt-8 text-center text-xs text-muted-foreground max-w-2xl mx-auto flex items-center justify-center gap-1.5">

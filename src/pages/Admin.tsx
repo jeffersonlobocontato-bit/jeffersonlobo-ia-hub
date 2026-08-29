@@ -26,6 +26,7 @@ import AdminSpeakingLogosTab from '@/components/admin/AdminSpeakingLogosTab';
 import AdminPalestrasTab from '@/components/admin/AdminPalestrasTab';
 import AdminPressTab from '@/components/admin/AdminPressTab';
 import AdminContentPipelineTab from '@/components/admin/AdminContentPipelineTab';
+import AdminProductsCasesTab from '@/components/admin/AdminProductsCasesTab';
 import { SEO } from '@/components/SEO';
 import { TelegramTestCard } from '@/components/admin/TelegramTestCard';
 
@@ -459,6 +460,7 @@ const Admin = () => {
             <TabsTrigger value="briefings">Briefings</TabsTrigger>
             <TabsTrigger value="imprensa">Imprensa</TabsTrigger>
             <TabsTrigger value="palestras">Palestras</TabsTrigger>
+            <TabsTrigger value="products-cases">Cases</TabsTrigger>
             <TabsTrigger value="stage-photos">Galeria</TabsTrigger>
             <TabsTrigger value="speaking-logos">Marcas</TabsTrigger>
             <TabsTrigger value="chat-leads">Chat</TabsTrigger>
@@ -558,6 +560,10 @@ const Admin = () => {
             <AdminPalestrasTab />
           </TabsContent>
 
+
+          <TabsContent value="products-cases">
+            <AdminProductsCasesTab />
+          </TabsContent>
 
           <TabsContent value="stage-photos">
             <AdminStagePhotosTab />
