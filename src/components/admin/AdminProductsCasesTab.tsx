@@ -132,9 +132,9 @@ const AdminProductsCasesTab = () => {
   const uploadFile = async (item: ProductCase, file: File) => {
     setUploadingId(item.id);
     const ext = file.name.split('.').pop();
-    const path = `${item.id}-${Date.now()}.${ext}`;
+    const path = `product-cases/${item.id}-${Date.now()}.${ext}`;
     const { error: upErr } = await supabase.storage
-      .from('product-cases')
+      .from('blog-covers')
       .upload(path, file, { upsert: true, cacheControl: '3600' });
     if (upErr) {
       toast({ title: 'Erro no upload', description: upErr.message, variant: 'destructive' });
