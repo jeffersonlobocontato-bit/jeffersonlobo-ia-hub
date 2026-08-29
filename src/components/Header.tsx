@@ -63,7 +63,7 @@ const Header = () => {
 
           {/* Desktop Navigation — ordem alinhada com a ordem real das seções na página */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            {['home', 'palestras', 'sobre', 'contato', 'livro'].map((item) => (
+            {['home', 'palestras', 'sobre', 'produtos', 'contato', 'livro'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
@@ -130,7 +130,7 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-6 space-y-4 animate-fade-in bg-background border-t border-primary/20">
-            {['home', 'palestras', 'sobre', 'contato', 'livro'].map((item) => (
+            {['home', 'palestras', 'sobre', 'produtos', 'contato', 'livro'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
