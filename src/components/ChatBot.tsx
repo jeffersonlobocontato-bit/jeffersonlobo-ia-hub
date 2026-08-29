@@ -1,7 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Send, X, Loader2 } from 'lucide-react';
+import { MessageCircle, Send, X, Loader2, Sparkles } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -11,14 +12,13 @@ interface Message {
 
 const WHATSAPP_NUMBER = '5545999864213'; // (45) 99986-4213
 
-const processMessageContent = (content: string) => {
-  // Substituir [LINK_WHATSAPP]texto[/LINK_WHATSAPP] por botões clicáveis
-  const parts = content.split(/(\[LINK_WHATSAPP\].*?\[\/LINK_WHATSAPP\])/g);
-  
+const processMessageContent = (content: string, onGoToTest: () => void) => {
+  // Substituir [LINK_WHATSAPP]/[LINK_TESTE]texto[/...] por botões clicáveis
+  const parts = content.split(/(\[LINK_WHATSAPP\].*?\[\/LINK_WHATSAPP\]|\[LINK_TESTE\].*?\[\/LINK_TESTE\])/g);
+
   return parts.map((part, index) => {
-    const match = part.match(/\[LINK_WHATSAPP\](.*?)\[\/LINK_WHATSAPP\]/);
-    if (match) {
-      const linkText = match[1];
+    const waMatch = part.match(/\[LINK_WHATSAPP\](.*?)\[\/LINK_WHATSAPP\]/);
+    if (waMatch) {
       return (
         <button
           key={index}
@@ -27,7 +27,21 @@ const processMessageContent = (content: string) => {
           onClick={() => window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank')}
         >
           <MessageCircle className="w-3 h-3 mt-0.5 shrink-0" />
-          <span className="flex-1 break-words">{linkText}</span>
+          <span className="flex-1 break-words">{waMatch[1]}</span>
+        </button>
+      );
+    }
+    const testeMatch = part.match(/\[LINK_TESTE\](.*?)\[\/LINK_TESTE\]/);
+    if (testeMatch) {
+      return (
+        <button
+          key={index}
+          type="button"
+          className="my-2 inline-flex w-full max-w-full items-start gap-2 rounded-md bg-primary px-3 py-2 text-left text-xs font-medium text-primary-foreground hover:bg-primary/90 whitespace-normal break-words"
+          onClick={onGoToTest}
+        >
+          <Sparkles className="w-3 h-3 mt-0.5 shrink-0" />
+          <span className="flex-1 break-words">{testeMatch[1]}</span>
         </button>
       );
     }
@@ -36,6 +50,7 @@ const processMessageContent = (content: string) => {
 };
 
 const ChatBot = () => {
+  const navigate = useNavigate();
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -314,7 +329,10 @@ const ChatBot = () => {
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               ) : (
                 <div className="text-sm prose prose-sm max-w-none dark:prose-invert">
-                  {processMessageContent(message.content)}
+                  {processMessageContent(message.content, () => {
+                    setIsOpen(false);
+                    navigate('/teste-ia');
+                  })}
                 </div>
               )}
             </div>

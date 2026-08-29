@@ -1,19 +1,13 @@
 project_id = "cgydeldzhnfyexphaheq"
 
-[functions.chat-assistant]
-verify_jwt = false
-
 [functions.chat-uivo-lobo]
 verify_jwt = false
 
 [functions.send-test-email]
 verify_jwt = false
 
-[functions.generate-embedding]
-verify_jwt = false
-
 [functions.populate-knowledge]
-verify_jwt = false
+verify_jwt = true
 
 [functions.sync-podcast-rss]
 verify_jwt = false
