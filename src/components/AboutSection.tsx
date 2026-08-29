@@ -65,7 +65,7 @@ const AboutSection = () => {
         <div className="space-y-8">
           <div className="text-center">
             <h3 className="display-title text-3xl md:text-4xl mb-4">
-              <span className="text-primary">Por que confiar</span> em Jefferson Lobo?
+              <span className="text-primary">Como Jefferson Lobo</span>&nbsp;pode ajudar?
             </h3>
             <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
               Experiência comprovada em ajudar empresas e profissionais a prosperarem na era da inteligência artificial
