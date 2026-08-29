@@ -1374,6 +1374,63 @@ export type Database = {
           },
         ]
       }
+      product_cases: {
+        Row: {
+          active: boolean
+          category: string
+          created_at: string
+          description: string
+          display_order: number
+          domain: string
+          focal_x: number
+          focal_y: number
+          id: string
+          image_alt: string | null
+          image_url: string | null
+          mockup: string
+          name: string
+          tags: Json
+          updated_at: string
+          zoom: number
+        }
+        Insert: {
+          active?: boolean
+          category: string
+          created_at?: string
+          description: string
+          display_order?: number
+          domain: string
+          focal_x?: number
+          focal_y?: number
+          id?: string
+          image_alt?: string | null
+          image_url?: string | null
+          mockup?: string
+          name: string
+          tags?: Json
+          updated_at?: string
+          zoom?: number
+        }
+        Update: {
+          active?: boolean
+          category?: string
+          created_at?: string
+          description?: string
+          display_order?: number
+          domain?: string
+          focal_x?: number
+          focal_y?: number
+          id?: string
+          image_alt?: string | null
+          image_url?: string | null
+          mockup?: string
+          name?: string
+          tags?: Json
+          updated_at?: string
+          zoom?: number
+        }
+        Relationships: []
+      }
       scroll_events: {
         Row: {
           created_at: string
