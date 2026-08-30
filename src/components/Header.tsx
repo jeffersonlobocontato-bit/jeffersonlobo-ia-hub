@@ -46,18 +46,13 @@ const Header = () => {
           {/* Logo */}
           <Link
             to="/"
-            className={`group flex items-center gap-3 hover:opacity-90 transition-opacity ${
-              isScrolled 
-                ? 'text-foreground' 
-                : 'text-foreground'
-            }`}
+            className="group flex items-center hover:opacity-90 transition-opacity text-foreground"
           >
-            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-primary font-serif text-xl text-primary-foreground shadow-sm transition-transform group-hover:-translate-y-0.5">
-              JL
-            </span>
             <span className="flex flex-col leading-none">
-              <span className="font-serif text-lg text-foreground">Jefferson Lobo</span>
-              <span className="text-[11px] font-medium uppercase tracking-wider text-foreground/60" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Estrategista de IA · palestrante · autor</span>
+              <span className="font-serif text-lg text-foreground">
+                Jefferson <span className="highlight-yellow">Lobo</span>
+              </span>
+              <span className="text-[11px] font-medium uppercase tracking-wider text-foreground/60" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Head Executivo de Marketing · Consultor em IA · Palestrante</span>
             </span>
           </Link>
 
