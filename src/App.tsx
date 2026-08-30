@@ -20,6 +20,8 @@ import ConsultoriaIA from "./pages/ConsultoriaIA";
 import BlogIndex from "./pages/BlogIndex";
 import BlogPost from "./pages/BlogPost";
 import PressReleaseOG from "./pages/PressReleaseOG";
+import Materiais from "./pages/Materiais";
+import MaterialDetalhe from "./pages/MaterialDetalhe";
 import PressCampaignKiosk from "./pages/admin/PressCampaignKiosk";
 import NotFound from "./pages/NotFound";
 
