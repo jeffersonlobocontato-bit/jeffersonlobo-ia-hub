@@ -40,8 +40,17 @@ const Footer = () => {
                   </button>
                 </li>
               ))}
+              <li>
+                <Link
+                  to="/materiais"
+                  className="text-foreground/85 hover:text-primary transition-colors"
+                >
+                  Materiais do livro
+                </Link>
+              </li>
             </ul>
           </div>
+
 
           {/* Contact Info */}
           <div>
