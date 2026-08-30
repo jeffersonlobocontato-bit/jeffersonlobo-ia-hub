@@ -76,12 +76,20 @@ const Header = () => {
               Teste IA
             </Link>
             <Link
+              to="/materiais"
+              className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Materiais
+            </Link>
+            <Link
               to="/blog"
               className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
               style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             >
               Blog
             </Link>
+
           </nav>
 
           {/* Desktop CTA Buttons */}
