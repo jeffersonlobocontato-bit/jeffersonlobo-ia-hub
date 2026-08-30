@@ -78,8 +78,8 @@ const Materiais = () => {
                       <BookOpen className="mr-2 h-5 w-5" />
                       Ler online
                     </Link>
-                  </Link>
                   </Button>
+
                 </div>
               </Card>
             ))}
