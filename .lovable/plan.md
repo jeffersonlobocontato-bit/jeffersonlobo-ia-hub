@@ -18,6 +18,15 @@ Reduzir o texto inicial da seção "Sobre" para um resumo curto e convidativo, m
 - Fallback: se `short_description` estiver vazio, manter o comportamento atual (mostrar `description` completo) para não quebrar o site enquanto o conteúdo não for editado.
 - Atualizar o `defaultData` local com um `short_description` de exemplo.
 
+## Sugestão de copy para o resumo curto
+**Opção principal (recomendada):**
+> "Head Executivo de Marketing do Sistema Fiep. Ajudo lideranças e times a orquestrarem fluxos de IA com identidade própria — saindo da era dos prompts genéricos para agentes de marca que realmente performam."
+
+**Opção alternativa (mais direta):**
+> "Estrategista de IA para marketing e marca: transformo prompts genéricos em agentes com DNA autoral para empresas e diretorias no Brasil."
+
+A biografia completa continua sendo o texto atual, expandido ao clicar em "Saiba mais sobre o Lobo".
+
 ### 3. Painel admin `src/components/admin/AdminAboutTab.tsx`
 - Adicionar campo "Resumo Curto" (textarea) editando `short_description`.
 - Renomear o campo existente "Descrição" para "Biografia Completa (expandida)" para deixar clara a diferença.
