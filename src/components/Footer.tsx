@@ -15,13 +15,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
           {/* Brand */}
           <div className="col-span-2">
-            <div className="mb-4 flex items-end gap-4">
-              <span className="font-serif text-5xl text-primary">JL</span>
-              <span className="mb-2 h-px w-24 bg-border" />
-            </div>
-            <h3 className="font-serif text-2xl text-foreground mb-4">Jefferson Lobo</h3>
+            <h3 className="font-serif text-4xl text-foreground mb-4">
+              Jefferson <span className="highlight-yellow">Lobo</span>
+            </h3>
             <p className="text-muted-foreground mb-4 max-w-md">
-              Estrategista de IA para marketing e marca — palestras, imersões e consultoria
+              Head Executivo de Marketing e consultor em IA — palestras, imersões e consultoria
               para lideranças que querem construir agentes de IA com identidade própria.
             </p>
           </div>

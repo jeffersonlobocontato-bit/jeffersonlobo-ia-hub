@@ -2,8 +2,7 @@ import { Helmet } from "react-helmet-async";
 
 const SITE_URL = "https://jeffersonlobo.tech";
 const SITE_NAME = "Jefferson Lobo";
-const DEFAULT_OG_IMAGE =
-  "https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp";
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.png`;
 
 interface SEOProps {
   title: string;
