@@ -129,7 +129,20 @@ const BookSection = () => {
                   Ler amostra grátis
                 </Button>
               )}
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-primary/30 hover:bg-primary/10"
+                onClick={() => trackCTA('book_materials', 'book_section')}
+              >
+                <Link to="/materiais">
+                  <FileText className="mr-2 w-5 h-5" />
+                  Materiais complementares
+                </Link>
+              </Button>
             </div>
+
           </div>
         </div>
       </div>
