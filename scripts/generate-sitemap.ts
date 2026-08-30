@@ -246,6 +246,9 @@ async function main() {
     { path: "/consultoria-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/teste-ia", lastmod: today, changefreq: "monthly", priority: "0.8" },
     { path: "/imprensa", lastmod: today, changefreq: "monthly", priority: "0.6" },
+    { path: "/materiais", lastmod: today, changefreq: "monthly", priority: "0.7" },
+    { path: "/materiais/auditoria-del", lastmod: today, changefreq: "yearly", priority: "0.6" },
+    { path: "/materiais/templates-del", lastmod: today, changefreq: "yearly", priority: "0.6" },
     { path: "/politica-privacidade", lastmod: today, changefreq: "yearly", priority: "0.3" },
     ...blogPosts.filter((r) => r.slug).map((r) => ({
       path: `/blog/${r.slug}`,

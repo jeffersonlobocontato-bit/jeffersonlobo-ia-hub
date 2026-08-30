@@ -76,12 +76,20 @@ const Header = () => {
               Teste IA
             </Link>
             <Link
+              to="/materiais"
+              className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Materiais
+            </Link>
+            <Link
               to="/blog"
               className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
               style={{ fontFamily: "'IBM Plex Mono', monospace" }}
             >
               Blog
             </Link>
+
           </nav>
 
           {/* Desktop CTA Buttons */}
@@ -144,6 +152,14 @@ const Header = () => {
               Teste IA
             </Link>
             <Link
+              to="/materiais"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block w-full text-left py-3 text-sm font-medium uppercase tracking-wider text-foreground hover:text-primary transition-colors"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Materiais
+            </Link>
+            <Link
               to="/blog"
               onClick={() => setIsMobileMenuOpen(false)}
               className="block w-full text-left py-3 text-sm font-medium uppercase tracking-wider text-foreground hover:text-primary transition-colors"
@@ -151,6 +167,7 @@ const Header = () => {
             >
               Blog
             </Link>
+
             {isAdmin && (
               <Button
                 asChild

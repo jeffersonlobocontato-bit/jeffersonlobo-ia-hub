@@ -1,6 +1,7 @@
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ShoppingCart, Star, BookOpen } from 'lucide-react';
+import { ShoppingCart, Star, BookOpen, FileText } from 'lucide-react';
 import bookCover from '@/assets/book-cover.jpg';
 import { useBookContent } from '@/hooks/useBookContent';
 import { useBookFeatures, useBookReviews } from '@/hooks/useBookFeatures';
@@ -129,7 +130,20 @@ const BookSection = () => {
                   Ler amostra grátis
                 </Button>
               )}
+              <Button
+                asChild
+                size="lg"
+                variant="outline"
+                className="border-primary/30 hover:bg-primary/10"
+                onClick={() => trackCTA('book_materials', 'book_section')}
+              >
+                <Link to="/materiais">
+                  <FileText className="mr-2 w-5 h-5" />
+                  Materiais complementares
+                </Link>
+              </Button>
             </div>
+
           </div>
         </div>
       </div>
