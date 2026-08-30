@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 const Footer = () => {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
