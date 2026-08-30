@@ -1,42 +1,40 @@
-## Diagnóstico
+# Plano: resumo curto do perfil com CTA "Saiba mais"
 
-O DNS está correto, mas o site continua fora do ar por um motivo diferente do que parecia:
+## Objetivo
+Reduzir o texto inicial da seção "Sobre" para um resumo curto e convidativo, mantendo a biografia completa acessível através de um CTA expansível "Saiba mais".
 
-- `jeffersonlobo.tech` → `185.158.133.1` ✅
-- `www.jeffersonlobo.tech` → `185.158.133.1` ✅
-- TXT `brevo-code` presente ✅
-- App Lovable (`jeffersonlobo-ia-hub.lovable.app`) responde **200 OK** ✅
+## O que será alterado
 
-Porém:
+### 1. Banco de dados
+- Adicionar coluna `short_description` (TEXT, nullable) na tabela `public.about_content`.
+- Criar migration SQL para a nova coluna.
+- Manter `description` como o texto completo/expandido.
 
-- `https://jeffersonlobo.tech` responde **HTTP 421 Misdirected Request** (servido pelo Cloudflare da Lovable)
-- `https://www.jeffersonlobo.tech` falha no **handshake TLS** (sem certificado emitido)
+### 2. Componente público `src/components/AboutSection.tsx`
+- Exibir `short_description` como texto principal/resumo.
+- Adicionar botão "Saiba mais sobre o Lobo" abaixo do resumo.
+- Ao clicar, expandir suavemente a `description` completa (animação de altura/opacidade).
+- Permitir recolher o texto expandido.
+- Fallback: se `short_description` estiver vazio, manter o comportamento atual (mostrar `description` completo) para não quebrar o site enquanto o conteúdo não for editado.
+- Atualizar o `defaultData` local com um `short_description` de exemplo.
 
-**Causa:** o domínio `jeffersonlobo.tech` **não está mais vinculado a este projeto na Lovable**. O 421 é a resposta padrão do edge quando o DNS aponta para o IP da Lovable mas o domínio não consta na lista de domínios do projeto — por isso o certificado do `www` também não é emitido. Provavelmente o domínio foi removido/desconectado em algum momento (ou nunca foi reconectado após alguma alteração), enquanto o DNS na IONOS continuou apontando para cá.
+### 3. Painel admin `src/components/admin/AdminAboutTab.tsx`
+- Adicionar campo "Resumo Curto" (textarea) editando `short_description`.
+- Renomear o campo existente "Descrição" para "Biografia Completa (expandida)" para deixar clara a diferença.
+- Ajustar placeholders e labels.
 
-Isto não é um problema de DNS nem de código — é de configuração do projeto.
+### 4. Validações e ajustes
+- Garantir que o botão use os tokens de cor primária e estilo consistente com os demais CTAs do site.
+- Preservar responsividade mobile: resumo e botão bem espaçados, expansão sem quebrar layout.
+- Manter acessibilidade: botão com `aria-expanded` e transição suave.
 
-## O que fazer (você, na Lovable)
+## Não será alterado
+- Estrutura da foto de perfil, título, read_line ou grid de serviços.
+- Dados existentes de `description` no banco.
+- Permissões/RLS da tabela `about_content`.
 
-1. Abrir **Project Settings → Project → Domains**
-2. Clicar em **Connect Domain** e adicionar `jeffersonlobo.tech`
-3. Repetir e adicionar também `www.jeffersonlobo.tech`
-4. Marcar `jeffersonlobo.tech` como **Primary** (o `www` vai redirecionar para ele)
-5. Como o DNS já está correto, a verificação deve passar em minutos e o SSL é provisionado automaticamente
-
-<presentation-actions>
-<presentation-open-publish>Abrir Publish / Domínios</presentation-open-publish>
-</presentation-actions>
-
-## Depois que reconectar
-
-Eu valido:
-- Status `Active` nos dois domínios
-- `https://jeffersonlobo.tech` retornando 200
-- `https://www.jeffersonlobo.tech` com SSL válido redirecionando para o primary
-
-## Observações
-
-- **Não mexer no DNS da IONOS** — está tudo certo lá. Qualquer mudança agora só atrasa.
-- **Não mexer na delegação `notify.jeffersonlobo.tech`** (email transacional Lovable) — continua isolada e funcionando.
-- Se ao tentar conectar aparecer "domínio já vinculado a outro projeto", me avise: nesse caso é preciso removê-lo do projeto antigo antes.
+## Critério de pronto
+- A seção "Sobre" mostra apenas o resumo curto inicialmente.
+- O botão "Saiba mais" expande a biografia completa com animação.
+- O admin permite editar separadamente o resumo curto e a biografia completa.
+- Build sem erros e preview validado.
