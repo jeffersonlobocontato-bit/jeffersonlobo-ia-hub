@@ -75,11 +75,11 @@ const HeroSection = () => {
 
           {/* Roles slash line (Matt Wolfe style) */}
           <div className="roles-slash">
+            <span className="role">Head Executivo de Marketing</span>
+            <span className="sep">/</span>
+            <span className="role">Consultor em IA</span>
+            <span className="sep">/</span>
             <span className="role">Palestrante</span>
-            <span className="sep">/</span>
-            <span className="role">Autor</span>
-            <span className="sep">/</span>
-            <span className="role">Estrategista de IA</span>
           </div>
 
           {/* Headline massivo com palavra em highlighter amarelo */}
