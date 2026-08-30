@@ -1,49 +1,45 @@
-# Plano: resumo curto do perfil com CTA "Saiba mais"
+# Plano: página de materiais complementares do livro (downloads)
 
 ## Objetivo
-Reduzir o texto inicial da seção "Sobre" para um resumo curto e convidativo, mantendo a biografia completa acessível através de um CTA expansível "Saiba mais".
+Publicar no site os dois materiais complementares do livro "O código invisível dos superagentes de IA" — **Protocolo de auditoria de fidelidade autoral** e **Templates operacionais: seus três arquivos DEL** — para consulta online e download direto em PDF, sem exigir cadastro.
 
-## O que será alterado
+## O que será criado
 
-### 1. Banco de dados
-- Adicionar coluna `short_description` (TEXT, nullable) na tabela `public.about_content`.
-- Criar migration SQL para a nova coluna.
-- Manter `description` como o texto completo/expandido.
+### 1. Nova página `/materiais`
+- Rota `/materiais` em `src/App.tsx`, nova página `src/pages/Materiais.tsx`.
+- Cabeçalho na identidade visual atual do site (preto / off-white / amarelo, títulos em display uppercase) — o CSS de marca que veio no zip é usado apenas como referência, não é importado.
+- Kicker "Material complementar", H1 "Materiais do livro", parágrafo curto explicando que são anexos operacionais do livro liberados para consulta e download.
+- Grid com 2 cards, um por material: título, resumo de 1–2 linhas, e dois botões: **Baixar PDF** e **Ler online**.
+- Header e Footer do site, SEO (`SEO.tsx`) com title/description próprios e breadcrumb.
 
-### 2. Componente público `src/components/AboutSection.tsx`
-- Exibir `short_description` como texto principal/resumo.
-- Adicionar botão "Saiba mais sobre o Lobo" abaixo do resumo.
-- Ao clicar, expandir suavemente a `description` completa (animação de altura/opacidade).
-- Permitir recolher o texto expandido.
-- Fallback: se `short_description` estiver vazio, manter o comportamento atual (mostrar `description` completo) para não quebrar o site enquanto o conteúdo não for editado.
-- Atualizar o `defaultData` local com um `short_description` de exemplo.
+### 2. Páginas de leitura online
+- `/materiais/auditoria-del` e `/materiais/templates-del`, renderizando o conteúdo dos dois materiais como conteúdo real do site (checklists e templates convertidos para JSX com os tokens de cor do projeto, não iframe do HTML original).
+- Botões no topo: **Baixar PDF** e **Copiar texto** (copia o conteúdo em texto puro, útil para os templates DEL que se salvam como .txt).
+- Índice interno curto no topo de cada material.
 
-## Sugestão de copy para o resumo curto
-**Opção principal (recomendada):**
-> "Head Executivo de Marketing do Sistema Fiep. Ajudo lideranças e times a orquestrarem fluxos de IA com identidade própria — saindo da era dos prompts genéricos para agentes de marca que realmente performam."
+### 3. Arquivos PDF
+- Os dois PDFs (`auditoria-del.pdf`, `templates-del.pdf`) publicados como assets via `lovable-assets`, referenciados pelos botões de download com `download` no link.
+- Sem cópia dos binários para o repositório.
 
-**Opção alternativa (mais direta):**
-> "Estrategista de IA para marketing e marca: transformo prompts genéricos em agentes com DNA autoral para empresas e diretorias no Brasil."
+### 4. Ligações de entrada
+- Botão **"Materiais complementares"** na seção do livro (`BookSection.tsx`), ao lado dos CTAs existentes, apontando para `/materiais`.
+- Link "Materiais" no menu do `Header` e no `Footer`.
+- Cliques nos downloads registrados via `useTrackCTA` (`material_download_auditoria` / `material_download_templates`) para aparecerem na analytics do painel.
 
-A biografia completa continua sendo o texto atual, expandido ao clicar em "Saiba mais sobre o Lobo".
+### 5. SEO
+- `/materiais` e as duas páginas de leitura adicionadas ao `sitemap.xml` (via `scripts/generate-sitemap.ts`).
+- Um H1 por página, metadados próprios, texto real indexável (por isso o conteúdo é reescrito em JSX em vez de PDF embutido).
 
-### 3. Painel admin `src/components/admin/AdminAboutTab.tsx`
-- Adicionar campo "Resumo Curto" (textarea) editando `short_description`.
-- Renomear o campo existente "Descrição" para "Biografia Completa (expandida)" para deixar clara a diferença.
-- Ajustar placeholders e labels.
+## Notas técnicas
+- Nenhuma mudança de banco de dados: o conteúdo é estático em código, não editável pelo admin.
+- As fontes IBM Plex Mono / Instrument Serif / Manrope do zip **não** serão adicionadas — o site mantém sua tipografia atual para não criar duas identidades.
+- Fallback: se um PDF falhar em carregar, o botão "Ler online" continua entregando o conteúdo.
 
-### 4. Validações e ajustes
-- Garantir que o botão use os tokens de cor primária e estilo consistente com os demais CTAs do site.
-- Preservar responsividade mobile: resumo e botão bem espaçados, expansão sem quebrar layout.
-- Manter acessibilidade: botão com `aria-expanded` e transição suave.
-
-## Não será alterado
-- Estrutura da foto de perfil, título, read_line ou grid de serviços.
-- Dados existentes de `description` no banco.
-- Permissões/RLS da tabela `about_content`.
+## Fora do escopo
+- Captura de lead / formulário antes do download (downloads abertos, conforme escolhido).
+- Plano anterior do resumo curto no perfil — descartado, a seção "Sobre" fica como está.
 
 ## Critério de pronto
-- A seção "Sobre" mostra apenas o resumo curto inicialmente.
-- O botão "Saiba mais" expande a biografia completa com animação.
-- O admin permite editar separadamente o resumo curto e a biografia completa.
-- Build sem erros e preview validado.
+- `/materiais` lista os dois materiais com download funcionando (PDF abre/baixa).
+- As duas páginas de leitura online exibem o conteúdo completo, responsivo no mobile.
+- Links de entrada no livro, header e footer funcionando; build sem erros.
