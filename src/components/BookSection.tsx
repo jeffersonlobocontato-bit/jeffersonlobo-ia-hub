@@ -3,10 +3,11 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { ShoppingCart, Star, BookOpen, FileText } from 'lucide-react';
 import bookCoverAsset from '@/assets/book-cover.jpg.asset.json';
-const bookCover = bookCoverAsset.url;
 import { useBookContent } from '@/hooks/useBookContent';
 import { useBookFeatures, useBookReviews } from '@/hooks/useBookFeatures';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
+
+const bookCover = bookCoverAsset.url;
 
 const BookSection = () => {
   const { data: bookData, isLoading } = useBookContent();
