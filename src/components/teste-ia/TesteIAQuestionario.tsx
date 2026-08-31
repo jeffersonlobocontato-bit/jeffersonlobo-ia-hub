@@ -139,8 +139,9 @@ export function TesteIAQuestionario({ leadId, accessToken, finalidade, onComplet
       });
 
       if (finalizeError) throw finalizeError;
-      const finalizedRow = Array.isArray(finalized) ? finalized[0] : finalized;
-      if (!finalizedRow?.success) throw new Error("finalize_failed");
+      // A rotina retorna um boolean (true = linha atualizada)
+      const ok = Array.isArray(finalized) ? Boolean((finalized[0] as any)?.success ?? finalized[0]) : Boolean(finalized);
+      if (!ok) throw new Error("finalize_failed: token ou lead inválido");
 
 
       toast.success("Teste finalizado! Veja seu resultado.");
