@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BrainCircuit } from 'lucide-react';
+import { ArrowRight, BrainCircuit, BookOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import heroBg from '@/assets/jefferson-portrait.png';
 import { useHeroContent } from '@/hooks/useHeroContent';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
@@ -17,6 +18,8 @@ const HeroSection = () => {
     subtitle: "Palestras, imersões e consultoria para empresas que querem sair do prompt avulso e construir agentes de IA com identidade própria — DNA autoral, não commodity.",
     cta_primary: "Fazer Diagnóstico Grátis",
     cta_secondary: "Contratar palestra",
+    cta_tertiary: "Leia meu livro",
+    cta_tertiary_target: "#livro",
     stat1_number: "127",
     stat1_label: "Palestras realizadas",
     stat2_number: "45+",
@@ -93,7 +96,7 @@ const HeroSection = () => {
           </p>
 
           {/* CTAs — palestra é a prioridade de negócio, por isso vem primeiro e com estilo sólido */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-2">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center items-center pt-2">
             <Button
               size="lg"
               onClick={() => {
@@ -111,6 +114,49 @@ const HeroSection = () => {
                 {displayData.cta_primary}
               </a>
             </Button>
+            {displayData.cta_tertiary && (
+              <Button
+                size="lg"
+                variant="outline"
+                asChild
+                className="text-base sm:text-lg px-8 py-6 border-primary/30 hover:bg-primary/10"
+              >
+                {(() => {
+                  const target = displayData.cta_tertiary_target || '#livro';
+                  const label = displayData.cta_tertiary;
+                  const handleClick = () => trackCTA('hero_cta_livro', 'hero_section');
+                  if (target.startsWith('#')) {
+                    return (
+                      <a
+                        href={target}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          handleClick();
+                          scrollToSection(target.replace('#', ''));
+                        }}
+                      >
+                        <BookOpen className="mr-2 w-5 h-5" />
+                        {label}
+                      </a>
+                    );
+                  }
+                  if (target.startsWith('/')) {
+                    return (
+                      <Link to={target} onClick={handleClick}>
+                        <BookOpen className="mr-2 w-5 h-5" />
+                        {label}
+                      </Link>
+                    );
+                  }
+                  return (
+                    <a href={target} target="_blank" rel="noopener noreferrer" onClick={handleClick}>
+                      <BookOpen className="mr-2 w-5 h-5" />
+                      {label}
+                    </a>
+                  );
+                })()}
+              </Button>
+            )}
           </div>
 
         </div>
