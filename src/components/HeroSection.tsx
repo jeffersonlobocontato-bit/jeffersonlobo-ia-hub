@@ -18,6 +18,8 @@ const HeroSection = () => {
     subtitle: "Palestras, imersões e consultoria para empresas que querem sair do prompt avulso e construir agentes de IA com identidade própria — DNA autoral, não commodity.",
     cta_primary: "Fazer Diagnóstico Grátis",
     cta_secondary: "Contratar palestra",
+    cta_tertiary: "Leia meu livro",
+    cta_tertiary_target: "#livro",
     stat1_number: "127",
     stat1_label: "Palestras realizadas",
     stat2_number: "45+",
