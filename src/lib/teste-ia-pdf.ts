@@ -27,12 +27,12 @@ interface FontFile {
 }
 
 const FONT_FILES: FontFile[] = [
-  { url: instrumentSerifRegularUrl, file: "InstrumentSerif-Regular.ttf", family: "InstrumentSerif", style: "normal" },
-  { url: instrumentSerifItalicUrl, file: "InstrumentSerif-Italic.ttf", family: "InstrumentSerif", style: "italic" },
-  { url: manropeRegularUrl, file: "Manrope-Regular.ttf", family: "Manrope", style: "normal" },
-  { url: manropeBoldUrl, file: "Manrope-Bold.ttf", family: "Manrope", style: "bold" },
-  { url: manropeExtraBoldUrl, file: "Manrope-ExtraBold.ttf", family: "ManropeExtraBold", style: "normal" },
-  { url: ibmPlexMonoSemiBoldUrl, file: "IBMPlexMono-SemiBold.ttf", family: "IBMPlexMono", style: "bold" },
+  { url: instrumentSerifRegularAsset.url, file: "InstrumentSerif-Regular.ttf", family: "InstrumentSerif", style: "normal" },
+  { url: instrumentSerifItalicAsset.url, file: "InstrumentSerif-Italic.ttf", family: "InstrumentSerif", style: "italic" },
+  { url: manropeRegularAsset.url, file: "Manrope-Regular.ttf", family: "Manrope", style: "normal" },
+  { url: manropeBoldAsset.url, file: "Manrope-Bold.ttf", family: "Manrope", style: "bold" },
+  { url: manropeExtraBoldAsset.url, file: "Manrope-ExtraBold.ttf", family: "ManropeExtraBold", style: "normal" },
+  { url: ibmPlexMonoSemiBoldAsset.url, file: "IBMPlexMono-SemiBold.ttf", family: "IBMPlexMono", style: "bold" },
 ];
 
 let fontsRegisteredPromise: Promise<void> | null = null;
