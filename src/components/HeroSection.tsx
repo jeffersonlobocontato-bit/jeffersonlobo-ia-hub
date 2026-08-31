@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BrainCircuit } from 'lucide-react';
+import { ArrowRight, BrainCircuit, BookOpen } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import heroBg from '@/assets/jefferson-portrait.png';
 import { useHeroContent } from '@/hooks/useHeroContent';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
