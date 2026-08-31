@@ -1,11 +1,11 @@
 import jsPDF from "jspdf";
 import signatureUrl from "@/assets/jefferson-signature.png";
-import instrumentSerifRegularUrl from "@/assets/fonts/InstrumentSerif-Regular.ttf";
-import instrumentSerifItalicUrl from "@/assets/fonts/InstrumentSerif-Italic.ttf";
-import manropeRegularUrl from "@/assets/fonts/Manrope-Regular.ttf";
-import manropeBoldUrl from "@/assets/fonts/Manrope-Bold.ttf";
-import manropeExtraBoldUrl from "@/assets/fonts/Manrope-ExtraBold.ttf";
-import ibmPlexMonoSemiBoldUrl from "@/assets/fonts/IBMPlexMono-SemiBold.ttf";
+import instrumentSerifRegularAsset from "@/assets/fonts/InstrumentSerif-Regular.ttf.asset.json";
+import instrumentSerifItalicAsset from "@/assets/fonts/InstrumentSerif-Italic.ttf.asset.json";
+import manropeRegularAsset from "@/assets/fonts/Manrope-Regular.ttf.asset.json";
+import manropeBoldAsset from "@/assets/fonts/Manrope-Bold.ttf.asset.json";
+import manropeExtraBoldAsset from "@/assets/fonts/Manrope-ExtraBold.ttf.asset.json";
+import ibmPlexMonoSemiBoldAsset from "@/assets/fonts/IBMPlexMono-SemiBold.ttf.asset.json";
 
 // === IDENTIDADE VISUAL — Manual da Marca Jefferson Lobo (v1 · 2026) ===
 const PETROLEO: [number, number, number] = [18, 32, 30]; // #12201E — fundo
