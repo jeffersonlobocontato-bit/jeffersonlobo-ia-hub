@@ -149,7 +149,7 @@ export function TesteIADashboard({ leadId, accessToken, onRestart }: TesteIADash
     toast.info("Gerando PDF...");
     try {
       const { generateTesteIAPdf } = await import("@/lib/teste-ia-pdf");
-      generateTesteIAPdf(lead as any, recommendations as any);
+      await generateTesteIAPdf(lead as any, recommendations as any);
       toast.success("PDF baixado!");
     } catch (e) {
       console.error(e);

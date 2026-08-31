@@ -1,5 +1,61 @@
 import jsPDF from "jspdf";
 import signatureUrl from "@/assets/jefferson-signature.png";
+import instrumentSerifRegularAsset from "@/assets/fonts/InstrumentSerif-Regular.ttf.asset.json";
+import instrumentSerifItalicAsset from "@/assets/fonts/InstrumentSerif-Italic.ttf.asset.json";
+import manropeRegularAsset from "@/assets/fonts/Manrope-Regular.ttf.asset.json";
+import manropeBoldAsset from "@/assets/fonts/Manrope-Bold.ttf.asset.json";
+import manropeExtraBoldAsset from "@/assets/fonts/Manrope-ExtraBold.ttf.asset.json";
+import ibmPlexMonoSemiBoldAsset from "@/assets/fonts/IBMPlexMono-SemiBold.ttf.asset.json";
+
+// === IDENTIDADE VISUAL — Manual da Marca Jefferson Lobo (v1 · 2026) ===
+const PETROLEO: [number, number, number] = [18, 32, 30]; // #12201E — fundo
+const PETROLEO_2: [number, number, number] = [27, 40, 36]; // #1B2824 — cards sobre fundo escuro
+const AMBAR: [number, number, number] = [226, 159, 101]; // #E29F65 — assinatura e destaque
+const AMBAR_ESCURO: [number, number, number] = [199, 117, 35]; // #C77523 — destaque sobre fundo claro
+const PAPEL: [number, number, number] = [242, 238, 228]; // #F2EEE4 — texto sobre fundo escuro / trilhos
+const PAPEL_2: [number, number, number] = [251, 249, 243]; // #FBF9F3 — fundo claro
+const TINTA: [number, number, number] = [26, 36, 34]; // #1A2422 — texto sobre fundo claro
+const TINTA_SUAVE: [number, number, number] = [61, 71, 68]; // #3D4744 — texto secundário sobre fundo claro
+const MUTED_ON_DARK: [number, number, number] = [138, 157, 151]; // texto secundário sobre fundo escuro
+
+// === Carregamento e cache das fontes da marca (Instrument Serif · Manrope · IBM Plex Mono) ===
+interface FontFile {
+  url: string;
+  file: string;
+  family: string;
+  style: "normal" | "bold" | "italic";
+}
+
+const FONT_FILES: FontFile[] = [
+  { url: instrumentSerifRegularAsset.url, file: "InstrumentSerif-Regular.ttf", family: "InstrumentSerif", style: "normal" },
+  { url: instrumentSerifItalicAsset.url, file: "InstrumentSerif-Italic.ttf", family: "InstrumentSerif", style: "italic" },
+  { url: manropeRegularAsset.url, file: "Manrope-Regular.ttf", family: "Manrope", style: "normal" },
+  { url: manropeBoldAsset.url, file: "Manrope-Bold.ttf", family: "Manrope", style: "bold" },
+  { url: manropeExtraBoldAsset.url, file: "Manrope-ExtraBold.ttf", family: "ManropeExtraBold", style: "normal" },
+  { url: ibmPlexMonoSemiBoldAsset.url, file: "IBMPlexMono-SemiBold.ttf", family: "IBMPlexMono", style: "bold" },
+];
+
+let fontsRegisteredPromise: Promise<void> | null = null;
+
+async function ensureBrandFonts(pdf: jsPDF): Promise<void> {
+  if (!fontsRegisteredPromise) {
+    fontsRegisteredPromise = (async () => {
+      for (const f of FONT_FILES) {
+        const res = await fetch(f.url);
+        const blob = await res.blob();
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve((reader.result as string).split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        pdf.addFileToVFS(f.file, base64);
+        pdf.addFont(f.file, f.family, f.style);
+      }
+    })();
+  }
+  await fontsRegisteredPromise;
+}
 
 // Pré-carrega a assinatura como dataURL para uso síncrono no jsPDF
 let signatureDataUrl: string | null = null;
@@ -132,7 +188,7 @@ function pickAprendizado(rec: PdfRecommendation, finalidade: Finalidade): Aprend
   return Array.isArray(list) ? list : [];
 }
 
-export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommendation[]) {
+export async function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommendation[]) {
   if (lead.score_geral == null) throw new Error("Relatório indisponível: lead sem score.");
 
   const competencias = lead.competencias || {};
@@ -147,96 +203,120 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   });
 
   const pdf = new jsPDF("p", "mm", "a4");
+  await ensureBrandFonts(pdf);
+  const pageIsDark: boolean[] = [];
+
   const W = pdf.internal.pageSize.getWidth();
   const H = pdf.internal.pageSize.getHeight();
   const M = 15; // margem
   const CONTENT_W = W - M * 2;
 
+  const setFill = (c: [number, number, number]) => pdf.setFillColor(c[0], c[1], c[2]);
+  const setText = (c: [number, number, number]) => pdf.setTextColor(c[0], c[1], c[2]);
+  const kicker = (text: string, x: number, y: number, size = 9, color: [number, number, number] = AMBAR) => {
+    pdf.setFont("IBMPlexMono", "bold");
+    pdf.setFontSize(size);
+    setText(color);
+    pdf.text(text.toUpperCase(), x, y);
+  };
+  const title = (text: string, x: number, y: number, size = 28, color: [number, number, number] = PAPEL) => {
+    pdf.setFont("InstrumentSerif", "normal");
+    pdf.setFontSize(size);
+    setText(color);
+    pdf.text(text, x, y);
+  };
+
   // === CAPA ===
-  pdf.setFillColor(13, 13, 13);
+  setFill(PETROLEO);
   pdf.rect(0, 0, W, H, "F");
-  pdf.setFillColor(252, 211, 77);
-  pdf.rect(0, 0, W, 60, "F");
-  pdf.setTextColor(13, 13, 13);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(32);
-  pdf.text("TESTE DE", M, 28);
-  pdf.text("MATURIDADE EM IA", M, 44);
+  pageIsDark[1] = true;
 
-  pdf.setFontSize(11);
-  pdf.setTextColor(252, 211, 77);
-  pdf.text("RELATÓRIO PERSONALIZADO", M, 80);
+  kicker("Relatório personalizado", M, 22, 9, AMBAR);
 
-  pdf.setFontSize(28);
-  pdf.setTextColor(255, 255, 255);
-  pdf.text(lead.nome.toUpperCase(), M, 95);
+  title("Teste de", M, 42, 30, PAPEL);
+  title("Maturidade em IA", M, 58, 30, PAPEL);
 
-  pdf.setFontSize(11);
-  pdf.setTextColor(180, 180, 180);
+  pdf.setDrawColor(AMBAR[0], AMBAR[1], AMBAR[2]);
+  pdf.setLineWidth(0.8);
+  pdf.line(M, 66, M + 28, 66);
+
+  pdf.setFont("Manrope", "bold");
+  pdf.setFontSize(20);
+  setText(PAPEL);
+  pdf.text(lead.nome, M, 82);
+
+  pdf.setFont("Manrope", "normal");
+  pdf.setFontSize(10.5);
+  setText(MUTED_ON_DARK);
   pdf.text(
     `${new Date().toLocaleDateString("pt-BR")} · ${lead.finalidade === "PF" ? "Profissional (PF)" : "Liderança / Empresário (PJ)"}`,
     M,
-    105
+    90
   );
 
-  pdf.setFillColor(252, 211, 77);
-  pdf.rect(M, 125, CONTENT_W, 40, "F");
-  pdf.setTextColor(13, 13, 13);
-  pdf.setFontSize(10);
-  pdf.text("SEU NÍVEL DE MATURIDADE", M + 5, 137);
-  pdf.setFontSize(28);
-  pdf.text((lead.nivel_maturidade || "-").toUpperCase(), M + 5, 158);
+  // Card — nível de maturidade
+  setFill(PETROLEO_2);
+  pdf.roundedRect(M, 110, CONTENT_W, 42, 2, 2, "F");
+  kicker("Seu nível de maturidade", M + 6, 122, 8.5, AMBAR);
+  pdf.setFont("InstrumentSerif", "normal");
+  pdf.setFontSize(26);
+  setText(PAPEL);
+  pdf.text(lead.nivel_maturidade || "-", M + 6, 143);
 
-  pdf.setFillColor(234, 88, 12);
-  pdf.rect(M, 175, CONTENT_W, 40, "F");
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFontSize(10);
-  pdf.text("SCORE GERAL", M + 5, 187);
-  pdf.setFontSize(36);
-  pdf.text(`${lead.score_geral.toFixed(1)}`, M + 5, 210);
-  pdf.setFontSize(14);
-  pdf.text("/5.0", M + 40, 210);
+  // Card — score geral
+  setFill(PETROLEO_2);
+  pdf.roundedRect(M, 160, CONTENT_W, 46, 2, 2, "F");
+  kicker("Score geral", M + 6, 172, 8.5, AMBAR);
+  pdf.setFont("ManropeExtraBold", "normal");
+  pdf.setFontSize(34);
+  setText(AMBAR);
+  pdf.text(`${lead.score_geral.toFixed(1)}`, M + 6, 195);
+  pdf.setFont("Manrope", "normal");
+  pdf.setFontSize(13);
+  setText(MUTED_ON_DARK);
+  pdf.text("/5.0", M + 6 + pdf.getTextWidth(`${lead.score_geral.toFixed(1)} `) + 20, 195);
 
   // === PÁGINA 2 — SCORES + COMPETÊNCIAS ===
   pdf.addPage();
-  pdf.setFillColor(255, 255, 255);
+  setFill(PAPEL_2);
   pdf.rect(0, 0, W, H, "F");
+  pageIsDark[pdf.getNumberOfPages()] = false;
 
-  pdf.setTextColor(13, 13, 13);
-  pdf.setFontSize(20);
-  pdf.text("SCORES POR NÍVEL", M, 25);
+  title("Scores por nível", M, 25, 19, TINTA);
 
-  pdf.setFontSize(12);
   const niveis = [
     { l: "BÁSICO", v: lead.score_basico },
     { l: "INTERMEDIÁRIO", v: lead.score_intermediario },
     { l: "AVANÇADO", v: lead.score_avancado },
   ];
-  let y = 40;
+  let y = 38;
   niveis.forEach((n) => {
-    pdf.setFillColor(240, 240, 240);
+    setFill(PAPEL);
     pdf.rect(M, y, CONTENT_W, 14, "F");
-    pdf.setFillColor(252, 211, 77);
+    setFill(AMBAR);
     pdf.rect(M, y, (CONTENT_W * (n.v || 0)) / 5, 14, "F");
-    pdf.setTextColor(13, 13, 13);
-    pdf.setFontSize(11);
-    pdf.text(`${n.l}`, M + 5, y + 9);
-    pdf.text(`${(n.v || 0).toFixed(1)}/5.0`, W - M - 20, y + 9);
+    pdf.setFont("IBMPlexMono", "bold");
+    pdf.setFontSize(10);
+    setText(TINTA);
+    pdf.text(n.l, M + 5, y + 9);
+    pdf.setFont("Manrope", "bold");
+    pdf.text(`${(n.v || 0).toFixed(1)}/5.0`, W - M - 22, y + 9);
     y += 20;
   });
 
-  y += 10;
-  pdf.setFontSize(20);
-  pdf.text("COMPETÊNCIAS", M, y);
+  y += 8;
+  title("Competências", M, y, 19, TINTA);
   y += 12;
-  pdf.setFontSize(11);
   Object.entries(competencias).forEach(([k, v]) => {
-    pdf.setFillColor(240, 240, 240);
+    setFill(PAPEL);
     pdf.rect(M, y, CONTENT_W, 10, "F");
-    pdf.setFillColor(252, 211, 77);
+    setFill(AMBAR);
     pdf.rect(M, y, (CONTENT_W * v) / 5, 10, "F");
-    pdf.setTextColor(13, 13, 13);
+    pdf.setFont("Manrope", "normal");
+    pdf.setFontSize(10.5);
+    setText(TINTA);
     pdf.text(competenciaLabels[k] || k, M + 5, y + 7);
+    pdf.setFont("Manrope", "bold");
     pdf.text(`${v.toFixed(1)}`, W - M - 10, y + 7);
     y += 14;
   });
@@ -245,23 +325,24 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   const ensureSpace = (need: number) => {
     if (y > H - need - 12) {
       pdf.addPage();
+      setFill(PAPEL_2);
+      pdf.rect(0, 0, W, H, "F");
+      pageIsDark[pdf.getNumberOfPages()] = false;
       y = 25;
     }
   };
 
   if (planoAcao.length > 0) {
     pdf.addPage();
-    pdf.setFillColor(255, 255, 255);
+    setFill(PAPEL_2);
     pdf.rect(0, 0, W, H, "F");
+    pageIsDark[pdf.getNumberOfPages()] = false;
 
-    pdf.setTextColor(13, 13, 13);
-    pdf.setFontSize(20);
-    pdf.setFont("helvetica", "bold");
-    pdf.text("PLANO DE AÇÃO 30 / 60 / 90", M, 25);
+    title("Plano de ação 30 / 60 / 90", M, 25, 19, TINTA);
 
+    pdf.setFont("Manrope", "normal");
     pdf.setFontSize(10);
-    pdf.setFont("helvetica", "normal");
-    pdf.setTextColor(110, 110, 110);
+    setText(TINTA_SUAVE);
     const personaLine =
       lead.finalidade === "PJ"
         ? "Recomendações para liderança, gestores e empresários (PJ)"
@@ -276,26 +357,26 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
       ensureSpace(60);
 
       // Cabeçalho do bloco
-      pdf.setFillColor(13, 13, 13);
+      setFill(PETROLEO);
       pdf.rect(M, y, CONTENT_W, 9, "F");
-      pdf.setTextColor(252, 211, 77);
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(11);
+      pdf.setFont("IBMPlexMono", "bold");
+      pdf.setFontSize(10.5);
+      setText(AMBAR);
       const headerText = `${i + 1}. ${p.competencia.toUpperCase()} — ${p.rec.titulo}`;
       const headerLines = pdf.splitTextToSize(headerText, CONTENT_W - 6);
       pdf.text(headerLines[0], M + 3, y + 6);
       y += 13;
 
       // Score
-      pdf.setFont("helvetica", "normal");
-      pdf.setTextColor(120, 120, 120);
+      pdf.setFont("Manrope", "normal");
+      setText(TINTA_SUAVE);
       pdf.setFontSize(9);
       pdf.text(`Score atual: ${p.score.toFixed(1)}/5`, M, y);
       y += 6;
 
       // Descrição
       pdf.setFontSize(10);
-      pdf.setTextColor(60, 60, 60);
+      setText(TINTA);
       const desc = pdf.splitTextToSize(p.rec.descricao || "", CONTENT_W);
       pdf.text(desc, M, y);
       y += desc.length * 4.5 + 3;
@@ -303,24 +384,25 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
       // Por que importa
       if (p.rec.por_que_importa) {
         ensureSpace(20);
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(9);
-        pdf.setTextColor(234, 88, 12);
+        pdf.setFont("IBMPlexMono", "bold");
+        pdf.setFontSize(8.5);
+        setText(AMBAR_ESCURO);
         pdf.text("POR QUE IMPORTA", M, y);
         y += 5;
-        pdf.setFont("helvetica", "italic");
-        pdf.setFontSize(9);
-        pdf.setTextColor(60, 60, 60);
+        pdf.setFont("InstrumentSerif", "italic");
+        pdf.setFontSize(10.5);
+        setText(TINTA_SUAVE);
         const pqi = pdf.splitTextToSize(p.rec.por_que_importa, CONTENT_W);
         pdf.text(pqi, M, y);
-        y += pqi.length * 4.5 + 4;
+        y += pqi.length * 4.7 + 4;
       }
 
       // Etapas 30/60/90 — layout em linhas separadas com badge à esquerda
+      // Gradiente âmbar (imediato) → âmbar-escuro → petróleo (fundação de longo prazo)
       const steps = [
-        { l: "30 DIAS", t: acoes.d30, bg: [252, 211, 77], fg: [13, 13, 13] },
-        { l: "60 DIAS", t: acoes.d60, bg: [234, 88, 12], fg: [255, 255, 255] },
-        { l: "90 DIAS", t: acoes.d90, bg: [13, 13, 13], fg: [252, 211, 77] },
+        { l: "30 DIAS", t: acoes.d30, bg: AMBAR, fg: PETROLEO },
+        { l: "60 DIAS", t: acoes.d60, bg: AMBAR_ESCURO, fg: PAPEL_2 },
+        { l: "90 DIAS", t: acoes.d90, bg: PETROLEO, fg: AMBAR },
       ];
       const BADGE_W = 22;
       const TEXT_X = M + BADGE_W + 4;
@@ -328,25 +410,24 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
       steps.forEach((step) => {
         if (!step.t) return;
-        pdf.setFont("helvetica", "normal");
+        pdf.setFont("Manrope", "normal");
         pdf.setFontSize(9.5);
-        pdf.setTextColor(30, 30, 30);
         const lines = pdf.splitTextToSize(step.t, TEXT_W);
         const blockH = Math.max(10, lines.length * 4.5 + 3);
         ensureSpace(blockH + 2);
 
         // Badge
-        pdf.setFillColor(step.bg[0], step.bg[1], step.bg[2]);
+        setFill(step.bg);
         pdf.rect(M, y, BADGE_W, blockH, "F");
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(8);
-        pdf.setTextColor(step.fg[0], step.fg[1], step.fg[2]);
+        pdf.setFont("IBMPlexMono", "bold");
+        pdf.setFontSize(7.5);
+        setText(step.fg);
         pdf.text(step.l, M + BADGE_W / 2, y + blockH / 2 + 2, { align: "center" });
 
         // Texto
-        pdf.setFont("helvetica", "normal");
+        pdf.setFont("Manrope", "normal");
         pdf.setFontSize(9.5);
-        pdf.setTextColor(30, 30, 30);
+        setText(TINTA);
         pdf.text(lines, TEXT_X, y + 5);
 
         y += blockH + 3;
@@ -360,22 +441,22 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
         const caminhoH = Math.max(14, caminhoLines.length * 4.5 + 9);
         ensureSpace(caminhoH + 4);
 
-        // Fundo grafite
-        pdf.setFillColor(30, 30, 30);
+        // Fundo petróleo
+        setFill(PETROLEO);
         pdf.rect(M, y, CONTENT_W, caminhoH, "F");
-        // Faixa amarela à esquerda
-        pdf.setFillColor(252, 211, 77);
+        // Faixa âmbar à esquerda
+        setFill(AMBAR);
         pdf.rect(M, y, 2, caminhoH, "F");
 
-        pdf.setFont("helvetica", "bold");
+        pdf.setFont("IBMPlexMono", "bold");
         pdf.setFontSize(7.5);
-        pdf.setTextColor(252, 211, 77);
+        setText(AMBAR);
         pdf.text("COMO LEVAR ADIANTE", M + 6, y + 5.5);
 
-        pdf.setFont("helvetica", "italic");
-        pdf.setFontSize(9);
-        pdf.setTextColor(235, 235, 235);
-        pdf.text(caminhoLines, M + 6, y + 10);
+        pdf.setFont("InstrumentSerif", "italic");
+        pdf.setFontSize(11);
+        setText(PAPEL);
+        pdf.text(caminhoLines, M + 6, y + 11);
 
         y += caminhoH + 4;
       }
@@ -391,16 +472,14 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
   if (trilhas.length > 0) {
     pdf.addPage();
-    pdf.setFillColor(255, 255, 255);
+    setFill(PAPEL_2);
     pdf.rect(0, 0, W, H, "F");
-    pdf.setTextColor(13, 13, 13);
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(20);
-    pdf.text("TRILHA DE CONHECIMENTO", M, 25);
+    pageIsDark[pdf.getNumberOfPages()] = false;
+    title("Trilha de conhecimento", M, 25, 19, TINTA);
 
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont("Manrope", "normal");
     pdf.setFontSize(10);
-    pdf.setTextColor(110, 110, 110);
+    setText(TINTA_SUAVE);
     const trilhaSub =
       lead.finalidade === "PJ"
         ? "Curadoria para líderes, gestores e empresários — livros, cursos, frameworks e comunidades."
@@ -412,11 +491,11 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
     trilhas.forEach((t) => {
       ensureSpace(20);
-      pdf.setFillColor(252, 211, 77);
+      setFill(AMBAR);
       pdf.rect(M, y, CONTENT_W, 8, "F");
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(11);
-      pdf.setTextColor(13, 13, 13);
+      pdf.setFont("IBMPlexMono", "bold");
+      pdf.setFontSize(10);
+      setText(PETROLEO);
       pdf.text(t.comp.toUpperCase(), M + 3, y + 5.5);
       y += 12;
 
@@ -426,30 +505,30 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
         const fonte = it.fonte || "";
 
         // tipo badge
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(8);
+        pdf.setFont("IBMPlexMono", "bold");
+        pdf.setFontSize(7.5);
         const tipoW = pdf.getTextWidth(tipo) + 6;
         const tipoTextLines = pdf.splitTextToSize(`${titulo}${fonte ? " — " + fonte : ""}`, CONTENT_W - tipoW - 6);
         const blockH = Math.max(8, tipoTextLines.length * 4.3 + 2);
         ensureSpace(blockH + 5);
 
-        pdf.setFillColor(13, 13, 13);
+        setFill(PETROLEO);
         pdf.rect(M, y, tipoW, 6, "F");
-        pdf.setTextColor(252, 211, 77);
+        setText(AMBAR);
         pdf.text(tipo, M + 3, y + 4.2);
 
         // Texto
-        pdf.setFont("helvetica", "normal");
+        pdf.setFont("Manrope", "normal");
         pdf.setFontSize(9.5);
-        pdf.setTextColor(30, 30, 30);
+        setText(TINTA);
         pdf.text(tipoTextLines, M + tipoW + 3, y + 4.2);
 
         y += blockH + 3;
 
         if (it.link) {
-          pdf.setFont("helvetica", "normal");
+          pdf.setFont("Manrope", "normal");
           pdf.setFontSize(8);
-          pdf.setTextColor(80, 110, 180);
+          setText(AMBAR_ESCURO);
           const linkLines = pdf.splitTextToSize(it.link, CONTENT_W - 6);
           pdf.textWithLink(linkLines[0], M + tipoW + 3, y, { url: it.link });
           y += 5;
@@ -461,25 +540,25 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
 
   // === PÁGINA FINAL — CTA SPEAKER / CONSULTOR ===
   pdf.addPage();
-  pdf.setFillColor(13, 13, 13);
+  setFill(PETROLEO);
   pdf.rect(0, 0, W, H, "F");
+  pageIsDark[pdf.getNumberOfPages()] = true;
 
-  // Faixa amarela superior
-  pdf.setFillColor(252, 211, 77);
+  // Faixa âmbar superior
+  setFill(AMBAR);
   pdf.rect(0, 0, W, 55, "F");
-  pdf.setTextColor(13, 13, 13);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(11);
-  pdf.text("PRÓXIMO PASSO", M, 22);
+  kicker("Próximo passo", M, 22, 9.5, PETROLEO);
+  pdf.setFont("InstrumentSerif", "normal");
   pdf.setFontSize(26);
-  pdf.text("LEVE ESSA CONVERSA", M, 36);
-  pdf.text("PARA DENTRO DA SUA EMPRESA", M, 48);
+  setText(PETROLEO);
+  pdf.text("Leve essa conversa", M, 38);
+  pdf.text("para dentro da sua empresa", M, 50);
 
   // Pitch
   let cy = 72;
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont("Manrope", "bold");
   pdf.setFontSize(13);
+  setText(PAPEL);
   const pitchTitle =
     lead.finalidade === "PJ"
       ? "Sua liderança e seus times precisam falar a mesma língua de IA."
@@ -488,9 +567,9 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   pdf.text(pitchTitleLines, M, cy);
   cy += pitchTitleLines.length * 6 + 6;
 
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont("Manrope", "normal");
   pdf.setFontSize(10.5);
-  pdf.setTextColor(220, 220, 220);
+  setText(MUTED_ON_DARK);
   const pitch = [
     "Sou Jefferson Lobo — estrategista de IA, palestrante e consultor para empresas que querem sair do improviso e construir uma operação madura, ética e produtiva com Inteligência Artificial.",
     "",
@@ -524,9 +603,9 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
       console.warn("Falha ao inserir assinatura no PDF:", e);
     }
     cy += sigH + 1;
-    pdf.setFont("helvetica", "normal");
+    pdf.setFont("Manrope", "normal");
     pdf.setFontSize(9);
-    pdf.setTextColor(180, 180, 180);
+    setText(MUTED_ON_DARK);
     pdf.text("Jefferson Lobo · Estrategista de IA", M, cy);
     cy += 6;
   }
@@ -534,51 +613,49 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   // Caixa de contato
   cy += 6;
   const boxH = 66;
-  pdf.setFillColor(252, 211, 77);
-  pdf.rect(M, cy, CONTENT_W, boxH, "F");
-  pdf.setTextColor(13, 13, 13);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(11);
-  pdf.text("FALE COMIGO", M + 5, cy + 10);
+  setFill(AMBAR);
+  pdf.roundedRect(M, cy, CONTENT_W, boxH, 2, 2, "F");
+  kicker("Fale comigo", M + 5, cy + 10, 8.5, PETROLEO);
 
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont("Manrope", "bold");
   pdf.setFontSize(14);
-  pdf.text("JEFFERSON LOBO", M + 5, cy + 20);
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(10);
+  setText(PETROLEO);
+  pdf.text("JEFFERSON LOBO", M + 5, cy + 21);
+  pdf.setFont("Manrope", "normal");
+  pdf.setFontSize(9.5);
   pdf.text("Estrategista de IA · Palestrante · Consultor", M + 5, cy + 27);
 
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont("Manrope", "bold");
   pdf.setFontSize(10);
   let ly = cy + 38;
   pdf.text("Site:", M + 5, ly);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont("Manrope", "normal");
   pdf.textWithLink("jeffersonlobo.tech", M + 22, ly, { url: "https://jeffersonlobo.tech" });
 
   ly += 6;
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont("Manrope", "bold");
   pdf.text("E-mail:", M + 5, ly);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont("Manrope", "normal");
   pdf.textWithLink("lobo@aivozes.com.br", M + 22, ly, { url: "mailto:lobo@aivozes.com.br" });
 
   ly += 6;
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont("Manrope", "bold");
   pdf.text("WhatsApp:", M + 5, ly);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont("Manrope", "normal");
   pdf.textWithLink("(45) 99986-4213", M + 30, ly, { url: "https://wa.me/5545999864213" });
 
   ly += 6;
-  pdf.setFont("helvetica", "bold");
+  pdf.setFont("Manrope", "bold");
   pdf.text("LinkedIn:", M + 5, ly);
-  pdf.setFont("helvetica", "normal");
+  pdf.setFont("Manrope", "normal");
   pdf.textWithLink("linkedin.com/in/jeffersonlobo", M + 27, ly, { url: "https://www.linkedin.com/in/jeffersonlobo" });
 
-  // Selo laranja
-  pdf.setFillColor(234, 88, 12);
+  // Selo petróleo
+  setFill(PETROLEO_2);
   pdf.rect(M, cy + boxH + 6, CONTENT_W, 18, "F");
-  pdf.setTextColor(255, 255, 255);
-  pdf.setFont("helvetica", "bold");
-  pdf.setFontSize(11);
+  pdf.setFont("IBMPlexMono", "bold");
+  pdf.setFontSize(10);
+  setText(AMBAR);
   pdf.text(
     "INDIQUE PARA SUA EMPRESA · AGENDE UMA CONVERSA SEM COMPROMISSO",
     W / 2,
@@ -591,8 +668,9 @@ export function generateTesteIAPdf(lead: PdfLead, recommendations: PdfRecommenda
   const pages = pdf.internal.pages.length - 1;
   for (let i = 1; i <= pages; i++) {
     pdf.setPage(i);
-    pdf.setFontSize(8);
-    pdf.setTextColor(140, 140, 140);
+    pdf.setFont("IBMPlexMono", "bold");
+    pdf.setFontSize(7.5);
+    setText(pageIsDark[i] ? MUTED_ON_DARK : TINTA_SUAVE);
     pdf.text("Jefferson Lobo · Estrategista de IA · jeffersonlobo.tech", W / 2, H - 8, { align: "center" });
   }
 
