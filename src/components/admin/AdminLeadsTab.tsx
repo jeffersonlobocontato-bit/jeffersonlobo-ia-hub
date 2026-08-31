@@ -76,7 +76,7 @@ export function AdminLeadsTab() {
         .eq("ativo", true)
         .order("ordem");
       if (error) throw error;
-      generateTesteIAPdf(lead as any, (recs || []) as any);
+      await generateTesteIAPdf(lead as any, (recs || []) as any);
       toast.success("Relatório baixado!");
     } catch (e) {
       console.error(e);
