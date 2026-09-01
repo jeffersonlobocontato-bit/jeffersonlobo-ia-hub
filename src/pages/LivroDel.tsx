@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { SEO } from '@/components/SEO';
+import { SEO, SITE_URL } from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
+import { Copy, Check } from 'lucide-react';
 import jeffersonPortrait from '@/assets/jefferson-portrait.png';
 import capaAsset from '@/assets/livro-del-capa-flutuante.png.asset.json';
 
@@ -85,9 +86,23 @@ const FAQS = [
   },
 ];
 
+const SHARE_URL = `${SITE_URL}/livro-del.html`;
+
 const LivroDel = () => {
   const { trackCTA } = useTrackCTA();
   const [openFaq, setOpenFaq] = useState<string | undefined>();
+  const [copied, setCopied] = useState(false);
+
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(SHARE_URL);
+      setCopied(true);
+      trackCTA('livro_del_copy_link', 'livro_del_hero');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
     <div className="dark min-h-screen flex flex-col bg-background text-foreground">
@@ -95,6 +110,7 @@ const LivroDel = () => {
         title="O código invisível dos superagentes de IA — Jefferson Lobo | Método DEL"
         description="Transforme IA genérica em agentes personalizados com DNA linguístico fiel à sua marca. O Método DEL, em livro — e-book ou impresso."
         path="/livro-del"
+        ogImage={`${SITE_URL}/og/livro-del.jpg`}
       />
       <Header />
 
@@ -150,6 +166,28 @@ const LivroDel = () => {
                   onClick={() => trackCTA('livro_del_hero_impresso', 'livro_del_hero')}
                 >
                   <a href={IMPRESSO_URL}>Quero o livro impresso</a>
+                </Button>
+              </div>
+
+              <div className="flex justify-center">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={copyShareLink}
+                  className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2 text-primary" />
+                      Link copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copiar link de compartilhamento
+                    </>
+                  )}
                 </Button>
               </div>
 
