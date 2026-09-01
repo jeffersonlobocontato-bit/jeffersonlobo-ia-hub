@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
-import { SEO } from '@/components/SEO';
+import { SEO, SITE_URL } from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
+import { Copy, Check } from 'lucide-react';
 import jeffersonPortrait from '@/assets/jefferson-portrait.png';
 import capaAsset from '@/assets/livro-del-capa-flutuante.png.asset.json';
 
