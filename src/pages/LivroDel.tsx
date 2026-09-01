@@ -86,9 +86,23 @@ const FAQS = [
   },
 ];
 
+const SHARE_URL = `${SITE_URL}/livro-del.html`;
+
 const LivroDel = () => {
   const { trackCTA } = useTrackCTA();
   const [openFaq, setOpenFaq] = useState<string | undefined>();
+  const [copied, setCopied] = useState(false);
+
+  const copyShareLink = async () => {
+    try {
+      await navigator.clipboard.writeText(SHARE_URL);
+      setCopied(true);
+      trackCTA('livro_del_copy_link', 'livro_del_hero');
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
     <div className="dark min-h-screen flex flex-col bg-background text-foreground">
@@ -96,6 +110,7 @@ const LivroDel = () => {
         title="O código invisível dos superagentes de IA — Jefferson Lobo | Método DEL"
         description="Transforme IA genérica em agentes personalizados com DNA linguístico fiel à sua marca. O Método DEL, em livro — e-book ou impresso."
         path="/livro-del"
+        ogImage={`${SITE_URL}/og/livro-del.jpg`}
       />
       <Header />
 
