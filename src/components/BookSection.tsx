@@ -1,7 +1,6 @@
-import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { ShoppingCart, Star, BookOpen, FileText } from 'lucide-react';
+import { ShoppingCart, Star, BookOpen } from 'lucide-react';
 import bookCoverAsset from '@/assets/book-cover.jpg.asset.json';
 import { useBookContent } from '@/hooks/useBookContent';
 import { useBookFeatures, useBookReviews } from '@/hooks/useBookFeatures';
