@@ -58,7 +58,7 @@ const Header = () => {
 
           {/* Desktop Navigation — ordem alinhada com a ordem real das seções na página */}
           <nav className="hidden md:flex items-center gap-6 lg:gap-8">
-            {['home', 'palestras', 'sobre', 'produtos', 'contato', 'livro'].map((item) => (
+            {['home', 'palestras', 'sobre', 'produtos', 'contato'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
@@ -68,6 +68,13 @@ const Header = () => {
                 {item}
               </button>
             ))}
+            <Link
+              to="/livro-del"
+              className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Livro
+            </Link>
             <Link
               to="/teste-ia"
               className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
@@ -126,7 +133,7 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div className="md:hidden py-6 space-y-4 animate-fade-in bg-background border-t border-primary/20">
-            {['home', 'palestras', 'sobre', 'produtos', 'contato', 'livro'].map((item) => (
+            {['home', 'palestras', 'sobre', 'produtos', 'contato'].map((item) => (
               <button
                 key={item}
                 onClick={() => scrollToSection(item)}
@@ -136,6 +143,14 @@ const Header = () => {
                 {item}
               </button>
             ))}
+            <Link
+              to="/livro-del"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block w-full text-left py-3 text-sm font-medium uppercase tracking-wider text-foreground hover:text-primary transition-colors"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Livro
+            </Link>
             <Link
               to="/teste-ia"
               onClick={() => setIsMobileMenuOpen(false)}
