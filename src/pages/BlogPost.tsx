@@ -269,6 +269,17 @@ const BlogPost = () => {
             >
               <Link2 className="h-4 w-4" />
             </button>
+            {typeof navigator !== 'undefined' && 'share' in navigator && (
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.share?.({ title: post.title, text: post.excerpt || '', url: shareUrl }).catch(() => {});
+                }}
+                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-border bg-background px-3 text-[10px] font-semibold uppercase tracking-[0.15em] hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+              >
+                Compartilhar
+              </button>
+            )}
           </div>
 
 
