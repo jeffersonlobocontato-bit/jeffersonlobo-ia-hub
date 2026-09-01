@@ -16,12 +16,8 @@ import { calcReadingMinutes, isInternalPost } from '@/lib/blog-utils';
 import { Card } from '@/components/ui/card';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
-const SOCIAL_PREVIEW_VERSION = 'img5';
 
-const shareVersionFromDate = (value?: string | null) => {
-  const digits = (value || new Date().toISOString()).replace(/\D/g, '').slice(0, 12);
-  return `${digits || new Date().toISOString().replace(/\D/g, '').slice(0, 8)}-${SOCIAL_PREVIEW_VERSION}`;
-};
+
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
@@ -124,12 +120,13 @@ const BlogPost = () => {
       }
     : null;
 
-  // URL de compartilhamento: arquivo .html plano e versionado no caminho.
-  // Não usamos ?v=2 porque alguns scrapers/caches tratam query string como
-  // fallback genérico da SPA e acabam puxando a imagem institucional do site.
-  const shareVersion = shareVersionFromDate(post.updated_at || post.published_at || post.date);
-  const shareUrl = `${SITE_URL}/noticia/${post.slug}-${shareVersion}.html`;
-  const sharePayload = encodeURIComponent(shareUrl);
+  // URL de compartilhamento: arquivo .html plano gerado no build (public/noticia/{slug}.html),
+  // que já traz title/og:image/og:description da matéria para os crawlers de WhatsApp e LinkedIn.
+  // Usamos o caminho ESTÁVEL (sem versão) para nunca cair em 404 quando o post é editado
+  // depois do último build — nesse caso o crawler cairia no index.html genérico da SPA.
+  const shareUrl = `${SITE_URL}/noticia/${post.slug}.html`;
+  const sharePayload = encodeURIComponent(`${post.title}\n\n${shareUrl}`);
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -272,6 +269,17 @@ const BlogPost = () => {
             >
               <Link2 className="h-4 w-4" />
             </button>
+            {typeof navigator !== 'undefined' && 'share' in navigator && (
+              <button
+                type="button"
+                onClick={() => {
+                  navigator.share?.({ title: post.title, text: post.excerpt || '', url: shareUrl }).catch(() => {});
+                }}
+                className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-border bg-background px-3 text-[10px] font-semibold uppercase tracking-[0.15em] hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+              >
+                Compartilhar
+              </button>
+            )}
           </div>
 
 
