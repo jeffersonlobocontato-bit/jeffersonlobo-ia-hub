@@ -6,7 +6,7 @@ import { useHeroContent } from '@/hooks/useHeroContent';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 const HeroSection = () => {
-  const { data: heroData } = useHeroContent();
+  const { data: heroData, isLoading } = useHeroContent();
   const { trackCTA } = useTrackCTA();
 
   const scrollToSection = (id: string) => {
@@ -14,11 +14,11 @@ const HeroSection = () => {
   };
 
   const defaultData = {
-    headline: "O marketing entrou na era da orquestração de fluxos com IA. Eu ensino lideranças a liderar essa virada.",
-    subtitle: "Palestras, imersões e consultoria para empresas que querem sair do prompt avulso e construir agentes de IA com identidade própria — DNA autoral, não commodity.",
-    cta_primary: "Fazer Diagnóstico Grátis",
-    cta_secondary: "Contratar palestra",
-    cta_tertiary: "Leia meu livro",
+    headline: "IA está redesenhando empresas, carreiras e profissões. Lidere essa transformação.",
+    subtitle: "Diagnóstico, estratégia e implementação de Inteligência Artificial para empresas que querem resultado real — e profissionais que não aceitam ficar para trás.",
+    cta_primary: "AVALIE GRÁTIS SEU DOMÍNIO EM IA",
+    cta_secondary: "Veja o Blog",
+    cta_tertiary: "LEIA MEU LIVRO",
     cta_tertiary_target: "#livro",
     stat1_number: "127",
     stat1_label: "Palestras realizadas",
@@ -29,6 +29,7 @@ const HeroSection = () => {
   };
 
   const displayData = heroData || defaultData;
+
 
   // Quebra a headline e aplica destaque amarelo "highlighter" na palavra-chave
   // Estratégia: pega as 2 últimas palavras antes de "sem perder dinheiro" ou destaca "IA"
@@ -85,15 +86,27 @@ const HeroSection = () => {
             <span className="role">Palestrante</span>
           </div>
 
-          {/* Headline massivo com palavra em highlighter amarelo */}
-          <h1 className="display-title text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem] tracking-tight break-words hyphens-none">
-            {renderHeadline(displayData.headline)}
-          </h1>
+          {isLoading ? (
+            <div className="space-y-6" aria-hidden="true">
+              <div className="mx-auto h-[2.5rem] sm:h-12 md:h-14 lg:h-16 xl:h-24 w-11/12 rounded bg-foreground/10 animate-pulse" />
+              <div className="mx-auto h-[2.5rem] sm:h-12 md:h-14 lg:h-16 xl:h-24 w-3/4 rounded bg-foreground/10 animate-pulse" />
+              <div className="mx-auto max-w-2xl h-6 md:h-8 w-full rounded bg-foreground/10 animate-pulse" />
+              <div className="mx-auto max-w-xl h-6 md:h-8 w-4/5 rounded bg-foreground/10 animate-pulse" />
+            </div>
+          ) : (
+            <>
+              {/* Headline massivo com palavra em highlighter amarelo */}
+              <h1 className="display-title text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem] tracking-tight break-words hyphens-none">
+                {renderHeadline(displayData.headline)}
+              </h1>
 
-          {/* Subtitle */}
-          <p className="mx-auto max-w-2xl text-lg sm:text-xl md:text-2xl text-foreground/90 font-medium">
-            {displayData.subtitle}
-          </p>
+              {/* Subtitle */}
+              <p className="mx-auto max-w-2xl text-lg sm:text-xl md:text-2xl text-foreground/90 font-medium">
+                {displayData.subtitle}
+              </p>
+            </>
+          )}
+
 
           {/* CTAs — palestra é a prioridade de negócio, por isso vem primeiro e com estilo sólido */}
           <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center items-center pt-2">
