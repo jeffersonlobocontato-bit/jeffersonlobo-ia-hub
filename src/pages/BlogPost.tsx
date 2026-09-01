@@ -16,12 +16,8 @@ import { calcReadingMinutes, isInternalPost } from '@/lib/blog-utils';
 import { Card } from '@/components/ui/card';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
-const SOCIAL_PREVIEW_VERSION = 'img5';
 
-const shareVersionFromDate = (value?: string | null) => {
-  const digits = (value || new Date().toISOString()).replace(/\D/g, '').slice(0, 12);
-  return `${digits || new Date().toISOString().replace(/\D/g, '').slice(0, 8)}-${SOCIAL_PREVIEW_VERSION}`;
-};
+
 
 const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
