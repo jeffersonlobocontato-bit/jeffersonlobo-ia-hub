@@ -185,6 +185,69 @@ async function writeSharePages(posts: BlogPostRow[]) {
   }
 }
 
+async function cacheBookSocialImage(): Promise<string> {
+  const sourceUrl = `${BASE_URL}${LIVRO_DEL_COVER_ASSET}`;
+  const response = await fetch(sourceUrl, {
+    headers: {
+      "user-agent": "facebookexternalhit/1.1 (+https://www.facebook.com/externalhit_uatext.php)",
+    },
+  });
+  if (!response.ok) {
+    console.warn(`share image: failed for livro-del (${response.status})`);
+    return FALLBACK_IMAGE;
+  }
+  const contentType = response.headers.get("content-type") || "";
+  if (!contentType.startsWith("image/")) {
+    console.warn(`share image: invalid content type for livro-del: ${contentType}`);
+    return FALLBACK_IMAGE;
+  }
+  const filename = "livro-del.jpg";
+  const bytes = await sharp(Buffer.from(await response.arrayBuffer()))
+    .resize(1200, 630, { fit: "contain", background: { r: 0, g: 0, b: 0 } })
+    .jpeg({ quality: 82, progressive: false, mozjpeg: true })
+    .toBuffer();
+  writeFileSync(resolve("public/og", filename), bytes);
+  return `${BASE_URL}/og/${filename}`;
+}
+
+async function writeBookSharePage() {
+  const image = escapeHtml(await cacheBookSocialImage());
+  const title = escapeHtml(LIVRO_DEL_TITLE);
+  const description = escapeHtml(truncateText(LIVRO_DEL_SUBTITLE));
+  const pageUrl = `${BASE_URL}/livro-del`;
+  const shareUrl = `${BASE_URL}/livro-del.html`;
+  const html = `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${title}</title>
+<meta name="description" content="${description}" />
+<link rel="canonical" href="${pageUrl}" />
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Jefferson Lobo" />
+<meta property="og:url" content="${shareUrl}" />
+<meta property="og:title" content="${title}" />
+<meta property="og:description" content="${description}" />
+<meta property="og:image" content="${image}" />
+<meta property="og:image:url" content="${image}" />
+<meta property="og:image:secure_url" content="${image}" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:alt" content="${title}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${title}" />
+<meta name="twitter:description" content="${description}" />
+<meta name="twitter:image" content="${image}" />
+<script>window.location.replace(${JSON.stringify(pageUrl)});</script>
+</head>
+<body><a href="${pageUrl}">${title}</a></body>
+</html>`;
+  writeFileSync(resolve("public/livro-del.html"), html);
+  console.log("share page: public/livro-del.html written");
+}
+
 async function fetchBlogPosts(): Promise<BlogPostRow[]> {
   try {
     const res = await fetch(
