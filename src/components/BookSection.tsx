@@ -121,28 +121,6 @@ const BookSection = () => {
                   Comprar agora
                 </Button>
               )}
-              {displayData.sample_link && displayData.sample_link !== '#' && (
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-primary/30 hover:bg-primary/10"
-                  onClick={() => window.open(displayData.sample_link, '_blank')}
-                >
-                  Ler amostra grátis
-                </Button>
-              )}
-              <Button
-                asChild
-                size="lg"
-                variant="outline"
-                className="border-primary/30 hover:bg-primary/10"
-                onClick={() => trackCTA('book_materials', 'book_section')}
-              >
-                <Link to="/materiais">
-                  <FileText className="mr-2 w-5 h-5" />
-                  Materiais complementares
-                </Link>
-              </Button>
             </div>
 
           </div>
