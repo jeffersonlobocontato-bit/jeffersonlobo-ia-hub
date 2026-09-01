@@ -260,15 +260,16 @@ const BlogPost = () => {
             </a>
             <button
               type="button"
-              aria-label="Copiar link"
+              aria-label="Copiar link para redes sociais"
               onClick={() => {
                 navigator.clipboard.writeText(shareUrl);
-                toast.success('Link copiado');
+                toast.success('Link copiado — este link puxa título e foto da matéria');
               }}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
+              className="inline-flex h-9 items-center justify-center gap-1.5 rounded-full border border-border bg-background px-3 text-[10px] font-semibold uppercase tracking-[0.15em] hover:bg-primary hover:text-primary-foreground hover:border-primary transition-colors"
             >
-              <Link2 className="h-4 w-4" />
+              <Link2 className="h-4 w-4" /> Copiar link
             </button>
+
             {typeof navigator !== 'undefined' && 'share' in navigator && (
               <button
                 type="button"
