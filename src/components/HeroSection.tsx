@@ -19,7 +19,7 @@ const HeroSection = () => {
     cta_primary: "AVALIE GRÁTIS SEU DOMÍNIO EM IA",
     cta_secondary: "Veja o Blog",
     cta_tertiary: "LEIA MEU LIVRO",
-    cta_tertiary_target: "#livro",
+    cta_tertiary_target: "/livro-del",
     stat1_number: "127",
     stat1_label: "Palestras realizadas",
     stat2_number: "45+",

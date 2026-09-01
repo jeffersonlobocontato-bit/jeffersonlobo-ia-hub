@@ -6,7 +6,9 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 import jeffersonPortrait from '@/assets/jefferson-portrait.png';
-import capaFlutuante from '@/assets/livro-del-capa-flutuante.png';
+import capaAsset from '@/assets/livro-del-capa-flutuante.png.asset.json';
+
+const capaFlutuante = capaAsset.url;
 
 const EBOOK_URL = 'https://pay.hotmart.com/O101044688E?hotfeature=51';
 const IMPRESSO_URL = 'https://pay.hotmart.com/U101121849J?bid=1788185288843&hotfeature=51';
