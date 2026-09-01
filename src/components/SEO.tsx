@@ -1,6 +1,6 @@
 import { Helmet } from "react-helmet-async";
 
-const SITE_URL = "https://jeffersonlobo.tech";
+export const SITE_URL = "https://jeffersonlobo.tech";
 const SITE_NAME = "Jefferson Lobo";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/og-default.png`;
 
