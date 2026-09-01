@@ -86,15 +86,27 @@ const HeroSection = () => {
             <span className="role">Palestrante</span>
           </div>
 
-          {/* Headline massivo com palavra em highlighter amarelo */}
-          <h1 className="display-title text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem] tracking-tight break-words hyphens-none">
-            {renderHeadline(displayData.headline)}
-          </h1>
+          {isLoading ? (
+            <div className="space-y-6" aria-hidden="true">
+              <div className="mx-auto h-[2.5rem] sm:h-12 md:h-14 lg:h-16 xl:h-24 w-11/12 rounded bg-foreground/10 animate-pulse" />
+              <div className="mx-auto h-[2.5rem] sm:h-12 md:h-14 lg:h-16 xl:h-24 w-3/4 rounded bg-foreground/10 animate-pulse" />
+              <div className="mx-auto max-w-2xl h-6 md:h-8 w-full rounded bg-foreground/10 animate-pulse" />
+              <div className="mx-auto max-w-xl h-6 md:h-8 w-4/5 rounded bg-foreground/10 animate-pulse" />
+            </div>
+          ) : (
+            <>
+              {/* Headline massivo com palavra em highlighter amarelo */}
+              <h1 className="display-title text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem] tracking-tight break-words hyphens-none">
+                {renderHeadline(displayData.headline)}
+              </h1>
 
-          {/* Subtitle */}
-          <p className="mx-auto max-w-2xl text-lg sm:text-xl md:text-2xl text-foreground/90 font-medium">
-            {displayData.subtitle}
-          </p>
+              {/* Subtitle */}
+              <p className="mx-auto max-w-2xl text-lg sm:text-xl md:text-2xl text-foreground/90 font-medium">
+                {displayData.subtitle}
+              </p>
+            </>
+          )}
+
 
           {/* CTAs — palestra é a prioridade de negócio, por isso vem primeiro e com estilo sólido */}
           <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center items-center pt-2">
