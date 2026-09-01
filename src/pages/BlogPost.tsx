@@ -124,12 +124,13 @@ const BlogPost = () => {
       }
     : null;
 
-  // URL de compartilhamento: arquivo .html plano e versionado no caminho.
-  // Não usamos ?v=2 porque alguns scrapers/caches tratam query string como
-  // fallback genérico da SPA e acabam puxando a imagem institucional do site.
-  const shareVersion = shareVersionFromDate(post.updated_at || post.published_at || post.date);
-  const shareUrl = `${SITE_URL}/noticia/${post.slug}-${shareVersion}.html`;
-  const sharePayload = encodeURIComponent(shareUrl);
+  // URL de compartilhamento: arquivo .html plano gerado no build (public/noticia/{slug}.html),
+  // que já traz title/og:image/og:description da matéria para os crawlers de WhatsApp e LinkedIn.
+  // Usamos o caminho ESTÁVEL (sem versão) para nunca cair em 404 quando o post é editado
+  // depois do último build — nesse caso o crawler cairia no index.html genérico da SPA.
+  const shareUrl = `${SITE_URL}/noticia/${post.slug}.html`;
+  const sharePayload = encodeURIComponent(`${post.title}\n\n${shareUrl}`);
+
 
   return (
     <div className="min-h-screen bg-background">
