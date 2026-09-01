@@ -14,6 +14,10 @@ const SUPABASE_KEY =
   process.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNneWRlbGR6aG5meWV4cGhhaGVxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjIzMzk1MzAsImV4cCI6MjA3NzkxNTUzMH0.l7Y3qaKUtqbrGVsUkvuQZnKzlKNjPWEiHFcJmt7CxNA";
 
+const LIVRO_DEL_COVER_ASSET = "/__l5e/assets-v1/279607f8-5a54-45a9-a085-9af093368ee9/livro-del-capa-flutuante.png";
+const LIVRO_DEL_TITLE = "O código invisível dos superagentes de inteligência artificial";
+const LIVRO_DEL_SUBTITLE = "Transforme IA genérica em agentes personalizados com DNA linguístico fiel à sua marca, sua voz e seu propósito.";
+
 interface SitemapEntry {
   path: string;
   lastmod?: string;
