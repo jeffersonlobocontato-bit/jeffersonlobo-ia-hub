@@ -169,6 +169,28 @@ const LivroDel = () => {
                 </Button>
               </div>
 
+              <div className="flex justify-center">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={copyShareLink}
+                  className="text-xs uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                  style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2 text-primary" />
+                      Link copiado!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-2" />
+                      Copiar link de compartilhamento
+                    </>
+                  )}
+                </Button>
+              </div>
+
               <p
                 className="text-xs text-muted-foreground uppercase tracking-widest"
                 style={{ fontFamily: "'IBM Plex Mono', monospace" }}
