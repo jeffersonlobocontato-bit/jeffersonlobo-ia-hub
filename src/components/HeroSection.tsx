@@ -6,7 +6,7 @@ import { useHeroContent } from '@/hooks/useHeroContent';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 const HeroSection = () => {
-  const { data: heroData } = useHeroContent();
+  const { data: heroData, isLoading } = useHeroContent();
   const { trackCTA } = useTrackCTA();
 
   const scrollToSection = (id: string) => {
@@ -14,11 +14,11 @@ const HeroSection = () => {
   };
 
   const defaultData = {
-    headline: "O marketing entrou na era da orquestração de fluxos com IA. Eu ensino lideranças a liderar essa virada.",
-    subtitle: "Palestras, imersões e consultoria para empresas que querem sair do prompt avulso e construir agentes de IA com identidade própria — DNA autoral, não commodity.",
-    cta_primary: "Fazer Diagnóstico Grátis",
-    cta_secondary: "Contratar palestra",
-    cta_tertiary: "Leia meu livro",
+    headline: "IA está redesenhando empresas, carreiras e profissões. Lidere essa transformação.",
+    subtitle: "Diagnóstico, estratégia e implementação de Inteligência Artificial para empresas que querem resultado real — e profissionais que não aceitam ficar para trás.",
+    cta_primary: "AVALIE GRÁTIS SEU DOMÍNIO EM IA",
+    cta_secondary: "Veja o Blog",
+    cta_tertiary: "LEIA MEU LIVRO",
     cta_tertiary_target: "#livro",
     stat1_number: "127",
     stat1_label: "Palestras realizadas",
@@ -29,6 +29,7 @@ const HeroSection = () => {
   };
 
   const displayData = heroData || defaultData;
+
 
   // Quebra a headline e aplica destaque amarelo "highlighter" na palavra-chave
   // Estratégia: pega as 2 últimas palavras antes de "sem perder dinheiro" ou destaca "IA"
