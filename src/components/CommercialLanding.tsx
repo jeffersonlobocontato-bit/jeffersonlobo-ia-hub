@@ -31,6 +31,8 @@ export interface CommercialLandingProps {
   formats: { name: string; duration: string; description: string }[];
   faq: { q: string; a: string }[];
   ctaLabel?: string;
+  /** URL do CTA principal. Padrão: formulário de briefing. */
+  ctaHref?: string;
   /** Registro mais sóbrio para páginas voltadas a diretoria/C-level (ex.: Consultoria) —
    * mesma estrutura, sem bloco preto/CTA cheio de cor, sombras discretas. */
   sober?: boolean;
