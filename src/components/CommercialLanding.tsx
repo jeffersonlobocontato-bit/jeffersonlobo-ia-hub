@@ -170,7 +170,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button asChild size="lg">
-                <a href="/#briefing">
+                <a href={props.ctaHref || "/#briefing"}>
                   {props.ctaLabel || "Solicitar proposta"}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
