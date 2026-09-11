@@ -13,7 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import { ArrowRight, Check, Sparkles } from "lucide-react";
+import { ArrowRight, Check, Sparkles, MapPin, ExternalLink } from "lucide-react";
 
 const SITE_URL = "https://jeffersonlobo.tech";
 
@@ -34,6 +34,21 @@ export interface CommercialLandingProps {
   /** Registro mais sóbrio para páginas voltadas a diretoria/C-level (ex.: Consultoria) —
    * mesma estrutura, sem bloco preto/CTA cheio de cor, sombras discretas. */
   sober?: boolean;
+  /** Bloco "resposta direta" para GEO/AEO — pergunta objetiva + resposta factual
+   * de ~100 palavras logo após o hero, antes de qualquer outra seção. */
+  entityDefinition?: { question: string; answer: string };
+  /** Área de atuação declarada no Schema.org Service — default Brasil (não muda
+   * o comportamento das páginas existentes se omitido). */
+  areaServed?: { type: string; name: string }[];
+  /** Casos concretos de palco com fonte externa verificável, quando existir —
+   * a prova mais forte de GEO é uma publicação de terceiro, não a própria afirmação. */
+  evidence?: {
+    title: string;
+    theme: string;
+    location: string;
+    date: string;
+    sources: { name: string; url: string }[];
+  }[];
 }
 
 // Pílula de kicker editorial (mono, contorno fino)
@@ -86,7 +101,9 @@ export default function CommercialLanding(props: CommercialLandingProps) {
         name: props.serviceType,
         serviceType: props.serviceType,
         provider: { "@id": `${SITE_URL}/#person` },
-        areaServed: { "@type": "Country", name: "Brasil" },
+        areaServed: (props.areaServed || [{ type: "Country", name: "Brasil" }]).map(
+          (a) => ({ "@type": a.type, name: a.name })
+        ),
         url,
         description: props.seoDescription,
         offers: props.formats.map((f) => ({
@@ -161,7 +178,66 @@ export default function CommercialLanding(props: CommercialLandingProps) {
           </div>
         </section>
 
+        {/* RESPOSTA DIRETA — bloco de definição para busca por IA (GEO/AEO) */}
+        {props.entityDefinition && (
+          <section className="bg-muted/30 py-16 border-b border-border">
+            <div className="container mx-auto px-4 max-w-3xl">
+              <h2 className="text-2xl md:text-3xl text-foreground mb-4 tracking-tight">
+                {props.entityDefinition.question}
+              </h2>
+              <p className="text-base md:text-lg text-foreground/85 leading-relaxed">
+                {props.entityDefinition.answer}
+              </p>
+            </div>
+          </section>
+        )}
+
         <LogosBarSection />
+
+        {/* EVIDÊNCIAS — casos de palco com fonte externa verificável */}
+        {props.evidence && props.evidence.length > 0 && (
+          <section className="bg-background py-20 border-b border-border">
+            <div className="container mx-auto px-4 max-w-5xl">
+              <SectionHead
+                kicker="Palestras e eventos realizados"
+                title="Prova, não promessa"
+              />
+              <div className="grid md:grid-cols-2 gap-6">
+                {props.evidence.map((e, i) => (
+                  <Card
+                    key={i}
+                    className="rounded-xl border border-border bg-card shadow-sm"
+                  >
+                    <CardContent className="p-6 space-y-3">
+                      <h3 className="text-lg text-foreground tracking-tight">{e.title}</h3>
+                      <p className="text-sm text-muted-foreground leading-relaxed">{e.theme}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+                        <MapPin className="w-3.5 h-3.5 shrink-0" />
+                        <span>{e.location} &middot; {e.date}</span>
+                      </div>
+                      {e.sources.length > 0 && (
+                        <div className="flex flex-wrap gap-2 pt-2">
+                          {e.sources.map((s, si) => (
+                            <a
+                              key={si}
+                              href={s.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 rounded-full border border-primary/25 bg-primary/10 px-2.5 py-1 text-[11px] font-medium text-primary hover:bg-primary/20 transition-colors"
+                            >
+                              {s.name}
+                              <ExternalLink className="w-3 h-3" />
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          </section>
+        )}
 
         {/* PARA QUEM */}
         <section className={sober ? "bg-muted/40 py-20 border-y border-border" : "bg-foreground py-20 border-y border-foreground/10"}>
