@@ -395,7 +395,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
               variant={sober ? "default" : "secondary"}
               className={sober ? "" : "bg-foreground text-background hover:bg-foreground/90"}
             >
-              <a href="/#briefing">
+              <a href={props.ctaHref || "/#briefing"}>
                 {props.ctaLabel || "Solicitar proposta"}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </a>
