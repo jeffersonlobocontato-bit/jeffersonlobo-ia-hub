@@ -49,6 +49,8 @@ export interface CommercialLandingProps {
     date: string;
     sources: { name: string; url: string }[];
   }[];
+  /** Oculta o bloco de evidências "Prova, não promessa" quando necessário. */
+  hideEvidence?: boolean;
 }
 
 // Pílula de kicker editorial (mono, contorno fino)
