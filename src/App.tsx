@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import AdminRoute from "@/components/AdminRoute";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
@@ -47,7 +47,8 @@ const App = () => (
               <Route path="/imprensa" element={<Imprensa />} />
               <Route path="/imprensa/r/:slug" element={<PressReleaseOG />} />
               <Route path="/palestras-ia" element={<PalestrasIA />} />
-              <Route path="/palestrante-inteligencia-artificial-parana" element={<PalestranteIAParana />} />
+              <Route path="/palestrante-inteligencia-artificial-parana-brasil" element={<PalestranteIAParana />} />
+              <Route path="/palestrante-inteligencia-artificial-parana" element={<Navigate to="/palestrante-inteligencia-artificial-parana-brasil" replace />} />
               <Route path="/workshop-ia" element={<WorkshopIA />} />
               <Route path="/consultoria-ia" element={<ConsultoriaIA />} />
               <Route path="/blog" element={<BlogIndex />} />

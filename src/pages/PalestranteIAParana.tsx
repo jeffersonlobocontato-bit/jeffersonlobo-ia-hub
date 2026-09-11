@@ -3,7 +3,7 @@ import CommercialLanding from "@/components/CommercialLanding";
 export default function PalestranteIAParana() {
   return (
     <CommercialLanding
-      slug="palestrante-inteligencia-artificial-parana"
+      slug="palestrante-inteligencia-artificial-parana-brasil"
       kicker="Palestrante de Inteligência Artificial no Paraná"
       h1="Palestrante de Inteligência Artificial no Paraná"
       h1Highlight="para empresas e eventos"
