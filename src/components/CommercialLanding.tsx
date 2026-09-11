@@ -31,6 +31,8 @@ export interface CommercialLandingProps {
   formats: { name: string; duration: string; description: string }[];
   faq: { q: string; a: string }[];
   ctaLabel?: string;
+  /** URL do CTA principal. Padrão: formulário de briefing. */
+  ctaHref?: string;
   /** Registro mais sóbrio para páginas voltadas a diretoria/C-level (ex.: Consultoria) —
    * mesma estrutura, sem bloco preto/CTA cheio de cor, sombras discretas. */
   sober?: boolean;
@@ -168,7 +170,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center pt-4">
               <Button asChild size="lg">
-                <a href="/#briefing">
+                <a href={props.ctaHref || "/#briefing"}>
                   {props.ctaLabel || "Solicitar proposta"}
                   <ArrowRight className="ml-2 w-4 h-4" />
                 </a>
@@ -393,7 +395,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
               variant={sober ? "default" : "secondary"}
               className={sober ? "" : "bg-foreground text-background hover:bg-foreground/90"}
             >
-              <a href="/#briefing">
+              <a href={props.ctaHref || "/#briefing"}>
                 {props.ctaLabel || "Solicitar proposta"}
                 <ArrowRight className="ml-2 w-4 h-4" />
               </a>
