@@ -4,6 +4,7 @@ export default function PalestranteIAParana() {
   return (
     <CommercialLanding
       slug="palestrante-inteligencia-artificial-parana-brasil"
+      hideEvidence
       kicker="Palestrante de Inteligência Artificial no Paraná"
       h1="Palestrante de Inteligência Artificial no Paraná"
       h1Highlight="para empresas e eventos"
