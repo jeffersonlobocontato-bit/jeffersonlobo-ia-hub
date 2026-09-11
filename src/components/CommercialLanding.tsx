@@ -197,7 +197,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
         <LogosBarSection />
 
         {/* EVIDÊNCIAS — casos de palco com fonte externa verificável */}
-        {props.evidence && props.evidence.length > 0 && (
+        {props.evidence && props.evidence.length > 0 && !props.hideEvidence && (
           <section className="bg-background py-20 border-b border-border">
             <div className="container mx-auto px-4 max-w-5xl">
               <SectionHead
