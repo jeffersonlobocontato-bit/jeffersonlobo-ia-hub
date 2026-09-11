@@ -5,10 +5,10 @@ export default function PalestranteIAParana() {
     <CommercialLanding
       slug="palestrante-inteligencia-artificial-parana-brasil"
       hideEvidence
-      kicker="Palestrante de Inteligência Artificial no Paraná"
-      h1="Palestrante de Inteligência Artificial no Paraná"
+      kicker="Palestrante de Inteligência Artificial no Brasil"
+      h1="Palestrante de Inteligência Artificial no Brasil"
       h1Highlight="para empresas e eventos"
-      subtitle="Atua em todo o Brasil, com atuação consolidada em Curitiba e no Paraná — onde já passou pelo 29º Congresso da ADJORI-PR e por organizações como CNI, MIT e Sistema Fiep. Keynotes, imersões e consultoria em IA generativa para empresas e eventos."
+      subtitle="Com atuação consolidada no Paraná, onde já passou pelo Gazeta do Povo, Construtora Laguna, Sistema Fiep. Keynotes, imersões e consultoria em IA generativa para empresas e eventos."
       seoTitle="Palestrante de Inteligência Artificial no Paraná | Jefferson Lobo"
       seoDescription="Jefferson Lobo é palestrante de Inteligência Artificial no Paraná: keynotes, imersões e consultoria em IA para empresas, indústrias e eventos em Curitiba e todo o estado."
       serviceType="Palestrante de Inteligência Artificial no Paraná"
