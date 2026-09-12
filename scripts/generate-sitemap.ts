@@ -286,6 +286,8 @@ function writeLlmsTxt(blogPosts: BlogPostRow[]) {
   lines.push('');
   lines.push('## Serviços');
   lines.push('');
+  lines.push(`- [Palestrante de Inteligência Artificial no Brasil](${BASE_URL}/palestrante-inteligencia-artificial): página de entidade de Jefferson Lobo como palestrante de IA — atuação nacional, sede em Curitiba/PR.`);
+  lines.push(`- [Palestrante de Inteligência Artificial no Paraná](${BASE_URL}/palestrante-inteligencia-artificial-parana-brasil): atuação regional consolidada no Paraná (ADJORI-PR, CNI, MIT, Sistema Fiep), dentro de uma atuação nacional.`);
   lines.push(`- [Palestras de Inteligência Artificial](${BASE_URL}/palestras-ia): keynotes presenciais e online sobre IA generativa, agentes, marketing e estratégia — para convenções, kickoffs, lideranças C-level e eventos corporativos em todo o Brasil.`);
   lines.push(`- [Workshop de IA in-company](${BASE_URL}/workshop-ia): imersões práticas (mão na massa) para times aplicarem IA generativa em fluxos reais da própria empresa, com ou sem conhecimento prévio.`);
   lines.push(`- [Consultoria de Inteligência Artificial](${BASE_URL}/consultoria-ia): acompanhamento estratégico para diretoria e C-level — diagnóstico de maturidade, roadmap de 12 meses, governança e orquestração de fluxos com identidade de marca.`);
@@ -359,6 +361,8 @@ async function main() {
     { path: "/livro-del", lastmod: today, changefreq: "weekly", priority: "0.9" },
     { path: "/blog", lastmod: today, changefreq: "weekly", priority: "0.9" },
     { path: "/palestras-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
+    { path: "/palestrante-inteligencia-artificial", lastmod: today, changefreq: "monthly", priority: "0.95" },
+    { path: "/palestrante-inteligencia-artificial-parana-brasil", lastmod: today, changefreq: "monthly", priority: "0.85" },
     { path: "/workshop-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/consultoria-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/teste-ia", lastmod: today, changefreq: "monthly", priority: "0.8" },
