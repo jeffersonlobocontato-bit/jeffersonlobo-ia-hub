@@ -41,6 +41,12 @@ const Footer = () => {
                 </li>
               ))}
             </ul>
+            <Link
+              to="/palestrante-inteligencia-artificial-parana-brasil"
+              className="mt-4 block text-xs text-muted-foreground hover:text-primary transition-colors"
+            >
+              Palestrante de IA no Paraná
+            </Link>
           </div>
 
 
