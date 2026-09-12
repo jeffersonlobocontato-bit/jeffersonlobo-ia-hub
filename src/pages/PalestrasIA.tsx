@@ -60,6 +60,10 @@ export default function PalestrasIA() {
           a: "IA generativa aplicada a marketing e negócios, agentes de IA com DNA autoral, orquestração de fluxos com IA, maturidade em IA para empresas, estratégia de IA para lideranças e ética/governança de IA no ambiente corporativo brasileiro.",
         },
         {
+          q: "O que é o Método DEL?",
+          a: "É a metodologia proprietária de Jefferson Lobo para treinar agentes de IA com identidade autoral: fidelidade sintática, semântica e lexical à voz da marca. Está detalhada no livro 'O código invisível dos superagentes de inteligência artificial' e é a base das consultorias e palestras.",
+        },
+        {
           q: "A palestra é adaptada ao público da empresa?",
           a: "Sim. Toda palestra passa por um briefing prévio com a empresa contratante para alinhar setor, nível de maturidade do público, dores específicas e objetivos do evento. Não existe palestra 'de prateleira'.",
         },

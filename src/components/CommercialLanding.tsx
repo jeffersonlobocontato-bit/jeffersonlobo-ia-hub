@@ -53,6 +53,10 @@ export interface CommercialLandingProps {
   }[];
   /** Oculta o bloco de evidências "Prova, não promessa" quando necessário. */
   hideEvidence?: boolean;
+  /** Bloco de metodologia proprietária (Método DEL) — o único diferencial que
+   * nenhum concorrente reivindica; dá um termo de marca citável em vez de
+   * linguagem genérica de categoria ("estratégia", "governança"). */
+  methodBlock?: { kicker: string; title: string; body: string; linkLabel: string; linkTo: string };
   /** Links internos para páginas relacionadas (hierarquia nacional → regional) —
    * reforça a arquitetura de rastreamento sem depender só do sitemap. */
   relatedPages?: { label: string; to: string }[];
@@ -195,6 +199,28 @@ export default function CommercialLanding(props: CommercialLandingProps) {
               <p className="text-base md:text-lg text-foreground/85 leading-relaxed">
                 {props.entityDefinition.answer}
               </p>
+            </div>
+          </section>
+        )}
+
+        {/* MÉTODO DEL — metodologia proprietária, termo de marca sem concorrência direta */}
+        {props.methodBlock && (
+          <section className="relative overflow-hidden py-16 sm:py-20 bg-brand-grid border-b border-border">
+            <div className="container mx-auto px-4 max-w-2xl text-center space-y-4">
+              <Kicker>{props.methodBlock.kicker}</Kicker>
+              <h2 className="display-title text-3xl sm:text-4xl text-foreground">
+                {props.methodBlock.title}
+              </h2>
+              <p className="text-base md:text-lg text-foreground/85 leading-relaxed">
+                {props.methodBlock.body}
+              </p>
+              <Link
+                to={props.methodBlock.linkTo}
+                className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
+              >
+                {props.methodBlock.linkLabel}
+                <ArrowRight className="w-4 h-4" />
+              </Link>
             </div>
           </section>
         )}
