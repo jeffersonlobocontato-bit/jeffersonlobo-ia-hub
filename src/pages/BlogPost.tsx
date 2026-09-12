@@ -12,8 +12,10 @@ import { BlogTOC } from '@/components/blog/BlogTOC';
 import { BlogFAQ, type FAQItem } from '@/components/blog/BlogFAQ';
 import { ReadingProgress } from '@/components/blog/ReadingProgress';
 import { calcReadingMinutes, isInternalPost } from '@/lib/blog-utils';
+import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 import { Card } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
 
@@ -23,6 +25,7 @@ const BlogPost = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: post, isLoading, error } = useBlogPost(slug);
   const { data: related = [] } = useRelatedPosts(slug, post?.category);
+  const { trackCTA } = useTrackCTA();
 
   useEffect(() => {
     document.documentElement.classList.add('dark');
@@ -399,6 +402,34 @@ const BlogPost = () => {
             </div>
           </section>
         )}
+
+        <section className="relative overflow-hidden py-20 sm:py-24 mt-20 bg-brand-grid border-y border-border">
+          <div className="container mx-auto px-5 relative z-10">
+            <div className="mx-auto max-w-3xl text-center space-y-6">
+              <span className="section-kicker">Palestras e consultoria</span>
+              <h2 className="display-title text-3xl sm:text-4xl md:text-5xl">
+                Palestrante de Inteligência Artificial para empresas, líderes e eventos corporativos em todo o Brasil.
+              </h2>
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Referência em IA aplicada a negócios, liderança, produtividade, governança e transformação organizacional.
+              </p>
+              <Button
+                size="lg"
+                asChild
+                className="text-base px-8 py-6"
+                onClick={() => trackCTA('blog_palestrante_whatsapp', `blog_${post.slug}`)}
+              >
+                <a
+                  href="https://wa.me/5545999864213?text=Ol%C3%A1%2C%20Jefferson!%20Li%20um%20artigo%20no%20seu%20blog%20e%20quero%20saber%20mais%20sobre%20palestras%20de%20IA."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Falar com Jefferson no WhatsApp
+                </a>
+              </Button>
+            </div>
+          </div>
+        </section>
       </main>
 
       <Footer />
