@@ -10,7 +10,7 @@ const AboutSection = () => {
   // Fallback data
   const defaultData = {
     name: "Jefferson Lobo",
-    title: "Head Executivo de Marketing e consultor em IA",
+    title: "Palestrante de Inteligência Artificial e Head Executivo de Marketing",
     read_line: "IA sem DNA autoral é commodity",
     description: "Head Executivo de Marketing do Sistema Fiep e defensor de uma tese proprietária: o marketing entrou na fase da orquestração de fluxos com IA — em vez de depender de prompts genéricos, marcas precisam construir agentes de IA com identidade própria. É nisso que ajudo lideranças, times de marketing e diretorias em todo o Brasil.",
     profile_image: profileImg

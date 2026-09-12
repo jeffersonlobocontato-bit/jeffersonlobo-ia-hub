@@ -14,8 +14,8 @@ const HeroSection = () => {
   };
 
   const defaultData = {
-    headline: "IA está redesenhando empresas, carreiras e profissões. Lidere essa transformação.",
-    subtitle: "Estratégia, agentes de IA e governança para lideranças e empresas que querem produtividade real — sem depender de prompts genéricos.",
+    headline: "Palestrante de Inteligência Artificial para empresas, líderes e eventos corporativos em todo o Brasil.",
+    subtitle: "Baseado em Curitiba, Paraná — atuação nacional em IA aplicada a negócios, liderança, produtividade, governança e transformação organizacional.",
     cta_primary: "AVALIE GRÁTIS SEU DOMÍNIO EM IA",
     cta_secondary: "Veja o Blog",
     cta_tertiary: "LEIA MEU LIVRO",
@@ -79,11 +79,11 @@ const HeroSection = () => {
 
           {/* Roles slash line (Matt Wolfe style) */}
           <div className="roles-slash">
-            <span className="role">Head Executivo de Marketing</span>
+            <span className="role">Palestrante de Inteligência Artificial</span>
             <span className="sep">/</span>
             <span className="role">Consultor em IA</span>
             <span className="sep">/</span>
-            <span className="role">Palestrante</span>
+            <span className="role">Head Executivo de Marketing</span>
           </div>
 
           {isLoading ? (

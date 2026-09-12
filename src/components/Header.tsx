@@ -52,7 +52,7 @@ const Header = () => {
               <span className="font-serif text-lg text-foreground">
                 Jefferson <span className="highlight-yellow">Lobo</span>
               </span>
-              <span className="text-[11px] font-medium uppercase tracking-wider text-foreground/60" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Head Executivo de Marketing · Consultor em IA · Palestrante</span>
+              <span className="text-[11px] font-medium uppercase tracking-wider text-foreground/60" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Palestrante de Inteligência Artificial · Consultor em IA · Head Executivo de Marketing</span>
             </span>
           </Link>
 
