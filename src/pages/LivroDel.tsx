@@ -320,6 +320,38 @@ const LivroDel = () => {
           </div>
         </section>
 
+        {/* PALESTRANTE */}
+        <section className="relative overflow-hidden py-20 sm:py-24 bg-brand-grid border-y border-border">
+          <div className="container mx-auto px-4 relative z-10">
+            <div className="mx-auto max-w-3xl text-center space-y-6">
+              <span className="section-kicker">Palestras e consultoria</span>
+
+              <h2 className="display-title text-3xl sm:text-4xl md:text-5xl">
+                Palestrante de Inteligência Artificial para empresas, líderes e eventos corporativos em todo o Brasil.
+              </h2>
+
+              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+                Referência em IA aplicada a negócios, liderança, produtividade, governança e transformação organizacional.
+              </p>
+
+              <Button
+                size="lg"
+                asChild
+                className="text-base px-8 py-6"
+                onClick={() => trackCTA('livro_del_palestrante_whatsapp', 'livro_del_palestrante')}
+              >
+                <a
+                  href="https://wa.me/5545999864213?text=Ol%C3%A1%2C%20Jefferson!%20Vi%20a%20p%C3%A1gina%20do%20seu%20livro%20e%20quero%20saber%20mais%20sobre%20palestras%20de%20IA."
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  Falar com Jefferson no WhatsApp
+                </a>
+              </Button>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ */}
         <section className="bg-card py-20 sm:py-24 border-t border-border">
           <div className="container mx-auto px-4">
