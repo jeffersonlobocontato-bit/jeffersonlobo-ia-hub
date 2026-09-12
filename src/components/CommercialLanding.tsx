@@ -53,6 +53,9 @@ export interface CommercialLandingProps {
   }[];
   /** Oculta o bloco de evidências "Prova, não promessa" quando necessário. */
   hideEvidence?: boolean;
+  /** Links internos para páginas relacionadas (hierarquia nacional → regional) —
+   * reforça a arquitetura de rastreamento sem depender só do sitemap. */
+  relatedPages?: { label: string; to: string }[];
 }
 
 // Pílula de kicker editorial (mono, contorno fino)
@@ -363,6 +366,20 @@ export default function CommercialLanding(props: CommercialLandingProps) {
             </Accordion>
           </div>
         </section>
+
+        {/* Links relacionados — hierarquia nacional/regional para descoberta via rastreamento */}
+        {props.relatedPages && props.relatedPages.length > 0 && (
+          <section className="bg-background py-10">
+            <div className="container mx-auto px-4 max-w-3xl flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-muted-foreground">
+              <span className="uppercase tracking-wider text-xs" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Ver também</span>
+              {props.relatedPages.map((p) => (
+                <Link key={p.to} to={p.to} className="underline underline-offset-4 hover:text-primary transition-colors">
+                  {p.label}
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* CTA FINAL — cheio de cor nas páginas de palestra/workshop; painel discreto no registro sóbrio */}
         <section

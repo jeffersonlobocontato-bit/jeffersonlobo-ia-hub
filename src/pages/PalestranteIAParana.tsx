@@ -101,6 +101,10 @@ export default function PalestranteIAParana() {
           a: "Sim. Toda palestra passa por um briefing prévio para alinhar setor, nível de maturidade do público, dores específicas e objetivos do evento — não existe palestra 'de prateleira'.",
         },
       ]}
+      relatedPages={[
+        { label: "Palestrante de Inteligência Artificial no Brasil", to: "/palestrante-inteligencia-artificial" },
+        { label: "Palestras de Inteligência Artificial", to: "/palestras-ia" },
+      ]}
     />
   );
 }

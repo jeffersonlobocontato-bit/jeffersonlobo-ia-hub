@@ -76,6 +76,10 @@ export default function PalestrasIA() {
           a: "O ideal é entre 30 e 60 dias para garantir agenda e personalização adequada. Para eventos urgentes (até 15 dias), entre em contato para verificar disponibilidade.",
         },
       ]}
+      relatedPages={[
+        { label: "Palestrante de Inteligência Artificial no Brasil", to: "/palestrante-inteligencia-artificial" },
+        { label: "Palestrante de IA no Paraná", to: "/palestrante-inteligencia-artificial-parana-brasil" },
+      ]}
     />
   );
 }
