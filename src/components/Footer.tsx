@@ -21,8 +21,9 @@ const Footer = () => {
               Jefferson <span className="highlight-yellow">Lobo</span>
             </h3>
             <p className="text-muted-foreground mb-4 max-w-md">
-              Head Executivo de Marketing e consultor em IA — palestras, imersões e consultoria
-              para lideranças que querem construir agentes de IA com identidade própria.
+              Palestrante de Inteligência Artificial no Brasil, com sede em Curitiba — palestras,
+              imersões e consultoria para lideranças que querem construir agentes de IA com
+              identidade própria.
             </p>
           </div>
 
