@@ -15,6 +15,7 @@ import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import Unsubscribe from "./pages/Unsubscribe";
 import Imprensa from "./pages/Imprensa";
 import PalestrasIA from "./pages/PalestrasIA";
+import PalestranteIA from "./pages/PalestranteIA";
 import PalestranteIAParana from "./pages/PalestranteIAParana";
 import WorkshopIA from "./pages/WorkshopIA";
 import ConsultoriaIA from "./pages/ConsultoriaIA";
@@ -47,6 +48,7 @@ const App = () => (
               <Route path="/imprensa" element={<Imprensa />} />
               <Route path="/imprensa/r/:slug" element={<PressReleaseOG />} />
               <Route path="/palestras-ia" element={<PalestrasIA />} />
+              <Route path="/palestrante-inteligencia-artificial" element={<PalestranteIA />} />
               <Route path="/palestrante-inteligencia-artificial-parana-brasil" element={<PalestranteIAParana />} />
               <Route path="/palestrante-inteligencia-artificial-parana" element={<Navigate to="/palestrante-inteligencia-artificial-parana-brasil" replace />} />
               <Route path="/workshop-ia" element={<WorkshopIA />} />
