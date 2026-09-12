@@ -15,7 +15,7 @@ const HeroSection = () => {
 
   const defaultData = {
     headline: "Palestrante de Inteligência Artificial para empresas, líderes e eventos corporativos em todo o Brasil.",
-    subtitle: "Referência nacional em IA aplicada a negócios, liderança, produtividade, governança e transformação organizacional.",
+    subtitle: "Referência em IA aplicada a negócios, liderança, produtividade, governança e transformação organizacional.",
     cta_primary: "AVALIE GRÁTIS SEU DOMÍNIO EM IA",
     cta_secondary: "Veja o Blog",
     cta_tertiary: "LEIA MEU LIVRO",
