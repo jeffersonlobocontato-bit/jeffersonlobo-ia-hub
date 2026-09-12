@@ -7,15 +7,15 @@ export default function PalestranteIA() {
       kicker="Palestrante de Inteligência Artificial"
       h1="Palestrante de Inteligência Artificial"
       h1Highlight="no Brasil"
-      subtitle="Baseado em Curitiba, com atuação em todo o Brasil — keynotes, imersões e consultoria em IA generativa aplicada a negócios, liderança, produtividade e governança para empresas e eventos corporativos."
+      subtitle="Referência nacional em IA aplicada a negócios — keynotes, imersões e consultoria em IA generativa aplicada a liderança, produtividade e governança para empresas e eventos corporativos em todo o Brasil."
       seoTitle="Palestrante de Inteligência Artificial no Brasil | Jefferson Lobo"
-      seoDescription="Jefferson Lobo é palestrante de Inteligência Artificial no Brasil, com sede em Curitiba: keynotes, imersões e consultoria em IA aplicada a negócios, liderança e produtividade para empresas e eventos."
+      seoDescription="Jefferson Lobo é palestrante de Inteligência Artificial no Brasil: keynotes, imersões e consultoria em IA aplicada a negócios, liderança e produtividade para empresas e eventos em todo o país."
       serviceType="Palestrante de Inteligência Artificial"
       areaServed={[{ type: "Country", name: "Brasil" }]}
       entityDefinition={{
         question: "Quem é um palestrante de Inteligência Artificial?",
         answer:
-          "Jefferson Lobo é palestrante de Inteligência Artificial, executivo, consultor e autor, com atuação em todo o Brasil e sede em Curitiba, Paraná. É Head Executivo de Marketing do Sistema Fiep e conduz keynotes, imersões e consultoria em IA generativa aplicada a negócios, liderança, produtividade e governança corporativa. Defende uma tese central: empresas que dependem de prompts genéricos ficam para trás — o caminho é construir agentes de IA com identidade própria, não commodity.",
+          "Jefferson Lobo é palestrante de Inteligência Artificial, executivo, consultor e autor, com atuação em todo o Brasil e referência nacional em IA aplicada a negócios. É Head Executivo de Marketing do Sistema Fiep e conduz keynotes, imersões e consultoria em IA generativa aplicada a negócios, liderança, produtividade e governança corporativa. Defende uma tese central: empresas que dependem de prompts genéricos ficam para trás — o caminho é construir agentes de IA com identidade própria, não commodity.",
       }}
       evidence={[
         {
@@ -77,7 +77,7 @@ export default function PalestranteIA() {
       faq={[
         {
           q: "Jefferson Lobo atende que regiões do Brasil?",
-          a: "Atua em todo o Brasil, presencial e online. É baseado em Curitiba, Paraná, mas atende empresas e eventos em qualquer estado com o mesmo formato e nível de personalização — deslocamento incluso no escopo da proposta para eventos presenciais fora de Curitiba.",
+          a: "Atua em todo o Brasil, presencial e online, atendendo empresas e eventos em qualquer estado com o mesmo formato e nível de personalização — deslocamento incluso no escopo da proposta para eventos presenciais.",
         },
         {
           q: "Quais temas de IA Jefferson Lobo aborda nas palestras?",

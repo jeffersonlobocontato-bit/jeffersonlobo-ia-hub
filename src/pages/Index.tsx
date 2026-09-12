@@ -35,7 +35,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="Jefferson Lobo — Palestrante de Inteligência Artificial no Brasil"
-        description="Jefferson Lobo é palestrante de Inteligência Artificial no Brasil, com sede em Curitiba: palestras, workshops e consultoria em IA para empresas e lideranças. Solicite uma proposta ou faça o Teste de Maturidade em IA gratuito."
+        description="Jefferson Lobo é palestrante de Inteligência Artificial no Brasil: palestras, workshops e consultoria em IA para empresas e lideranças. Solicite uma proposta ou faça o Teste de Maturidade em IA gratuito."
         path="/"
       />
       <Header />

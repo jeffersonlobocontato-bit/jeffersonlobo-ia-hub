@@ -4,13 +4,12 @@ export default function PalestranteIAParana() {
   return (
     <CommercialLanding
       slug="palestrante-inteligencia-artificial-parana-brasil"
-      hideEvidence
-      kicker="Palestrante de Inteligência Artificial no Brasil"
-      h1="Palestrante de Inteligência Artificial no Brasil"
+      kicker="Palestrante de Inteligência Artificial no Paraná"
+      h1="Palestrante de Inteligência Artificial no Paraná"
       h1Highlight="para empresas e eventos"
-      subtitle="Com atuação consolidada no Paraná, onde já passou pelo Gazeta do Povo, Construtora Laguna, Sistema Fiep. Keynotes, imersões e consultoria em IA generativa para empresas e eventos."
+      subtitle="Referência nacional em IA aplicada a negócios, com atuação consolidada no Paraná — passagens por CNI, Gazeta do Povo, MIT, Sistema Fiep e Laguna Construtora. Keynotes, imersões e consultoria em IA generativa para empresas e eventos."
       seoTitle="Palestrante de Inteligência Artificial no Paraná | Jefferson Lobo"
-      seoDescription="Jefferson Lobo é palestrante de Inteligência Artificial no Paraná: keynotes, imersões e consultoria em IA para empresas, indústrias e eventos em Curitiba e todo o estado."
+      seoDescription="Jefferson Lobo é palestrante de Inteligência Artificial no Paraná: keynotes, imersões e consultoria em IA para empresas, indústrias e eventos em todo o estado, dentro de uma atuação nacional."
       serviceType="Palestrante de Inteligência Artificial no Paraná"
       ctaHref="https://wa.me/5545999864213?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20uma%20proposta%20de%20palestra%20de%20IA."
       areaServed={[
@@ -20,7 +19,7 @@ export default function PalestranteIAParana() {
       entityDefinition={{
         question: "Quem é um palestrante de Inteligência Artificial no Paraná?",
         answer:
-          "Jefferson Lobo é palestrante de Inteligência Artificial, executivo, consultor e autor que atua em todo o Brasil, com base em Curitiba e atuação consolidada no Paraná. É Head Executivo de Marketing do Sistema Fiep e conduz palestras corporativas, imersões e consultoria em IA generativa aplicada a marketing, comunicação e liderança. No Paraná, já levou o tema a eventos como o 29º Congresso da ADJORI-PR, em Foz do Iguaçu, e a organizações como CNI, Gazeta do Povo, MIT, Sistema Fiep, Sesi e IEL. Defende uma tese central: empresas que dependem de prompts genéricos ficam para trás — o caminho é construir agentes de IA com identidade própria, não commodity.",
+          "Jefferson Lobo é palestrante de Inteligência Artificial, executivo, consultor e autor que atua em todo o Brasil, com atuação consolidada no Paraná. É Head Executivo de Marketing do Sistema Fiep e conduz palestras corporativas, imersões e consultoria em IA generativa aplicada a marketing, comunicação e liderança. No Paraná, já levou o tema a eventos como o 29º Congresso da ADJORI-PR, em Foz do Iguaçu, e a organizações como CNI, Gazeta do Povo, MIT, Sistema Fiep, Sesi e IEL. Defende uma tese central: empresas que dependem de prompts genéricos ficam para trás — o caminho é construir agentes de IA com identidade própria, não commodity.",
       }}
       evidence={[
         {
@@ -39,7 +38,7 @@ export default function PalestranteIAParana() {
       forWho={[
         "Empresas e indústrias — no Paraná ou em qualquer estado — que precisam nivelar diretoria e gerência sobre o que IA realmente muda no negócio",
         "Associações setoriais, sindicatos e federações buscando uma keynote de autoridade nacional em IA, com base sólida no ecossistema paranaense",
-        "Eventos, congressos e convenções em Curitiba, no interior do Paraná ou em qualquer lugar do Brasil que precisam de uma palestra provocadora sobre IA",
+        "Eventos, congressos e convenções em qualquer cidade do Paraná ou do Brasil que precisam de uma palestra provocadora sobre IA",
         "Times de marketing e comunicação que vão estruturar projetos de IA nos próximos 12 meses",
       ]}
       deliverables={[
@@ -64,7 +63,7 @@ export default function PalestranteIAParana() {
           name: "Keynote presencial",
           duration: "45 a 90 min",
           description:
-            "Palestra para auditório, convenção ou evento corporativo em Curitiba, no interior do Paraná ou em qualquer estado do Brasil, com presença de palco e demonstrações ao vivo.",
+            "Palestra para auditório, convenção ou evento corporativo em qualquer cidade do Paraná ou do Brasil, com presença de palco e demonstrações ao vivo.",
         },
         {
           name: "Keynote online ao vivo",
@@ -82,11 +81,11 @@ export default function PalestranteIAParana() {
       faq={[
         {
           q: "Jefferson Lobo atende só o Paraná ou todo o Brasil?",
-          a: "Atua em todo o Brasil, presencial e online. O Paraná é sua base — mora e trabalha em Curitiba, e é lá que está concentrada a maior parte da sua rede e do seu histórico recente de palco (ADJORI-PR, CNI, MIT, Sistema Fiep, entre outros). Fora do estado, atende com o mesmo formato e o mesmo nível de personalização.",
+          a: "Atua em todo o Brasil, presencial e online. O Paraná é onde está concentrada a maior parte da sua rede e do seu histórico recente de palco (ADJORI-PR, CNI, MIT, Sistema Fiep, entre outros). Fora do estado, atende com o mesmo formato e o mesmo nível de personalização.",
         },
         {
           q: "Jefferson Lobo atende empresas em todo o Paraná?",
-          a: "Sim. Atua com palestras presenciais em Curitiba e no interior do estado, além de keynotes online para empresas com operação distribuída. Já esteve em Foz do Iguaçu (29º Congresso da ADJORI-PR) e segue ativo na rede do Sistema Fiep, que cobre todo o Paraná.",
+          a: "Sim. Atua com palestras presenciais na capital e no interior do estado, além de keynotes online para empresas com operação distribuída. Já esteve em Foz do Iguaçu (29º Congresso da ADJORI-PR) e segue ativo na rede do Sistema Fiep, que cobre todo o Paraná.",
         },
         {
           q: "Quais temas de IA Jefferson Lobo aborda nas palestras?",

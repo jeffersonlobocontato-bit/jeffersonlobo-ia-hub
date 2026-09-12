@@ -9,12 +9,12 @@ import { toast } from "@/hooks/use-toast";
 const SITE_URL = "https://jeffersonlobo.tech";
 
 const BIO_CURTA =
-  "Jefferson Lobo é palestrante, autor e consultor em Inteligência Artificial aplicada a marketing, negócios e lideranças. Atua como Gerente Executivo de Marketing do Sistema Fiep.";
+  "Jefferson Lobo é palestrante, autor e consultor em Inteligência Artificial aplicada a marketing, negócios e lideranças. Atua como Head Executivo de Marketing do Sistema Fiep.";
 
 const BIO_MEDIA =
-  "Jefferson Lobo é palestrante, autor e consultor brasileiro em Inteligência Artificial aplicada a marketing, negócios e lideranças. Gerente Executivo de Marketing do Sistema Fiep, é referência nacional em IA generativa para o ambiente corporativo, com foco em agentes de IA com identidade autoral (DNA de marca) e na fase de orquestração de fluxos de marketing com IA.";
+  "Jefferson Lobo é palestrante, autor e consultor brasileiro em Inteligência Artificial aplicada a marketing, negócios e lideranças. Head Executivo de Marketing do Sistema Fiep, é referência nacional em IA generativa para o ambiente corporativo, com foco em agentes de IA com identidade autoral (DNA de marca) e na fase de orquestração de fluxos de marketing com IA.";
 
-const BIO_LONGA = `Jefferson Lobo é palestrante, autor e consultor em Inteligência Artificial aplicada a marketing, negócios e lideranças. Atua como Gerente Executivo de Marketing do Sistema Fiep (Federação das Indústrias do Estado do Paraná), combinando visão executiva de marketing em uma grande instituição com prática técnica em IA generativa.
+const BIO_LONGA = `Jefferson Lobo é palestrante, autor e consultor em Inteligência Artificial aplicada a marketing, negócios e lideranças. Atua como Head Executivo de Marketing do Sistema Fiep (Federação das Indústrias do Estado do Paraná), combinando visão executiva de marketing em uma grande instituição com prática técnica em IA generativa.
 
 É reconhecido por defender teses proprietárias no debate brasileiro de IA, como o desafio de construir agentes de IA com DNA autoral e a tese de que o marketing com IA entrou na fase da orquestração de fluxos — superando a "indústria de prompts" e ferramentas isoladas.
 
@@ -69,9 +69,9 @@ export default function Imprensa() {
             </CardHeader>
             <CardContent className="space-y-3 text-muted-foreground">
               <p><strong className="text-foreground">Nome:</strong> Jefferson Lobo</p>
-              <p><strong className="text-foreground">Cargo executivo:</strong> Gerente Executivo de Marketing do Sistema Fiep (Federação das Indústrias do Estado do Paraná)</p>
+              <p><strong className="text-foreground">Cargo executivo:</strong> Head Executivo de Marketing do Sistema Fiep (Federação das Indústrias do Estado do Paraná)</p>
               <p><strong className="text-foreground">Atuação:</strong> Palestrante, autor e consultor em Inteligência Artificial aplicada a marketing, negócios e lideranças</p>
-              <p><strong className="text-foreground">Base:</strong> Curitiba/PR — atende todo o Brasil presencialmente e online</p>
+              <p><strong className="text-foreground">Território:</strong> Nacional — atende todo o Brasil, presencialmente e online</p>
             </CardContent>
           </Card>
 
