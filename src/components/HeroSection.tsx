@@ -15,7 +15,7 @@ const HeroSection = () => {
 
   const defaultData = {
     headline: "IA está redesenhando empresas, carreiras e profissões. Lidere essa transformação.",
-    subtitle: "Diagnóstico, estratégia e implementação de Inteligência Artificial para empresas que querem resultado real — e profissionais que não aceitam ficar para trás.",
+    subtitle: "Estratégia, agentes de IA e governança para lideranças e empresas que querem produtividade real — sem depender de prompts genéricos.",
     cta_primary: "AVALIE GRÁTIS SEU DOMÍNIO EM IA",
     cta_secondary: "Veja o Blog",
     cta_tertiary: "LEIA MEU LIVRO",
