@@ -617,7 +617,7 @@ export async function generateTesteIAPdf(lead: PdfLead, recommendations: PdfReco
     pdf.setFont("Manrope", "normal");
     pdf.setFontSize(9);
     setText(MUTED_ON_DARK);
-    pdf.text("Jefferson Lobo · Estrategista de IA", M, cy);
+    pdf.text("Jefferson Lobo · Palestrante de IA", M, cy);
     cy += 6;
   }
 
@@ -634,7 +634,7 @@ export async function generateTesteIAPdf(lead: PdfLead, recommendations: PdfReco
   pdf.text("JEFFERSON LOBO", M + 5, cy + 21);
   pdf.setFont("Manrope", "normal");
   pdf.setFontSize(9.5);
-  pdf.text("Estrategista de IA · Palestrante · Consultor", M + 5, cy + 27);
+  pdf.text("Palestrante de Inteligência Artificial · Consultor", M + 5, cy + 27);
 
   pdf.setFont("Manrope", "bold");
   pdf.setFontSize(10);
@@ -682,7 +682,7 @@ export async function generateTesteIAPdf(lead: PdfLead, recommendations: PdfReco
     pdf.setFont("IBMPlexMono", "bold");
     pdf.setFontSize(7.5);
     setText(pageIsDark[i] ? MUTED_ON_DARK : TINTA_SUAVE);
-    pdf.text("Jefferson Lobo · Estrategista de IA · jeffersonlobo.tech", W / 2, H - 8, { align: "center" });
+    pdf.text("Jefferson Lobo · Palestrante de IA · jeffersonlobo.tech", W / 2, H - 8, { align: "center" });
   }
 
   pdf.save(`teste-ia-${lead.nome.replace(/\s+/g, "-").toLowerCase()}.pdf`);
