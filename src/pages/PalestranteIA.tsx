@@ -17,6 +17,13 @@ export default function PalestranteIA() {
         answer:
           "Jefferson Lobo é palestrante de Inteligência Artificial, executivo, consultor e autor, com atuação em todo o Brasil e referência nacional em IA aplicada a negócios. É Head Executivo de Marketing do Sistema Fiep e conduz keynotes, imersões e consultoria em IA generativa aplicada a negócios, liderança, produtividade e governança corporativa. Defende uma tese central: empresas que dependem de prompts genéricos ficam para trás — o caminho é construir agentes de IA com identidade própria, não commodity.",
       }}
+      methodBlock={{
+        kicker: "Metodologia proprietária",
+        title: "O Método DEL",
+        body: "Framework para treinar agentes de IA com DNA autoral — fidelidade sintática, semântica e lexical à voz da marca, em vez de prompts genéricos. É a base de todo o trabalho de consultoria e das palestras.",
+        linkLabel: "Conheça o livro",
+        linkTo: "/livro-del",
+      }}
       evidence={[
         {
           title: "29º Congresso da ADJORI-PR",
@@ -86,6 +93,10 @@ export default function PalestranteIA() {
         {
           q: "Jefferson Lobo tem atuação forte no Paraná?",
           a: "Sim. Além da atuação nacional, tem histórico consolidado no Paraná — passou pelo 29º Congresso da ADJORI-PR e por organizações como CNI, MIT e Sistema Fiep. Veja detalhes na página dedicada ao Paraná.",
+        },
+        {
+          q: "O que é o Método DEL?",
+          a: "É a metodologia proprietária de Jefferson Lobo para treinar agentes de IA com identidade autoral: fidelidade sintática, semântica e lexical à voz da marca. Está detalhada no livro 'O código invisível dos superagentes de inteligência artificial' e é a base das consultorias e palestras.",
         },
         {
           q: "Como contratar um palestrante de Inteligência Artificial?",
