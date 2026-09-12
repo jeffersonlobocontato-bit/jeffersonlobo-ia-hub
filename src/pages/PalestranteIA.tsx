@@ -11,6 +11,7 @@ export default function PalestranteIA() {
       seoTitle="Palestrante de Inteligência Artificial no Brasil | Jefferson Lobo"
       seoDescription="Jefferson Lobo é palestrante de Inteligência Artificial no Brasil: keynotes, imersões e consultoria em IA aplicada a negócios, liderança e produtividade para empresas e eventos em todo o país."
       serviceType="Palestrante de Inteligência Artificial"
+      ctaHref="https://wa.me/5545999864213?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20uma%20proposta%20de%20palestra%20de%20IA."
       areaServed={[{ type: "Country", name: "Brasil" }]}
       entityDefinition={{
         question: "Quem é um palestrante de Inteligência Artificial?",

@@ -21,6 +21,7 @@ export default function PalestranteIAParana() {
         answer:
           "Jefferson Lobo é palestrante de Inteligência Artificial, executivo, consultor e autor que atua em todo o Brasil, com atuação consolidada no Paraná. É Head Executivo de Marketing do Sistema Fiep e conduz palestras corporativas, imersões e consultoria em IA generativa aplicada a marketing, comunicação e liderança. No Paraná, já levou o tema a eventos como o 29º Congresso da ADJORI-PR, em Foz do Iguaçu, e a organizações como CNI, Gazeta do Povo, MIT, Sistema Fiep, Sesi e IEL. Defende uma tese central: empresas que dependem de prompts genéricos ficam para trás — o caminho é construir agentes de IA com identidade própria, não commodity.",
       }}
+      hideEvidence
       evidence={[
         {
           title: "29º Congresso da ADJORI-PR",
