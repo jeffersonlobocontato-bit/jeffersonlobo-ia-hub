@@ -25,6 +25,7 @@ export default function PalestranteIA() {
         linkLabel: "Conheça o livro",
         linkTo: "/livro-del",
       }}
+      hideEvidence
       evidence={[
         {
           title: "29º Congresso da ADJORI-PR",
