@@ -35,26 +35,37 @@ const FONT_FILES: FontFile[] = [
   { url: ibmPlexMonoSemiBoldAsset.url, file: "IBMPlexMono-SemiBold.ttf", family: "IBMPlexMono", style: "bold" },
 ];
 
-let fontsRegisteredPromise: Promise<void> | null = null;
+// Cache dos dados base64 das fontes (o carregamento só acontece uma vez),
+// mas o registro no jsPDF é feito por documento, porque VFS e font-map
+// são internos a cada instância de jsPDF.
+let fontDataCache: Record<string, string> | null = null;
+
+async function loadFontData(): Promise<Record<string, string>> {
+  if (fontDataCache) return fontDataCache;
+
+  const cache: Record<string, string> = {};
+  for (const f of FONT_FILES) {
+    const res = await fetch(f.url);
+    const blob = await res.blob();
+    const base64 = await new Promise<string>((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve((reader.result as string).split(",")[1]);
+      reader.onerror = reject;
+      reader.readAsDataURL(blob);
+    });
+    cache[f.file] = base64;
+  }
+
+  fontDataCache = cache;
+  return cache;
+}
 
 async function ensureBrandFonts(pdf: jsPDF): Promise<void> {
-  if (!fontsRegisteredPromise) {
-    fontsRegisteredPromise = (async () => {
-      for (const f of FONT_FILES) {
-        const res = await fetch(f.url);
-        const blob = await res.blob();
-        const base64 = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve((reader.result as string).split(",")[1]);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
-        pdf.addFileToVFS(f.file, base64);
-        pdf.addFont(f.file, f.family, f.style);
-      }
-    })();
+  const fontData = await loadFontData();
+  for (const f of FONT_FILES) {
+    pdf.addFileToVFS(f.file, fontData[f.file]);
+    pdf.addFont(f.file, f.family, f.style);
   }
-  await fontsRegisteredPromise;
 }
 
 // Pré-carrega a assinatura como dataURL para uso síncrono no jsPDF

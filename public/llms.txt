@@ -12,6 +12,8 @@ Base em Curitiba/PR. Atende todo o Brasil, presencialmente e online, ministrando
 
 ## Serviços
 
+- [Palestrante de Inteligência Artificial no Brasil](https://jeffersonlobo.tech/palestrante-inteligencia-artificial): página de entidade de Jefferson Lobo como palestrante de IA — atuação nacional, sede em Curitiba/PR.
+- [Palestrante de Inteligência Artificial no Paraná](https://jeffersonlobo.tech/palestrante-inteligencia-artificial-parana-brasil): atuação regional consolidada no Paraná (ADJORI-PR, CNI, MIT, Sistema Fiep), dentro de uma atuação nacional.
 - [Palestras de Inteligência Artificial](https://jeffersonlobo.tech/palestras-ia): keynotes presenciais e online sobre IA generativa, agentes, marketing e estratégia — para convenções, kickoffs, lideranças C-level e eventos corporativos em todo o Brasil.
 - [Workshop de IA in-company](https://jeffersonlobo.tech/workshop-ia): imersões práticas (mão na massa) para times aplicarem IA generativa em fluxos reais da própria empresa, com ou sem conhecimento prévio.
 - [Consultoria de Inteligência Artificial](https://jeffersonlobo.tech/consultoria-ia): acompanhamento estratégico para diretoria e C-level — diagnóstico de maturidade, roadmap de 12 meses, governança e orquestração de fluxos com identidade de marca.
