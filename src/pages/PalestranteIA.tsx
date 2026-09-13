@@ -51,6 +51,7 @@ export default function PalestranteIA() {
           ],
           image: "/palco/palco-unisenai-business.png",
           imageAlt: "Jefferson Lobo no palco da imersão UniSenai Business Global, em parceria com o MIT, em Curitiba",
+          imagePosition: "center 12%",
         },
         {
           title: "Painel Laguna x Gazeta do Povo — Mercado Imobiliário de Alto Padrão",
