@@ -25,7 +25,6 @@ export default function PalestranteIA() {
         linkLabel: "Conheça o livro",
         linkTo: "/livro-del",
       }}
-      hideEvidence
       evidence={[
         {
           title: "29º Congresso da ADJORI-PR",
@@ -37,6 +36,38 @@ export default function PalestranteIA() {
             { name: "Paraná Portal", url: "https://www.paranaportal.com/destaque/jefferson-lobo-mostra-o-impacto-da-ia-na-comunicacao/" },
             { name: "Blog do Doc", url: "https://blogdodoc.com/2026/05/28/jefferson-lobo-e-confirmado-como-palestrante-no-29o-congresso-da-adjori-pr" },
             { name: "Blog do Johnny", url: "https://blogdojohnny.com/postagens/jefferson-lobo-e-confirmado-como-palestrante-no-29o-congresso-da-adjori-pr/" },
+          ],
+        },
+        {
+          title: "Encontro Nacional de Comunicadores do Sistema Indústria (CNI)",
+          theme:
+            "Painel sobre estratégias e tendências de comunicação com profissionais do Sistema Indústria de todo o país — defendeu que a IA está mudando a comunicação corporativa em três frentes: agentes de suporte, automação de tarefas simples e uma mudança real no escopo das profissões de comunicação.",
+          location: "Brasília, DF",
+          date: "Agosto de 2026",
+          sources: [
+            { name: "Portal da Indústria (CNI)", url: "https://imprensa.portaldaindustria.com.br/releases/profissionais-do-sistema-industria-debatem-estrategias-e-tendencias-de-comunicacao/" },
+            { name: "Brasil Inovador", url: "https://brasilinovador.com.br/sistema-industria-reune-comunicadores-em-brasilia-para-alinhar-ia-e-estrategias-corporativas/" },
+          ],
+        },
+        {
+          title: "UniSenai PR + MIT — Imersão em Inteligência Artificial para Líderes Industriais",
+          theme:
+            'Conduziu o workshop "IA na Prática para Decisões Ágeis e Seguras", com exemplos reais de prompts e a criação de agentes de IA enxutos aplicados à tomada de decisão na indústria.',
+          location: "Curitiba, PR",
+          date: "Outubro de 2025",
+          sources: [
+            { name: "UniSenai PR", url: "https://unisenaipr.com.br/unisenai-pr-e-mit-promovem-imersao-em-ia-para-lideres-industriais-do-parana" },
+            { name: "Agência Sistema Fiep", url: "https://agenciafiep.com.br/2025/10/03/imersao-em-ia-conecta-lideres-industriais-do-parana-ao-futuro-da-inovacao/" },
+          ],
+        },
+        {
+          title: "Painel Laguna x Gazeta do Povo — Mercado Imobiliário de Alto Padrão",
+          theme:
+            'Painelista ao lado do economista Fábio Tadeu Araújo (CEO da Brain Inteligência Estratégica) no encontro promovido pela Construtora Laguna com a Gazeta do Povo para o Dia do Corretor, discutindo como a inteligência artificial se torna ferramenta essencial no atendimento comercial do mercado imobiliário de alto padrão.',
+          location: "Curitiba, PR (Galeria Laguna)",
+          date: "Agosto de 2026",
+          sources: [
+            { name: "Gazeta do Povo", url: "https://www.gazetadopovo.com.br/gpbc/papo-prsa/mercado-imobiliario-alto-padrao/" },
           ],
         },
       ]}
