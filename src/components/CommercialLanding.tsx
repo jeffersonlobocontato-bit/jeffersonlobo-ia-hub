@@ -50,6 +50,8 @@ export interface CommercialLandingProps {
     location: string;
     date: string;
     sources: { name: string; url: string }[];
+    image?: string;
+    imageAlt?: string;
   }[];
   /** Oculta o bloco de evidências "Prova, não promessa" quando necessário. */
   hideEvidence?: boolean;
@@ -239,8 +241,18 @@ export default function CommercialLanding(props: CommercialLandingProps) {
                 {props.evidence.map((e, i) => (
                   <Card
                     key={i}
-                    className="rounded-xl border border-border bg-card shadow-sm"
+                    className="overflow-hidden rounded-xl border border-border bg-card shadow-sm"
                   >
+                    {e.image && (
+                      <div className="aspect-video w-full overflow-hidden bg-muted">
+                        <img
+                          src={e.image}
+                          alt={e.imageAlt || e.title}
+                          className="h-full w-full object-cover"
+                          loading="lazy"
+                        />
+                      </div>
+                    )}
                     <CardContent className="p-6 space-y-3">
                       <h3 className="text-lg text-foreground tracking-tight">{e.title}</h3>
                       <p className="text-sm text-muted-foreground leading-relaxed">{e.theme}</p>
