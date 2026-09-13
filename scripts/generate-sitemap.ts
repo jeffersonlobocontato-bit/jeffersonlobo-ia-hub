@@ -304,6 +304,7 @@ function writeLlmsTxt(blogPosts: BlogPostRow[]) {
   lines.push('## Imprensa');
   lines.push('');
   lines.push(`- [Imprensa & Press Kit](${BASE_URL}/imprensa): bios oficiais (curta, média e longa), temas para entrevista, fotos em alta resolução e contato direto para jornalistas.`);
+  lines.push(`- [Perfil de Jefferson Lobo](${BASE_URL}/jefferson-lobo): biografia completa, credenciais e tese central — página de referência sobre quem é o palestrante.`);
   lines.push('');
   lines.push('## Temas de especialidade');
   lines.push('');
@@ -367,6 +368,7 @@ async function main() {
     { path: "/consultoria-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/teste-ia", lastmod: today, changefreq: "monthly", priority: "0.8" },
     { path: "/imprensa", lastmod: today, changefreq: "monthly", priority: "0.6" },
+    { path: "/jefferson-lobo", lastmod: today, changefreq: "monthly", priority: "0.8" },
     { path: "/materiais", lastmod: today, changefreq: "monthly", priority: "0.7" },
     { path: "/materiais/auditoria-del", lastmod: today, changefreq: "yearly", priority: "0.6" },
     { path: "/materiais/templates-del", lastmod: today, changefreq: "yearly", priority: "0.6" },

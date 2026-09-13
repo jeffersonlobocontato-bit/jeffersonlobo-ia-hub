@@ -14,6 +14,7 @@ import TesteIA from "./pages/TesteIA";
 import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
 import Unsubscribe from "./pages/Unsubscribe";
 import Imprensa from "./pages/Imprensa";
+import JeffersonLobo from "./pages/JeffersonLobo";
 import PalestrasIA from "./pages/PalestrasIA";
 import PalestranteIA from "./pages/PalestranteIA";
 import PalestranteIAParana from "./pages/PalestranteIAParana";
@@ -46,6 +47,7 @@ const App = () => (
               <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
               <Route path="/unsubscribe" element={<Unsubscribe />} />
               <Route path="/imprensa" element={<Imprensa />} />
+              <Route path="/jefferson-lobo" element={<JeffersonLobo />} />
               <Route path="/imprensa/r/:slug" element={<PressReleaseOG />} />
               <Route path="/palestras-ia" element={<PalestrasIA />} />
               <Route path="/palestrante-inteligencia-artificial" element={<PalestranteIA />} />
