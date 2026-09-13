@@ -36,6 +36,8 @@ export default function PalestranteIA() {
             { name: "Portal da Indústria (CNI)", url: "https://imprensa.portaldaindustria.com.br/releases/profissionais-do-sistema-industria-debatem-estrategias-e-tendencias-de-comunicacao/" },
             { name: "Brasil Inovador", url: "https://brasilinovador.com.br/sistema-industria-reune-comunicadores-em-brasilia-para-alinhar-ia-e-estrategias-corporativas/" },
           ],
+          image: "https://cgydeldzhnfyexphaheq.supabase.co/storage/v1/object/public/stage-photos/8e517450-4252-4f5b-acda-70edc81217a7-1787962915687.jpg",
+          imageAlt: "Jefferson Lobo em painel do Encontro Nacional de Comunicadores do Sistema Indústria (CNI), em Brasília",
         },
         {
           title: "UniSenai PR + MIT — Imersão em Inteligência Artificial para Líderes Industriais",
@@ -47,6 +49,8 @@ export default function PalestranteIA() {
             { name: "UniSenai PR", url: "https://unisenaipr.com.br/unisenai-pr-e-mit-promovem-imersao-em-ia-para-lideres-industriais-do-parana" },
             { name: "Agência Sistema Fiep", url: "https://agenciafiep.com.br/2025/10/03/imersao-em-ia-conecta-lideres-industriais-do-parana-ao-futuro-da-inovacao/" },
           ],
+          image: "/palco/palco-unisenai-business.png",
+          imageAlt: "Jefferson Lobo no palco da imersão UniSenai Business Global, em parceria com o MIT, em Curitiba",
         },
         {
           title: "Painel Laguna x Gazeta do Povo — Mercado Imobiliário de Alto Padrão",
@@ -57,6 +61,8 @@ export default function PalestranteIA() {
           sources: [
             { name: "Gazeta do Povo", url: "https://www.gazetadopovo.com.br/gpbc/papo-prsa/mercado-imobiliario-alto-padrao/" },
           ],
+          image: "https://cgydeldzhnfyexphaheq.supabase.co/storage/v1/object/public/stage-photos/c3509640-0b2b-4f2f-b1d6-e1b83c7a7501-1787962717580.jpg",
+          imageAlt: "Jefferson Lobo no painel promovido pela Construtora Laguna e Gazeta do Povo sobre o mercado imobiliário de alto padrão, em Curitiba",
         },
       ]}
       forWho={[
