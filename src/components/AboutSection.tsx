@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import * as LucideIcons from 'lucide-react';
 import profileImg from '@/assets/profile.jpg';
@@ -58,6 +59,12 @@ const AboutSection = () => {
             <div className="space-y-4 text-lg text-muted-foreground whitespace-pre-line">
               {displayData.description}
             </div>
+            <Link
+              to="/jefferson-lobo"
+              className="inline-block text-sm font-medium text-primary underline underline-offset-4 hover:text-primary/80 transition-colors"
+            >
+              Ver perfil completo, biografia e credenciais →
+            </Link>
           </div>
         </div>
 

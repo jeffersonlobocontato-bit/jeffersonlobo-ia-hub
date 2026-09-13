@@ -1,4 +1,5 @@
 import { Helmet } from "react-helmet-async";
+import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
@@ -72,6 +73,11 @@ export default function Imprensa() {
               <p><strong className="text-foreground">Cargo executivo:</strong> Head Executivo de Marketing do Sistema Fiep (Federação das Indústrias do Estado do Paraná)</p>
               <p><strong className="text-foreground">Atuação:</strong> Palestrante, autor e consultor em Inteligência Artificial aplicada a marketing, negócios e lideranças</p>
               <p><strong className="text-foreground">Território:</strong> Nacional — atende todo o Brasil, presencialmente e online</p>
+              <p>
+                <Link to="/jefferson-lobo" className="text-primary underline underline-offset-4 hover:text-primary/80">
+                  Ver perfil completo, biografia e credenciais →
+                </Link>
+              </p>
             </CardContent>
           </Card>
 
