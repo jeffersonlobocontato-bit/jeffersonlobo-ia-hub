@@ -52,6 +52,8 @@ export interface CommercialLandingProps {
     sources: { name: string; url: string }[];
     image?: string;
     imageAlt?: string;
+    /** object-position da foto do card (ex.: "center 12%") — evita cortar rosto/cabeça. */
+    imagePosition?: string;
   }[];
   /** Oculta o bloco de evidências "Prova, não promessa" quando necessário. */
   hideEvidence?: boolean;
@@ -249,6 +251,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
                           src={e.image}
                           alt={e.imageAlt || e.title}
                           className="h-full w-full object-cover"
+                          style={e.imagePosition ? { objectPosition: e.imagePosition } : undefined}
                           loading="lazy"
                         />
                       </div>
