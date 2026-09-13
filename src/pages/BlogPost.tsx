@@ -74,6 +74,11 @@ const BlogPost = () => {
 
   const tldr = (post.excerpt || post.subtitle || '').trim();
 
+  // "curadoria" = conteúdo do pipeline "Vozes que Importam", não escrito pelo Jefferson —
+  // autor (schema, meta tag e assinatura visível) precisa refletir isso corretamente.
+  const isCuradoria = post.author_kind === 'curadoria';
+  const authorName = isCuradoria ? 'Vozes que Importam' : 'Jefferson Lobo';
+
   const articleJsonLd: Record<string, any> = {
     '@context': 'https://schema.org',
     '@type': 'Article',
@@ -82,7 +87,9 @@ const BlogPost = () => {
     image: post.cover_image ? [post.cover_image] : undefined,
     datePublished: published,
     dateModified: updated,
-    author: { '@type': 'Person', name: 'Jefferson Lobo', url: SITE_URL },
+    author: isCuradoria
+      ? { '@type': 'Organization', name: authorName }
+      : { '@id': `${SITE_URL}/#person` },
     publisher: {
       '@type': 'Organization',
       name: 'Jefferson Lobo',
@@ -147,7 +154,7 @@ const BlogPost = () => {
         {post.cover_image && <meta property="og:image" content={post.cover_image} />}
         <meta property="article:published_time" content={published} />
         <meta property="article:modified_time" content={updated} />
-        <meta property="article:author" content="Jefferson Lobo" />
+        <meta property="article:author" content={authorName} />
         <meta property="article:section" content={post.category} />
         {(post.tags || []).map((t) => (
           <meta key={t} property="article:tag" content={t} />
@@ -189,7 +196,7 @@ const BlogPost = () => {
               </p>
             )}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs uppercase tracking-wider text-muted-foreground border-t border-b border-border py-3">
-              <span className="font-bold text-foreground">Jefferson Lobo</span>
+              <span className="font-bold text-foreground">{authorName}</span>
               <span className="flex items-center gap-1.5">
                 <Calendar className="w-3.5 h-3.5" /> {formattedDate}
               </span>

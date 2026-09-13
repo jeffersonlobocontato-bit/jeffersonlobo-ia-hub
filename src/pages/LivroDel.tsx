@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { SEO, SITE_URL } from '@/components/SEO';
@@ -88,6 +89,36 @@ const FAQS = [
 
 const SHARE_URL = `${SITE_URL}/livro-del.html`;
 
+const bookJsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Book',
+  '@id': `${SITE_URL}/livro-del#book`,
+  name: 'O código invisível dos superagentes de inteligência artificial',
+  url: `${SITE_URL}/livro-del`,
+  description:
+    'Transforme IA genérica em agentes personalizados com DNA linguístico fiel à sua marca. O Método DEL, em livro — e-book ou impresso.',
+  inLanguage: 'pt-BR',
+  author: { '@id': `${SITE_URL}/#person` },
+  offers: [
+    {
+      '@type': 'Offer',
+      name: 'E-book',
+      url: EBOOK_URL,
+      price: '47.00',
+      priceCurrency: 'BRL',
+      availability: 'https://schema.org/InStock',
+    },
+    {
+      // Sem preço fixo aqui de propósito: não há valor visível pro impresso na página —
+      // melhor faltar o campo do que inventar um número.
+      '@type': 'Offer',
+      name: 'Impresso',
+      url: IMPRESSO_URL,
+      availability: 'https://schema.org/InStock',
+    },
+  ],
+};
+
 const LivroDel = () => {
   const { trackCTA } = useTrackCTA();
   const [openFaq, setOpenFaq] = useState<string | undefined>();
@@ -112,6 +143,9 @@ const LivroDel = () => {
         path="/livro-del"
         ogImage={`${SITE_URL}/og/livro-del.jpg`}
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(bookJsonLd)}</script>
+      </Helmet>
       <Header />
 
       <main className="flex-1">

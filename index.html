@@ -86,63 +86,18 @@
           "url": "https://jeffersonlobo.tech",
           "inLanguage": "pt-BR",
           "publisher": { "@id": "https://jeffersonlobo.tech/#person" }
-        },
-        {
-          "@type": "FAQPage",
-          "mainEntity": [
-            {
-              "@type": "Question",
-              "name": "Quem é Jefferson Lobo?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Jefferson Lobo é palestrante de Inteligência Artificial para empresas e lideranças, com atuação em todo o Brasil. Atua como Head Executivo de Marketing do Sistema Fiep e é referência nacional em IA aplicada a negócios, produtividade, governança e transformação organizacional."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Quais palestras Jefferson Lobo ministra?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Keynotes e workshops sobre IA generativa para lideranças, agentes de IA com DNA autoral, orquestração de fluxos de marketing com IA, maturidade em IA para empresas e governança de IA no ambiente corporativo."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Como contratar Jefferson Lobo para uma palestra ou consultoria?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "O contato é feito pelo site jeffersonlobo.tech, na seção de briefing, pelo e-mail lobo@aivozes.com.br ou pelo telefone +55 45 99986-4213. Atende empresas em todo o Brasil, presencialmente e online."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Jefferson Lobo oferece diagnóstico de maturidade em IA?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Sim. O Teste de Maturidade em IA está disponível gratuitamente em https://jeffersonlobo.tech/teste-ia e gera um diagnóstico do nível de maturidade da empresa ou time em Inteligência Artificial."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "Qual é a tese principal de Jefferson Lobo sobre IA no marketing?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "Defende que o marketing com IA entrou na fase da orquestração de fluxos, na qual marcas precisam construir agentes de IA com identidade autoral (DNA de marca), em vez de depender de prompts genéricos e ferramentas isoladas."
-              }
-            },
-            {
-              "@type": "Question",
-              "name": "O que é o Método DEL?",
-              "acceptedAnswer": {
-                "@type": "Answer",
-                "text": "É a metodologia proprietária de Jefferson Lobo para treinar agentes de IA com identidade autoral: fidelidade sintática, semântica e lexical à voz da marca. Está detalhada no livro 'O código invisível dos superagentes de inteligência artificial' e é a base das consultorias e palestras."
-              }
-            }
-          ]
         }
       ]
     }
     </script>
+    <!--
+      O FAQPage sitewide foi removido daqui: este index.html é o shell da SPA e é servido
+      igual pra toda rota, então aquele bloco disparava em todo post/página do site sem
+      as perguntas estarem visíveis como texto em lugar nenhum — descumpre a diretriz do
+      Google pra rich results de FAQ (o conteúdo marcado precisa estar visível na página).
+      Cada página que precisa de FAQPage já declara o seu próprio, com perguntas reais
+      e visíveis (CommercialLanding.tsx, BlogPost.tsx) — é o jeito certo de fazer isso.
+    -->
   </head>
 
 

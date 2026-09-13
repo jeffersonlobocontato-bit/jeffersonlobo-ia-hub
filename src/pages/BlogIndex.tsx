@@ -29,7 +29,9 @@ const BlogIndex = () => {
       url: `${SITE_URL}/blog/${p.slug}`,
       datePublished: p.published_at || p.date,
       image: p.cover_image || undefined,
-      author: { '@type': 'Person', name: 'Jefferson Lobo' },
+      author: p.author_kind === 'curadoria'
+        ? { '@type': 'Organization', name: 'Vozes que Importam' }
+        : { '@id': `${SITE_URL}/#person` },
     })),
   };
 
