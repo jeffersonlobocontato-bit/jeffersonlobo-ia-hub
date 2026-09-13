@@ -27,18 +27,6 @@ export default function PalestranteIA() {
       }}
       evidence={[
         {
-          title: "29º Congresso da ADJORI-PR",
-          theme:
-            '"O Impacto e os desafios da Inteligência Artificial na comunicação" — palestra sobre aplicação prática e responsável de IA em veículos de comunicação.',
-          location: "Foz do Iguaçu, PR",
-          date: "Julho de 2026",
-          sources: [
-            { name: "Paraná Portal", url: "https://www.paranaportal.com/destaque/jefferson-lobo-mostra-o-impacto-da-ia-na-comunicacao/" },
-            { name: "Blog do Doc", url: "https://blogdodoc.com/2026/05/28/jefferson-lobo-e-confirmado-como-palestrante-no-29o-congresso-da-adjori-pr" },
-            { name: "Blog do Johnny", url: "https://blogdojohnny.com/postagens/jefferson-lobo-e-confirmado-como-palestrante-no-29o-congresso-da-adjori-pr/" },
-          ],
-        },
-        {
           title: "Encontro Nacional de Comunicadores do Sistema Indústria (CNI)",
           theme:
             "Painel sobre estratégias e tendências de comunicação com profissionais do Sistema Indústria de todo o país — defendeu que a IA está mudando a comunicação corporativa em três frentes: agentes de suporte, automação de tarefas simples e uma mudança real no escopo das profissões de comunicação.",
