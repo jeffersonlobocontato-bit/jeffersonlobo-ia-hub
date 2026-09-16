@@ -539,6 +539,7 @@ const Admin = () => {
               onSave={updateBlogPost}
               onDelete={deleteBlogPost}
               onAdd={addBlogPost}
+              autoOpenId={newBlogPostId}
             />
           </TabsContent>
 
