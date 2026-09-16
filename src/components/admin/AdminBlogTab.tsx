@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Save, Trash2, Plus, ChevronDown, ChevronUp, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CoverImageUploader } from '@/components/blog/CoverImageUploader';
 import { MarkdownEditor } from '@/components/blog/MarkdownEditor';
 import { slugify, calcReadingMinutes } from '@/lib/blog-utils';
