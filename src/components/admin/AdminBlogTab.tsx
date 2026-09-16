@@ -80,11 +80,23 @@ interface AdminBlogTabProps {
   onSave: (post: any) => void;
   onDelete: (id: string) => void;
   onAdd: () => void;
+  autoOpenId?: string | null;
 }
 
-export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminBlogTabProps) => {
+export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd, autoOpenId }: AdminBlogTabProps) => {
   const [seoOpen, setSeoOpen] = useState<Record<string, boolean>>({});
   const [openPost, setOpenPost] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!autoOpenId) return;
+    if (!data.some((p) => p.id === autoOpenId)) return;
+    setOpenPost((s) => ({ ...s, [autoOpenId]: true }));
+    requestAnimationFrame(() => {
+      document
+        .getElementById(`blog-post-${autoOpenId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [autoOpenId, data]);
   const patch = (id: string, fields: any) =>
     onUpdate(data.map((p) => (p.id === id ? { ...p, ...fields } : p)));
 
