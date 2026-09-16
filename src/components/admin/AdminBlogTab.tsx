@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
 import { Save, Trash2, Plus, ChevronDown, ChevronUp, X } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CoverImageUploader } from '@/components/blog/CoverImageUploader';
 import { MarkdownEditor } from '@/components/blog/MarkdownEditor';
 import { slugify, calcReadingMinutes } from '@/lib/blog-utils';
@@ -80,11 +80,23 @@ interface AdminBlogTabProps {
   onSave: (post: any) => void;
   onDelete: (id: string) => void;
   onAdd: () => void;
+  autoOpenId?: string | null;
 }
 
-export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminBlogTabProps) => {
+export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd, autoOpenId }: AdminBlogTabProps) => {
   const [seoOpen, setSeoOpen] = useState<Record<string, boolean>>({});
   const [openPost, setOpenPost] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!autoOpenId) return;
+    if (!data.some((p) => p.id === autoOpenId)) return;
+    setOpenPost((s) => ({ ...s, [autoOpenId]: true }));
+    requestAnimationFrame(() => {
+      document
+        .getElementById(`blog-post-${autoOpenId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+  }, [autoOpenId, data]);
   const patch = (id: string, fields: any) =>
     onUpdate(data.map((p) => (p.id === id ? { ...p, ...fields } : p)));
 
@@ -99,7 +111,7 @@ export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd }: AdminB
         const tagsStr = Array.isArray(post.tags) ? post.tags.join(', ') : '';
         const isOpen = !!openPost[post.id];
         return (
-          <Card key={post.id}>
+          <Card key={post.id} id={`blog-post-${post.id}`}>
             <CardHeader className="py-3">
               <CardTitle className="text-base flex justify-between items-center gap-3">
                 <button
