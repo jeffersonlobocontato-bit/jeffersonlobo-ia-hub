@@ -111,7 +111,7 @@ export const AdminBlogTab = ({ data, onUpdate, onSave, onDelete, onAdd, autoOpen
         const tagsStr = Array.isArray(post.tags) ? post.tags.join(', ') : '';
         const isOpen = !!openPost[post.id];
         return (
-          <Card key={post.id}>
+          <Card key={post.id} id={`blog-post-${post.id}`}>
             <CardHeader className="py-3">
               <CardTitle className="text-base flex justify-between items-center gap-3">
                 <button
