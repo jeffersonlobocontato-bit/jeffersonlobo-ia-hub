@@ -42,6 +42,7 @@ const Admin = () => {
   const [contactData, setContactData] = useState<any>(null);
   const [services, setServices] = useState<any[]>([]);
   const [blogPosts, setBlogPosts] = useState<any[]>([]);
+  const [newBlogPostId, setNewBlogPostId] = useState<string | null>(null);
   const [bookFeatures, setBookFeatures] = useState<any[]>([]);
   const [bookReviews, setBookReviews] = useState<any[]>([]);
   const [trustStats, setTrustStats] = useState<any[]>([]);
