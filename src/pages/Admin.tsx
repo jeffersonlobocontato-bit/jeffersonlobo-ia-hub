@@ -221,20 +221,25 @@ const Admin = () => {
 
   const addBlogPost = async () => {
     const ts = Date.now();
-    const { error } = await supabase.from('blog_posts').insert({
-      title: 'Novo Post',
-      slug: `novo-post-${ts}`,
-      excerpt: 'Resumo do post',
-      category: 'Categoria',
-      date: new Date().toISOString().split('T')[0],
-      linkedin_url: '',
-      active: true,
-    });
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .insert({
+        title: 'Novo Post',
+        slug: `novo-post-${ts}`,
+        excerpt: 'Resumo do post',
+        category: 'Categoria',
+        date: new Date().toISOString().split('T')[0],
+        linkedin_url: '',
+        active: false,
+      })
+      .select('id')
+      .single();
     if (error) {
       toast({ title: "Erro ao adicionar", description: error.message, variant: "destructive" });
     } else {
-      toast({ title: "Post adicionado!" });
-      loadAllContent();
+      toast({ title: "Rascunho criado!", description: "Editor aberto abaixo." });
+      setNewBlogPostId(data?.id ?? null);
+      await loadAllContent();
     }
   };
 
