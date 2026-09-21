@@ -178,11 +178,13 @@ export async function publishSitemapAndLlms(
 
   if (error) return { ok: false, reasons: [`falha ao buscar posts: ${error.message}`] };
 
+  // Commits sequenciais, de propósito: a Contents API do GitHub cria um commit
+  // novo por PUT baseado no HEAD atual da branch — dois PUTs concorrentes na
+  // mesma branch fazem o segundo ler um HEAD que o primeiro já moveu, e a API
+  // responde 409 (sha não confere). Rodar em série evita a corrida.
   const rows = (posts || []) as BlogPostRow[];
-  const [sitemapResult, llmsResult] = await Promise.all([
-    commitFile('public/sitemap.xml', buildSitemapXml(rows), 'chore: atualiza sitemap.xml (post publicado)'),
-    commitFile('public/llms.txt', buildLlmsTxt(rows), 'chore: atualiza llms.txt (post publicado)'),
-  ]);
+  const sitemapResult = await commitFile('public/sitemap.xml', buildSitemapXml(rows), 'chore: atualiza sitemap.xml (post publicado)');
+  const llmsResult = await commitFile('public/llms.txt', buildLlmsTxt(rows), 'chore: atualiza llms.txt (post publicado)');
 
   const reasons: string[] = [];
   if (!sitemapResult.ok) reasons.push(`sitemap.xml: ${sitemapResult.reason}`);
