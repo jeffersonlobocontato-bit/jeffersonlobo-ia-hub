@@ -2,6 +2,7 @@
 // que já foram aprovados no admin (status='approved') e avisa por Telegram
 // se algum ainda estiver esperando aprovação, sem forçar a publicação.
 import { createClient } from 'npm:@supabase/supabase-js@2';
+import { publishNoticiaHtml } from '../_shared/publish-noticia-html.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
