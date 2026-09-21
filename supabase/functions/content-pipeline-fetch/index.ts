@@ -294,36 +294,58 @@ Deno.serve(async (req) => {
     if (!curationDraft.title || !curationDraft.content_md) throw new Error('Rascunho de curadoria veio vazio da OpenAI');
     if (!authoredDraft.title || !authoredDraft.content_md) throw new Error('Rascunho autoral veio vazio da OpenAI');
 
-    // Imagem de capa: a coluna de curadoria sempre sai com foto — reaproveita a imagem da
-    // primeira nota (com crédito à fonte) quando o feed trouxe uma; se não trouxe, gera uma
-    // com IA. O artigo autoral não tem "fonte" natural pra creditar, então vai direto de IA.
+    // Imagem de capa: sempre no padrão visual do site (petróleo + kicker + título
+    // em serif com destaque âmbar + assinatura) via renderBrandedCover, em vez da
+    // foto genérica gerada por IA que o pipeline usava antes. A coluna de curadoria
+    // só foge dessa regra quando o próprio feed já trouxe uma foto de capa da fonte
+    // original (aí vale mais creditar a foto real do que gerar uma capa de marca).
     let curationCover: { url: string; alt: string } | null = null;
     const topItem = pool[0];
     try {
       if (topItem?.imageUrl) {
         curationCover = { url: topItem.imageUrl, alt: `Foto: ${topItem.source}` };
       } else {
+        const bytes = await renderBrandedCover({
+          kicker: 'VOZES QUE IMPORTAM',
+          title: curationDraft.title,
+        });
+        const url = await uploadCoverImage(supabase, bytes, `${today}-curadoria.png`);
+        curationCover = { url, alt: curationDraft.title };
+      }
+    } catch (e) {
+      console.warn('capa da coluna de curadoria falhou, tentando fallback de IA', e);
+      try {
         const bytes = await generateImage(
           openAIApiKey,
           `Fotografia realista, editorial, para capa de matéria de tecnologia sobre: ${topItem?.title || curationDraft.title}. Sem texto, sem logotipos.`,
         );
         const url = await uploadCoverImage(supabase, bytes, `${today}-curadoria.png`);
         curationCover = { url, alt: 'Imagem gerada por IA' };
+      } catch (e2) {
+        console.warn('fallback de capa da coluna de curadoria também falhou (segue sem imagem)', e2);
       }
-    } catch (e) {
-      console.warn('capa da coluna de curadoria falhou (segue sem imagem)', e);
     }
 
     let authoredCover: { url: string; alt: string } | null = null;
     try {
-      const bytes = await generateImage(
-        openAIApiKey,
-        `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
-      );
+      const bytes = await renderBrandedCover({
+        kicker: 'INTELIGÊNCIA ARTIFICIAL',
+        title: authoredDraft.title,
+      });
       const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
-      authoredCover = { url, alt: 'Imagem gerada por IA' };
+      authoredCover = { url, alt: authoredDraft.title };
     } catch (e) {
-      console.warn('capa do artigo autoral falhou (segue sem imagem)', e);
+      console.warn('capa do artigo autoral (padrão da marca) falhou, tentando fallback de IA', e);
+      try {
+        const bytes = await generateImage(
+          openAIApiKey,
+          `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
+        );
+        const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
+        authoredCover = { url, alt: 'Imagem gerada por IA' };
+      } catch (e2) {
+        console.warn('fallback de capa do artigo autoral também falhou (segue sem imagem)', e2);
+      }
     }
 
     const { data: curationPost, error: e1 } = await supabase
