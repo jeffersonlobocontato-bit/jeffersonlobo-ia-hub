@@ -1,4 +1,7 @@
-// Gera/commita public/noticia/{slug}.html pra UM post específico, sob demanda.
+// Gera/commita public/noticia/{slug}.html pra UM post específico, e também
+// regenera public/sitemap.xml + public/llms.txt com todos os posts ativos —
+// sob demanda, sem depender de `npm run build` (só roda quando clica Publish
+// no Lovable).
 //
 // Existe pra cobrir o caso que a pipeline automática (content-pipeline-publish)
 // não cobre: um post publicado fora dela — direto via SQL no Supabase, por
@@ -11,6 +14,7 @@
 // (usado pela pipeline hoje, 21/09).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { publishNoticiaHtml } from '../_shared/publish-noticia-html.ts';
+import { publishSitemapAndLlms } from '../_shared/publish-sitemap-llms.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -46,9 +50,14 @@ Deno.serve(async (req) => {
       });
     }
 
-    const result = await publishNoticiaHtml(post);
-    return new Response(JSON.stringify(result), {
-      status: result.ok ? 200 : 502,
+    const [noticiaResult, sitemapResult] = await Promise.all([
+      publishNoticiaHtml(post),
+      publishSitemapAndLlms(supabase),
+    ]);
+
+    const ok = noticiaResult.ok && sitemapResult.ok;
+    return new Response(JSON.stringify({ ok, noticia: noticiaResult, sitemapAndLlms: sitemapResult }), {
+      status: ok ? 200 : 502,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
