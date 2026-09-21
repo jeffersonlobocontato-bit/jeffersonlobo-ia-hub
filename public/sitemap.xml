@@ -97,6 +97,12 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://jeffersonlobo.tech/blog/usar-inteligencia-com-inteligencia</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://jeffersonlobo.tech/blog/a-orquestracao-de-agentes-de-ia-alem-dos-prompts-a-essencia-do-marketing-autoral-2026-09-21</loc>
     <lastmod>2026-09-21</lastmod>
     <changefreq>monthly</changefreq>
@@ -109,25 +115,25 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jeffersonlobo.tech/blog/palestrante-de-ia-para-industria</loc>
-    <lastmod>2026-09-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
     <loc>https://jeffersonlobo.tech/blog/como-treinar-agente-de-ia-com-a-voz-da-marca</loc>
     <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jeffersonlobo.tech/blog/orquestracao-de-fluxos-de-ia-nao-e-prompt-engineering</loc>
+    <loc>https://jeffersonlobo.tech/blog/ia-para-marketing-e-comunicacao-por-que-prompt-generico-nao-escala</loc>
     <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jeffersonlobo.tech/blog/ia-para-marketing-e-comunicacao-por-que-prompt-generico-nao-escala</loc>
+    <loc>https://jeffersonlobo.tech/blog/palestrante-de-ia-para-industria</loc>
+    <lastmod>2026-09-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jeffersonlobo.tech/blog/orquestracao-de-fluxos-de-ia-nao-e-prompt-engineering</loc>
     <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
