@@ -91,20 +91,20 @@
     <priority>0.3</priority>
   </url>
   <url>
+    <loc>https://jeffersonlobo.tech/blog/entre-a-parede-virtual-e-a-governanca-a-ia-sob-o-microscopio-da-realidade-2026-09-21</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jeffersonlobo.tech/blog/a-orquestracao-de-agentes-de-ia-alem-dos-prompts-a-essencia-do-marketing-autoral-2026-09-21</loc>
+    <lastmod>2026-09-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://jeffersonlobo.tech/blog/o-clique-perdeu-a-coroa-quem-manda-agora-e-a-citacao</loc>
     <lastmod>2026-09-16</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://jeffersonlobo.tech/blog/orquestracao-de-fluxos-de-ia-nao-e-prompt-engineering</loc>
-    <lastmod>2026-09-13</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://jeffersonlobo.tech/blog/ia-para-marketing-e-comunicacao-por-que-prompt-generico-nao-escala</loc>
-    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -121,14 +121,20 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jeffersonlobo.tech/blog/por-que-ia-sem-dna-autoral-e-commodity</loc>
+    <loc>https://jeffersonlobo.tech/blog/orquestracao-de-fluxos-de-ia-nao-e-prompt-engineering</loc>
     <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jeffersonlobo.tech/blog/a-ia-entre-o-bilhao-e-a-regulacao-openai-fatura-e-a-lei-se-aperta-2026-08-31</loc>
-    <lastmod>2026-08-31</lastmod>
+    <loc>https://jeffersonlobo.tech/blog/ia-para-marketing-e-comunicacao-por-que-prompt-generico-nao-escala</loc>
+    <lastmod>2026-09-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jeffersonlobo.tech/blog/por-que-ia-sem-dna-autoral-e-commodity</loc>
+    <lastmod>2026-09-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
@@ -139,13 +145,19 @@
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://jeffersonlobo.tech/blog/da-governanca-a-educacao-openai-google-e-o-desafio-da-orquestracao-de-agentes-2026-08-28</loc>
-    <lastmod>2026-08-28</lastmod>
+    <loc>https://jeffersonlobo.tech/blog/a-ia-entre-o-bilhao-e-a-regulacao-openai-fatura-e-a-lei-se-aperta-2026-08-31</loc>
+    <lastmod>2026-08-31</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
     <loc>https://jeffersonlobo.tech/blog/a-orquestracao-de-fluxos-de-ia-no-marketing-alem-do-prompt-avulso-2026-08-28</loc>
+    <lastmod>2026-08-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
+    <loc>https://jeffersonlobo.tech/blog/da-governanca-a-educacao-openai-google-e-o-desafio-da-orquestracao-de-agentes-2026-08-28</loc>
     <lastmod>2026-08-28</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
