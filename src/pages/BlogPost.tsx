@@ -130,11 +130,14 @@ const BlogPost = () => {
       }
     : null;
 
-  // URL de compartilhamento: arquivo .html plano gerado no build (public/noticia/{slug}.html),
-  // que já traz title/og:image/og:description da matéria para os crawlers de WhatsApp e LinkedIn.
-  // Usamos o caminho ESTÁVEL (sem versão) para nunca cair em 404 quando o post é editado
-  // depois do último build — nesse caso o crawler cairia no index.html genérico da SPA.
-  const shareUrl = `${SITE_URL}/noticia/${post.slug}.html`;
+  // URL de compartilhamento: a edge function blog-share (supabase/functions/blog-share),
+  // que gera o HTML com title/og:image/og:description direto do banco pra qualquer post —
+  // inclusive os publicados automaticamente pelo pipeline diário, que nunca passam por um
+  // build do site. O antigo esquema apontava pra um arquivo estático em public/noticia/{slug}.html
+  // que só existia quando alguém gerava e commitava esse arquivo manualmente; pra qualquer post
+  // sem esse arquivo (todo post do pipeline automático), o link caía em 404 e WhatsApp/LinkedIn
+  // não conseguiam montar a prévia — exatamente o problema reportado.
+  const shareUrl = `${SUPABASE_FUNCTIONS_URL}/blog-share/${post.slug}`;
   const sharePayload = encodeURIComponent(`${post.title}\n\n${shareUrl}`);
 
 
