@@ -18,9 +18,6 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
-// Mesmo projeto de supabase/config.toml (project_id). Usado só pra montar a URL
-// pública da edge function blog-share — ver comentário em cima de `shareUrl`.
-const SUPABASE_FUNCTIONS_URL = 'https://cgydeldzhnfyexphaheq.supabase.co/functions/v1';
 
 
 
