@@ -44,6 +44,7 @@ Deno.serve(async (req) => {
     const approved = (posts || []).filter((p) => p.status === 'approved');
     const stillPending = (posts || []).filter((p) => p.status === 'pending_review');
 
+    const noticiaFailures: string[] = [];
     for (const post of approved) {
       await supabase
         .from('blog_posts')
@@ -54,7 +55,30 @@ Deno.serve(async (req) => {
       supabase.functions.invoke('publish-linkedin', { body: { postId: post.id } }).catch((e) => {
         console.warn('publish-linkedin falhou (não bloqueia o blog)', e);
       });
+      // Gera/commita public/noticia/{slug}.html pro link de compartilhamento (LinkedIn/
+      // WhatsApp) já sair bonito no domínio do site — ver _shared/publish-noticia-html.ts.
+      // Nunca bloqueia nem reverte a publicação do post no blog.
+      const noticiaResult = await publishNoticiaHtml(post);
+      if (!noticiaResult.ok) {
+        console.warn(`publishNoticiaHtml falhou para "${post.title}"`, noticiaResult.reason);
+        noticiaFailures.push(`• ${post.title}: ${noticiaResult.reason}`);
+      }
     }
+
+    if (noticiaFailures.length > 0) {
+      await supabase.functions
+        .invoke('notify-telegram', {
+          body: {
+            text:
+              `⚠️ <b>Post publicado, mas a prévia de compartilhamento (/noticia) falhou</b>\n\n` +
+              `${noticiaFailures.join('\n')}\n\n` +
+              `O blog continua no ar normalmente — só o link bonito pro LinkedIn/WhatsApp não foi gerado. ` +
+              `Confira o secret GITHUB_TOKEN.`,
+          },
+        })
+        .catch(() => {});
+    }
+
 
     if (approved.length > 0) {
       await supabase
