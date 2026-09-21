@@ -50,10 +50,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    const [noticiaResult, sitemapResult] = await Promise.all([
-      publishNoticiaHtml(post),
-      publishSitemapAndLlms(supabase),
-    ]);
+    // Sequencial de propósito: ver comentário em publish-sitemap-llms.ts sobre
+    // por que commits concorrentes na mesma branch causam 409 na Contents API.
+    const noticiaResult = await publishNoticiaHtml(post);
+    const sitemapResult = await publishSitemapAndLlms(supabase);
 
     const ok = noticiaResult.ok && sitemapResult.ok;
     return new Response(JSON.stringify({ ok, noticia: noticiaResult, sitemapAndLlms: sitemapResult }), {
