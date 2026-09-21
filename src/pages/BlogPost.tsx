@@ -133,14 +133,14 @@ const BlogPost = () => {
       }
     : null;
 
-  // URL de compartilhamento: a edge function blog-share (supabase/functions/blog-share),
-  // que gera o HTML com title/og:image/og:description direto do banco pra qualquer post —
-  // inclusive os publicados automaticamente pelo pipeline diário, que nunca passam por um
-  // build do site. O antigo esquema apontava pra um arquivo estático em public/noticia/{slug}.html
-  // que só existia quando alguém gerava e commitava esse arquivo manualmente; pra qualquer post
-  // sem esse arquivo (todo post do pipeline automático), o link caía em 404 e WhatsApp/LinkedIn
-  // não conseguiam montar a prévia — exatamente o problema reportado.
-  const shareUrl = `${SUPABASE_FUNCTIONS_URL}/blog-share/${post.slug}`;
+  // URL de compartilhamento: arquivo estático public/noticia/{slug}.html, com title/
+  // og:image/og:description prontos pra WhatsApp/LinkedIn (que não executam JS, então
+  // não veem as tags que o react-helmet-async injeta na rota /blog/:slug).
+  // Esse arquivo agora é gerado e commitado automaticamente na publicação pelo pipeline
+  // diário (supabase/functions/content-pipeline-publish, via _shared/publish-noticia-html.ts).
+  // Fallback caso o commit falhe (GITHUB_TOKEN ausente etc.): a edge function blog-share
+  // cobre qualquer post direto do banco.
+  const shareUrl = `${SITE_URL}/noticia/${post.slug}.html`;
   const sharePayload = encodeURIComponent(`${post.title}\n\n${shareUrl}`);
 
 
