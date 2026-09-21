@@ -6,6 +6,7 @@
 // admin. Notifica por Telegram quando a pauta do dia está pronta.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { signApprovalToken } from '../_shared/approval-token.ts';
+import { renderBrandedCover } from '../_shared/branded-cover.ts';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
 
