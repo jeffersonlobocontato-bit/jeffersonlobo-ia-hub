@@ -19,6 +19,8 @@ import {
 } from '@/types/videoEditor';
 import { VideoStagePreview } from './video-editor/VideoStagePreview';
 import { CoverPreview } from './video-editor/CoverPreview';
+import { VideoPlayer } from './video-editor/VideoPlayer';
+import { VideoTimelineRuler } from './video-editor/VideoTimelineRuler';
 
 // video_projects ainda não está no types.ts gerado — mesmo padrão de cast
 // já usado em outras abas do admin (ex.: AdminProductsCasesTab).
@@ -38,6 +40,7 @@ const AdminVideoEditorTab = () => {
   const [enviando, setEnviando] = useState<string | null>(null);
   const [transcrevendo, setTranscrevendo] = useState(false);
   const [erroTranscricao, setErroTranscricao] = useState<string | null>(null);
+  const [tempoAtual, setTempoAtual] = useState(0); // playhead da timeline, em segundos
 
   const carregar = async () => {
     setLoading(true);
@@ -59,6 +62,7 @@ const AdminVideoEditorTab = () => {
     // (filtroVintage, overlayFundo, legenda.manchete…) não têm esses campos
     // no JSON — normaliza pra sempre abrir com um config completo.
     setConfig(normalizarConfig(p.config, p.template));
+    setTempoAtual(0);
   };
 
   const voltar = () => {
@@ -160,6 +164,8 @@ const AdminVideoEditorTab = () => {
     setConfig((c) => (c ? { ...c, filtroVintage: { ...c.filtroVintage, ...patch } } : c));
   const patchOverlayFundo = (patch: Partial<VideoProjectConfig['overlayFundo']>) =>
     setConfig((c) => (c ? { ...c, overlayFundo: { ...c.overlayFundo, ...patch } } : c));
+  const patchTimeline = (patch: Partial<VideoProjectConfig['timeline']>) =>
+    setConfig((c) => (c ? { ...c, timeline: { ...c.timeline, ...patch } } : c));
 
   if (loading) {
     return <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando…</div>;
@@ -249,6 +255,7 @@ const AdminVideoEditorTab = () => {
           <TabsList className="flex-wrap">
             <TabsTrigger value="template">Template</TabsTrigger>
             <TabsTrigger value="moldura">Moldura</TabsTrigger>
+            <TabsTrigger value="timeline">Linha do tempo</TabsTrigger>
             <TabsTrigger value="fundo">Fundo</TabsTrigger>
             <TabsTrigger value="legenda">Legenda</TabsTrigger>
             <TabsTrigger value="assinatura">Assinatura</TabsTrigger>
@@ -318,7 +325,12 @@ const AdminVideoEditorTab = () => {
                 onChange={(e) => {
                   const f = e.target.files?.[0]; if (!f) return;
                   const mediaTipo = f.type.startsWith('video') ? 'video' : 'imagem';
-                  upload(f, 'moldura', (url) => patchMoldura({ mediaUrl: url, mediaTipo }));
+                  upload(f, 'moldura', (url) => {
+                    patchMoldura({ mediaUrl: url, mediaTipo });
+                    // Arquivo novo — o corte e a duração do arquivo antigo não valem mais.
+                    patchTimeline({ duracaoOriginalSegundos: null, cortarInicioSegundos: 0, cortarFimSegundos: null });
+                    setTempoAtual(0);
+                  });
                 }}
               />
               <Button size="sm" variant="outline" onClick={() => document.getElementById('up-moldura')?.click()} disabled={enviando === 'moldura'}>
@@ -350,6 +362,32 @@ const AdminVideoEditorTab = () => {
                 <Slider value={[config.moldura.focalY]} min={0} max={100} step={1} onValueChange={([v]) => patchMoldura({ focalY: v })} />
               </div>
             </div>
+          </TabsContent>
+
+          {/* LINHA DO TEMPO — etapas 1-3: player de verdade + régua de tempo.
+              Corte (arrastar bordas) e faixas de B-roll/trilha vêm nas
+              próximas etapas, por cima dessa mesma base. */}
+          <TabsContent value="timeline" className="space-y-4 pt-4">
+            {config.moldura.mediaTipo !== 'video' || !config.moldura.mediaUrl ? (
+              <p className="text-xs text-muted-foreground">Envie a gravação (vídeo) na aba Moldura primeiro — a linha do tempo toca esse arquivo.</p>
+            ) : (
+              <>
+                <VideoPlayer
+                  mediaUrl={config.moldura.mediaUrl}
+                  tempoAtual={tempoAtual}
+                  onTempoAtualChange={setTempoAtual}
+                  onDuracaoDetectada={(d) => patchTimeline({ duracaoOriginalSegundos: d })}
+                />
+                <VideoTimelineRuler
+                  duracaoSegundos={config.timeline.duracaoOriginalSegundos ?? 0}
+                  tempoAtual={tempoAtual}
+                  onSeek={setTempoAtual}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Por enquanto só toca e navega no tempo. Cortar trecho (arrastar as bordas) e organizar clipes de B-roll na linha do tempo são as próximas etapas.
+                </p>
+              </>
+            )}
           </TabsContent>
 
           {/* FUNDO — muda de conteúdo conforme o template, mas o value da aba

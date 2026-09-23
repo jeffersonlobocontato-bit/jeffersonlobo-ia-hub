@@ -85,6 +85,31 @@ export interface CapaConfig {
   imagemUrl: string | null;
 }
 
+// ── TIMELINE ──────────────────────────────────────────────────────────────
+// Etapa 1 da linha do tempo: só o suficiente pra tocar a gravação principal
+// (moldura.mediaUrl) e mostrar o corte dela na régua. Cresce nas próximas
+// etapas — B-roll com múltiplos clipes e trilha sonora entram como campos
+// novos aqui dentro, sem trocar o nome nem duplicar estrutura.
+export interface TimelineConfig {
+  duracaoOriginalSegundos: number | null; // duração real do arquivo, detectada pelo player — null até o vídeo carregar
+  cortarInicioSegundos: number; // segundos a partir do início do arquivo original (trim in)
+  cortarFimSegundos: number | null; // segundos a partir do início do arquivo original (trim out); null = até o fim
+}
+
+/** Duração do trecho que de fato entra no vídeo final, já considerando o corte. */
+export function duracaoEfetivaTimeline(timeline: TimelineConfig): number {
+  const fim = timeline.cortarFimSegundos ?? timeline.duracaoOriginalSegundos ?? 0;
+  return Math.max(0, fim - timeline.cortarInicioSegundos);
+}
+
+/** Formato m:ss usado no player e na régua — um só lugar pra mudar (ex.: horas em vídeos longos). */
+export function formatarTempoTimeline(segundos: number): string {
+  const s = Math.max(0, Math.floor(segundos));
+  const m = Math.floor(s / 60);
+  const r = s % 60;
+  return `${m}:${r.toString().padStart(2, '0')}`;
+}
+
 export interface FiltroVintageConfig {
   ativo: boolean;
   intensidade: number; // 0–100 — grão + tom quente + vinheta
@@ -107,6 +132,7 @@ export interface VideoProjectConfig {
   capa: CapaConfig;
   filtroVintage: FiltroVintageConfig;
   overlayFundo: OverlayFundoConfig;
+  timeline: TimelineConfig;
 }
 
 export interface VideoProject {
@@ -267,6 +293,11 @@ export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
       imagemUrl: null,
       opacidade: 35,
     },
+    timeline: {
+      duracaoOriginalSegundos: null,
+      cortarInicioSegundos: 0,
+      cortarFimSegundos: null,
+    },
   };
 }
 
@@ -292,5 +323,6 @@ export function normalizarConfig(config: Partial<VideoProjectConfig> | null | un
     capa: { ...padrao.capa, ...config.capa },
     filtroVintage: { ...padrao.filtroVintage, ...config.filtroVintage },
     overlayFundo: { ...padrao.overlayFundo, ...config.overlayFundo },
+    timeline: { ...padrao.timeline, ...config.timeline },
   };
 }
