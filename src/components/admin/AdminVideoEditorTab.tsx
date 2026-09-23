@@ -14,7 +14,7 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, Copy, Upload, ArrowLeft, Loader2 } from 'lucide-react';
 import {
-  type VideoProject, type VideoProjectConfig, type TemplateTipo, type Paleta, type TransicaoTipo, type EstiloLegenda,
+  type VideoProject, type VideoProjectConfig, type TemplateTipo, type Paleta, type EstiloLegenda,
   PALETAS, TEMPLATE_LABELS, TEMPLATE_LIBRARY, criarConfigPadrao, normalizarConfig, duracaoTotalClipes,
 } from '@/types/videoEditor';
 import { VideoStagePreview } from './video-editor/VideoStagePreview';
@@ -26,6 +26,7 @@ import { VideoTimelineLegendaTrack } from './video-editor/VideoTimelineLegendaTr
 import { VideoLegendaAoVivo } from './video-editor/VideoLegendaAoVivo';
 import { VideoTrilhaSonoraPlayer } from './video-editor/VideoTrilhaSonoraPlayer';
 import { VideoTimelineTrilhaTrack } from './video-editor/VideoTimelineTrilhaTrack';
+import { VideoTimelineTransicaoMarcadores } from './video-editor/VideoTimelineTransicaoMarcadores';
 
 // video_projects ainda não está no types.ts gerado — mesmo padrão de cast
 // já usado em outras abas do admin (ex.: AdminProductsCasesTab).
@@ -382,11 +383,11 @@ const AdminVideoEditorTab = () => {
             </div>
           </TabsContent>
 
-          {/* LINHA DO TEMPO — etapas 1-7: player, régua com corte, faixa de
-              B-roll (só no template fundo dinâmico), faixa de legenda
+          {/* LINHA DO TEMPO — etapas 1-8, todas as planejadas: player, régua
+              com corte, faixa de B-roll com marcador de transição em cada
+              corte (só no template fundo dinâmico), faixa de legenda
               sincronizada e trilha sonora (toca de verdade junto com o
-              vídeo, com fade — configura na aba Trilha). Marcadores de
-              transição entram como última faixa, na próxima etapa. */}
+              vídeo, com fade — configura na aba Trilha). */}
           <TabsContent value="timeline" className="space-y-4 pt-4">
             {config.moldura.mediaTipo !== 'video' || !config.moldura.mediaUrl ? (
               <p className="text-xs text-muted-foreground">Envie a gravação (vídeo) na aba Moldura primeiro — a linha do tempo toca esse arquivo.</p>
@@ -428,17 +429,26 @@ const AdminVideoEditorTab = () => {
                   onSeek={setTempoAtual}
                 />
                 {template === 'fundo_dinamico' && (
-                  <VideoTimelineBRollTrack
-                    clipes={config.fundoDinamico.clipes}
-                    duracaoTotalSegundos={duracaoTotalTimeline}
-                    tempoAtual={tempoAtual}
-                    onSeek={setTempoAtual}
-                    onReordenar={(clipes) => patchConfig({ fundoDinamico: { clipes } })}
-                    onRedimensionar={(id, duracaoSegundos) => patchConfig({
-                      fundoDinamico: { clipes: config.fundoDinamico.clipes.map((c) => (c.id === id ? { ...c, duracaoSegundos } : c)) },
-                    })}
-                    onRemover={(id) => patchConfig({ fundoDinamico: { clipes: config.fundoDinamico.clipes.filter((c) => c.id !== id) } })}
-                  />
+                  <>
+                    <VideoTimelineTransicaoMarcadores
+                      clipes={config.fundoDinamico.clipes}
+                      duracaoTotalSegundos={duracaoTotalTimeline}
+                      onAlterarTransicao={(id, transicao) => patchConfig({
+                        fundoDinamico: { clipes: config.fundoDinamico.clipes.map((c) => (c.id === id ? { ...c, transicao } : c)) },
+                      })}
+                    />
+                    <VideoTimelineBRollTrack
+                      clipes={config.fundoDinamico.clipes}
+                      duracaoTotalSegundos={duracaoTotalTimeline}
+                      tempoAtual={tempoAtual}
+                      onSeek={setTempoAtual}
+                      onReordenar={(clipes) => patchConfig({ fundoDinamico: { clipes } })}
+                      onRedimensionar={(id, duracaoSegundos) => patchConfig({
+                        fundoDinamico: { clipes: config.fundoDinamico.clipes.map((c) => (c.id === id ? { ...c, duracaoSegundos } : c)) },
+                      })}
+                      onRemover={(id) => patchConfig({ fundoDinamico: { clipes: config.fundoDinamico.clipes.filter((c) => c.id !== id) } })}
+                    />
+                  </>
                 )}
                 <VideoTimelineTrilhaTrack
                   trilha={config.trilhaSonora}
@@ -449,7 +459,7 @@ const AdminVideoEditorTab = () => {
                 />
                 <p className="text-xs text-muted-foreground">
                   Arraste as alças âmbar pra cortar o trecho usado da gravação — fora dele o vídeo não toca.
-                  {template === 'fundo_dinamico' && ' Na faixa de baixo, arraste o corpo de um clipe pra reordenar e a borda direita pra mudar a duração.'}
+                  {template === 'fundo_dinamico' && ' Na faixa de baixo, arraste o corpo de um clipe pra reordenar e a borda direita pra mudar a duração — e clique na bolinha acima de cada corte pra trocar o tipo de transição.'}
                   {config.trilhaSonora.ativa && config.trilhaSonora.mediaUrl && ' Aperte play pra ouvir a trilha sonora tocando junto.'}
                 </p>
               </>
@@ -551,27 +561,13 @@ const AdminVideoEditorTab = () => {
                   <Button size="sm" variant="outline" onClick={() => document.getElementById(`up-clipe-${clipe.id}`)?.click()} disabled={enviando === `clipe-${clipe.id}`}>
                     <Upload className="mr-1 h-4 w-4" /> {enviando === `clipe-${clipe.id}` ? 'Enviando…' : (clipe.mediaUrl ? 'Trocar mídia' : 'Enviar mídia')}
                   </Button>
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <Label className="text-xs">Duração (s)</Label>
-                      <Input type="number" min={1} max={20} value={clipe.duracaoSegundos} onChange={(e) => patchConfig({
-                        fundoDinamico: { clipes: config.fundoDinamico.clipes.map((c) => (c.id === clipe.id ? { ...c, duracaoSegundos: Number(e.target.value) } : c)) },
-                      })} />
-                    </div>
-                    <div>
-                      <Label className="text-xs">Transição</Label>
-                      <Select value={clipe.transicao} onValueChange={(v) => patchConfig({
-                        fundoDinamico: { clipes: config.fundoDinamico.clipes.map((c) => (c.id === clipe.id ? { ...c, transicao: v as TransicaoTipo } : c)) },
-                      })}>
-                        <SelectTrigger><SelectValue /></SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="corte">Corte seco</SelectItem>
-                          <SelectItem value="fusao">Fusão</SelectItem>
-                          <SelectItem value="arrasto">Arrasto</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
+                  <div>
+                    <Label className="text-xs">Duração (s)</Label>
+                    <Input type="number" min={1} max={20} value={clipe.duracaoSegundos} onChange={(e) => patchConfig({
+                      fundoDinamico: { clipes: config.fundoDinamico.clipes.map((c) => (c.id === clipe.id ? { ...c, duracaoSegundos: Number(e.target.value) } : c)) },
+                    })} />
                   </div>
+                  <p className="text-[11px] text-muted-foreground">A transição de entrada desse clipe se ajusta na aba Linha do tempo, no marcador acima da faixa.</p>
                 </Card>
                 ))}
                 <Button size="sm" variant="outline" onClick={() => patchConfig({
