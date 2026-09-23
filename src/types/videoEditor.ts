@@ -87,9 +87,10 @@ export interface CapaConfig {
 
 // ── TIMELINE ──────────────────────────────────────────────────────────────
 // Etapa 1 da linha do tempo: só o suficiente pra tocar a gravação principal
-// (moldura.mediaUrl) e mostrar o corte dela na régua. Cresce nas próximas
-// etapas — B-roll com múltiplos clipes e trilha sonora entram como campos
-// novos aqui dentro, sem trocar o nome nem duplicar estrutura.
+// (moldura.mediaUrl) e mostrar o corte dela na régua. Na prática, B-roll
+// (fundoDinamico.clipes) e trilha sonora (trilhaSonora, abaixo) acabaram
+// como suas próprias seções em VideoProjectConfig, não dentro deste objeto
+// — cada uma já tinha (ou ganhou) campos que só fazem sentido nela mesma.
 export interface TimelineConfig {
   duracaoOriginalSegundos: number | null; // duração real do arquivo, detectada pelo player — null até o vídeo carregar
   cortarInicioSegundos: number; // segundos a partir do início do arquivo original (trim in)
@@ -163,6 +164,31 @@ export interface OverlayFundoConfig {
   opacidade: number; // 0–100
 }
 
+export interface TrilhaSonoraConfig {
+  ativa: boolean;
+  mediaUrl: string | null;
+  volume: number; // 0–100
+  fadeInSegundos: number; // 0 = entra sem fade
+  fadeOutSegundos: number; // 0 = sai sem fade
+}
+
+/**
+ * Volume real (0–1) num instante, já aplicando o fade de entrada/saída.
+ * `duracaoSegundos` é o total do vídeo (a trilha repete em loop se for
+ * mais curta que isso), não a duração do próprio arquivo de música.
+ */
+export function volumeComFade(trilha: TrilhaSonoraConfig, tempoSegundos: number, duracaoSegundos: number): number {
+  const base = trilha.volume / 100;
+  if (trilha.fadeInSegundos > 0 && tempoSegundos < trilha.fadeInSegundos) {
+    return base * (tempoSegundos / trilha.fadeInSegundos);
+  }
+  const inicioFadeOut = duracaoSegundos - trilha.fadeOutSegundos;
+  if (trilha.fadeOutSegundos > 0 && tempoSegundos > inicioFadeOut) {
+    return base * Math.max(0, (duracaoSegundos - tempoSegundos) / trilha.fadeOutSegundos);
+  }
+  return base;
+}
+
 export interface VideoProjectConfig {
   paleta: Paleta;
   mostrarZonasSeguras: boolean;
@@ -175,6 +201,7 @@ export interface VideoProjectConfig {
   filtroVintage: FiltroVintageConfig;
   overlayFundo: OverlayFundoConfig;
   timeline: TimelineConfig;
+  trilhaSonora: TrilhaSonoraConfig;
 }
 
 export interface VideoProject {
@@ -340,6 +367,13 @@ export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
       cortarInicioSegundos: 0,
       cortarFimSegundos: null,
     },
+    trilhaSonora: {
+      ativa: false,
+      mediaUrl: null,
+      volume: 40,
+      fadeInSegundos: 1,
+      fadeOutSegundos: 1,
+    },
   };
 }
 
@@ -366,5 +400,6 @@ export function normalizarConfig(config: Partial<VideoProjectConfig> | null | un
     filtroVintage: { ...padrao.filtroVintage, ...config.filtroVintage },
     overlayFundo: { ...padrao.overlayFundo, ...config.overlayFundo },
     timeline: { ...padrao.timeline, ...config.timeline },
+    trilhaSonora: { ...padrao.trilhaSonora, ...config.trilhaSonora },
   };
 }

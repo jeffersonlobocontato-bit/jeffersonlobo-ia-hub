@@ -13,6 +13,8 @@ interface Props {
   /** Corte (etapa 4): fora dele não toca — dar play começa do início do corte, e o vídeo pausa sozinho no fim dele. */
   cortarInicioSegundos?: number;
   cortarFimSegundos?: number | null;
+  /** Etapa 7: a trilha sonora precisa saber quando tocar/pausar junto com o vídeo. */
+  onTocandoChange?: (tocando: boolean) => void;
 }
 
 /**
@@ -23,16 +25,20 @@ interface Props {
  */
 export const VideoPlayer = ({
   mediaUrl, tempoAtual, onTempoAtualChange, onDuracaoDetectada,
-  cortarInicioSegundos = 0, cortarFimSegundos = null,
+  cortarInicioSegundos = 0, cortarFimSegundos = null, onTocandoChange,
 }: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [tocando, setTocando] = useState(false);
   const [duracao, setDuracao] = useState(0);
 
-  // Se o vídeo mudou (outro arquivo enviado), reseta o player.
+  // Se o vídeo mudou (outro arquivo enviado), reseta o player — e avisa quem
+  // estiver ouvindo `tocando` (a trilha sonora), senão ela fica "tocando"
+  // pro estado do pai mesmo com o vídeo parado depois da troca.
   useEffect(() => {
     setTocando(false);
     setDuracao(0);
+    onTocandoChange?.(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mediaUrl]);
 
   // O tempo pode mudar por fora (clique na régua) — sincroniza o elemento
@@ -66,8 +72,8 @@ export const VideoPlayer = ({
         className="w-full max-w-[280px] rounded-lg border bg-black"
         style={{ aspectRatio: '9 / 16' }}
         playsInline
-        onPlay={() => setTocando(true)}
-        onPause={() => setTocando(false)}
+        onPlay={() => { setTocando(true); onTocandoChange?.(true); }}
+        onPause={() => { setTocando(false); onTocandoChange?.(false); }}
         onTimeUpdate={(e) => {
           const el = e.currentTarget;
           if (cortarFimSegundos !== null && el.currentTime >= cortarFimSegundos) {

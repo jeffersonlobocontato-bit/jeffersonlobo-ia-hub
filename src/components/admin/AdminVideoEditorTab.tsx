@@ -24,6 +24,8 @@ import { VideoTimelineRuler } from './video-editor/VideoTimelineRuler';
 import { VideoTimelineBRollTrack } from './video-editor/VideoTimelineBRollTrack';
 import { VideoTimelineLegendaTrack } from './video-editor/VideoTimelineLegendaTrack';
 import { VideoLegendaAoVivo } from './video-editor/VideoLegendaAoVivo';
+import { VideoTrilhaSonoraPlayer } from './video-editor/VideoTrilhaSonoraPlayer';
+import { VideoTimelineTrilhaTrack } from './video-editor/VideoTimelineTrilhaTrack';
 
 // video_projects ainda não está no types.ts gerado — mesmo padrão de cast
 // já usado em outras abas do admin (ex.: AdminProductsCasesTab).
@@ -44,6 +46,7 @@ const AdminVideoEditorTab = () => {
   const [transcrevendo, setTranscrevendo] = useState(false);
   const [erroTranscricao, setErroTranscricao] = useState<string | null>(null);
   const [tempoAtual, setTempoAtual] = useState(0); // playhead da timeline, em segundos
+  const [tocando, setTocando] = useState(false); // segue o play/pause do VideoPlayer — a trilha sonora acompanha
 
   const carregar = async () => {
     setLoading(true);
@@ -66,6 +69,7 @@ const AdminVideoEditorTab = () => {
     // no JSON — normaliza pra sempre abrir com um config completo.
     setConfig(normalizarConfig(p.config, p.template));
     setTempoAtual(0);
+    setTocando(false);
   };
 
   const voltar = () => {
@@ -169,6 +173,8 @@ const AdminVideoEditorTab = () => {
     setConfig((c) => (c ? { ...c, overlayFundo: { ...c.overlayFundo, ...patch } } : c));
   const patchTimeline = (patch: Partial<VideoProjectConfig['timeline']>) =>
     setConfig((c) => (c ? { ...c, timeline: { ...c.timeline, ...patch } } : c));
+  const patchTrilhaSonora = (patch: Partial<VideoProjectConfig['trilhaSonora']>) =>
+    setConfig((c) => (c ? { ...c, trilhaSonora: { ...c.trilhaSonora, ...patch } } : c));
 
   if (loading) {
     return <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando…</div>;
@@ -269,6 +275,7 @@ const AdminVideoEditorTab = () => {
             <TabsTrigger value="timeline">Linha do tempo</TabsTrigger>
             <TabsTrigger value="fundo">Fundo</TabsTrigger>
             <TabsTrigger value="legenda">Legenda</TabsTrigger>
+            <TabsTrigger value="trilha">Trilha</TabsTrigger>
             <TabsTrigger value="assinatura">Assinatura</TabsTrigger>
             <TabsTrigger value="capa">Capa</TabsTrigger>
           </TabsList>
@@ -375,12 +382,11 @@ const AdminVideoEditorTab = () => {
             </div>
           </TabsContent>
 
-          {/* LINHA DO TEMPO — etapas 1-6: player, régua com corte, faixa de
-              B-roll (só no template fundo dinâmico) e faixa de legenda —
-              a transcrição da aba Legenda, sincronizada de verdade com o
-              player (a legenda ao vivo acima da régua é a prova disso).
-              Trilha sonora e marcadores de transição entram como novas
-              faixas aqui embaixo, nas próximas etapas. */}
+          {/* LINHA DO TEMPO — etapas 1-7: player, régua com corte, faixa de
+              B-roll (só no template fundo dinâmico), faixa de legenda
+              sincronizada e trilha sonora (toca de verdade junto com o
+              vídeo, com fade — configura na aba Trilha). Marcadores de
+              transição entram como última faixa, na próxima etapa. */}
           <TabsContent value="timeline" className="space-y-4 pt-4">
             {config.moldura.mediaTipo !== 'video' || !config.moldura.mediaUrl ? (
               <p className="text-xs text-muted-foreground">Envie a gravação (vídeo) na aba Moldura primeiro — a linha do tempo toca esse arquivo.</p>
@@ -393,6 +399,13 @@ const AdminVideoEditorTab = () => {
                   onDuracaoDetectada={(d) => patchTimeline({ duracaoOriginalSegundos: d })}
                   cortarInicioSegundos={config.timeline.cortarInicioSegundos}
                   cortarFimSegundos={config.timeline.cortarFimSegundos}
+                  onTocandoChange={setTocando}
+                />
+                <VideoTrilhaSonoraPlayer
+                  trilha={config.trilhaSonora}
+                  timeline={config.timeline}
+                  tempoAtual={tempoAtual}
+                  tocando={tocando}
                 />
                 <VideoLegendaAoVivo palavras={config.legenda.palavras} tempoAtual={tempoAtual} />
                 <div>
@@ -427,9 +440,17 @@ const AdminVideoEditorTab = () => {
                     onRemover={(id) => patchConfig({ fundoDinamico: { clipes: config.fundoDinamico.clipes.filter((c) => c.id !== id) } })}
                   />
                 )}
+                <VideoTimelineTrilhaTrack
+                  trilha={config.trilhaSonora}
+                  timeline={config.timeline}
+                  duracaoEixoSegundos={duracaoTotalTimeline}
+                  tempoAtual={tempoAtual}
+                  onSeek={setTempoAtual}
+                />
                 <p className="text-xs text-muted-foreground">
                   Arraste as alças âmbar pra cortar o trecho usado da gravação — fora dele o vídeo não toca.
                   {template === 'fundo_dinamico' && ' Na faixa de baixo, arraste o corpo de um clipe pra reordenar e a borda direita pra mudar a duração.'}
+                  {config.trilhaSonora.ativa && config.trilhaSonora.mediaUrl && ' Aperte play pra ouvir a trilha sonora tocando junto.'}
                 </p>
               </>
             )}
@@ -665,6 +686,47 @@ const AdminVideoEditorTab = () => {
                   manchete: [...config.legenda.manchete, { texto: 'nova linha', destaque: false }],
                 })}><Plus className="mr-1 h-4 w-4" /> Adicionar linha</Button>
               </div>
+            )}
+          </TabsContent>
+
+          {/* TRILHA SONORA */}
+          <TabsContent value="trilha" className="space-y-4 pt-4">
+            <div className="flex items-center gap-2">
+              <Switch checked={config.trilhaSonora.ativa} onCheckedChange={(v) => patchTrilhaSonora({ ativa: v })} />
+              <Label>Música de fundo ativa</Label>
+            </div>
+            {config.trilhaSonora.ativa && (
+              <>
+                <div>
+                  <Label className="mb-1 block text-xs uppercase text-muted-foreground">Arquivo de áudio</Label>
+                  <input
+                    type="file" accept="audio/*" id="up-trilha" className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f, 'trilha', (url) => patchTrilhaSonora({ mediaUrl: url })); }}
+                  />
+                  <Button size="sm" variant="outline" onClick={() => document.getElementById('up-trilha')?.click()} disabled={enviando === 'trilha'}>
+                    <Upload className="mr-1 h-4 w-4" /> {enviando === 'trilha' ? 'Enviando…' : (config.trilhaSonora.mediaUrl ? 'Trocar música' : 'Enviar música')}
+                  </Button>
+                  {config.trilhaSonora.mediaUrl && (
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Toca em loop se for mais curta que o vídeo. Pra ouvir junto com a gravação, abra a aba Linha do tempo e dê play.
+                    </p>
+                  )}
+                </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label className="text-xs">Volume ({config.trilhaSonora.volume}%)</Label>
+                    <Slider value={[config.trilhaSonora.volume]} min={0} max={100} step={5} onValueChange={([v]) => patchTrilhaSonora({ volume: v })} />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Fade de entrada ({config.trilhaSonora.fadeInSegundos}s)</Label>
+                    <Slider value={[config.trilhaSonora.fadeInSegundos]} min={0} max={5} step={0.5} onValueChange={([v]) => patchTrilhaSonora({ fadeInSegundos: v })} />
+                  </div>
+                  <div>
+                    <Label className="text-xs">Fade de saída ({config.trilhaSonora.fadeOutSegundos}s)</Label>
+                    <Slider value={[config.trilhaSonora.fadeOutSegundos]} min={0} max={5} step={0.5} onValueChange={([v]) => patchTrilhaSonora({ fadeOutSegundos: v })} />
+                  </div>
+                </div>
+              </>
             )}
           </TabsContent>
 
