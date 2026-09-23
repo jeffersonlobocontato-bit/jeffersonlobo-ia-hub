@@ -15,9 +15,9 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, Copy, Upload, ArrowLeft, Loader2 } from 'lucide-react';
 import {
   type VideoProject, type VideoProjectConfig, type TemplateTipo, type Paleta, type EstiloLegenda,
-  PALETAS, TEMPLATE_LABELS, TEMPLATE_LIBRARY, criarConfigPadrao, normalizarConfig, duracaoTotalClipes,
+  PALETAS, TEMPLATE_LABELS, TEMPLATE_LIBRARY, criarConfigPadrao, normalizarConfig, duracaoTotalClipes, criarClipeFundo,
 } from '@/types/videoEditor';
-import { VideoStagePreview } from './video-editor/VideoStagePreview';
+import { VideoStagePreview, type ElementoSelecionado } from './video-editor/VideoStagePreview';
 import { CoverPreview } from './video-editor/CoverPreview';
 import { VideoPlayer } from './video-editor/VideoPlayer';
 import { VideoTimelineRuler } from './video-editor/VideoTimelineRuler';
@@ -48,6 +48,7 @@ const AdminVideoEditorTab = () => {
   const [erroTranscricao, setErroTranscricao] = useState<string | null>(null);
   const [tempoAtual, setTempoAtual] = useState(0); // playhead da timeline, em segundos
   const [tocando, setTocando] = useState(false); // segue o play/pause do VideoPlayer — a trilha sonora acompanha
+  const [elementoSelecionado, setElementoSelecionado] = useState<ElementoSelecionado>('moldura'); // camada selecionada no palco
 
   const carregar = async () => {
     setLoading(true);
@@ -71,6 +72,7 @@ const AdminVideoEditorTab = () => {
     setConfig(normalizarConfig(p.config, p.template));
     setTempoAtual(0);
     setTocando(false);
+    setElementoSelecionado('moldura');
   };
 
   const voltar = () => {
@@ -262,7 +264,16 @@ const AdminVideoEditorTab = () => {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
         <div className="flex flex-col items-center gap-4">
-          <VideoStagePreview template={template} config={config} onMolduraChange={patchMoldura} />
+          <VideoStagePreview
+            template={template}
+            config={config}
+            onMolduraChange={patchMoldura}
+            onClipeFundoChange={(patch) => patchConfig({
+              fundoDinamico: { clipes: config.fundoDinamico.clipes.map((c, i) => (i === 0 ? { ...c, ...patch } : c)) },
+            })}
+            elementoSelecionado={elementoSelecionado}
+            onSelecionarElemento={setElementoSelecionado}
+          />
           <div className="w-full max-w-[280px] border-t pt-3">
             <p className="mb-2 text-center text-xs font-medium text-muted-foreground">Capa</p>
             <CoverPreview config={config} />
@@ -571,7 +582,7 @@ const AdminVideoEditorTab = () => {
                 </Card>
                 ))}
                 <Button size="sm" variant="outline" onClick={() => patchConfig({
-                  fundoDinamico: { clipes: [...config.fundoDinamico.clipes, { id: crypto.randomUUID(), mediaUrl: null, tipo: 'imagem', duracaoSegundos: 4, transicao: 'fusao' }] },
+                  fundoDinamico: { clipes: [...config.fundoDinamico.clipes, criarClipeFundo()] },
                 })}><Plus className="mr-1 h-4 w-4" /> Adicionar clipe</Button>
               </div>
             )}

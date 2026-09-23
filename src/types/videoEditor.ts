@@ -45,6 +45,14 @@ export interface ClipeFundo {
   tipo: 'imagem' | 'video';
   duracaoSegundos: number;
   transicao: TransicaoTipo;
+  zoom: number; // 100–200, enquadramento do clipe dentro do palco (fundo é selecionável e ajustável, como a moldura)
+  focalX: number; // 0–100
+  focalY: number;
+}
+
+/** Clipe novo com o enquadramento padrão — usado tanto ao criar o projeto quanto ao adicionar um clipe depois. */
+export function criarClipeFundo(transicao: TransicaoTipo = 'fusao'): ClipeFundo {
+  return { id: crypto.randomUUID(), mediaUrl: null, tipo: 'imagem', duracaoSegundos: 4, transicao, zoom: 100, focalX: 50, focalY: 50 };
 }
 
 export interface FundoDinamicoConfig {
@@ -324,9 +332,7 @@ export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
       imagemUrl: null,
     },
     fundoDinamico: {
-      clipes: [
-        { id: crypto.randomUUID(), mediaUrl: null, tipo: 'imagem', duracaoSegundos: 4, transicao: def.transicaoPadrao },
-      ],
+      clipes: [criarClipeFundo(def.transicaoPadrao)],
     },
     legenda: {
       ativa: true,
@@ -393,7 +399,14 @@ export function normalizarConfig(config: Partial<VideoProjectConfig> | null | un
     ...config,
     moldura: { ...padrao.moldura, ...config.moldura },
     cardDados: { ...padrao.cardDados, ...config.cardDados },
-    fundoDinamico: { ...padrao.fundoDinamico, ...config.fundoDinamico },
+    // O merge raso troca o array de clipes inteiro (não dá pra "mesclar" uma
+    // lista campo a campo como um objeto) — sem isso, clipes salvos antes de
+    // zoom/focalX/focalY existirem ficavam com esses campos undefined.
+    fundoDinamico: {
+      ...padrao.fundoDinamico,
+      ...config.fundoDinamico,
+      clipes: (config.fundoDinamico?.clipes ?? padrao.fundoDinamico.clipes).map((c) => ({ ...criarClipeFundo(), ...c })),
+    },
     legenda: { ...padrao.legenda, ...config.legenda },
     assinatura: { ...padrao.assinatura, ...config.assinatura },
     capa: { ...padrao.capa, ...config.capa },
