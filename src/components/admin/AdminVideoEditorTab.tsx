@@ -36,6 +36,8 @@ const AdminVideoEditorTab = () => {
   const [template, setTemplate] = useState<TemplateTipo>('card_dados');
   const [salvando, setSalvando] = useState(false);
   const [enviando, setEnviando] = useState<string | null>(null);
+  const [transcrevendo, setTranscrevendo] = useState(false);
+  const [erroTranscricao, setErroTranscricao] = useState<string | null>(null);
 
   const carregar = async () => {
     setLoading(true);
@@ -117,6 +119,30 @@ const AdminVideoEditorTab = () => {
     if (error) { toast({ title: 'Erro no upload', description: error.message, variant: 'destructive' }); return; }
     const { data } = db.storage.from('video-projects').getPublicUrl(path);
     aplicar(data.publicUrl);
+  };
+
+  const transcrever = async () => {
+    if (!config?.moldura.mediaUrl || config.moldura.mediaTipo !== 'video') return;
+    // A transcrição demora (chamada à OpenAI) — se o admin trocar de projeto
+    // antes dela voltar, o patchLegenda abaixo não pode acabar escrevendo no
+    // config do projeto que está aberto agora, que não é o que foi transcrito.
+    const projetoDaTranscricao = selecionadoId;
+    setTranscrevendo(true);
+    setErroTranscricao(null);
+    const { data, error } = await db.functions.invoke('transcribe-video', { body: { mediaUrl: config.moldura.mediaUrl } });
+    setTranscrevendo(false);
+    if (error || !data?.ok) {
+      const msg = data?.error || error?.message || 'falha desconhecida';
+      setErroTranscricao(msg);
+      toast({ title: 'Erro ao transcrever', description: msg, variant: 'destructive' });
+      return;
+    }
+    if (selecionadoId !== projetoDaTranscricao) {
+      toast({ title: 'Transcrição pronta, mas o projeto foi trocado', description: 'Abra o projeto original de novo pra aplicar.' });
+      return;
+    }
+    patchLegenda({ palavras: data.palavras, transcritoEm: new Date().toISOString() });
+    toast({ title: `Transcrito: ${data.palavras.length} palavras` });
   };
 
   const patchConfig = (patch: Partial<VideoProjectConfig>) => setConfig((c) => (c ? { ...c, ...patch } : c));
@@ -286,14 +312,23 @@ const AdminVideoEditorTab = () => {
               </div>
             </div>
             <div>
-              <Label className="mb-1 block text-xs uppercase text-muted-foreground">Gravação / foto de referência</Label>
+              <Label className="mb-1 block text-xs uppercase text-muted-foreground">Gravação (vídeo, com áudio) ou foto de referência</Label>
               <input
-                type="file" accept="image/*" id="up-moldura" className="hidden"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f, 'moldura', (url) => patchMoldura({ mediaUrl: url })); }}
+                type="file" accept="image/*,video/*" id="up-moldura" className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0]; if (!f) return;
+                  const mediaTipo = f.type.startsWith('video') ? 'video' : 'imagem';
+                  upload(f, 'moldura', (url) => patchMoldura({ mediaUrl: url, mediaTipo }));
+                }}
               />
               <Button size="sm" variant="outline" onClick={() => document.getElementById('up-moldura')?.click()} disabled={enviando === 'moldura'}>
-                <Upload className="mr-1 h-4 w-4" /> {enviando === 'moldura' ? 'Enviando…' : 'Enviar imagem'}
+                <Upload className="mr-1 h-4 w-4" /> {enviando === 'moldura' ? 'Enviando…' : 'Enviar gravação'}
               </Button>
+              {config.moldura.mediaUrl && (
+                <p className="mt-1 text-xs text-muted-foreground">
+                  {config.moldura.mediaTipo === 'video' ? 'Vídeo enviado — pode transcrever na aba Legenda.' : 'Só imagem — envie um vídeo aqui pra poder transcrever a fala.'}
+                </p>
+              )}
             </div>
             <div className="grid grid-cols-2 gap-4">
               {config.moldura.modo === 'flutuante' && (
@@ -448,10 +483,44 @@ const AdminVideoEditorTab = () => {
               <Switch checked={config.legenda.ativa} onCheckedChange={(v) => patchLegenda({ ativa: v })} />
               <Label>Legenda automática ativa</Label>
             </div>
-            <p className="text-xs text-muted-foreground">
-              A transcrição real da fala e a sincronização palavra a palavra entram na próxima etapa (precisa de um serviço de transcrição).
-              Por enquanto, ajuste aqui como o texto de exemplo aparece.
-            </p>
+            <div className="space-y-2 rounded-md border p-3">
+              <Label className="text-xs uppercase text-muted-foreground">Transcrição automática</Label>
+              {config.moldura.mediaTipo !== 'video' || !config.moldura.mediaUrl ? (
+                <p className="text-xs text-muted-foreground">Envie a gravação (vídeo) na aba Moldura primeiro — a transcrição usa o áudio dela.</p>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2">
+                    <Button size="sm" onClick={transcrever} disabled={transcrevendo}>
+                      {transcrevendo ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null}
+                      {transcrevendo ? 'Transcrevendo…' : (config.legenda.palavras.length > 0 ? 'Transcrever de novo' : 'Transcrever a fala')}
+                    </Button>
+                    {config.legenda.transcritoEm && (
+                      <span className="text-xs text-muted-foreground">{config.legenda.palavras.length} palavras · transcrito em {new Date(config.legenda.transcritoEm).toLocaleString('pt-BR')}</span>
+                    )}
+                  </div>
+                  {erroTranscricao && <p className="text-xs text-destructive">{erroTranscricao}</p>}
+                  {config.legenda.palavras.length > 0 && (
+                    <div className="max-h-40 space-y-1 overflow-y-auto rounded border p-2">
+                      {config.legenda.palavras.map((p, i) => (
+                        <div key={i} className="flex items-center gap-2">
+                          <span className="w-12 shrink-0 font-mono text-[10px] text-muted-foreground">{p.inicio.toFixed(1)}s</span>
+                          <Input
+                            className="h-7 text-xs"
+                            value={p.texto}
+                            onChange={(e) => patchLegenda({
+                              palavras: config.legenda.palavras.map((w, j) => (j === i ? { ...w, texto: e.target.value } : w)),
+                            })}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  <p className="text-xs text-muted-foreground">
+                    A legenda sincronizada de verdade (palavra aparecendo no tempo certo durante a reprodução) ainda depende do player/timeline do vídeo, que é a próxima peça. Por ora, a transcrição fica salva e editável aqui, e os campos abaixo usam texto de exemplo pra pré-visualização.
+                  </p>
+                </>
+              )}
+            </div>
             <div className="space-y-2">
               <Label className="text-xs">Estilo</Label>
               <Select value={config.legenda.estilo} onValueChange={(v) => patchLegenda({ estilo: v as EstiloLegenda })}>

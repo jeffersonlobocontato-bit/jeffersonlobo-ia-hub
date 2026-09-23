@@ -29,6 +29,7 @@ export interface MolduraConfig {
   focalX: number; // 0–100, ponto focal da mídia dentro da moldura
   focalY: number;
   mediaUrl: string | null;
+  mediaTipo: 'imagem' | 'video'; // vídeo é o que tem áudio pra transcrever — imagem é só referência visual
 }
 
 export interface CardDadosConfig {
@@ -55,12 +56,20 @@ export interface LinhaManchete {
   destaque: boolean; // linha em negrito grande (a "palavra-chave" do bloco)
 }
 
+export interface PalavraTranscrita {
+  texto: string;
+  inicio: number; // segundos, desde o início da gravação
+  fim: number;
+}
+
 export interface LegendaConfig {
   ativa: boolean;
   estilo: EstiloLegenda;
   textoExemplo: string; // usado nos estilos karaoke/frase
   palavraDestaque: string; // usado no estilo karaoke
   manchete: LinhaManchete[]; // usado no estilo manchete (bloco de várias linhas, uma em destaque)
+  palavras: PalavraTranscrita[]; // transcrição real, com tempo por palavra (Whisper) — [] até transcrever
+  transcritoEm: string | null; // ISO — null enquanto não roda a transcrição automática
 }
 
 export interface AssinaturaConfig {
@@ -204,6 +213,7 @@ const molduraPadrao = (modo: ModoMoldura): MolduraConfig => ({
   focalX: 50,
   focalY: 40,
   mediaUrl: null,
+  mediaTipo: 'imagem',
 });
 
 export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
@@ -228,6 +238,8 @@ export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
       estilo: def.estiloLegendaPadrao,
       textoExemplo: 'aí que talvez você não queira ouvir,',
       palavraDestaque: 'você',
+      palavras: [],
+      transcritoEm: null,
       manchete: [
         { texto: 'todo mundo', destaque: false },
         { texto: 'ama contar', destaque: false },

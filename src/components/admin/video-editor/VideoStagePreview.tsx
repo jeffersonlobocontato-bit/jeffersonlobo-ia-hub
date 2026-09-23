@@ -1,6 +1,17 @@
 import { useCallback, useRef, useState } from 'react';
 import { PALETAS, ZONA_SEGURA, type VideoProjectConfig, type TemplateTipo } from '@/types/videoEditor';
 
+/** Mídia da moldura: vídeo (tem áudio, é a fonte da transcrição) ou imagem de referência. */
+const MolduraMedia = ({ moldura, className }: { moldura: VideoProjectConfig['moldura']; className: string }) => {
+  const style = { transform: `scale(${moldura.zoom / 100})`, objectPosition: `${moldura.focalX}% ${moldura.focalY}%` };
+  if (!moldura.mediaUrl) return null;
+  return moldura.mediaTipo === 'video' ? (
+    <video src={moldura.mediaUrl} className={className} style={style} muted playsInline />
+  ) : (
+    <img src={moldura.mediaUrl} alt="gravação" className={className} style={style} />
+  );
+};
+
 interface Props {
   template: TemplateTipo;
   config: VideoProjectConfig;
@@ -70,12 +81,7 @@ export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) 
         {telaCheia ? (
           <div className="absolute inset-0" style={{ filter: filtroVintageCss }}>
             {moldura.mediaUrl ? (
-              <img
-                src={moldura.mediaUrl}
-                alt="gravação"
-                className="h-full w-full object-cover"
-                style={{ transform: `scale(${moldura.zoom / 100})`, objectPosition: `${moldura.focalX}% ${moldura.focalY}%` }}
-              />
+              <MolduraMedia moldura={moldura} className="h-full w-full object-cover" />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-[8px]" style={{ color: `${pal.text}66` }}>
                 gravação em tela cheia
@@ -182,15 +188,7 @@ export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) 
             }}
           >
             {moldura.mediaUrl ? (
-              <img
-                src={moldura.mediaUrl}
-                alt="gravação"
-                className="h-full w-full object-cover"
-                style={{
-                  transform: `scale(${moldura.zoom / 100})`,
-                  objectPosition: `${moldura.focalX}% ${moldura.focalY}%`,
-                }}
-              />
+              <MolduraMedia moldura={moldura} className="h-full w-full object-cover" />
             ) : (
               <span className="text-[6px]" style={{ color: `${pal.text}88` }}>sua gravação</span>
             )}
