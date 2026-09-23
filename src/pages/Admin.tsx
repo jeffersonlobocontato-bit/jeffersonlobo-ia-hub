@@ -26,6 +26,7 @@ import AdminSpeakingLogosTab from '@/components/admin/AdminSpeakingLogosTab';
 import AdminPalestrasTab from '@/components/admin/AdminPalestrasTab';
 import AdminPressTab from '@/components/admin/AdminPressTab';
 import AdminContentPipelineTab from '@/components/admin/AdminContentPipelineTab';
+import AdminCriativosTab from '@/components/admin/AdminCriativosTab';
 import AdminProductsCasesTab from '@/components/admin/AdminProductsCasesTab';
 import { SEO } from '@/components/SEO';
 import { TelegramTestCard } from '@/components/admin/TelegramTestCard';
@@ -461,6 +462,7 @@ const Admin = () => {
             <TabsTrigger value="trust">Confiança</TabsTrigger>
             <TabsTrigger value="podcast">Podcast</TabsTrigger>
             <TabsTrigger value="blog">Blog</TabsTrigger>
+            <TabsTrigger value="criativos">Criativos</TabsTrigger>
             <TabsTrigger value="pipeline">Pipeline de Conteúdo</TabsTrigger>
             <TabsTrigger value="leads">Leads IA</TabsTrigger>
             <TabsTrigger value="briefings">Briefings</TabsTrigger>
@@ -545,6 +547,10 @@ const Admin = () => {
 
           <TabsContent value="podcast">
             <AdminPodcastTab />
+          </TabsContent>
+
+          <TabsContent value="criativos">
+            <AdminCriativosTab />
           </TabsContent>
 
           <TabsContent value="pipeline">
