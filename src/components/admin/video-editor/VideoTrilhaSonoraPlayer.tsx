@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { type TrilhaSonoraConfig, type TimelineConfig, volumeComFade, duracaoEfetivaTimeline } from '@/types/videoEditor';
+import { type TrilhaSonoraConfig, type TimelineConfig, volumeComFade, duracaoEfetivaTimeline, tempoEfetivoDesdeInicio } from '@/types/videoEditor';
 
 interface Props {
   trilha: TrilhaSonoraConfig;
@@ -35,12 +35,13 @@ export const VideoTrilhaSonoraPlayer = ({ trilha, timeline, tempoAtual, tocando 
     const duracaoAudio = duracaoAudioRef.current;
     const alvo = duracaoAudio > 0 ? tempoAtual % duracaoAudio : tempoAtual;
     if (Math.abs(el.currentTime - alvo) > 0.35) el.currentTime = alvo;
-    // O fade é do vídeo FINAL (depois do corte), não da gravação bruta —
-    // tempo relativo ao início do corte, duração relativa ao trecho usado.
-    // Sem isso, cortar o início do vídeo pra depois de onde o fade-in
-    // deveria acontecer simplesmente cancelava o fade (o tempo já nascia
-    // maior que o fadeInSegundos configurado).
-    const tempoRelativo = Math.max(0, tempoAtual - timeline.cortarInicioSegundos);
+    // O fade é do vídeo FINAL (depois do corte e dos trechos apagados no
+    // meio), não da gravação bruta — tempo relativo ao início do corte,
+    // descontando qualquer trecho apagado já percorrido, e duração relativa
+    // ao trecho que de fato sai no vídeo. Sem isso, cortar o início do vídeo
+    // ou apagar um pedaço do meio dessincronizava o fade do que realmente
+    // toca.
+    const tempoRelativo = tempoEfetivoDesdeInicio(timeline, tempoAtual);
     const duracaoEfetiva = duracaoEfetivaTimeline(timeline);
     el.volume = Math.max(0, Math.min(1, volumeComFade(trilha, tempoRelativo, duracaoEfetiva)));
   }, [tempoAtual, trilha, timeline]);

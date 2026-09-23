@@ -1,5 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
-import { formatarTempoTimeline } from '@/types/videoEditor';
+import { formatarTempoTimeline, type CorteInterno } from '@/types/videoEditor';
 
 interface Props {
   /** Escala total da régua — pode ser maior que o vídeo (ex.: fundo dinâmico mais longo que a gravação). */
@@ -12,6 +12,8 @@ interface Props {
   cortarFimSegundos: number;
   onCortarInicioChange: (segundos: number) => void;
   onCortarFimChange: (segundos: number) => void;
+  /** Trechos apagados de dentro do corte (etapa "dividir/apagar trecho") — desenhados como faixas riscadas por cima do trecho usado. */
+  cortesInternos?: CorteInterno[];
 }
 
 // Nenhum corte pode deixar menos que isso — evita um clipe de duração zero
@@ -27,6 +29,7 @@ const TRECHO_MINIMO_SEGUNDOS = 0.5;
 export const VideoTimelineRuler = ({
   duracaoSegundos, duracaoVideoSegundos, tempoAtual, onSeek,
   cortarInicioSegundos, cortarFimSegundos, onCortarInicioChange, onCortarFimChange,
+  cortesInternos = [],
 }: Props) => {
   const trilhaRef = useRef<HTMLDivElement>(null);
   const [arrastando, setArrastando] = useState<'inicio' | 'fim' | null>(null);
@@ -79,6 +82,24 @@ export const VideoTimelineRuler = ({
         <div className="absolute inset-y-0 right-0 rounded-r-md bg-muted-foreground/10" style={{ width: `${100 - fimPct}%` }} />
         {/* trecho usado */}
         <div className="absolute inset-y-0 bg-primary/20" style={{ left: `${inicioPct}%`, width: `${fimPct - inicioPct}%` }} />
+
+        {/* trechos apagados no meio (ripple delete) — riscados por cima do trecho usado */}
+        {cortesInternos.map((c) => {
+          const leftPct = (c.inicioSegundos / duracaoSegundos) * 100;
+          const widthPct = ((c.fimSegundos - c.inicioSegundos) / duracaoSegundos) * 100;
+          return (
+            <div
+              key={c.id}
+              className="absolute inset-y-0 bg-destructive/40"
+              style={{
+                left: `${leftPct}%`,
+                width: `${widthPct}%`,
+                backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 3px, hsl(var(--destructive) / .5) 3px, hsl(var(--destructive) / .5) 6px)',
+              }}
+              title="Trecho apagado"
+            />
+          );
+        })}
 
         <div className="absolute inset-y-0 w-0.5 bg-primary" style={{ left: `${playheadPct}%` }} />
         <div

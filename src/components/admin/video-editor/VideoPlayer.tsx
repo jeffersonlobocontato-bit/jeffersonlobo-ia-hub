@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Play, Pause } from 'lucide-react';
-import { formatarTempoTimeline } from '@/types/videoEditor';
+import { formatarTempoTimeline, pularCortesInternos, type CorteInterno } from '@/types/videoEditor';
 
 interface Props {
   mediaUrl: string;
@@ -13,6 +13,8 @@ interface Props {
   /** Corte (etapa 4): fora dele não toca — dar play começa do início do corte, e o vídeo pausa sozinho no fim dele. */
   cortarInicioSegundos?: number;
   cortarFimSegundos?: number | null;
+  /** Trechos apagados de dentro do corte acima — a reprodução pula por cima deles, sem parar. */
+  cortesInternos?: CorteInterno[];
   /** Etapa 7: a trilha sonora precisa saber quando tocar/pausar junto com o vídeo. */
   onTocandoChange?: (tocando: boolean) => void;
 }
@@ -25,7 +27,7 @@ interface Props {
  */
 export const VideoPlayer = ({
   mediaUrl, tempoAtual, onTempoAtualChange, onDuracaoDetectada,
-  cortarInicioSegundos = 0, cortarFimSegundos = null, onTocandoChange,
+  cortarInicioSegundos = 0, cortarFimSegundos = null, cortesInternos = [], onTocandoChange,
 }: Props) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [tocando, setTocando] = useState(false);
@@ -47,7 +49,9 @@ export const VideoPlayer = ({
   useEffect(() => {
     const el = videoRef.current;
     if (!el) return;
-    if (Math.abs(el.currentTime - tempoAtual) > 0.25) el.currentTime = tempoAtual;
+    const alvo = pularCortesInternos(tempoAtual, cortesInternos);
+    if (Math.abs(el.currentTime - alvo) > 0.25) el.currentTime = alvo;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tempoAtual]);
 
   const alternarPlay = () => {
@@ -58,6 +62,7 @@ export const VideoPlayer = ({
       if (el.currentTime < cortarInicioSegundos || (cortarFimSegundos !== null && el.currentTime >= cortarFimSegundos)) {
         el.currentTime = cortarInicioSegundos;
       }
+      el.currentTime = pularCortesInternos(el.currentTime, cortesInternos);
       el.play();
     } else {
       el.pause();
@@ -85,6 +90,9 @@ export const VideoPlayer = ({
             // reprodução) — sem isso ele continuava passando por um trecho
             // que a régua já mostra como "fora do corte".
             el.currentTime = cortarInicioSegundos;
+          } else {
+            const semCorte = pularCortesInternos(el.currentTime, cortesInternos);
+            if (semCorte !== el.currentTime) el.currentTime = semCorte;
           }
           onTempoAtualChange(el.currentTime);
         }}
