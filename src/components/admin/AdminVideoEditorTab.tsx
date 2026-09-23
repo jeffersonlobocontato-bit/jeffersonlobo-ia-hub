@@ -364,9 +364,9 @@ const AdminVideoEditorTab = () => {
             </div>
           </TabsContent>
 
-          {/* LINHA DO TEMPO — etapas 1-3: player de verdade + régua de tempo.
-              Corte (arrastar bordas) e faixas de B-roll/trilha vêm nas
-              próximas etapas, por cima dessa mesma base. */}
+          {/* LINHA DO TEMPO — etapas 1-4: player de verdade, régua de tempo e
+              corte arrastando as bordas. Faixas de B-roll/trilha (etapas 5+)
+              entram por cima dessa mesma base. */}
           <TabsContent value="timeline" className="space-y-4 pt-4">
             {config.moldura.mediaTipo !== 'video' || !config.moldura.mediaUrl ? (
               <p className="text-xs text-muted-foreground">Envie a gravação (vídeo) na aba Moldura primeiro — a linha do tempo toca esse arquivo.</p>
@@ -377,14 +377,20 @@ const AdminVideoEditorTab = () => {
                   tempoAtual={tempoAtual}
                   onTempoAtualChange={setTempoAtual}
                   onDuracaoDetectada={(d) => patchTimeline({ duracaoOriginalSegundos: d })}
+                  cortarInicioSegundos={config.timeline.cortarInicioSegundos}
+                  cortarFimSegundos={config.timeline.cortarFimSegundos}
                 />
                 <VideoTimelineRuler
                   duracaoSegundos={config.timeline.duracaoOriginalSegundos ?? 0}
                   tempoAtual={tempoAtual}
                   onSeek={setTempoAtual}
+                  cortarInicioSegundos={config.timeline.cortarInicioSegundos}
+                  cortarFimSegundos={config.timeline.cortarFimSegundos ?? config.timeline.duracaoOriginalSegundos ?? 0}
+                  onCortarInicioChange={(v) => patchTimeline({ cortarInicioSegundos: v })}
+                  onCortarFimChange={(v) => patchTimeline({ cortarFimSegundos: v })}
                 />
                 <p className="text-xs text-muted-foreground">
-                  Por enquanto só toca e navega no tempo. Cortar trecho (arrastar as bordas) e organizar clipes de B-roll na linha do tempo são as próximas etapas.
+                  Arraste as alças âmbar pra cortar o trecho usado — fora dele o vídeo não toca. Organizar clipes de B-roll na linha do tempo é a próxima etapa.
                 </p>
               </>
             )}
