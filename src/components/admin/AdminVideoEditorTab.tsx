@@ -22,6 +22,8 @@ import { CoverPreview } from './video-editor/CoverPreview';
 import { VideoPlayer } from './video-editor/VideoPlayer';
 import { VideoTimelineRuler } from './video-editor/VideoTimelineRuler';
 import { VideoTimelineBRollTrack } from './video-editor/VideoTimelineBRollTrack';
+import { VideoTimelineLegendaTrack } from './video-editor/VideoTimelineLegendaTrack';
+import { VideoLegendaAoVivo } from './video-editor/VideoLegendaAoVivo';
 
 // video_projects ainda não está no types.ts gerado — mesmo padrão de cast
 // já usado em outras abas do admin (ex.: AdminProductsCasesTab).
@@ -373,10 +375,12 @@ const AdminVideoEditorTab = () => {
             </div>
           </TabsContent>
 
-          {/* LINHA DO TEMPO — etapas 1-5: player, régua com corte, e a faixa
-              de B-roll (só no template fundo dinâmico, que é onde os clipes
-              são criados na aba Fundo). Trilha sonora e legenda sincronizada
-              entram como novas faixas aqui embaixo, nas próximas etapas. */}
+          {/* LINHA DO TEMPO — etapas 1-6: player, régua com corte, faixa de
+              B-roll (só no template fundo dinâmico) e faixa de legenda —
+              a transcrição da aba Legenda, sincronizada de verdade com o
+              player (a legenda ao vivo acima da régua é a prova disso).
+              Trilha sonora e marcadores de transição entram como novas
+              faixas aqui embaixo, nas próximas etapas. */}
           <TabsContent value="timeline" className="space-y-4 pt-4">
             {config.moldura.mediaTipo !== 'video' || !config.moldura.mediaUrl ? (
               <p className="text-xs text-muted-foreground">Envie a gravação (vídeo) na aba Moldura primeiro — a linha do tempo toca esse arquivo.</p>
@@ -390,6 +394,7 @@ const AdminVideoEditorTab = () => {
                   cortarInicioSegundos={config.timeline.cortarInicioSegundos}
                   cortarFimSegundos={config.timeline.cortarFimSegundos}
                 />
+                <VideoLegendaAoVivo palavras={config.legenda.palavras} tempoAtual={tempoAtual} />
                 <div>
                   <p className="mb-1 font-mono text-[10px] uppercase text-muted-foreground">Vídeo principal</p>
                   <VideoTimelineRuler
@@ -403,6 +408,12 @@ const AdminVideoEditorTab = () => {
                     onCortarFimChange={(v) => patchTimeline({ cortarFimSegundos: v })}
                   />
                 </div>
+                <VideoTimelineLegendaTrack
+                  palavras={config.legenda.palavras}
+                  duracaoTotalSegundos={duracaoTotalTimeline}
+                  tempoAtual={tempoAtual}
+                  onSeek={setTempoAtual}
+                />
                 {template === 'fundo_dinamico' && (
                   <VideoTimelineBRollTrack
                     clipes={config.fundoDinamico.clipes}

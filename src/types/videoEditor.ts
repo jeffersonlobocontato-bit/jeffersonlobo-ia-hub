@@ -141,6 +141,17 @@ export function indiceClipeNoTempo(clipes: ClipeFundo[], tempoSegundos: number):
   return indice;
 }
 
+// ── LEGENDA NA LINHA DO TEMPO ────────────────────────────────────────────
+// Diferente do B-roll, cada palavra já vem com início/fim reais (a
+// transcrição devolve isso) — não precisa posicionar nada, só procurar.
+/** Índice da palavra que está sendo falada nesse instante, ou -1 antes da primeira/sem transcrição. */
+export function indicePalavraNoTempo(palavras: PalavraTranscrita[], tempoSegundos: number): number {
+  if (palavras.length === 0) return -1;
+  let indice = -1;
+  palavras.forEach((p, i) => { if (tempoSegundos >= p.inicio) indice = i; });
+  return indice;
+}
+
 export interface FiltroVintageConfig {
   ativo: boolean;
   intensidade: number; // 0–100 — grão + tom quente + vinheta
