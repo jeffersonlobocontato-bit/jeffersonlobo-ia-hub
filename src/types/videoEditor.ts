@@ -110,6 +110,37 @@ export function formatarTempoTimeline(segundos: number): string {
   return `${m}:${r.toString().padStart(2, '0')}`;
 }
 
+// ── B-ROLL (fundo dinâmico) NA LINHA DO TEMPO ───────────────────────────
+// Os clipes tocam um atrás do outro, sem espaço entre eles — a posição de
+// cada um é sempre calculada a partir da ordem do array e da duração dos
+// anteriores, nunca guardada solta (senão dá pra um clipe "flutuar" e abrir
+// buraco ou sobrepor o vizinho sem querer).
+export interface ClipePosicionado {
+  clipe: ClipeFundo;
+  inicioSegundos: number;
+}
+
+export function posicionarClipes(clipes: ClipeFundo[]): ClipePosicionado[] {
+  let acumulado = 0;
+  return clipes.map((clipe) => {
+    const posicionado = { clipe, inicioSegundos: acumulado };
+    acumulado += clipe.duracaoSegundos;
+    return posicionado;
+  });
+}
+
+export function duracaoTotalClipes(clipes: ClipeFundo[]): number {
+  return clipes.reduce((soma, c) => soma + c.duracaoSegundos, 0);
+}
+
+/** Índice do clipe que está "tocando" num instante — o último cujo início é <= tempo. */
+export function indiceClipeNoTempo(clipes: ClipeFundo[], tempoSegundos: number): number {
+  const posicoes = posicionarClipes(clipes);
+  let indice = 0;
+  posicoes.forEach((p, i) => { if (tempoSegundos >= p.inicioSegundos) indice = i; });
+  return indice;
+}
+
 export interface FiltroVintageConfig {
   ativo: boolean;
   intensidade: number; // 0–100 — grão + tom quente + vinheta

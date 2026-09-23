@@ -2,7 +2,10 @@ import { useCallback, useRef, useState } from 'react';
 import { formatarTempoTimeline } from '@/types/videoEditor';
 
 interface Props {
+  /** Escala total da régua — pode ser maior que o vídeo (ex.: fundo dinâmico mais longo que a gravação). */
   duracaoSegundos: number;
+  /** Até onde o corte pode ir — a duração real do vídeo, nunca a escala da régua. */
+  duracaoVideoSegundos: number;
   tempoAtual: number;
   onSeek: (segundos: number) => void;
   cortarInicioSegundos: number;
@@ -22,7 +25,7 @@ const TRECHO_MINIMO_SEGUNDOS = 0.5;
  * sem mexer no playhead. O trecho fora do corte fica visualmente apagado.
  */
 export const VideoTimelineRuler = ({
-  duracaoSegundos, tempoAtual, onSeek,
+  duracaoSegundos, duracaoVideoSegundos, tempoAtual, onSeek,
   cortarInicioSegundos, cortarFimSegundos, onCortarInicioChange, onCortarFimChange,
 }: Props) => {
   const trilhaRef = useRef<HTMLDivElement>(null);
@@ -41,9 +44,9 @@ export const VideoTimelineRuler = ({
     if (arrastando === 'inicio') {
       onCortarInicioChange(Math.max(0, Math.min(t, cortarFimSegundos - TRECHO_MINIMO_SEGUNDOS)));
     } else {
-      onCortarFimChange(Math.min(duracaoSegundos, Math.max(t, cortarInicioSegundos + TRECHO_MINIMO_SEGUNDOS)));
+      onCortarFimChange(Math.min(duracaoVideoSegundos, Math.max(t, cortarInicioSegundos + TRECHO_MINIMO_SEGUNDOS)));
     }
-  }, [arrastando, segundosDoClique, cortarInicioSegundos, cortarFimSegundos, duracaoSegundos, onCortarInicioChange, onCortarFimChange]);
+  }, [arrastando, segundosDoClique, cortarInicioSegundos, cortarFimSegundos, duracaoVideoSegundos, onCortarInicioChange, onCortarFimChange]);
 
   if (duracaoSegundos <= 0) {
     return <p className="text-xs text-muted-foreground">Carregando duração do vídeo…</p>;

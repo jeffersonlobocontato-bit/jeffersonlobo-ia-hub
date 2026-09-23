@@ -15,12 +15,13 @@ import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, Copy, Upload, ArrowLeft, Loader2 } from 'lucide-react';
 import {
   type VideoProject, type VideoProjectConfig, type TemplateTipo, type Paleta, type TransicaoTipo, type EstiloLegenda,
-  PALETAS, TEMPLATE_LABELS, TEMPLATE_LIBRARY, criarConfigPadrao, normalizarConfig,
+  PALETAS, TEMPLATE_LABELS, TEMPLATE_LIBRARY, criarConfigPadrao, normalizarConfig, duracaoTotalClipes,
 } from '@/types/videoEditor';
 import { VideoStagePreview } from './video-editor/VideoStagePreview';
 import { CoverPreview } from './video-editor/CoverPreview';
 import { VideoPlayer } from './video-editor/VideoPlayer';
 import { VideoTimelineRuler } from './video-editor/VideoTimelineRuler';
+import { VideoTimelineBRollTrack } from './video-editor/VideoTimelineBRollTrack';
 
 // video_projects ainda não está no types.ts gerado — mesmo padrão de cast
 // já usado em outras abas do admin (ex.: AdminProductsCasesTab).
@@ -228,6 +229,14 @@ const AdminVideoEditorTab = () => {
     );
   }
 
+  // Eixo de tempo compartilhado pelas faixas da timeline: cobre tanto a
+  // gravação principal quanto o fundo dinâmico, o que for mais longo — senão
+  // um fundo mais comprido que o vídeo ficaria cortado fora da régua.
+  const duracaoTotalTimeline = Math.max(
+    config.timeline.duracaoOriginalSegundos ?? 0,
+    template === 'fundo_dinamico' ? duracaoTotalClipes(config.fundoDinamico.clipes) : 0,
+  );
+
   // ── EDITOR DO PROJETO ──────────────────────────────────────────────────
   return (
     <div className="space-y-6">
@@ -364,9 +373,10 @@ const AdminVideoEditorTab = () => {
             </div>
           </TabsContent>
 
-          {/* LINHA DO TEMPO — etapas 1-4: player de verdade, régua de tempo e
-              corte arrastando as bordas. Faixas de B-roll/trilha (etapas 5+)
-              entram por cima dessa mesma base. */}
+          {/* LINHA DO TEMPO — etapas 1-5: player, régua com corte, e a faixa
+              de B-roll (só no template fundo dinâmico, que é onde os clipes
+              são criados na aba Fundo). Trilha sonora e legenda sincronizada
+              entram como novas faixas aqui embaixo, nas próximas etapas. */}
           <TabsContent value="timeline" className="space-y-4 pt-4">
             {config.moldura.mediaTipo !== 'video' || !config.moldura.mediaUrl ? (
               <p className="text-xs text-muted-foreground">Envie a gravação (vídeo) na aba Moldura primeiro — a linha do tempo toca esse arquivo.</p>
@@ -380,17 +390,35 @@ const AdminVideoEditorTab = () => {
                   cortarInicioSegundos={config.timeline.cortarInicioSegundos}
                   cortarFimSegundos={config.timeline.cortarFimSegundos}
                 />
-                <VideoTimelineRuler
-                  duracaoSegundos={config.timeline.duracaoOriginalSegundos ?? 0}
-                  tempoAtual={tempoAtual}
-                  onSeek={setTempoAtual}
-                  cortarInicioSegundos={config.timeline.cortarInicioSegundos}
-                  cortarFimSegundos={config.timeline.cortarFimSegundos ?? config.timeline.duracaoOriginalSegundos ?? 0}
-                  onCortarInicioChange={(v) => patchTimeline({ cortarInicioSegundos: v })}
-                  onCortarFimChange={(v) => patchTimeline({ cortarFimSegundos: v })}
-                />
+                <div>
+                  <p className="mb-1 font-mono text-[10px] uppercase text-muted-foreground">Vídeo principal</p>
+                  <VideoTimelineRuler
+                    duracaoSegundos={duracaoTotalTimeline}
+                    duracaoVideoSegundos={config.timeline.duracaoOriginalSegundos ?? 0}
+                    tempoAtual={tempoAtual}
+                    onSeek={setTempoAtual}
+                    cortarInicioSegundos={config.timeline.cortarInicioSegundos}
+                    cortarFimSegundos={config.timeline.cortarFimSegundos ?? config.timeline.duracaoOriginalSegundos ?? 0}
+                    onCortarInicioChange={(v) => patchTimeline({ cortarInicioSegundos: v })}
+                    onCortarFimChange={(v) => patchTimeline({ cortarFimSegundos: v })}
+                  />
+                </div>
+                {template === 'fundo_dinamico' && (
+                  <VideoTimelineBRollTrack
+                    clipes={config.fundoDinamico.clipes}
+                    duracaoTotalSegundos={duracaoTotalTimeline}
+                    tempoAtual={tempoAtual}
+                    onSeek={setTempoAtual}
+                    onReordenar={(clipes) => patchConfig({ fundoDinamico: { clipes } })}
+                    onRedimensionar={(id, duracaoSegundos) => patchConfig({
+                      fundoDinamico: { clipes: config.fundoDinamico.clipes.map((c) => (c.id === id ? { ...c, duracaoSegundos } : c)) },
+                    })}
+                    onRemover={(id) => patchConfig({ fundoDinamico: { clipes: config.fundoDinamico.clipes.filter((c) => c.id !== id) } })}
+                  />
+                )}
                 <p className="text-xs text-muted-foreground">
-                  Arraste as alças âmbar pra cortar o trecho usado — fora dele o vídeo não toca. Organizar clipes de B-roll na linha do tempo é a próxima etapa.
+                  Arraste as alças âmbar pra cortar o trecho usado da gravação — fora dele o vídeo não toca.
+                  {template === 'fundo_dinamico' && ' Na faixa de baixo, arraste o corpo de um clipe pra reordenar e a borda direita pra mudar a duração.'}
                 </p>
               </>
             )}
