@@ -13,13 +13,16 @@ interface Props {
  * Tudo é desenhado a partir de `config` — nada aqui é "final": é o mesmo
  * princípio do Carrossel (dado vira card, nunca o contrário).
  *
- * Arraste dentro do palco para reposicionar a moldura; os demais ajustes
- * (tamanho, zoom, foco) ficam nos controles ao lado, fora deste componente.
+ * Em templates de moldura flutuante, arraste dentro do palco para
+ * reposicionar a moldura. Em templates de tela cheia (a gravação ocupa o
+ * palco inteiro) não há o que arrastar — o "fundo" É a gravação.
  */
 export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) => {
   const stageRef = useRef<HTMLDivElement>(null);
   const [arrastando, setArrastando] = useState(false);
   const pal = PALETAS[config.paleta];
+  const { moldura } = config;
+  const telaCheia = moldura.modo === 'tela_cheia';
 
   const clamp = (v: number, min = 0, max = 100) => Math.max(min, Math.min(max, v));
 
@@ -32,6 +35,7 @@ export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) 
   }, [onMolduraChange]);
 
   const handlePointerDown = (e: React.PointerEvent) => {
+    if (telaCheia) return;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
     setArrastando(true);
     atualizarPosicao(e.clientX, e.clientY);
@@ -42,11 +46,14 @@ export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) 
   };
   const handlePointerUp = () => setArrastando(false);
 
-  const { moldura } = config;
   // Palco é 9:16 (mais alto que largo); moldura é quadrada (aspect-ratio 1/1),
   // então o mesmo comprimento em pixels vale uma % menor da altura do palco
   // do que da largura — sem essa conversão a legenda cai em cima da moldura.
   const alturaMoldura = moldura.larguraPct * (9 / 16);
+
+  const filtroVintageCss = config.filtroVintage.ativo
+    ? `sepia(${config.filtroVintage.intensidade * 0.006}) saturate(${1 + config.filtroVintage.intensidade * 0.004}) contrast(1.05) brightness(0.97)`
+    : undefined;
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -56,11 +63,40 @@ export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) 
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
         onPointerLeave={handlePointerUp}
-        className="relative w-full max-w-[280px] overflow-hidden rounded-xl border shadow-sm select-none cursor-move"
+        className={`relative w-full max-w-[280px] overflow-hidden rounded-xl border shadow-sm select-none ${telaCheia ? '' : 'cursor-move'}`}
         style={{ aspectRatio: '9 / 16', background: pal.bgDark, touchAction: 'none' }}
       >
         {/* ── FUNDO ── */}
-        {template === 'card_dados' ? (
+        {telaCheia ? (
+          <div className="absolute inset-0" style={{ filter: filtroVintageCss }}>
+            {moldura.mediaUrl ? (
+              <img
+                src={moldura.mediaUrl}
+                alt="gravação"
+                className="h-full w-full object-cover"
+                style={{ transform: `scale(${moldura.zoom / 100})`, objectPosition: `${moldura.focalX}% ${moldura.focalY}%` }}
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-[8px]" style={{ color: `${pal.text}66` }}>
+                gravação em tela cheia
+              </div>
+            )}
+            {config.overlayFundo.ativo && config.overlayFundo.imagemUrl && (
+              <img
+                src={config.overlayFundo.imagemUrl}
+                alt=""
+                className="absolute inset-0 h-full w-full object-cover mix-blend-screen"
+                style={{ opacity: config.overlayFundo.opacidade / 100 }}
+              />
+            )}
+            {config.filtroVintage.ativo && (
+              <div
+                className="pointer-events-none absolute inset-0"
+                style={{ boxShadow: `inset 0 0 ${18 + config.filtroVintage.intensidade / 3}px ${6 + config.filtroVintage.intensidade / 6}px rgba(20,10,0,.65)` }}
+              />
+            )}
+          </div>
+        ) : template === 'card_dados' ? (
           <>
             {/* barra de gradiente no topo, marca registrada do template */}
             <div
@@ -130,40 +166,73 @@ export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) 
           </>
         )}
 
-        {/* ── MOLDURA (gravação) ── */}
-        <div
-          className="absolute flex items-center justify-center overflow-hidden shadow-lg"
-          style={{
-            left: `${moldura.xPct}%`,
-            top: `${moldura.yPct}%`,
-            width: `${moldura.larguraPct}%`,
-            aspectRatio: '1 / 1',
-            transform: 'translate(-50%, -50%)',
-            borderRadius: '22%',
-            border: `2px solid ${pal.accent}88`,
-            background: '#222',
-          }}
-        >
-          {moldura.mediaUrl ? (
-            <img
-              src={moldura.mediaUrl}
-              alt="gravação"
-              className="h-full w-full object-cover"
-              style={{
-                transform: `scale(${moldura.zoom / 100})`,
-                objectPosition: `${moldura.focalX}% ${moldura.focalY}%`,
-              }}
-            />
-          ) : (
-            <span className="text-[6px]" style={{ color: `${pal.text}88` }}>sua gravação</span>
-          )}
-        </div>
+        {/* ── MOLDURA flutuante (gravação pequena sobre o fundo) ── */}
+        {!telaCheia && (
+          <div
+            className="absolute flex items-center justify-center overflow-hidden shadow-lg"
+            style={{
+              left: `${moldura.xPct}%`,
+              top: `${moldura.yPct}%`,
+              width: `${moldura.larguraPct}%`,
+              aspectRatio: '1 / 1',
+              transform: 'translate(-50%, -50%)',
+              borderRadius: '22%',
+              border: `2px solid ${pal.accent}88`,
+              background: '#222',
+            }}
+          >
+            {moldura.mediaUrl ? (
+              <img
+                src={moldura.mediaUrl}
+                alt="gravação"
+                className="h-full w-full object-cover"
+                style={{
+                  transform: `scale(${moldura.zoom / 100})`,
+                  objectPosition: `${moldura.focalX}% ${moldura.focalY}%`,
+                }}
+              />
+            ) : (
+              <span className="text-[6px]" style={{ color: `${pal.text}88` }}>sua gravação</span>
+            )}
+          </div>
+        )}
 
         {/* ── LEGENDA ── */}
-        {config.legenda.ativa && (
+        {config.legenda.ativa && config.legenda.estilo === 'manchete' && (
+          <div
+            className="absolute inset-x-[8%] flex flex-col items-start gap-[2px] text-left leading-[1.05]"
+            style={{ bottom: `${ZONA_SEGURA.baixoPct + 6}%`, fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {config.legenda.manchete.map((linha, i) => (
+              <span
+                key={i}
+                className={linha.destaque ? 'text-[16px] font-black' : 'text-[8px] font-semibold'}
+                style={{ color: pal.text, textShadow: '0 1px 4px rgba(0,0,0,.6)' }}
+              >
+                {linha.texto}
+              </span>
+            ))}
+          </div>
+        )}
+
+        {config.legenda.ativa && config.legenda.estilo === 'frase' && (
+          <div
+            className="absolute inset-x-[8%] text-left text-[8px] font-semibold"
+            style={{ bottom: `${ZONA_SEGURA.baixoPct + 5}%`, color: pal.text, textShadow: '0 1px 4px rgba(0,0,0,.6)', fontFamily: "'DM Sans', sans-serif" }}
+          >
+            {config.legenda.textoExemplo}
+          </div>
+        )}
+
+        {config.legenda.ativa && config.legenda.estilo === 'karaoke' && (
           <div
             className="absolute inset-x-[10%] text-center text-[7px] font-bold leading-snug"
-            style={{ top: `${moldura.yPct + alturaMoldura / 2 + 3}%`, color: pal.text, fontFamily: "'DM Sans', sans-serif" }}
+            style={{
+              top: telaCheia ? undefined : `${moldura.yPct + alturaMoldura / 2 + 3}%`,
+              bottom: telaCheia ? `${ZONA_SEGURA.baixoPct + 5}%` : undefined,
+              color: pal.text,
+              fontFamily: "'DM Sans', sans-serif",
+            }}
           >
             {config.legenda.textoExemplo.split(config.legenda.palavraDestaque).map((parte, i, arr) => (
               <span key={i}>
@@ -181,7 +250,9 @@ export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) 
           </div>
         )}
       </div>
-      <p className="text-[11px] text-muted-foreground">Arraste dentro do palco para posicionar a moldura</p>
+      <p className="text-[11px] text-muted-foreground">
+        {telaCheia ? 'Gravação em tela cheia — sem moldura pra arrastar' : 'Arraste dentro do palco para posicionar a moldura'}
+      </p>
     </div>
   );
 };

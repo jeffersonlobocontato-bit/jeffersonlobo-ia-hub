@@ -14,8 +14,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { Plus, Trash2, Copy, Upload, ArrowLeft, Loader2 } from 'lucide-react';
 import {
-  type VideoProject, type VideoProjectConfig, type TemplateTipo, type Paleta, type TransicaoTipo,
-  PALETAS, TEMPLATE_LABELS, criarConfigPadrao,
+  type VideoProject, type VideoProjectConfig, type TemplateTipo, type Paleta, type TransicaoTipo, type EstiloLegenda,
+  PALETAS, TEMPLATE_LABELS, TEMPLATE_LIBRARY, criarConfigPadrao, normalizarConfig,
 } from '@/types/videoEditor';
 import { VideoStagePreview } from './video-editor/VideoStagePreview';
 import { CoverPreview } from './video-editor/CoverPreview';
@@ -53,7 +53,10 @@ const AdminVideoEditorTab = () => {
     setSelecionadoId(p.id);
     setTitulo(p.title);
     setTemplate(p.template);
-    setConfig(p.config);
+    // Projetos salvos antes da biblioteca de templates ganhar campos novos
+    // (filtroVintage, overlayFundo, legenda.manchete…) não têm esses campos
+    // no JSON — normaliza pra sempre abrir com um config completo.
+    setConfig(normalizarConfig(p.config, p.template));
   };
 
   const voltar = () => {
@@ -76,7 +79,7 @@ const AdminVideoEditorTab = () => {
     const { data, error } = await db.from('video_projects').insert({
       title: `${p.title} (cópia)`,
       template: p.template,
-      config: p.config,
+      config: normalizarConfig(p.config, p.template),
       cover_url: p.cover_url,
     }).select().single();
     if (error) { toast({ title: 'Erro ao duplicar', description: error.message, variant: 'destructive' }); return; }
@@ -127,6 +130,10 @@ const AdminVideoEditorTab = () => {
     setConfig((c) => (c ? { ...c, assinatura: { ...c.assinatura, ...patch } } : c));
   const patchCapa = (patch: Partial<VideoProjectConfig['capa']>) =>
     setConfig((c) => (c ? { ...c, capa: { ...c.capa, ...patch } } : c));
+  const patchFiltroVintage = (patch: Partial<VideoProjectConfig['filtroVintage']>) =>
+    setConfig((c) => (c ? { ...c, filtroVintage: { ...c.filtroVintage, ...patch } } : c));
+  const patchOverlayFundo = (patch: Partial<VideoProjectConfig['overlayFundo']>) =>
+    setConfig((c) => (c ? { ...c, overlayFundo: { ...c.overlayFundo, ...patch } } : c));
 
   if (loading) {
     return <div className="flex items-center gap-2 text-muted-foreground"><Loader2 className="h-4 w-4 animate-spin" /> Carregando…</div>;
@@ -136,14 +143,26 @@ const AdminVideoEditorTab = () => {
   if (!selecionado || !config) {
     return (
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold">Editor de Vídeo</h2>
-            <p className="text-sm text-muted-foreground">Reels e vídeos verticais no padrão visual do Carrossel Jefferson.</p>
-          </div>
-          <div className="flex gap-2">
-            <Button size="sm" onClick={() => criar('card_dados')}><Plus className="mr-1 h-4 w-4" /> Card de dados</Button>
-            <Button size="sm" variant="outline" onClick={() => criar('fundo_dinamico')}><Plus className="mr-1 h-4 w-4" /> Fundo dinâmico</Button>
+        <div>
+          <h2 className="text-lg font-semibold">Editor de Vídeo</h2>
+          <p className="text-sm text-muted-foreground">Reels e vídeos verticais no padrão visual do Carrossel Jefferson.</p>
+        </div>
+
+        <div>
+          <p className="mb-2 text-xs font-medium uppercase tracking-wide text-muted-foreground">Biblioteca de templates — novo vídeo a partir de</p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            {TEMPLATE_LIBRARY.map((t) => (
+              <Card key={t.id} className="flex flex-col justify-between p-4">
+                <div>
+                  <p className="font-medium">{t.nome}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{t.origem}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">{t.descricao}</p>
+                </div>
+                <Button size="sm" className="mt-3 w-fit" onClick={() => criar(t.id)}>
+                  <Plus className="mr-1 h-4 w-4" /> Criar
+                </Button>
+              </Card>
+            ))}
           </div>
         </div>
 
@@ -152,6 +171,8 @@ const AdminVideoEditorTab = () => {
             Nenhum vídeo ainda. Crie o primeiro escolhendo um template acima.
           </Card>
         ) : (
+          <>
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">Seus vídeos</p>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {projetos.map((p) => (
               <Card key={p.id} className="p-4">
@@ -169,6 +190,7 @@ const AdminVideoEditorTab = () => {
               </Card>
             ))}
           </div>
+          </>
         )}
       </div>
     );
@@ -246,6 +268,23 @@ const AdminVideoEditorTab = () => {
 
           {/* MOLDURA */}
           <TabsContent value="moldura" className="space-y-4 pt-4">
+            <div className="space-y-2">
+              <Label className="text-xs">Formato</Label>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => patchMoldura({ modo: 'flutuante', larguraPct: config.moldura.larguraPct === 100 ? 36 : config.moldura.larguraPct })}
+                  className={`rounded-md border px-3 py-2 text-xs ${config.moldura.modo === 'flutuante' ? 'border-primary' : 'border-border'}`}
+                >
+                  Moldura pequena sobre o fundo
+                </button>
+                <button
+                  onClick={() => patchMoldura({ modo: 'tela_cheia', larguraPct: 100 })}
+                  className={`rounded-md border px-3 py-2 text-xs ${config.moldura.modo === 'tela_cheia' ? 'border-primary' : 'border-border'}`}
+                >
+                  Tela cheia
+                </button>
+              </div>
+            </div>
             <div>
               <Label className="mb-1 block text-xs uppercase text-muted-foreground">Gravação / foto de referência</Label>
               <input
@@ -257,10 +296,12 @@ const AdminVideoEditorTab = () => {
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label className="text-xs">Tamanho ({config.moldura.larguraPct}%)</Label>
-                <Slider value={[config.moldura.larguraPct]} min={20} max={60} step={1} onValueChange={([v]) => patchMoldura({ larguraPct: v })} />
-              </div>
+              {config.moldura.modo === 'flutuante' && (
+                <div>
+                  <Label className="text-xs">Tamanho ({config.moldura.larguraPct}%)</Label>
+                  <Slider value={[config.moldura.larguraPct]} min={20} max={60} step={1} onValueChange={([v]) => patchMoldura({ larguraPct: v })} />
+                </div>
+              )}
               <div>
                 <Label className="text-xs">Zoom ({config.moldura.zoom}%)</Label>
                 <Slider value={[config.moldura.zoom]} min={100} max={200} step={2} onValueChange={([v]) => patchMoldura({ zoom: v })} />
@@ -282,7 +323,42 @@ const AdminVideoEditorTab = () => {
               existe mais (painel em branco até o usuário clicar em outra aba
               e voltar). */}
           <TabsContent value="fundo" className="space-y-4 pt-4">
-            {template === 'card_dados' ? (
+            {template === 'depoimento_estudio' ? (
+              <div className="space-y-4">
+                <p className="text-xs text-muted-foreground">
+                  A gravação em si (o fundo, aqui) é enviada na aba Moldura. Esta aba cuida do acabamento: filtro e imagem de referência atrás de quem fala.
+                </p>
+                <div className="flex items-center gap-2">
+                  <Switch checked={config.filtroVintage.ativo} onCheckedChange={(v) => patchFiltroVintage({ ativo: v })} />
+                  <Label>Filtro vintage / grão (cortes de B-roll)</Label>
+                </div>
+                {config.filtroVintage.ativo && (
+                  <div>
+                    <Label className="text-xs">Intensidade ({config.filtroVintage.intensidade}%)</Label>
+                    <Slider value={[config.filtroVintage.intensidade]} min={0} max={100} step={5} onValueChange={([v]) => patchFiltroVintage({ intensidade: v })} />
+                  </div>
+                )}
+                <div className="flex items-center gap-2">
+                  <Switch checked={config.overlayFundo.ativo} onCheckedChange={(v) => patchOverlayFundo({ ativo: v })} />
+                  <Label>Imagem de referência atrás de quem fala (capa de livro, foto do autor…)</Label>
+                </div>
+                {config.overlayFundo.ativo && (
+                  <div className="space-y-3">
+                    <input
+                      type="file" accept="image/*" id="up-overlay" className="hidden"
+                      onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f, 'overlay', (url) => patchOverlayFundo({ imagemUrl: url })); }}
+                    />
+                    <Button size="sm" variant="outline" onClick={() => document.getElementById('up-overlay')?.click()} disabled={enviando === 'overlay'}>
+                      <Upload className="mr-1 h-4 w-4" /> {enviando === 'overlay' ? 'Enviando…' : 'Enviar imagem'}
+                    </Button>
+                    <div>
+                      <Label className="text-xs">Opacidade ({config.overlayFundo.opacidade}%)</Label>
+                      <Slider value={[config.overlayFundo.opacidade]} min={5} max={80} step={5} onValueChange={([v]) => patchOverlayFundo({ opacidade: v })} />
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : template === 'card_dados' ? (
               <>
                 <div>
                   <Label className="text-xs">Título</Label>
@@ -376,14 +452,68 @@ const AdminVideoEditorTab = () => {
               A transcrição real da fala e a sincronização palavra a palavra entram na próxima etapa (precisa de um serviço de transcrição).
               Por enquanto, ajuste aqui como o texto de exemplo aparece.
             </p>
-            <div>
-              <Label className="text-xs">Texto de exemplo</Label>
-              <Textarea rows={2} value={config.legenda.textoExemplo} onChange={(e) => patchLegenda({ textoExemplo: e.target.value })} />
+            <div className="space-y-2">
+              <Label className="text-xs">Estilo</Label>
+              <Select value={config.legenda.estilo} onValueChange={(v) => patchLegenda({ estilo: v as EstiloLegenda })}>
+                <SelectTrigger className="w-64"><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="karaoke">Karaokê — palavra em destaque, embaixo da moldura</SelectItem>
+                  <SelectItem value="frase">Frase simples — uma linha, sem destaque</SelectItem>
+                  <SelectItem value="manchete">Manchete — bloco de linhas, uma em destaque</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            <div>
-              <Label className="text-xs">Palavra em destaque</Label>
-              <Input value={config.legenda.palavraDestaque} onChange={(e) => patchLegenda({ palavraDestaque: e.target.value })} />
-            </div>
+
+            {config.legenda.estilo === 'karaoke' && (
+              <>
+                <div>
+                  <Label className="text-xs">Texto de exemplo</Label>
+                  <Textarea rows={2} value={config.legenda.textoExemplo} onChange={(e) => patchLegenda({ textoExemplo: e.target.value })} />
+                </div>
+                <div>
+                  <Label className="text-xs">Palavra em destaque</Label>
+                  <Input value={config.legenda.palavraDestaque} onChange={(e) => patchLegenda({ palavraDestaque: e.target.value })} />
+                </div>
+              </>
+            )}
+
+            {config.legenda.estilo === 'frase' && (
+              <div>
+                <Label className="text-xs">Texto de exemplo</Label>
+                <Textarea rows={2} value={config.legenda.textoExemplo} onChange={(e) => patchLegenda({ textoExemplo: e.target.value })} />
+              </div>
+            )}
+
+            {config.legenda.estilo === 'manchete' && (
+              <div className="space-y-2">
+                <Label className="text-xs">Linhas do bloco</Label>
+                {config.legenda.manchete.map((linha, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <Input
+                      value={linha.texto}
+                      onChange={(e) => patchLegenda({
+                        manchete: config.legenda.manchete.map((l, j) => (j === i ? { ...l, texto: e.target.value } : l)),
+                      })}
+                    />
+                    <label className="flex items-center gap-1 whitespace-nowrap text-xs text-muted-foreground">
+                      <Switch
+                        checked={linha.destaque}
+                        onCheckedChange={(v) => patchLegenda({
+                          manchete: config.legenda.manchete.map((l, j) => (j === i ? { ...l, destaque: v } : l)),
+                        })}
+                      />
+                      destaque
+                    </label>
+                    <Button size="sm" variant="ghost" onClick={() => patchLegenda({
+                      manchete: config.legenda.manchete.filter((_, j) => j !== i),
+                    })}><Trash2 className="h-3.5 w-3.5 text-destructive" /></Button>
+                  </div>
+                ))}
+                <Button size="sm" variant="outline" onClick={() => patchLegenda({
+                  manchete: [...config.legenda.manchete, { texto: 'nova linha', destaque: false }],
+                })}><Plus className="mr-1 h-4 w-4" /> Adicionar linha</Button>
+              </div>
+            )}
           </TabsContent>
 
           {/* ASSINATURA */}

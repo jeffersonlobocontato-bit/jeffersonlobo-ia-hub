@@ -1,18 +1,30 @@
-// Tipos e presets do Editor de Vídeo (Admin > Editor de Vídeo).
+// Tipos e presets do Editor de Vídeo (Admin > Criativos > Vídeos & Reels).
 //
 // A configuração de cada projeto é guardada como dado (JSONB), nunca como
 // pixel "queimado" — o mesmo princípio do Carrossel Jefferson: qualquer
 // campo pode ser reaberto e editado depois sem refazer o vídeo do zero.
+//
+// TEMPLATE_LIBRARY é o catálogo: cada referência de vídeo que analisamos
+// (reel do Instagram, etc.) vira uma entrada aqui, com seu próprio conjunto
+// de padrões. Adicionar uma referência nova é adicionar um item na lista —
+// não reescrever telas.
 
 export type Paleta = 'ambar' | 'ciano' | 'sage';
-export type TemplateTipo = 'card_dados' | 'fundo_dinamico';
-export type TransicaoTipo = 'corte' | 'fusao' | 'arrasto';
+export type TemplateTipo = 'card_dados' | 'fundo_dinamico' | 'depoimento_estudio';
+// 'iris' (wipe circular) é a transição que aparece na referência do
+// "depoimento de estúdio", mas ainda não tem seletor na UI nem renderização
+// no preview — por isso nenhum template usa como padrão ainda. Fica no tipo
+// pra já existir o nome quando essa transição for implementada de verdade.
+export type TransicaoTipo = 'corte' | 'fusao' | 'arrasto' | 'iris';
 export type StatusProjeto = 'rascunho' | 'pronto' | 'publicado';
+export type EstiloLegenda = 'karaoke' | 'frase' | 'manchete';
+export type ModoMoldura = 'flutuante' | 'tela_cheia';
 
 export interface MolduraConfig {
-  xPct: number; // centro X, % da largura do palco
-  yPct: number; // centro Y, % da altura do palco
-  larguraPct: number; // largura da moldura, % da largura do palco
+  modo: ModoMoldura; // 'flutuante' = moldura pequena sobre o fundo; 'tela_cheia' = a gravação ocupa o palco inteiro
+  xPct: number; // centro X, % da largura do palco (só importa em modo flutuante)
+  yPct: number; // centro Y, % da altura do palco (só importa em modo flutuante)
+  larguraPct: number; // largura da moldura, % da largura do palco (só importa em modo flutuante)
   zoom: number; // 100–200, zoom da mídia dentro da moldura
   focalX: number; // 0–100, ponto focal da mídia dentro da moldura
   focalY: number;
@@ -38,11 +50,17 @@ export interface FundoDinamicoConfig {
   clipes: ClipeFundo[];
 }
 
+export interface LinhaManchete {
+  texto: string;
+  destaque: boolean; // linha em negrito grande (a "palavra-chave" do bloco)
+}
+
 export interface LegendaConfig {
   ativa: boolean;
-  estilo: 'karaoke' | 'frase';
-  textoExemplo: string;
-  palavraDestaque: string;
+  estilo: EstiloLegenda;
+  textoExemplo: string; // usado nos estilos karaoke/frase
+  palavraDestaque: string; // usado no estilo karaoke
+  manchete: LinhaManchete[]; // usado no estilo manchete (bloco de várias linhas, uma em destaque)
 }
 
 export interface AssinaturaConfig {
@@ -58,6 +76,17 @@ export interface CapaConfig {
   imagemUrl: string | null;
 }
 
+export interface FiltroVintageConfig {
+  ativo: boolean;
+  intensidade: number; // 0–100 — grão + tom quente + vinheta
+}
+
+export interface OverlayFundoConfig {
+  ativo: boolean;
+  imagemUrl: string | null; // ex.: capa de livro, foto de referência
+  opacidade: number; // 0–100
+}
+
 export interface VideoProjectConfig {
   paleta: Paleta;
   mostrarZonasSeguras: boolean;
@@ -67,6 +96,8 @@ export interface VideoProjectConfig {
   legenda: LegendaConfig;
   assinatura: AssinaturaConfig;
   capa: CapaConfig;
+  filtroVintage: FiltroVintageConfig;
+  overlayFundo: OverlayFundoConfig;
 }
 
 export interface VideoProject {
@@ -107,10 +138,68 @@ export const ZONA_SEGURA = {
   direitaPct: 9,  // curtir / comentar / compartilhar / salvar
 };
 
-const molduraPadrao = (): MolduraConfig => ({
+// ── BIBLIOTECA DE TEMPLATES ──────────────────────────────────────────────
+// Cada entrada nasce de uma referência de vídeo analisada. Pra adicionar uma
+// referência nova: extrair o padrão dela, criar a entrada aqui com os
+// padrões (moldura, legenda, filtro, transição) e, se precisar de um campo
+// que ainda não existe, estender VideoProjectConfig.
+export interface TemplateDefinition {
+  id: TemplateTipo;
+  nome: string;
+  origem: string; // de onde veio o padrão (referência analisada)
+  descricao: string;
+  moldura: { modo: ModoMoldura };
+  estiloLegendaPadrao: EstiloLegenda;
+  filtroVintagePadrao: boolean;
+  transicaoPadrao: TransicaoTipo;
+}
+
+export const TEMPLATE_LIBRARY: TemplateDefinition[] = [
+  {
+    id: 'card_dados',
+    nome: '📊 Card de dados',
+    origem: 'Reel de análise de dados (gráfico + fala)',
+    descricao: 'Fundo é um card fixo (gráfico/dado) que anima uma vez no início. Moldura pequena, legenda frase a frase.',
+    moldura: { modo: 'flutuante' },
+    estiloLegendaPadrao: 'karaoke',
+    filtroVintagePadrao: false,
+    transicaoPadrao: 'corte',
+  },
+  {
+    id: 'fundo_dinamico',
+    nome: '🎞️ Fundo dinâmico',
+    origem: 'Uso geral — múltiplas mídias trocando',
+    descricao: 'Fundo troca entre vídeos/imagens ao longo da fala, com transições de fusão ou arrasto. Moldura pequena.',
+    moldura: { modo: 'flutuante' },
+    estiloLegendaPadrao: 'karaoke',
+    filtroVintagePadrao: false,
+    transicaoPadrao: 'fusao',
+  },
+  {
+    id: 'depoimento_estudio',
+    nome: '🎙️ Depoimento de estúdio',
+    origem: 'Reel tipo podcast (plano aberto, estante de fundo)',
+    descricao: 'Gravação em tela cheia (plano americano), com cortes para B-roll em filtro vintage/grão, transição em íris circular e imagem de referência com brilho atrás de quem fala. Legenda alterna entre linha simples e um bloco "manchete" com a palavra-chave em destaque.',
+    moldura: { modo: 'tela_cheia' },
+    estiloLegendaPadrao: 'frase',
+    filtroVintagePadrao: true,
+    transicaoPadrao: 'fusao', // 'iris' seria o ideal (é o que a referência usa) — ver comentário em TransicaoTipo
+  },
+];
+
+export function definicaoTemplate(id: TemplateTipo): TemplateDefinition {
+  return TEMPLATE_LIBRARY.find((t) => t.id === id) ?? TEMPLATE_LIBRARY[0];
+}
+
+// Mantido por compatibilidade com o que já lia só nome/descrição.
+export const TEMPLATE_LABELS: Record<TemplateTipo, { nome: string; desc: string }> =
+  Object.fromEntries(TEMPLATE_LIBRARY.map((t) => [t.id, { nome: t.nome, desc: t.descricao }])) as Record<TemplateTipo, { nome: string; desc: string }>;
+
+const molduraPadrao = (modo: ModoMoldura): MolduraConfig => ({
+  modo,
   xPct: 50,
-  yPct: 62,
-  larguraPct: 36,
+  yPct: modo === 'tela_cheia' ? 50 : 62,
+  larguraPct: modo === 'tela_cheia' ? 100 : 36,
   zoom: 110,
   focalX: 50,
   focalY: 40,
@@ -118,10 +207,11 @@ const molduraPadrao = (): MolduraConfig => ({
 });
 
 export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
+  const def = definicaoTemplate(template);
   return {
     paleta: 'ambar',
     mostrarZonasSeguras: true,
-    moldura: molduraPadrao(),
+    moldura: molduraPadrao(def.moldura.modo),
     cardDados: {
       titulo: 'Título do card de dados',
       subtitulo: 'LINHA DE APOIO EM CAIXA ALTA',
@@ -130,14 +220,20 @@ export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
     },
     fundoDinamico: {
       clipes: [
-        { id: crypto.randomUUID(), mediaUrl: null, tipo: 'imagem', duracaoSegundos: 4, transicao: 'fusao' },
+        { id: crypto.randomUUID(), mediaUrl: null, tipo: 'imagem', duracaoSegundos: 4, transicao: def.transicaoPadrao },
       ],
     },
     legenda: {
       ativa: true,
-      estilo: 'karaoke',
+      estilo: def.estiloLegendaPadrao,
       textoExemplo: 'aí que talvez você não queira ouvir,',
       palavraDestaque: 'você',
+      manchete: [
+        { texto: 'todo mundo', destaque: false },
+        { texto: 'ama contar', destaque: false },
+        { texto: 'histórias', destaque: true },
+        { texto: 'de superação', destaque: false },
+      ],
     },
     assinatura: {
       ativa: true,
@@ -150,16 +246,39 @@ export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
       handle: '@jeffersonlobo',
       imagemUrl: null,
     },
+    filtroVintage: {
+      ativo: def.filtroVintagePadrao,
+      intensidade: 55,
+    },
+    overlayFundo: {
+      ativo: false,
+      imagemUrl: null,
+      opacidade: 35,
+    },
   };
 }
 
-export const TEMPLATE_LABELS: Record<TemplateTipo, { nome: string; desc: string }> = {
-  card_dados: {
-    nome: '📊 Card de dados',
-    desc: 'Fundo é um card fixo (gráfico/dado) que anima uma vez no início. Moldura pequena, legenda frase a frase.',
-  },
-  fundo_dinamico: {
-    nome: '🎞️ Fundo dinâmico',
-    desc: 'Fundo troca entre vídeos/imagens ao longo da fala, com transições de fusão ou arrasto.',
-  },
-};
+/**
+ * Preenche, num config vindo do banco, qualquer campo que a biblioteca de
+ * templates ganhou depois que aquele projeto foi salvo (ex.: projetos
+ * criados antes de filtroVintage/overlayFundo/legenda.manchete existirem).
+ * Sem isso, abrir um projeto antigo quebra a tela inteira porque o preview
+ * lê `config.filtroVintage.ativo` etc. direto, sem checar undefined.
+ * Campos que o projeto já tem são mantidos; só o que falta vem do padrão.
+ */
+export function normalizarConfig(config: Partial<VideoProjectConfig> | null | undefined, template: TemplateTipo): VideoProjectConfig {
+  const padrao = criarConfigPadrao(template);
+  if (!config) return padrao;
+  return {
+    ...padrao,
+    ...config,
+    moldura: { ...padrao.moldura, ...config.moldura },
+    cardDados: { ...padrao.cardDados, ...config.cardDados },
+    fundoDinamico: { ...padrao.fundoDinamico, ...config.fundoDinamico },
+    legenda: { ...padrao.legenda, ...config.legenda },
+    assinatura: { ...padrao.assinatura, ...config.assinatura },
+    capa: { ...padrao.capa, ...config.capa },
+    filtroVintage: { ...padrao.filtroVintage, ...config.filtroVintage },
+    overlayFundo: { ...padrao.overlayFundo, ...config.overlayFundo },
+  };
+}
