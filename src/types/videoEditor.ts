@@ -99,16 +99,83 @@ export interface CapaConfig {
 // (fundoDinamico.clipes) e trilha sonora (trilhaSonora, abaixo) acabaram
 // como suas próprias seções em VideoProjectConfig, não dentro deste objeto
 // — cada uma já tinha (ou ganhou) campos que só fazem sentido nela mesma.
+/** Um trecho apagado de dentro do corte principal — a reprodução pula direto de `inicioSegundos` até `fimSegundos` ("ripple delete": não sobra buraco, só encurta o vídeo final). */
+export interface CorteInterno {
+  id: string;
+  inicioSegundos: number;
+  fimSegundos: number;
+}
+
+export function criarCorteInterno(inicioSegundos: number, fimSegundos: number): CorteInterno {
+  return { id: crypto.randomUUID(), inicioSegundos, fimSegundos };
+}
+
+/**
+ * Ordena e funde cortes internos que se sobrepõem ou se tocam — sem isso, dois
+ * cortes cobrindo o mesmo trecho (ex.: clicou "Apagar aqui" duas vezes perto
+ * do mesmo ponto) fariam a duração apagada ser somada em dobro.
+ */
+function mesclarCortesInternos(cortes: CorteInterno[]): { inicioSegundos: number; fimSegundos: number }[] {
+  const ordenados = [...cortes].sort((a, b) => a.inicioSegundos - b.inicioSegundos);
+  const mesclados: { inicioSegundos: number; fimSegundos: number }[] = [];
+  for (const c of ordenados) {
+    const ultimo = mesclados[mesclados.length - 1];
+    if (ultimo && c.inicioSegundos <= ultimo.fimSegundos) {
+      ultimo.fimSegundos = Math.max(ultimo.fimSegundos, c.fimSegundos);
+    } else {
+      mesclados.push({ inicioSegundos: c.inicioSegundos, fimSegundos: c.fimSegundos });
+    }
+  }
+  return mesclados;
+}
+
 export interface TimelineConfig {
   duracaoOriginalSegundos: number | null; // duração real do arquivo, detectada pelo player — null até o vídeo carregar
   cortarInicioSegundos: number; // segundos a partir do início do arquivo original (trim in)
   cortarFimSegundos: number | null; // segundos a partir do início do arquivo original (trim out); null = até o fim
+  cortesInternos: CorteInterno[]; // trechos apagados de dentro da janela acima (dividir/apagar no meio do vídeo)
 }
 
-/** Duração do trecho que de fato entra no vídeo final, já considerando o corte. */
+/** Duração do trecho que de fato entra no vídeo final, já considerando o corte de borda e os trechos apagados no meio. */
 export function duracaoEfetivaTimeline(timeline: TimelineConfig): number {
   const fim = timeline.cortarFimSegundos ?? timeline.duracaoOriginalSegundos ?? 0;
-  return Math.max(0, fim - timeline.cortarInicioSegundos);
+  const bruta = Math.max(0, fim - timeline.cortarInicioSegundos);
+  // Só conta o que cada corte tem de fato dentro da janela [início, fim] —
+  // arrastar a alça de corte depois de já ter um trecho apagado no meio pode
+  // deixar aquele corte parcial ou totalmente fora da janela atual.
+  const apagado = mesclarCortesInternos(timeline.cortesInternos ?? []).reduce((soma, c) => {
+    const inicioClipado = Math.max(c.inicioSegundos, timeline.cortarInicioSegundos);
+    const fimClipado = Math.min(c.fimSegundos, fim);
+    return soma + Math.max(0, fimClipado - inicioClipado);
+  }, 0);
+  return Math.max(0, bruta - apagado);
+}
+
+/**
+ * Quanto do vídeo FINAL já passou até `tempoAtualBruto` (tempo bruto, do
+ * arquivo original) — usado pelo fade da trilha sonora, que precisa
+ * acompanhar o tempo do vídeo depois do corte e dos trechos apagados, não o
+ * tempo bruto do arquivo (senão o fade dessincroniza assim que existe algum
+ * trecho apagado antes do ponto atual).
+ */
+export function tempoEfetivoDesdeInicio(timeline: TimelineConfig, tempoAtualBruto: number): number {
+  const bruto = Math.max(0, tempoAtualBruto - timeline.cortarInicioSegundos);
+  const apagadoAntes = mesclarCortesInternos(timeline.cortesInternos ?? []).reduce((soma, c) => {
+    const inicioClipado = Math.max(c.inicioSegundos, timeline.cortarInicioSegundos);
+    const fimClipado = Math.min(c.fimSegundos, tempoAtualBruto);
+    return soma + Math.max(0, fimClipado - inicioClipado);
+  }, 0);
+  return Math.max(0, bruto - apagadoAntes);
+}
+
+/** Se `tempoSegundos` cai dentro de algum corte interno, empurra pro fim dele — usado pelo player pra pular o trecho apagado durante play/seek, sem deixar o vídeo passar por cima dele. */
+export function pularCortesInternos(tempoSegundos: number, cortes: CorteInterno[]): number {
+  const ordenados = [...cortes].sort((a, b) => a.inicioSegundos - b.inicioSegundos);
+  let t = tempoSegundos;
+  for (const c of ordenados) {
+    if (t >= c.inicioSegundos && t < c.fimSegundos) t = c.fimSegundos;
+  }
+  return t;
 }
 
 /** Formato m:ss usado no player e na régua — um só lugar pra mudar (ex.: horas em vídeos longos). */
@@ -372,6 +439,7 @@ export function criarConfigPadrao(template: TemplateTipo): VideoProjectConfig {
       duracaoOriginalSegundos: null,
       cortarInicioSegundos: 0,
       cortarFimSegundos: null,
+      cortesInternos: [],
     },
     trilhaSonora: {
       ativa: false,
@@ -412,7 +480,7 @@ export function normalizarConfig(config: Partial<VideoProjectConfig> | null | un
     capa: { ...padrao.capa, ...config.capa },
     filtroVintage: { ...padrao.filtroVintage, ...config.filtroVintage },
     overlayFundo: { ...padrao.overlayFundo, ...config.overlayFundo },
-    timeline: { ...padrao.timeline, ...config.timeline },
+    timeline: { ...padrao.timeline, ...config.timeline, cortesInternos: config.timeline?.cortesInternos ?? padrao.timeline.cortesInternos },
     trilhaSonora: { ...padrao.trilhaSonora, ...config.trilhaSonora },
   };
 }

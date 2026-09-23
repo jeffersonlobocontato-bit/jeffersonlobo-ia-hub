@@ -16,6 +16,7 @@ import { Plus, Trash2, Copy, Upload, ArrowLeft, Loader2 } from 'lucide-react';
 import {
   type VideoProject, type VideoProjectConfig, type TemplateTipo, type Paleta, type EstiloLegenda,
   PALETAS, TEMPLATE_LABELS, TEMPLATE_LIBRARY, criarConfigPadrao, normalizarConfig, duracaoTotalClipes, criarClipeFundo,
+  criarCorteInterno, type CorteInterno,
 } from '@/types/videoEditor';
 import { VideoStagePreview, type ElementoSelecionado } from './video-editor/VideoStagePreview';
 import { CoverPreview } from './video-editor/CoverPreview';
@@ -27,6 +28,7 @@ import { VideoLegendaAoVivo } from './video-editor/VideoLegendaAoVivo';
 import { VideoTrilhaSonoraPlayer } from './video-editor/VideoTrilhaSonoraPlayer';
 import { VideoTimelineTrilhaTrack } from './video-editor/VideoTimelineTrilhaTrack';
 import { VideoTimelineTransicaoMarcadores } from './video-editor/VideoTimelineTransicaoMarcadores';
+import { VideoTimelineCortesInternos } from './video-editor/VideoTimelineCortesInternos';
 
 // video_projects ainda não está no types.ts gerado — mesmo padrão de cast
 // já usado em outras abas do admin (ex.: AdminProductsCasesTab).
@@ -49,6 +51,7 @@ const AdminVideoEditorTab = () => {
   const [tempoAtual, setTempoAtual] = useState(0); // playhead da timeline, em segundos
   const [tocando, setTocando] = useState(false); // segue o play/pause do VideoPlayer — a trilha sonora acompanha
   const [elementoSelecionado, setElementoSelecionado] = useState<ElementoSelecionado>('moldura'); // camada selecionada no palco
+  const [abaAtiva, setAbaAtiva] = useState('template'); // controlado pra dar pra pular de aba a partir de um "+" nas faixas vazias da timeline
 
   const carregar = async () => {
     setLoading(true);
@@ -73,6 +76,7 @@ const AdminVideoEditorTab = () => {
     setTempoAtual(0);
     setTocando(false);
     setElementoSelecionado('moldura');
+    setAbaAtiva('template');
   };
 
   const voltar = () => {
@@ -176,6 +180,12 @@ const AdminVideoEditorTab = () => {
     setConfig((c) => (c ? { ...c, overlayFundo: { ...c.overlayFundo, ...patch } } : c));
   const patchTimeline = (patch: Partial<VideoProjectConfig['timeline']>) =>
     setConfig((c) => (c ? { ...c, timeline: { ...c.timeline, ...patch } } : c));
+  const adicionarCorteInterno = (corte: CorteInterno) =>
+    setConfig((c) => (c ? { ...c, timeline: { ...c.timeline, cortesInternos: [...c.timeline.cortesInternos, corte] } } : c));
+  const alterarCorteInterno = (id: string, patch: Partial<CorteInterno>) =>
+    setConfig((c) => (c ? { ...c, timeline: { ...c.timeline, cortesInternos: c.timeline.cortesInternos.map((corte) => (corte.id === id ? { ...corte, ...patch } : corte)) } } : c));
+  const removerCorteInterno = (id: string) =>
+    setConfig((c) => (c ? { ...c, timeline: { ...c.timeline, cortesInternos: c.timeline.cortesInternos.filter((corte) => corte.id !== id) } } : c));
   const patchTrilhaSonora = (patch: Partial<VideoProjectConfig['trilhaSonora']>) =>
     setConfig((c) => (c ? { ...c, trilhaSonora: { ...c.trilhaSonora, ...patch } } : c));
 
@@ -280,7 +290,7 @@ const AdminVideoEditorTab = () => {
           </div>
         </div>
 
-        <Tabs defaultValue="template">
+        <Tabs value={abaAtiva} onValueChange={setAbaAtiva}>
           <TabsList className="flex-wrap">
             <TabsTrigger value="template">Template</TabsTrigger>
             <TabsTrigger value="moldura">Moldura</TabsTrigger>
@@ -411,6 +421,7 @@ const AdminVideoEditorTab = () => {
                   onDuracaoDetectada={(d) => patchTimeline({ duracaoOriginalSegundos: d })}
                   cortarInicioSegundos={config.timeline.cortarInicioSegundos}
                   cortarFimSegundos={config.timeline.cortarFimSegundos}
+                  cortesInternos={config.timeline.cortesInternos}
                   onTocandoChange={setTocando}
                 />
                 <VideoTrilhaSonoraPlayer
@@ -431,13 +442,24 @@ const AdminVideoEditorTab = () => {
                     cortarFimSegundos={config.timeline.cortarFimSegundos ?? config.timeline.duracaoOriginalSegundos ?? 0}
                     onCortarInicioChange={(v) => patchTimeline({ cortarInicioSegundos: v })}
                     onCortarFimChange={(v) => patchTimeline({ cortarFimSegundos: v })}
+                    cortesInternos={config.timeline.cortesInternos}
                   />
                 </div>
+                <VideoTimelineCortesInternos
+                  cortes={config.timeline.cortesInternos}
+                  tempoAtual={tempoAtual}
+                  cortarInicioSegundos={config.timeline.cortarInicioSegundos}
+                  cortarFimSegundos={config.timeline.cortarFimSegundos ?? config.timeline.duracaoOriginalSegundos ?? 0}
+                  onAdicionar={adicionarCorteInterno}
+                  onAlterar={alterarCorteInterno}
+                  onRemover={removerCorteInterno}
+                />
                 <VideoTimelineLegendaTrack
                   palavras={config.legenda.palavras}
                   duracaoTotalSegundos={duracaoTotalTimeline}
                   tempoAtual={tempoAtual}
                   onSeek={setTempoAtual}
+                  onAdicionar={() => setAbaAtiva('legenda')}
                 />
                 {template === 'fundo_dinamico' && (
                   <>
@@ -467,9 +489,11 @@ const AdminVideoEditorTab = () => {
                   duracaoEixoSegundos={duracaoTotalTimeline}
                   tempoAtual={tempoAtual}
                   onSeek={setTempoAtual}
+                  onAdicionar={() => setAbaAtiva('trilha')}
                 />
                 <p className="text-xs text-muted-foreground">
                   Arraste as alças âmbar pra cortar o trecho usado da gravação — fora dele o vídeo não toca.
+                  Pra apagar um pedaço do meio, posicione o playhead e use "Apagar aqui" logo abaixo da régua — o vídeo pula esse trecho sozinho, sem deixar buraco.
                   {template === 'fundo_dinamico' && ' Na faixa de baixo, arraste o corpo de um clipe pra reordenar e a borda direita pra mudar a duração — e clique na bolinha acima de cada corte pra trocar o tipo de transição.'}
                   {config.trilhaSonora.ativa && config.trilhaSonora.mediaUrl && ' Aperte play pra ouvir a trilha sonora tocando junto.'}
                 </p>
