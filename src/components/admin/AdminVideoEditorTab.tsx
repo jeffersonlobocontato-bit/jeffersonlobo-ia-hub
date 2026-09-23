@@ -616,7 +616,7 @@ const AdminVideoEditorTab = () => {
                     </div>
                   )}
                   <p className="text-xs text-muted-foreground">
-                    A legenda sincronizada de verdade (palavra aparecendo no tempo certo durante a reprodução) ainda depende do player/timeline do vídeo, que é a próxima peça. Por ora, a transcrição fica salva e editável aqui, e os campos abaixo usam texto de exemplo pra pré-visualização.
+                    A legenda sincronizada de verdade (palavra acendendo no tempo certo) já está na aba Linha do tempo, acima do player. Os campos abaixo (estilo, texto de exemplo) são só pra ajustar como a legenda aparece visualmente no card estático.
                   </p>
                 </>
               )}
