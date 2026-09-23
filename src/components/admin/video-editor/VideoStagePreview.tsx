@@ -43,8 +43,10 @@ export const VideoStagePreview = ({ template, config, onMolduraChange }: Props) 
   const handlePointerUp = () => setArrastando(false);
 
   const { moldura } = config;
-  const molduraAlturaPct = moldura.larguraPct * (16 / 9) * (9 / 16) * 1; // squircle ~1:1.2, ajustado abaixo
-  const alturaMoldura = moldura.larguraPct * 1.15;
+  // Palco é 9:16 (mais alto que largo); moldura é quadrada (aspect-ratio 1/1),
+  // então o mesmo comprimento em pixels vale uma % menor da altura do palco
+  // do que da largura — sem essa conversão a legenda cai em cima da moldura.
+  const alturaMoldura = moldura.larguraPct * (9 / 16);
 
   return (
     <div className="flex flex-col items-center gap-2">

@@ -201,7 +201,7 @@ const AdminVideoEditorTab = () => {
           <TabsList className="flex-wrap">
             <TabsTrigger value="template">Template</TabsTrigger>
             <TabsTrigger value="moldura">Moldura</TabsTrigger>
-            <TabsTrigger value={template === 'card_dados' ? 'card' : 'fundo'}>Fundo</TabsTrigger>
+            <TabsTrigger value="fundo">Fundo</TabsTrigger>
             <TabsTrigger value="legenda">Legenda</TabsTrigger>
             <TabsTrigger value="assinatura">Assinatura</TabsTrigger>
             <TabsTrigger value="capa">Capa</TabsTrigger>
@@ -276,41 +276,43 @@ const AdminVideoEditorTab = () => {
             </div>
           </TabsContent>
 
-          {/* FUNDO — card de dados */}
-          {template === 'card_dados' && (
-            <TabsContent value="card" className="space-y-4 pt-4">
-              <div>
-                <Label className="text-xs">Título</Label>
-                <Textarea rows={2} value={config.cardDados.titulo} onChange={(e) => patchCardDados({ titulo: e.target.value })} />
-              </div>
-              <div>
-                <Label className="text-xs">Subtítulo</Label>
-                <Input value={config.cardDados.subtitulo} onChange={(e) => patchCardDados({ subtitulo: e.target.value })} />
-              </div>
-              <div>
-                <Label className="text-xs">Fonte dos dados</Label>
-                <Input value={config.cardDados.fonte} onChange={(e) => patchCardDados({ fonte: e.target.value })} />
-              </div>
-              <div>
-                <Label className="mb-1 block text-xs uppercase text-muted-foreground">Gráfico / imagem do card</Label>
-                <input
-                  type="file" accept="image/*" id="up-card" className="hidden"
-                  onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f, 'card', (url) => patchCardDados({ imagemUrl: url })); }}
-                />
-                <Button size="sm" variant="outline" onClick={() => document.getElementById('up-card')?.click()} disabled={enviando === 'card'}>
-                  <Upload className="mr-1 h-4 w-4" /> {enviando === 'card' ? 'Enviando…' : 'Enviar imagem'}
-                </Button>
-              </div>
-            </TabsContent>
-          )}
-
-          {/* FUNDO — dinâmico */}
-          {template === 'fundo_dinamico' && (
-            <TabsContent value="fundo" className="space-y-3 pt-4">
-              <p className="text-xs text-muted-foreground">
-                Cada clipe troca no tempo indicado, com a transição escolhida. A pré-visualização mostra só o primeiro clipe por enquanto.
-              </p>
-              {config.fundoDinamico.clipes.map((clipe, i) => (
+          {/* FUNDO — muda de conteúdo conforme o template, mas o value da aba
+              fica sempre "fundo": trocar o value junto com o template deixava
+              o Radix Tabs com o estado interno apontando pra uma aba que não
+              existe mais (painel em branco até o usuário clicar em outra aba
+              e voltar). */}
+          <TabsContent value="fundo" className="space-y-4 pt-4">
+            {template === 'card_dados' ? (
+              <>
+                <div>
+                  <Label className="text-xs">Título</Label>
+                  <Textarea rows={2} value={config.cardDados.titulo} onChange={(e) => patchCardDados({ titulo: e.target.value })} />
+                </div>
+                <div>
+                  <Label className="text-xs">Subtítulo</Label>
+                  <Input value={config.cardDados.subtitulo} onChange={(e) => patchCardDados({ subtitulo: e.target.value })} />
+                </div>
+                <div>
+                  <Label className="text-xs">Fonte dos dados</Label>
+                  <Input value={config.cardDados.fonte} onChange={(e) => patchCardDados({ fonte: e.target.value })} />
+                </div>
+                <div>
+                  <Label className="mb-1 block text-xs uppercase text-muted-foreground">Gráfico / imagem do card</Label>
+                  <input
+                    type="file" accept="image/*" id="up-card" className="hidden"
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) upload(f, 'card', (url) => patchCardDados({ imagemUrl: url })); }}
+                  />
+                  <Button size="sm" variant="outline" onClick={() => document.getElementById('up-card')?.click()} disabled={enviando === 'card'}>
+                    <Upload className="mr-1 h-4 w-4" /> {enviando === 'card' ? 'Enviando…' : 'Enviar imagem'}
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground">
+                  Cada clipe troca no tempo indicado, com a transição escolhida. A pré-visualização mostra só o primeiro clipe por enquanto.
+                </p>
+                {config.fundoDinamico.clipes.map((clipe, i) => (
                 <Card key={clipe.id} className="space-y-2 p-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-medium">Clipe {i + 1}</span>
@@ -356,12 +358,13 @@ const AdminVideoEditorTab = () => {
                     </div>
                   </div>
                 </Card>
-              ))}
-              <Button size="sm" variant="outline" onClick={() => patchConfig({
-                fundoDinamico: { clipes: [...config.fundoDinamico.clipes, { id: crypto.randomUUID(), mediaUrl: null, tipo: 'imagem', duracaoSegundos: 4, transicao: 'fusao' }] },
-              })}><Plus className="mr-1 h-4 w-4" /> Adicionar clipe</Button>
-            </TabsContent>
-          )}
+                ))}
+                <Button size="sm" variant="outline" onClick={() => patchConfig({
+                  fundoDinamico: { clipes: [...config.fundoDinamico.clipes, { id: crypto.randomUUID(), mediaUrl: null, tipo: 'imagem', duracaoSegundos: 4, transicao: 'fusao' }] },
+                })}><Plus className="mr-1 h-4 w-4" /> Adicionar clipe</Button>
+              </div>
+            )}
+          </TabsContent>
 
           {/* LEGENDA */}
           <TabsContent value="legenda" className="space-y-4 pt-4">

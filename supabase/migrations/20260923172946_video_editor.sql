@@ -31,7 +31,9 @@ CREATE TRIGGER update_video_projects_updated_at
   FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- Bucket para mídia bruta (gravações, fundos, capas renderizadas, assinatura).
--- Não é público por padrão: é material de trabalho, não conteúdo do site.
+-- Público (mesmo padrão de stage-photos/product-cases/blog-covers): é o que
+-- permite ao front pegar a URL com getPublicUrl(). Só admins enviam/alteram/
+-- apagam — quem tem o link do objeto consegue lê-lo, como nos outros buckets.
 INSERT INTO storage.buckets (id, name, public)
 VALUES ('video-projects', 'video-projects', true)
 ON CONFLICT (id) DO NOTHING;
