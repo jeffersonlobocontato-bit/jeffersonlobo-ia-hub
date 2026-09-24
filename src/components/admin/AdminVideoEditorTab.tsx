@@ -12,12 +12,13 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Plus, Trash2, Copy, Upload, ArrowLeft, Loader2 } from 'lucide-react';
+import { Plus, Trash2, Copy, Upload, ArrowLeft, Loader2, Wand2 } from 'lucide-react';
 import {
   type VideoProject, type VideoProjectConfig, type TemplateTipo, type Paleta, type EstiloLegenda,
   PALETAS, TEMPLATE_LABELS, TEMPLATE_LIBRARY, criarConfigPadrao, normalizarConfig, duracaoTotalClipes, criarClipeFundo,
   criarCorteInterno, type CorteInterno,
 } from '@/types/videoEditor';
+import { VideoDeteccaoSilencio } from './video-editor/VideoDeteccaoSilencio';
 import { VideoStagePreview, type ElementoSelecionado } from './video-editor/VideoStagePreview';
 import { CoverPreview } from './video-editor/CoverPreview';
 import { VideoPlayer } from './video-editor/VideoPlayer';
@@ -52,6 +53,10 @@ const AdminVideoEditorTab = () => {
   const [tocando, setTocando] = useState(false); // segue o play/pause do VideoPlayer — a trilha sonora acompanha
   const [elementoSelecionado, setElementoSelecionado] = useState<ElementoSelecionado>('moldura'); // camada selecionada no palco
   const [abaAtiva, setAbaAtiva] = useState('template'); // controlado pra dar pra pular de aba a partir de um "+" nas faixas vazias da timeline
+  const [instrucaoIA, setInstrucaoIA] = useState(''); // "modo automático" — instrução em texto livre que a IA traduz num patch de config
+  const [aplicandoIA, setAplicandoIA] = useState(false);
+  const [resumoIA, setResumoIA] = useState<string | null>(null);
+  const [erroIA, setErroIA] = useState<string | null>(null);
 
   const carregar = async () => {
     setLoading(true);
@@ -163,6 +168,53 @@ const AdminVideoEditorTab = () => {
     toast({ title: `Transcrito: ${data.palavras.length} palavras` });
   };
 
+  const aplicarInstrucaoIA = async () => {
+    if (!config || !instrucaoIA.trim()) return;
+    const projetoDaInstrucao = selecionadoId;
+    setAplicandoIA(true);
+    setErroIA(null);
+    const resumoAtual = {
+      paleta: config.paleta,
+      mostrarZonasSeguras: config.mostrarZonasSeguras,
+      legendaEstilo: config.legenda.estilo,
+      filtroVintageAtivo: config.filtroVintage.ativo,
+      filtroVintageIntensidade: config.filtroVintage.intensidade,
+      overlayFundoAtivo: config.overlayFundo.ativo,
+      trilhaSonoraAtiva: config.trilhaSonora.ativa,
+      trilhaSonoraVolume: config.trilhaSonora.volume,
+    };
+    const { data, error } = await db.functions.invoke('video-ai-instrucoes', { body: { instrucao: instrucaoIA, resumoAtual } });
+    setAplicandoIA(false);
+    if (error || !data?.ok) {
+      const msg = data?.error || error?.message || 'falha desconhecida';
+      setErroIA(msg);
+      toast({ title: 'Erro ao aplicar instrução', description: msg, variant: 'destructive' });
+      return;
+    }
+    if (selecionadoId !== projetoDaInstrucao) {
+      toast({ title: 'Ajuste pronto, mas o projeto foi trocado', description: 'Abra o projeto original de novo pra aplicar.' });
+      return;
+    }
+    // A IA só é "nudged" pelo enum/min/max do schema da ferramenta — nada
+    // impede um modelo de devolver um valor fora dele (sinônimo, typo,
+    // arredondamento). Sem validar aqui, um paleta inválido, por exemplo,
+    // quebra PALETAS[config.paleta] no preview inteiro na hora.
+    const patch = data.patch ?? {};
+    const clamp = (v: number, min: number, max: number) => Math.min(max, Math.max(min, v));
+    if (patch.paleta === 'ambar' || patch.paleta === 'ciano' || patch.paleta === 'sage') patchConfig({ paleta: patch.paleta });
+    if (typeof patch.mostrarZonasSeguras === 'boolean') patchConfig({ mostrarZonasSeguras: patch.mostrarZonasSeguras });
+    if (patch.legendaEstilo === 'karaoke' || patch.legendaEstilo === 'frase' || patch.legendaEstilo === 'manchete') patchLegenda({ estilo: patch.legendaEstilo });
+    if (typeof patch.filtroVintageAtivo === 'boolean') patchFiltroVintage({ ativo: patch.filtroVintageAtivo });
+    if (typeof patch.filtroVintageIntensidade === 'number') patchFiltroVintage({ intensidade: clamp(patch.filtroVintageIntensidade, 0, 100) });
+    if (typeof patch.overlayFundoAtivo === 'boolean') patchOverlayFundo({ ativo: patch.overlayFundoAtivo });
+    if (typeof patch.trilhaSonoraAtiva === 'boolean') patchTrilhaSonora({ ativa: patch.trilhaSonoraAtiva });
+    if (typeof patch.trilhaSonoraVolume === 'number') patchTrilhaSonora({ volume: clamp(patch.trilhaSonoraVolume, 0, 100) });
+    if (typeof patch.trilhaSonoraFadeInSegundos === 'number') patchTrilhaSonora({ fadeInSegundos: clamp(patch.trilhaSonoraFadeInSegundos, 0, 5) });
+    if (typeof patch.trilhaSonoraFadeOutSegundos === 'number') patchTrilhaSonora({ fadeOutSegundos: clamp(patch.trilhaSonoraFadeOutSegundos, 0, 5) });
+    setResumoIA(patch.resumo ?? null);
+    setInstrucaoIA('');
+  };
+
   const patchConfig = (patch: Partial<VideoProjectConfig>) => setConfig((c) => (c ? { ...c, ...patch } : c));
   const patchMoldura = (patch: Partial<VideoProjectConfig['moldura']>) =>
     setConfig((c) => (c ? { ...c, moldura: { ...c.moldura, ...patch } } : c));
@@ -271,6 +323,26 @@ const AdminVideoEditorTab = () => {
           {salvando ? <Loader2 className="mr-1 h-4 w-4 animate-spin" /> : null} Salvar
         </Button>
       </div>
+
+      <Card className="space-y-2 p-3">
+        <Label className="text-xs uppercase text-muted-foreground">Instrução em texto (IA) — modo automático</Label>
+        <div className="flex gap-2">
+          <Input
+            placeholder='Ex.: "legenda estilo manchete, filtro vintage mais forte, tira a trilha sonora"'
+            value={instrucaoIA}
+            onChange={(e) => setInstrucaoIA(e.target.value)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !aplicandoIA) aplicarInstrucaoIA(); }}
+          />
+          <Button size="sm" onClick={aplicarInstrucaoIA} disabled={aplicandoIA || !instrucaoIA.trim()}>
+            {aplicandoIA ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+          </Button>
+        </div>
+        {erroIA && <p className="text-xs text-destructive">{erroIA}</p>}
+        {resumoIA && !erroIA && <p className="text-xs text-muted-foreground">{resumoIA}</p>}
+        <p className="text-[11px] text-muted-foreground">
+          Ajusta paleta, zonas seguras, estilo de legenda, filtro vintage, imagem de referência e trilha sonora — só o que já existe como campo aqui embaixo.
+        </p>
+      </Card>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[280px_1fr]">
         <div className="flex flex-col items-center gap-4">
@@ -454,6 +526,17 @@ const AdminVideoEditorTab = () => {
                   onAlterar={alterarCorteInterno}
                   onRemover={removerCorteInterno}
                 />
+                {config.legenda.palavras.length > 0 && (
+                  <div>
+                    <p className="mb-1 font-mono text-[10px] uppercase text-muted-foreground">Cortar silêncios automaticamente</p>
+                    <VideoDeteccaoSilencio
+                      palavras={config.legenda.palavras}
+                      cortarInicioSegundos={config.timeline.cortarInicioSegundos}
+                      cortarFimSegundos={config.timeline.cortarFimSegundos ?? config.timeline.duracaoOriginalSegundos ?? 0}
+                      onAplicar={(cortes) => patchTimeline({ cortesInternos: [...config.timeline.cortesInternos, ...cortes] })}
+                    />
+                  </div>
+                )}
                 <VideoTimelineLegendaTrack
                   palavras={config.legenda.palavras}
                   duracaoTotalSegundos={duracaoTotalTimeline}
