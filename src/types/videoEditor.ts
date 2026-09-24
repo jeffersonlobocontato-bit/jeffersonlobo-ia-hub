@@ -70,6 +70,55 @@ export interface PalavraTranscrita {
   fim: number;
 }
 
+export interface SugestaoSilencio {
+  inicioSegundos: number;
+  fimSegundos: number;
+}
+
+const MARGEM_SILENCIO_SEGUNDOS = 0.12; // não cola a alça na palavra — deixa uma respiraçãozinha antes/depois
+const LIMIAR_SILENCIO_PADRAO_SEGUNDOS = 0.7;
+
+/**
+ * Detecta pausas longas na fala usando os timestamps que a transcrição
+ * (Whisper) já devolve por palavra — sem precisar analisar o áudio de novo.
+ * Cada intervalo entre o fim de uma palavra e o início da próxima (e as
+ * pontas: início do corte até a 1ª palavra, última palavra até o fim do
+ * corte) maior que `limiarSegundos` vira uma sugestão de trecho a apagar.
+ */
+export function detectarSilencios(
+  palavras: PalavraTranscrita[],
+  cortarInicioSegundos: number,
+  cortarFimSegundos: number,
+  limiarSegundos: number = LIMIAR_SILENCIO_PADRAO_SEGUNDOS,
+): SugestaoSilencio[] {
+  if (palavras.length === 0 || cortarFimSegundos <= cortarInicioSegundos) return [];
+  const ordenadas = [...palavras].sort((a, b) => a.inicio - b.inicio);
+  const sugestoes: SugestaoSilencio[] = [];
+
+  const primeiraPausa = ordenadas[0].inicio - cortarInicioSegundos;
+  if (primeiraPausa >= limiarSegundos) {
+    sugestoes.push({ inicioSegundos: cortarInicioSegundos, fimSegundos: ordenadas[0].inicio - MARGEM_SILENCIO_SEGUNDOS });
+  }
+
+  for (let i = 0; i < ordenadas.length - 1; i++) {
+    const gap = ordenadas[i + 1].inicio - ordenadas[i].fim;
+    if (gap >= limiarSegundos) {
+      sugestoes.push({
+        inicioSegundos: ordenadas[i].fim + MARGEM_SILENCIO_SEGUNDOS,
+        fimSegundos: ordenadas[i + 1].inicio - MARGEM_SILENCIO_SEGUNDOS,
+      });
+    }
+  }
+
+  const ultimaPalavra = ordenadas[ordenadas.length - 1];
+  const ultimaPausa = cortarFimSegundos - ultimaPalavra.fim;
+  if (ultimaPausa >= limiarSegundos) {
+    sugestoes.push({ inicioSegundos: ultimaPalavra.fim + MARGEM_SILENCIO_SEGUNDOS, fimSegundos: cortarFimSegundos });
+  }
+
+  return sugestoes.filter((s) => s.fimSegundos - s.inicioSegundos > MARGEM_SILENCIO_SEGUNDOS);
+}
+
 export interface LegendaConfig {
   ativa: boolean;
   estilo: EstiloLegenda;
