@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Obrigado por acompanhar! Seu guia da Ilha de Edição com IA chegou</title>
+<meta name="description" content="Valeu pela audiência! Aqui está o passo a passo completo, com prompts e anexos, de como construí minha ilha de edição com IA. Boa sorte no seu projeto. — Jefferson Lobo" />
+<link rel="canonical" href="https://jeffersonlobo.tech/guia-ilha.html" />
+<meta name="theme-color" content="#12201E" />
+<link rel="icon" href="/favicon.ico" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Jefferson Lobo" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:url" content="https://jeffersonlobo.tech/guia-ilha.html" />
+<meta property="og:title" content="Obrigado por acompanhar! 🙌 Seu guia chegou" />
+<meta property="og:description" content="Valeu pela audiência! Aqui está o passo a passo completo de como construí minha ilha de edição com IA, com os prompts e os anexos. Boa sorte no seu projeto! — Jefferson Lobo" />
+<meta property="og:image" content="https://jeffersonlobo.tech/og/guia-ilha.jpg" />
+<meta property="og:image:url" content="https://jeffersonlobo.tech/og/guia-ilha.jpg" />
+<meta property="og:image:secure_url" content="https://jeffersonlobo.tech/og/guia-ilha.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Obrigado por acompanhar. Seu guia da Ilha de Edição com IA chegou." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Obrigado por acompanhar! 🙌 Seu guia chegou" />
+<meta name="twitter:description" content="Valeu pela audiência! Aqui está o passo a passo completo de como construí minha ilha de edição com IA. Boa sorte no seu projeto!" />
+<meta name="twitter:image" content="https://jeffersonlobo.tech/og/guia-ilha.jpg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --pet:#12201E; --s1:#1B2824; --s2:#232E2C; --line:#2E3B38;
+    --amb:#E29F65; --amb-d:#C77523; --paper:#F2EEE4;
+    --muted:rgba(242,238,228,.72); --faint:rgba(242,238,228,.48);
+    --serif:'Instrument Serif',Georgia,serif; --sans:'Manrope',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--pet);color:var(--paper)}
+  body{font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  .glow{position:fixed;right:-220px;top:-200px;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle,rgba(226,159,101,.18),rgba(226,159,101,0) 65%);pointer-events:none;z-index:0}
+  header,main,footer{position:relative;z-index:1}
+  header{padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .wm{font-family:var(--serif);font-size:24px;line-height:1;text-decoration:none}
+  .wm em{font-style:italic;color:var(--amb)}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--amb)}
+  .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center;padding:24px 0 64px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,5.2vw,64px);line-height:1.02;margin:16px 0 20px;letter-spacing:-.005em}
+  h1 em{font-style:italic;color:var(--amb)}
+  .lead{font-size:18px;color:var(--muted);max-width:34em;margin:0 0 28px}
+  .lead b{color:var(--paper);font-weight:600}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:15px 26px;font-weight:700;font-size:16px;text-decoration:none;transition:transform .15s ease, box-shadow .15s ease}
+  .btn.primary{background:var(--amb);color:#12201E;box-shadow:0 10px 28px rgba(226,159,101,.25)}
+  .btn.primary:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(226,159,101,.32)}
+  .btn.ghost{border:1px solid var(--line);color:var(--paper)}
+  .btn.ghost:hover{border-color:var(--amb)}
+  .btn svg{width:18px;height:18px}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:14px}
+  .cover{position:relative;justify-self:center;width:100%;max-width:290px}
+  .cover img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid rgba(242,238,228,.14);box-shadow:0 30px 70px rgba(0,0,0,.45);transform:rotate(1.6deg)}
+  .cover .badge{position:absolute;left:-18px;bottom:28px;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amb);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  h2{font-family:var(--serif);font-weight:400;font-size:clamp(32px,4.4vw,44px);line-height:1.08;margin:10px 0 28px}
+  h2 em{font-style:italic;color:var(--amb)}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card .n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amb)}
+  .card h3{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.15;margin:8px 0 8px}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  .pages{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:8px}
+  .pages img{width:100%;display:block;border-radius:10px;border:1px solid rgba(242,238,228,.12)}
+  .note{color:var(--faint);font-size:13.5px;margin-top:14px}
+  .luck{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:end}
+  .luck p{color:var(--muted);font-size:17px;margin:0 0 14px;max-width:34em}
+  .sig .wm{font-size:34px}
+  .role{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:8px}
+  .links{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+  footer{padding:28px 0 40px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  footer span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  footer .ag{font-family:var(--serif);font-size:16px;letter-spacing:0;text-transform:none;color:var(--paper)}
+  footer .ag em{font-style:italic;color:var(--amb)}
+  @media (max-width:820px){
+    .hero{grid-template-columns:1fr;gap:40px;padding:8px 0 48px}
+    .cover{max-width:240px}
+    .cover .badge{left:-8px}
+    .grid,.pages{grid-template-columns:1fr}
+    .pages{grid-template-columns:repeat(3,1fr);gap:10px}
+    .luck{grid-template-columns:1fr;gap:28px}
+    .btn{width:100%;justify-content:center}
+    .cta{flex-direction:column;align-items:stretch}
+  }
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+<div class="wrap">
+  <header>
+    <a class="wm" href="https://jeffersonlobo.tech/">Jefferson <em>Lobo</em></a>
+    <span class="kicker">Guia gratuito</span>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <div class="kicker">Obrigado por acompanhar</div>
+        <h1>Valeu pela audiência. <em>Seu guia</em> chegou.</h1>
+        <p class="lead">Fico feliz de ter você por aqui. Este é o passo a passo completo de <b>como editei um reel com IA e construí minha própria ilha de edição</b>: os prompts de cada etapa, os anexos que usei como referência e os limites que encontrei no caminho.</p>
+        <div class="cta">
+          <a class="btn primary" href="/guias/guia-ilha-de-edicao-ia.pdf" download="Guia - Ilha de Edicao com IA - Jefferson Lobo.pdf">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></svg>
+            Baixar o guia em PDF
+          </a>
+          <a class="btn ghost" href="/guias/guia-ilha-de-edicao-ia.pdf" target="_blank" rel="noopener">Abrir no navegador</a>
+        </div>
+        <div class="meta">PDF · 13 páginas · 3 MB</div>
+      </div>
+      <div class="cover">
+        <img src="/guias/guia-ilha-capa.jpg" alt="Capa do guia: Como editei um reel com IA e criei minha própria ilha de edição" width="909" height="1286" />
+        <div class="badge">6 passos · prompts · anexos</div>
+      </div>
+    </div>
+
+    <section>
+      <div class="kicker">O que tem dentro</div>
+      <h2>Da primeira edição à <em>ilha</em> pronta</h2>
+      <div class="grid">
+        <div class="card"><div class="n">01</div><h3>Os 6 passos</h3><p>Do primeiro reel editado por IA ao reel final de 2min30 para 1min29, com o que saiu em cada etapa.</p></div>
+        <div class="card"><div class="n">02</div><h3>Os prompts</h3><p>Versões técnicas de cada pedido, com contexto, requisitos e saída esperada, prontas para você adaptar.</p></div>
+        <div class="card"><div class="n">03</div><h3>Os anexos</h3><p>Que tipo de referência usei para layout, templates e estilo de edição, e para que cada uma serviu.</p></div>
+        <div class="card"><div class="n">04</div><h3>O que roda por trás</h3><p>Transcrição, cortes testados, animação em código e trilha gerada sem banco de músicas.</p></div>
+        <div class="card"><div class="n">05</div><h3>Limites reais</h3><p>Tempo de render, cortes no meio da frase, direitos de imagem e o que ainda depende de você.</p></div>
+        <div class="card"><div class="n">06</div><h3>Modelo de prompt</h3><p>Um modelo para copiar, preencher e enviar junto com o seu primeiro vídeo.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Uma espiada</div>
+      <h2>Algumas páginas do guia</h2>
+      <div class="pages">
+        <img src="/guias/guia-ilha-p03.jpg" alt="Página do passo 1" loading="lazy" />
+        <img src="/guias/guia-ilha-p05.jpg" alt="Página do passo 3" loading="lazy" />
+        <img src="/guias/guia-ilha-p09.jpg" alt="Página de anexos usados" loading="lazy" />
+      </div>
+      <p class="note">Rostos e nomes de terceiros que aparecem nos anexos de referência foram desfocados.</p>
+    </section>
+
+    <section>
+      <div class="luck">
+        <div>
+          <div class="kicker">Boa sorte no seu projeto</div>
+          <h2>Agora é a <em>sua</em> vez.</h2>
+          <p>Comece pequeno: um vídeo curto, um pedido claro e muita revisão. As melhores decisões deste projeto vieram das correções no meio do caminho, e vai ser assim com o seu também.</p>
+          <p>Quando a sua ilha estiver de pé, me marca no Instagram. Quero ver o que você construiu.</p>
+          <div class="sig" style="margin-top:24px">
+            <div class="wm">Jefferson <em>Lobo</em></div>
+            <div class="role">Head Executivo de Marketing · Consultor em IA · Palestrante</div>
+          </div>
+        </div>
+        <div class="links">
+          <a class="btn primary" href="/guias/guia-ilha-de-edicao-ia.pdf" download="Guia - Ilha de Edicao com IA - Jefferson Lobo.pdf">Baixar o guia</a>
+          <a class="btn ghost" href="https://www.instagram.com/jeffersonlobo.tech/" target="_blank" rel="noopener">Seguir no Instagram</a>
+          <a class="btn ghost" href="https://jeffersonlobo.tech/">Conhecer o site</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span class="ag">Agência de Inteligência <em>Vozes</em></span>
+    <span>lobo@aivozes.com.br</span>
+  </footer>
+</div>
+</body>
+</html>
