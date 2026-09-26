@@ -27,6 +27,7 @@ import Materiais from "./pages/Materiais";
 import LivroDel from "./pages/LivroDel";
 import MaterialDetalhe from "./pages/MaterialDetalhe";
 import PressCampaignKiosk from "./pages/admin/PressCampaignKiosk";
+import Claudia from "./pages/Claudia";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -60,6 +61,7 @@ const App = () => (
               <Route path="/materiais" element={<Materiais />} />
               <Route path="/materiais/:slug" element={<MaterialDetalhe />} />
               <Route path="/livro-del" element={<LivroDel />} />
+              <Route path="/claudia" element={<Claudia />} />
               <Route
                 path="/admin"
                 element={
