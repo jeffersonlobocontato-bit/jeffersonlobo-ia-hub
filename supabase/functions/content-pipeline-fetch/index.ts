@@ -226,6 +226,8 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const aiApiKey = Deno.env.get('LOVABLE_API_KEY');
+  // Fallback de capa via DALL·E — opcional; sem a key, segue sem imagem.
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   const supabase = createClient(supabaseUrl, serviceKey);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -239,10 +241,16 @@ Deno.serve(async (req) => {
       .select('id, status')
       .eq('run_date', today)
       .maybeSingle();
-    if (existingRun) {
+    if (existingRun && existingRun.status !== 'failed') {
       return new Response(JSON.stringify({ skipped: true, reason: `run de ${today} já existe (status: ${existingRun.status})` }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+    // Run 'failed' NÃO bloqueia reexecução: sem isso, uma falha de manhã
+    // (ex.: gateway de IA instável) deixava o dia inteiro sem pauta, sem
+    // recuperação automática. Apaga o registro falho e tenta de novo.
+    if (existingRun) {
+      await supabase.from('content_pipeline_runs').delete().eq('id', existingRun.id);
     }
 
     const { data: sources, error: sourcesErr } = await supabase
