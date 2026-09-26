@@ -144,25 +144,37 @@ function slugify(text: string): string {
 }
 
 async function draftWithAI(apiKey: string, systemPrompt: string, userPrompt: string): Promise<Draft> {
-  const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-    }),
-  });
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Gateway de IA falhou (${res.status}): ${errText.slice(0, 500)}`);
+  // Até 3 tentativas com espera crescente: uma falha passageira do gateway
+  // (429/5xx) não pode derrubar a pauta do dia inteira, como aconteceu em
+  // 24/09 — antes disso, um único erro aqui fazia o run inteiro falhar.
+  let res: Response | null = null;
+  let lastError = '';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+        }),
+      });
+      if (res.ok) break;
+      lastError = `Gateway de IA falhou (${res.status}): ${(await res.text()).slice(0, 500)}`;
+      res = null;
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : String(e);
+    }
+    if (attempt < 3) await new Promise((r) => setTimeout(r, 2000 * attempt));
   }
+  if (!res) throw new Error(lastError || 'Gateway de IA falhou após 3 tentativas');
 
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content;
