@@ -335,15 +335,17 @@ Deno.serve(async (req) => {
       }
     } catch (e) {
       console.warn('capa da coluna de curadoria falhou, tentando fallback de IA', e);
-      try {
-        const bytes = await generateImage(
-          openAIApiKey,
-          `Fotografia realista, editorial, para capa de matéria de tecnologia sobre: ${topItem?.title || curationDraft.title}. Sem texto, sem logotipos.`,
-        );
-        const url = await uploadCoverImage(supabase, bytes, `${today}-curadoria.png`);
-        curationCover = { url, alt: 'Imagem gerada por IA' };
-      } catch (e2) {
-        console.warn('fallback de capa da coluna de curadoria também falhou (segue sem imagem)', e2);
+      if (openAIApiKey) {
+        try {
+          const bytes = await generateImage(
+            openAIApiKey,
+            `Fotografia realista, editorial, para capa de matéria de tecnologia sobre: ${topItem?.title || curationDraft.title}. Sem texto, sem logotipos.`,
+          );
+          const url = await uploadCoverImage(supabase, bytes, `${today}-curadoria.png`);
+          curationCover = { url, alt: 'Imagem gerada por IA' };
+        } catch (e2) {
+          console.warn('fallback de capa da coluna de curadoria também falhou (segue sem imagem)', e2);
+        }
       }
     }
 
@@ -357,15 +359,17 @@ Deno.serve(async (req) => {
       authoredCover = { url, alt: authoredDraft.title };
     } catch (e) {
       console.warn('capa do artigo autoral (padrão da marca) falhou, tentando fallback de IA', e);
-      try {
-        const bytes = await generateImage(
-          openAIApiKey,
-          `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
-        );
-        const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
-        authoredCover = { url, alt: 'Imagem gerada por IA' };
-      } catch (e2) {
-        console.warn('fallback de capa do artigo autoral também falhou (segue sem imagem)', e2);
+      if (openAIApiKey) {
+        try {
+          const bytes = await generateImage(
+            openAIApiKey,
+            `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
+          );
+          const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
+          authoredCover = { url, alt: 'Imagem gerada por IA' };
+        } catch (e2) {
+          console.warn('fallback de capa do artigo autoral também falhou (segue sem imagem)', e2);
+        }
       }
     }
 
