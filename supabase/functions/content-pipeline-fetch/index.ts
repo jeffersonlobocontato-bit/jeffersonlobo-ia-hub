@@ -144,25 +144,37 @@ function slugify(text: string): string {
 }
 
 async function draftWithAI(apiKey: string, systemPrompt: string, userPrompt: string): Promise<Draft> {
-  const res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: 'google/gemini-2.5-flash',
-      response_format: { type: 'json_object' },
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt },
-      ],
-    }),
-  });
-  if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`Gateway de IA falhou (${res.status}): ${errText.slice(0, 500)}`);
+  // Até 3 tentativas com espera crescente: uma falha passageira do gateway
+  // (429/5xx) não pode derrubar a pauta do dia inteira, como aconteceu em
+  // 24/09 — antes disso, um único erro aqui fazia o run inteiro falhar.
+  let res: Response | null = null;
+  let lastError = '';
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      res = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'google/gemini-2.5-flash',
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: userPrompt },
+          ],
+        }),
+      });
+      if (res.ok) break;
+      lastError = `Gateway de IA falhou (${res.status}): ${(await res.text()).slice(0, 500)}`;
+      res = null;
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : String(e);
+    }
+    if (attempt < 3) await new Promise((r) => setTimeout(r, 2000 * attempt));
   }
+  if (!res) throw new Error(lastError || 'Gateway de IA falhou após 3 tentativas');
 
   const data = await res.json();
   const raw = data.choices?.[0]?.message?.content;
@@ -214,6 +226,8 @@ Deno.serve(async (req) => {
   const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
   const serviceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
   const aiApiKey = Deno.env.get('LOVABLE_API_KEY');
+  // Fallback de capa via DALL·E — opcional; sem a key, segue sem imagem.
+  const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
   const supabase = createClient(supabaseUrl, serviceKey);
 
   const today = new Date().toISOString().slice(0, 10);
@@ -227,10 +241,16 @@ Deno.serve(async (req) => {
       .select('id, status')
       .eq('run_date', today)
       .maybeSingle();
-    if (existingRun) {
+    if (existingRun && existingRun.status !== 'failed') {
       return new Response(JSON.stringify({ skipped: true, reason: `run de ${today} já existe (status: ${existingRun.status})` }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+    // Run 'failed' NÃO bloqueia reexecução: sem isso, uma falha de manhã
+    // (ex.: gateway de IA instável) deixava o dia inteiro sem pauta, sem
+    // recuperação automática. Apaga o registro falho e tenta de novo.
+    if (existingRun) {
+      await supabase.from('content_pipeline_runs').delete().eq('id', existingRun.id);
     }
 
     const { data: sources, error: sourcesErr } = await supabase
@@ -315,15 +335,17 @@ Deno.serve(async (req) => {
       }
     } catch (e) {
       console.warn('capa da coluna de curadoria falhou, tentando fallback de IA', e);
-      try {
-        const bytes = await generateImage(
-          openAIApiKey,
-          `Fotografia realista, editorial, para capa de matéria de tecnologia sobre: ${topItem?.title || curationDraft.title}. Sem texto, sem logotipos.`,
-        );
-        const url = await uploadCoverImage(supabase, bytes, `${today}-curadoria.png`);
-        curationCover = { url, alt: 'Imagem gerada por IA' };
-      } catch (e2) {
-        console.warn('fallback de capa da coluna de curadoria também falhou (segue sem imagem)', e2);
+      if (openAIApiKey) {
+        try {
+          const bytes = await generateImage(
+            openAIApiKey,
+            `Fotografia realista, editorial, para capa de matéria de tecnologia sobre: ${topItem?.title || curationDraft.title}. Sem texto, sem logotipos.`,
+          );
+          const url = await uploadCoverImage(supabase, bytes, `${today}-curadoria.png`);
+          curationCover = { url, alt: 'Imagem gerada por IA' };
+        } catch (e2) {
+          console.warn('fallback de capa da coluna de curadoria também falhou (segue sem imagem)', e2);
+        }
       }
     }
 
@@ -337,15 +359,17 @@ Deno.serve(async (req) => {
       authoredCover = { url, alt: authoredDraft.title };
     } catch (e) {
       console.warn('capa do artigo autoral (padrão da marca) falhou, tentando fallback de IA', e);
-      try {
-        const bytes = await generateImage(
-          openAIApiKey,
-          `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
-        );
-        const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
-        authoredCover = { url, alt: 'Imagem gerada por IA' };
-      } catch (e2) {
-        console.warn('fallback de capa do artigo autoral também falhou (segue sem imagem)', e2);
+      if (openAIApiKey) {
+        try {
+          const bytes = await generateImage(
+            openAIApiKey,
+            `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
+          );
+          const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
+          authoredCover = { url, alt: 'Imagem gerada por IA' };
+        } catch (e2) {
+          console.warn('fallback de capa do artigo autoral também falhou (segue sem imagem)', e2);
+        }
       }
     }
 

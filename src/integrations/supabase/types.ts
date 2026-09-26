@@ -1758,6 +1758,45 @@ export type Database = {
         }
         Relationships: []
       }
+      video_projects: {
+        Row: {
+          config: Json
+          cover_url: string | null
+          created_at: string
+          display_order: number
+          duration_seconds: number | null
+          id: string
+          status: string
+          template: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          config?: Json
+          cover_url?: string | null
+          created_at?: string
+          display_order?: number
+          duration_seconds?: number | null
+          id?: string
+          status?: string
+          template?: string
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          config?: Json
+          cover_url?: string | null
+          created_at?: string
+          display_order?: number
+          duration_seconds?: number | null
+          id?: string
+          status?: string
+          template?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       press_campaign_stats: {

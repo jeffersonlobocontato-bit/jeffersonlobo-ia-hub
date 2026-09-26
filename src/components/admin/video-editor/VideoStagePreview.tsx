@@ -176,15 +176,32 @@ export const VideoStagePreview = ({
           ) : (
             <>
               {clipeFundo?.mediaUrl ? (
-                <img
-                  src={clipeFundo.mediaUrl}
-                  alt=""
-                  className="absolute inset-0 h-full w-full object-cover"
-                  style={{
-                    transform: `scale(${clipeFundo.zoom / 100})`,
-                    objectPosition: `${clipeFundo.focalX}% ${clipeFundo.focalY}%`,
-                  }}
-                />
+                // Clipe de vídeo precisa de <video> — renderizar como <img>
+                // deixava o fundo em branco/quebrado na prévia.
+                clipeFundo.tipo === 'video' ? (
+                  <video
+                    src={clipeFundo.mediaUrl}
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{
+                      transform: `scale(${clipeFundo.zoom / 100})`,
+                      objectPosition: `${clipeFundo.focalX}% ${clipeFundo.focalY}%`,
+                    }}
+                    muted
+                    playsInline
+                    autoPlay
+                    loop
+                  />
+                ) : (
+                  <img
+                    src={clipeFundo.mediaUrl}
+                    alt=""
+                    className="absolute inset-0 h-full w-full object-cover"
+                    style={{
+                      transform: `scale(${clipeFundo.zoom / 100})`,
+                      objectPosition: `${clipeFundo.focalX}% ${clipeFundo.focalY}%`,
+                    }}
+                  />
+                )
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center text-[8px]" style={{ color: `${pal.text}66` }}>
                   fundo dinâmico ({config.fundoDinamico.clipes.length} clipe{config.fundoDinamico.clipes.length !== 1 ? 's' : ''})
