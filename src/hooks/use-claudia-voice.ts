@@ -26,6 +26,24 @@ function getRecognitionCtor(): SpeechRecognitionStatic | null {
   return window.SpeechRecognition ?? window.webkitSpeechRecognition ?? null;
 }
 
+function startWithRetry(recognition: SpeechRecognition, isStillCurrent: () => boolean) {
+  try {
+    recognition.start();
+  } catch {
+    // Chrome allows only one active recognition session at a time; start()
+    // throws if the previous session hasn't fully released the microphone
+    // yet. Retry once shortly after instead of leaving the session stuck.
+    window.setTimeout(() => {
+      if (!isStillCurrent()) return;
+      try {
+        recognition.start();
+      } catch {
+        // Still busy — give up; the next result/error/end cycle will retry.
+      }
+    }, 300);
+  }
+}
+
 function pickPtVoice(): SpeechSynthesisVoice | null {
   const voices = window.speechSynthesis?.getVoices() ?? [];
   return (
@@ -83,13 +101,20 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
         transcript += event.results[i][0].transcript;
       }
       if (normalize(transcript).includes(normalize(wakeWord))) {
-        recognition.onend = null;
+        recognition.onresult = null;
+        recognition.onerror = null;
+        // Wait for this recognition to fully end before starting the next one —
+        // Chrome only allows one active recognition session at a time, and
+        // starting a new one too early throws (silently) and leaves this
+        // instance orphaned, listening on its own in the background.
+        recognition.onend = () => {
+          setPhase("greeting");
+          speak(greeting, () => {
+            if (!armedRef.current) return;
+            startCommandRecognition();
+          });
+        };
         recognition.stop();
-        setPhase("greeting");
-        speak(greeting, () => {
-          if (!armedRef.current) return;
-          startCommandRecognition();
-        });
       }
     };
 
@@ -99,6 +124,10 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
         armedRef.current = false;
         setArmed(false);
         setPhase("off");
+        return;
+      }
+      if (event.error !== "no-speech" && event.error !== "aborted") {
+        pushLog("info", `(reconhecimento: ${event.error})`);
       }
       // "no-speech" and "aborted" are recovered by onend below.
     };
@@ -111,13 +140,9 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
 
     recognitionRef.current = recognition;
     setPhase("listening-wake");
-    try {
-      recognition.start();
-    } catch {
-      // start() can throw if called while already running; safe to ignore.
-    }
+    startWithRetry(recognition, () => armedRef.current && recognitionRef.current === recognition);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wakeWord, greeting, speak]);
+  }, [wakeWord, greeting, speak, pushLog]);
 
   const startCommandRecognition = useCallback(() => {
     const Ctor = getRecognitionCtor();
@@ -129,7 +154,16 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
+    // Once onresult fires, it alone owns the transition back to wake mode
+    // (via speak's onDone). Without this flag, onend fires right after onresult
+    // too (non-continuous recognition auto-stops after a result) and would
+    // start a SECOND wake recognition while the first is already listening —
+    // Chrome then throws on the second start(), silently, leaving an orphaned
+    // instance running and the visible one broken.
+    let resultHandled = false;
+
     recognition.onresult = (event) => {
+      resultHandled = true;
       const transcript = event.results[0]?.[0]?.transcript ?? "";
       pushLog("heard", transcript);
       setPhase("executing");
@@ -148,11 +182,14 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
         setPhase("off");
         return;
       }
-      if (armedRef.current) startWakeRecognition();
+      if (!resultHandled && event.error !== "no-speech" && event.error !== "aborted") {
+        pushLog("info", `(reconhecimento: ${event.error})`);
+      }
+      if (!resultHandled && armedRef.current) startWakeRecognition();
     };
 
     recognition.onend = () => {
-      if (armedRef.current && modeRef.current === "command" && recognitionRef.current === recognition) {
+      if (!resultHandled && armedRef.current && modeRef.current === "command" && recognitionRef.current === recognition) {
         // No result captured (silence timeout) — go back to listening for the wake word.
         startWakeRecognition();
       }
@@ -160,11 +197,7 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
 
     recognitionRef.current = recognition;
     setPhase("listening-command");
-    try {
-      recognition.start();
-    } catch {
-      // ignore
-    }
+    startWithRetry(recognition, () => armedRef.current && recognitionRef.current === recognition);
   }, [onCommand, speak, startWakeRecognition, pushLog]);
 
   const arm = useCallback(() => {
