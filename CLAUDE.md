@@ -42,10 +42,10 @@ Este é o "hub": além de documentar este repositório, aqui fica o registro dos
 | Apelido | Repositório | O que é |
 |---|---|---|
 | hub, site, portfólio | `jeffersonlobo-ia-hub` | Este projeto — site pessoal, blog, imprensa, Claudia |
-| vozes, agência | `voz-agencia-premium` | Site institucional da Agência de Inteligência Vozes |
-| notícias, imprensa paraná | `vozesparanaenses` | Portal de notícias com redação e curadoria por IA |
-| insta, insights | `insta-insights-pro` | Análise de conteúdo/engajamento do Instagram |
-| chat, mensageria | `connect-chat` | App de mensageria (protótipo inicial) |
+| vozes, agência | `voz-agencia-premium` | Site institucional (landing page) da Agência de Inteligência Vozes — sem backend, conteúdo hardcoded |
+| notícias, vozes paranaenses | `vozesparanaenses` | Portal de notícias do Paraná com pipeline de conteúdo por IA (raspagem → cluster → redação), mais Publieditorial e Vitrine Pessoal no mesmo app |
+| insta, insights, conteúdo IA | `insta-insights-pro` | **Não é análise de Instagram** — é pipeline de geração de posts/carrosséis por IA a partir de notícias, com aprovação humana e publicação no LinkedIn |
+| zapvozes, chat, disparo | `connect-chat` | **Não é chat 1:1** — é CRM/disparo de imprensa via WhatsApp+e-mail ("ZapVozes"), com base real de ~140 jornalistas já importada |
 
 > Projetos que **não** são pessoais (produtos/clientes, ficam de fora deste registro): `politiza-ia` (produto, duplicado por cliente em `juntos-mato-grosso-142`/`juntosparana399`) e `vitrine-mkt-sistema-fiep` (já entregue ao cliente FIEP).
 
