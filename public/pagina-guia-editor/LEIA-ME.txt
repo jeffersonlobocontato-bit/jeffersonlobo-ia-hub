@@ -1,0 +1,13 @@
+Página do guia "Como editar um reel por 10 centavos" — jeffersonlobo.tech
+
+No GitHub do jeffersonlobo-ia-hub, abra a pasta "public" e use Add file > Upload files
+com o conteúdo da pasta "public" deste zip, mantendo as pastas:
+  public/guia-editor.html
+  public/guias/guia-editor-10-centavos.pdf
+  public/guias/guia-editor-capa.jpg, -p02.jpg, -p05.jpg, -p07.jpg
+  public/og/guia-editor.jpg
+(ou, no terminal: git am 0001-guia-editor.patch)
+
+Depois do deploy a página fica em:
+  https://jeffersonlobo.tech/guia-editor.html
+É o link que a automação do direct manda para quem comentar EDITOR.
