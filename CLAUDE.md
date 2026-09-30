@@ -30,7 +30,7 @@ Agentes de leitura para alimentar os comandos de voz (saída escrita para ser fa
 - `claudia-email` — triagem do Gmail (clientes, imprensa, parcerias, financeiro); só lê e cria rascunho
 - `claudia-projetos` — placar de PRs/CI/commits dos 5 projetos do registro abaixo
 - `claudia-briefing` — "bom dia": roda os dois em paralelo e devolve um briefing único
-Ainda não estão ligados ao `/claudia`: falta a edge function que chama esses agentes (ver `handleCommand` em `Claudia.tsx`).
+No site (`/claudia`) a mesma lógica roda na edge function `claudia-command` (Gmail + GitHub só leitura, IA via AI Gateway do Lovable, exige admin). Pedidos com palavras de `BRAIN_PATTERNS` em `Claudia.tsx` (e-mail, projeto, briefing…) vão para ela; o resto segue nos atalhos de navegação. Secrets necessários: `GMAIL_CLIENT_ID`, `GMAIL_CLIENT_SECRET`, `GMAIL_REFRESH_TOKEN` (escopo `gmail.readonly`) e `GITHUB_TOKEN` (fine-grained, só leitura). Ao mudar os agentes, mantenha o prompt da função em sincronia.
 
 ## Supabase
 - 80+ migrations em `supabase/migrations/` — schema já é grande, sempre olhar migrations recentes antes de assumir estrutura de tabela

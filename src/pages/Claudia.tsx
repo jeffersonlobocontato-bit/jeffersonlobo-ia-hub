@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, AlertTriangle } from "lucide-react";
 import { ClaudiaVisual, CLAUDIA_DOMAINS } from "@/components/claudia/ClaudiaVisual";
 import { useClaudiaVoice, type ClaudiaPhase } from "@/hooks/use-claudia-voice";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ClaudiaCommand {
   patterns: string[];
@@ -25,6 +27,10 @@ const COMMANDS: ClaudiaCommand[] = [
   { patterns: ["memoria", "lembrar"], domain: "memoria", response: "Acessando a memória do sistema." },
 ];
 
+// Palavras que mandam o pedido direto para o "cérebro" (Gmail/GitHub), antes dos atalhos
+// de navegação — senão "resume os e-mails de cliente" cairia no atalho "cliente".
+const BRAIN_PATTERNS = ["email", "e-mail", "emails", "caixa de entrada", "jornalista", "projeto", "projetos", "briefing", "bom dia", "me atualiza", "pull request", "ci quebrado"];
+
 const STOP_PATTERNS = ["parar", "pausa", "dormir", "obrigado", "tchau"];
 
 const normalize = (s: string) =>
@@ -42,10 +48,23 @@ const PHASE_LABEL: Record<ClaudiaPhase, string> = {
   executing: "Executando",
 };
 
+// Pedidos que não são atalho de navegação (e-mails, projetos, briefing) vão para a
+// edge function claudia-command, que consulta Gmail/GitHub só em leitura. Exige admin.
+async function askClaudiaBrain(transcript: string): Promise<string> {
+  const { data, error } = await supabase.functions.invoke("claudia-command", { body: { transcript } });
+  if (error || !data?.reply) {
+    return data?.error ?? "Não consegui consultar isso agora. Tente de novo em instantes.";
+  }
+  return data.reply as string;
+}
+
 export default function Claudia() {
   const [activeDomain, setActiveDomain] = useState<string | null>(null);
+  const { isAdmin } = useAuth();
+  const isAdminRef = useRef(false);
+  isAdminRef.current = isAdmin;
 
-  const handleCommand = useCallback((transcript: string) => {
+  const handleCommand = useCallback(async (transcript: string) => {
     const heard = normalize(transcript);
 
     if (STOP_PATTERNS.some((p) => heard.includes(p))) {
@@ -53,16 +72,24 @@ export default function Claudia() {
       return "Até logo, Lobo.";
     }
 
-    const match = COMMANDS.find((c) => c.patterns.some((p) => heard.includes(normalize(p))));
+    const toBrain = BRAIN_PATTERNS.some((p) => heard.includes(normalize(p)));
+    const match = toBrain ? undefined : COMMANDS.find((c) => c.patterns.some((p) => heard.includes(normalize(p))));
     if (!match) {
       setActiveDomain(null);
-      return "Não entendi. Pode repetir?";
+      if (!isAdminRef.current) {
+        return "Não entendi. Para e-mails e projetos, entre como administrador no site.";
+      }
+      setActiveDomain("rotina");
+      const reply = await askClaudiaBrain(transcript);
+      setActiveDomain(null);
+      return reply;
     }
 
     setActiveDomain(match.domain);
     window.setTimeout(() => setActiveDomain(null), 6000);
     if (match.openPath) {
-      window.open(match.openPath, "_blank", "noopener,noreferrer");
+      // Mesma aba: pop-up de window.open é bloqueado porque o evento não vem de um clique real.
+      window.location.assign(match.openPath);
     }
     return match.response;
     // eslint-disable-next-line react-hooks/exhaustive-deps
