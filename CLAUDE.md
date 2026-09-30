@@ -25,6 +25,13 @@ Site pessoal, blog e hub de conteúdo de Jefferson Lobo (palestrante e consultor
 - Navegação disparada por comando de voz usa `window.location.assign` (mesma aba), nunca `window.open` — pop-up bloqueado pelo navegador porque o evento não vem de um clique real do usuário.
 - Hoje os "comandos" só navegam para páginas que já existem no site — não aciona skills ou automações reais.
 
+## Agentes da Claudia (`.claude/agents/`)
+Agentes de leitura para alimentar os comandos de voz (saída escrita para ser falada, sem escrita/envio):
+- `claudia-email` — triagem do Gmail (clientes, imprensa, parcerias, financeiro); só lê e cria rascunho
+- `claudia-projetos` — placar de PRs/CI/commits dos 5 projetos do registro abaixo
+- `claudia-briefing` — "bom dia": roda os dois em paralelo e devolve um briefing único
+Ainda não estão ligados ao `/claudia`: falta a edge function que chama esses agentes (ver `handleCommand` em `Claudia.tsx`).
+
 ## Supabase
 - 80+ migrations em `supabase/migrations/` — schema já é grande, sempre olhar migrations recentes antes de assumir estrutura de tabela
 - Edge functions relevantes: `content-pipeline-fetch`/`content-pipeline-publish` (pipeline de conteúdo), `chat-uivo-lobo` (chatbot do site), `sync-podcast-rss`, `publish-linkedin`, `video-ai-instrucoes`, sistema de e-mail transacional (`send-transactional-email`, `process-email-queue`, `handle-email-unsubscribe`/`handle-email-suppression`)
