@@ -56,3 +56,6 @@ verify_jwt = false
 
 [functions.publish-share-page]
 verify_jwt = true
+
+[functions.claudia-command]
+verify_jwt = true
