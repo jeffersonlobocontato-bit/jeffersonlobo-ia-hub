@@ -13,7 +13,7 @@
 // Secrets necessários (Supabase → Edge Functions → Secrets):
 //   LOVABLE_API_KEY (já existe)
 //   GMAIL_CLIENT_ID, GMAIL_CLIENT_SECRET, GMAIL_REFRESH_TOKEN  (escopo gmail.readonly)
-//   GITHUB_TOKEN  (fine-grained, só leitura: Pull requests, Contents, Actions, Metadata)
+//   GITHUB_TOKEN  (fine-grained, só leitura: Pull requests, Contents, Checks, Metadata)
 import { createClient } from 'npm:@supabase/supabase-js@2';
 
 const corsHeaders = {
