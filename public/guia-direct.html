@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sua aula chegou: comentário que vira direct sozinho · Jefferson Lobo</title>
+<meta name="description" content="Valeu por comentar DIRECT! A aula completa e o passo a passo escrito para responder comentários e mandar mensagem no direct automaticamente, pedindo para o Claude. — Jefferson Lobo" />
+<link rel="canonical" href="https://jeffersonlobo.tech/guia-direct.html" />
+<meta name="theme-color" content="#12201E" />
+<link rel="icon" href="/favicon.ico" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Jefferson Lobo" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:url" content="https://jeffersonlobo.tech/guia-direct.html" />
+<meta property="og:title" content="Sua aula chegou 🙌 Comentário que vira direct sozinho" />
+<meta property="og:description" content="A aula e o passo a passo para responder comentários e mandar DM automática pedindo para o Claude. — Jefferson Lobo" />
+<meta property="og:image" content="https://jeffersonlobo.tech/og/guia-direct.jpg" />
+<meta property="og:image:url" content="https://jeffersonlobo.tech/og/guia-direct.jpg" />
+<meta property="og:image:secure_url" content="https://jeffersonlobo.tech/og/guia-direct.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Sua aula chegou: comentário que vira direct sozinho." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Sua aula chegou 🙌 Comentário que vira direct sozinho" />
+<meta name="twitter:description" content="A aula e o passo a passo para responder comentários e mandar DM automática pedindo para o Claude." />
+<meta name="twitter:image" content="https://jeffersonlobo.tech/og/guia-direct.jpg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --pet:#12201E; --s1:#1B2824; --s2:#232E2C; --line:#2E3B38; --deep:#0C1715;
+    --amb:#E29F65; --amb-d:#C77523; --paper:#F2EEE4;
+    --muted:rgba(242,238,228,.72); --faint:rgba(242,238,228,.48);
+    --serif:'Instrument Serif',Georgia,serif; --sans:'Manrope',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--pet);color:var(--paper)}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  .glow{position:fixed;right:-220px;top:-200px;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle,rgba(226,159,101,.18),rgba(226,159,101,0) 65%);pointer-events:none;z-index:0}
+  header,main,footer{position:relative;z-index:1}
+  header{padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .wm{font-family:var(--serif);font-size:24px;line-height:1;text-decoration:none}
+  .wm em{font-style:italic;color:var(--amb)}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--amb)}
+  .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center;padding:24px 0 64px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,5.2vw,64px);line-height:1.02;margin:16px 0 20px;letter-spacing:-.005em}
+  h1 em{font-style:italic;color:var(--amb)}
+  .lead{font-size:18px;color:var(--muted);max-width:34em;margin:0 0 28px}
+  .lead b{color:var(--paper);font-weight:600}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:15px 26px;font-weight:700;font-size:16px;text-decoration:none;transition:transform .15s ease, box-shadow .15s ease;border:0;cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--amb);color:#12201E;box-shadow:0 10px 28px rgba(226,159,101,.25)}
+  .btn.primary:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(226,159,101,.32)}
+  .btn.ghost{border:1px solid var(--line);color:var(--paper);background:transparent}
+  .btn.ghost:hover{border-color:var(--amb)}
+  .btn svg{width:18px;height:18px}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:14px}
+  .cover{position:relative;justify-self:center;width:100%;max-width:290px}
+  .cover img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid rgba(242,238,228,.14);box-shadow:0 30px 70px rgba(0,0,0,.45);transform:rotate(1.6deg)}
+  .cover .badge{position:absolute;left:-18px;bottom:28px;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amb);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  h2{font-family:var(--serif);font-weight:400;font-size:clamp(32px,4.4vw,44px);line-height:1.08;margin:10px 0 28px}
+  h2 em{font-style:italic;color:var(--amb)}
+  .sub{color:var(--muted);font-size:17px;max-width:40em;margin:-12px 0 28px}
+  /* vídeo */
+  .video{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(160deg,#1B2824,#0C1715);box-shadow:0 30px 70px rgba(0,0,0,.35)}
+  .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .video .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
+  .video .play{width:84px;height:84px;border-radius:50%;background:rgba(226,159,101,.14);border:1px solid rgba(226,159,101,.5);display:grid;place-items:center}
+  .video .play i{display:block;width:0;height:0;border-left:24px solid var(--amb);border-top:15px solid transparent;border-bottom:15px solid transparent;margin-left:6px}
+  .video .ph b{font-family:var(--serif);font-weight:400;font-size:28px}
+  .video .ph span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  /* fluxo */
+  .flow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:8px 0 6px}
+  .node{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:20px 22px;position:relative}
+  .node .n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amb)}
+  .node .t{font-family:var(--serif);font-size:24px;line-height:1.1;margin:6px 0 6px}
+  .node p{margin:0;color:var(--muted);font-size:15px}
+  .node:not(:last-child)::after{content:"→";position:absolute;right:-14px;top:50%;transform:translateY(-50%);color:var(--amb);font-size:20px;z-index:2}
+  /* pré-requisitos */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card .n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amb)}
+  .card h3{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.15;margin:8px 0 8px}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  /* passos */
+  .steps{display:flex;flex-direction:column;gap:22px;counter-reset:passo}
+  .step{display:grid;grid-template-columns:.95fr 1.05fr;gap:28px;align-items:start;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .step.solo{grid-template-columns:1fr}
+  .step .n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amb)}
+  .step h3{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.1;margin:8px 0 12px}
+  .step p{margin:0 0 12px;color:var(--muted)}
+  .step p b,.step li b{color:var(--paper);font-weight:600}
+  .step ol,.step ul{margin:0 0 12px;padding-left:20px;color:var(--muted)}
+  .step li{margin:0 0 6px}
+  .step li::marker{color:var(--amb)}
+  .step figure{margin:0}
+  .step figure img{width:100%;display:block;border-radius:10px;border:1px solid rgba(242,238,228,.12)}
+  .step figcaption{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:8px;line-height:1.5}
+  .pair{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  code,.kbd{font-family:var(--mono);font-size:13.5px;background:var(--deep);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--paper);white-space:nowrap}
+  .alert{border-left:2px solid var(--amb);padding:4px 0 4px 14px;margin:10px 0 0;color:var(--paper);font-size:15px}
+  /* prompts */
+  .prompt{background:var(--deep);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:4px 0 16px;position:relative}
+  .prompt .lbl{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+  .prompt .lbl span{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amb)}
+  .prompt pre{margin:0;font-family:var(--mono);font-size:14px;line-height:1.65;color:var(--paper);white-space:pre-wrap;word-break:break-word}
+  .prompt pre b{color:var(--amb);font-weight:500}
+  .copy{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:transparent;color:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .copy:hover{border-color:var(--amb)}
+  .copy.ok{border-color:var(--amb);color:var(--amb)}
+  /* limites */
+  .limits{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .limit{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .limit b{display:block;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15;margin-bottom:6px;color:var(--paper)}
+  .limit span{color:var(--muted);font-size:15px}
+  .note{color:var(--faint);font-size:13.5px;margin-top:14px}
+  .luck{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:end}
+  .luck p{color:var(--muted);font-size:17px;margin:0 0 14px;max-width:34em}
+  .sig .wm{font-size:34px}
+  .role{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:8px}
+  .links{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+  footer{padding:28px 0 40px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  footer span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  footer .ag{font-family:var(--serif);font-size:16px;letter-spacing:0;text-transform:none;color:var(--paper)}
+  footer .ag em{font-style:italic;color:var(--amb)}
+  @media (max-width:820px){
+    .hero{grid-template-columns:1fr;gap:40px;padding:8px 0 48px}
+    .cover{max-width:240px}
+    .cover .badge{left:-8px}
+    .grid,.flow,.limits{grid-template-columns:1fr}
+    .node:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-20px;transform:translateX(-50%)}
+    .step{grid-template-columns:1fr;padding:20px}
+    .luck{grid-template-columns:1fr;gap:28px}
+    .btn{width:100%;justify-content:center}
+    .cta{flex-direction:column;align-items:stretch}
+    code{white-space:normal;word-break:break-all}
+  }
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+<div class="wrap">
+  <header>
+    <a class="wm" href="https://jeffersonlobo.tech/">Jefferson <em>Lobo</em></a>
+    <span class="kicker">Aula gratuita</span>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <div class="kicker">Você comentou DIRECT</div>
+        <h1>Comentário que vira <em>direct</em> sozinho.</h1>
+        <p class="lead">Valeu por acompanhar. Aqui está a aula que eu prometi: como fazer o Instagram <b>responder o comentário e mandar a mensagem no direct automaticamente</b>, sem pagar por ferramenta de fluxo e sem montar nada. Você só pede para o Claude o que quer, e ele cria.</p>
+        <div class="cta">
+          <a class="btn primary" href="#aula">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>
+            Assistir à aula
+          </a>
+          <a class="btn ghost" href="/guias/guia-direct-automatico.pdf" download="Guia - Comentario que vira direct - Jefferson Lobo.pdf">Baixar o passo a passo em PDF</a>
+        </div>
+        <div class="meta">Aula em vídeo · 7 passos · prompts para copiar</div>
+      </div>
+      <div class="cover">
+        <img src="/guias/guia-direct-capa.jpg" alt="Capa do guia: Comentário que vira direct sozinho" width="909" height="1287" />
+        <div class="badge">Zernio + Claude · grátis</div>
+      </div>
+    </div>
+
+    <section id="aula">
+      <div class="kicker">A aula</div>
+      <h2>A configuração inteira, <em>do zero</em>.</h2>
+      <p class="sub">Assista uma vez com calma e depois siga o passo a passo escrito logo abaixo, com a tela de cada etapa.</p>
+      <div class="video" id="video" data-yt="smMH_2B-dmE">
+        <div class="ph">
+          <div class="play"><i></i></div>
+          <b>A aula entra aqui</b>
+          <span>Enquanto isso, o passo a passo completo está logo abaixo</span>
+        </div>
+      </div>
+      <p class="note" style="margin-top:12px">Não carregou? <a href="https://youtu.be/smMH_2B-dmE" target="_blank" rel="noopener">Abrir a aula no YouTube</a></p>
+    </section>
+
+    <section>
+      <div class="kicker">Como funciona</div>
+      <h2>Três peças, e você só <em>conversa</em> com uma.</h2>
+      <div class="flow">
+        <div class="node"><div class="n">01 · INSTAGRAM</div><div class="t">Alguém comenta</div><p>A pessoa escreve a palavra-chave no seu post ou reel, por exemplo DIRECT.</p></div>
+        <div class="node"><div class="n">02 · ZERNIO</div><div class="t">A automação dispara</div><p>O Zernio está ligado à sua conta e responde o comentário e manda a DM com um botão.</p></div>
+        <div class="node"><div class="n">03 · CLAUDE</div><div class="t">Você só pede</div><p>Pelo conector, o Claude cria, ajusta, pausa e mede a automação a partir do que você escreve.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Antes de começar</div>
+      <h2>O que você vai <em>precisar</em></h2>
+      <div class="grid">
+        <div class="card"><div class="n">01</div><h3>Instagram profissional</h3><p>Conta de criador ou de empresa. É o tipo de conta que permite automação de mensagens.</p></div>
+        <div class="card"><div class="n">02</div><h3>Conta no Zernio</h3><p>Os 2 primeiros perfis conectados são grátis. As mensagens só passam a ser cobradas depois de 10 mil por mês.</p></div>
+        <div class="card"><div class="n">03</div><h3>Claude com conectores</h3><p>Uma conta no Claude que permita adicionar conectores personalizados, no computador ou no navegador.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Passo a passo</div>
+      <h2>Do zero ao primeiro <em>direct</em> automático</h2>
+      <div class="steps">
+
+        <div class="step">
+          <div>
+            <div class="n">PASSO 01</div>
+            <h3>Crie a sua conta no Zernio</h3>
+            <p>Entre em <b>zernio.com</b> e crie a conta. Ele mostra três etapas de boas-vindas.</p>
+            <p>A primeira pede para copiar uma <b>chave de API</b>. Para este guia você <b>não precisa dela</b>: o Claude vai entrar pelo login, que é mais seguro.</p>
+            <p class="alert">Nunca cole a chave de API numa conversa. Se colou, apague essa chave em API Keys e gere outra.</p>
+          </div>
+          <figure><img src="/guias/direct/tela1.jpg" alt="Tela de boas-vindas do Zernio com as três etapas" loading="lazy" /><figcaption>Boas-vindas do Zernio · a conexão da plataforma é a etapa 2</figcaption></figure>
+        </div>
+
+        <div class="step solo">
+          <div>
+            <div class="n">PASSO 02</div>
+            <h3>Conecte o seu Instagram</h3>
+            <ol>
+              <li>Em <b>Connections</b>, escolha <b>Instagram</b>.</li>
+              <li>Entre com a sua conta do Instagram e <b>aceite as permissões de mensagens e de comentários</b>. Sem elas, a automação não consegue responder.</li>
+              <li>Quando voltar para o Zernio, a etapa aparece como <b>You're connected</b>.</li>
+            </ol>
+            <p>Se você tem mais de uma conta, conecte só a que vai usar. Os 2 primeiros perfis são grátis.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div>
+            <div class="n">PASSO 03</div>
+            <h3>Abra os conectores do Claude</h3>
+            <ol>
+              <li>No Claude, vá em <b>Personalização</b> e abra a aba <b>Conectores</b>.</li>
+              <li>Clique em <b>Adicionar</b> e escolha <b>Adicionar conector personalizado</b>.</li>
+            </ol>
+          </div>
+          <figure><img src="/guias/direct/tela2.jpg" alt="Página de conectores do Claude com o menu Adicionar conector personalizado" loading="lazy" /><figcaption>Personalização · Conectores · Adicionar</figcaption></figure>
+        </div>
+
+        <div class="step">
+          <div>
+            <div class="n">PASSO 04</div>
+            <h3>Cole o endereço do Zernio</h3>
+            <ol>
+              <li>Em <b>Nome</b>, escreva algo que você reconheça, como <code>Zernio Instagram</code>.</li>
+              <li>Em <b>URL do servidor MCP</b>, cole <code>https://mcp.zernio.com/mcp</code></li>
+              <li>Em <b>Autenticação</b>, deixe <b>Entrar agora</b>. Em <b>Cliente OAuth</b>, <b>Registrar automaticamente</b>.</li>
+              <li>Clique em <b>Continuar</b>, entre na sua conta do Zernio e autorize.</li>
+            </ol>
+          </div>
+          <div class="pair">
+            <figure><img src="/guias/direct/tela3.jpg" alt="Janela Adicionar conector personalizado vazia" loading="lazy" /><figcaption>A janela vazia</figcaption></figure>
+            <figure><img src="/guias/direct/tela4.jpg" alt="Janela preenchida com o endereço do Zernio e o login" loading="lazy" /><figcaption>Preenchida · login detectado</figcaption></figure>
+          </div>
+        </div>
+
+        <div class="step">
+          <div>
+            <div class="n">PASSO 05</div>
+            <h3>Escolha o que o Claude pode fazer sozinho</h3>
+            <p>Depois de conectado, o Claude mostra as ferramentas do Zernio em grupos.</p>
+            <ul>
+              <li><b>Somente leitura</b> (ver contas, posts, métricas): pode deixar <b>permitir sempre</b>.</li>
+              <li><b>Escrita</b> (criar automação, responder, publicar): deixe <b>requer aprovação</b>. Assim nada sai da sua conta sem você ver antes.</li>
+            </ul>
+          </div>
+          <figure><img src="/guias/direct/tela5.jpg" alt="Permissões das ferramentas do conector do Zernio no Claude" loading="lazy" /><figcaption>Permissões do conector · leitura e escrita</figcaption></figure>
+        </div>
+
+        <div class="step solo">
+          <div>
+            <div class="n">PASSO 06</div>
+            <h3>Peça a automação em português</h3>
+            <p>Abra uma conversa nova no Claude e cole o pedido abaixo, trocando o que está em laranja. Ele monta a automação e mostra o resumo para você aprovar.</p>
+            <div class="prompt">
+              <div class="lbl"><span>Prompt · criar a automação</span><button class="copy" data-alvo="p1">Copiar</button></div>
+<pre id="p1">Usando o conector do Zernio, crie uma automação de comentário no meu Instagram.
+
+Post: <b>[cole o link do post ou do reel]</b>
+Palavra-chave: <b>DIRECT</b> (aceitar maiúscula e minúscula)
+Mensagem no direct: <b>"Oi! Aqui está a aula que eu prometi 👇"</b>
+Botão: <b>"Assistir à aula"</b>, abrindo <b>[link da sua página]</b>
+Resposta pública no comentário: varie entre 3 frases curtas, como "Te mandei no direct!".
+
+Antes de ativar, me mostre o resumo para eu aprovar.</pre>
+            </div>
+            <p>Uma automação por post deixa tudo organizado: cada conteúdo com a sua palavra, a sua mensagem e os seus números.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div>
+            <div class="n">PASSO 07</div>
+            <h3>Teste com outra conta e meça</h3>
+            <ol>
+              <li>Comente a palavra-chave usando <b>outra conta</b>. Comentário do próprio dono não dispara.</li>
+              <li>Confira a resposta no comentário e a mensagem com o botão no direct.</li>
+              <li>Dias depois, pergunte ao Claude como está indo.</li>
+            </ol>
+            <div class="prompt">
+              <div class="lbl"><span>Prompt · ver os resultados</span><button class="copy" data-alvo="p2">Copiar</button></div>
+<pre id="p2">Como está a automação <b>DIRECT</b>? Quantas pessoas comentaram a palavra, quantas DMs foram entregues, quantas falharam e quantos cliques o botão teve?</pre>
+            </div>
+          </div>
+          <div class="pair">
+            <figure><img src="/guias/direct/comentarios.jpg" alt="Comentário com a palavra-chave e a resposta automática" loading="lazy" /><figcaption>O comentário e a resposta</figcaption></figure>
+            <figure><img src="/guias/direct/dm.jpg" alt="Mensagem automática no direct com o botão" loading="lazy" /><figcaption>A DM com o botão</figcaption></figure>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Antes de ligar, saiba isso</div>
+      <h2>As regras do Instagram que <em>ninguém</em> conta</h2>
+      <div class="limits">
+        <div class="limit"><b>Janela de 7 dias</b><span>O Instagram só deixa mandar a mensagem privada até 7 dias depois do comentário. Ligue a automação logo que postar.</span></div>
+        <div class="limit"><b>Uma mensagem por comentário</b><span>Cada comentário recebe uma DM. Se a pessoa comentar de novo, ela não recebe outra.</span></div>
+        <div class="limit"><b>Quem não te segue</b><span>A mensagem chega, mas cai em Solicitações de mensagem. Vale avisar no vídeo: "confere as solicitações".</span></div>
+        <div class="limit"><b>Escolha bem a palavra</b><span>Use uma palavra que ninguém escreveria por acaso. Se a palavra fosse AULA, um elogio como "que aula!" também dispararia.</span></div>
+        <div class="limit"><b>Só a automação mede clique</b><span>Os cliques no botão mandado pela automação são contados. Link mandado à mão no direct não é medido.</span></div>
+        <div class="limit"><b>Como desligar</b><span>Peça ao Claude para pausar ou apagar a automação. Para tirar o acesso: Conectores, Desvincular no Claude, e Connected apps no Zernio.</span></div>
+      </div>
+      <div class="prompt" style="margin-top:22px">
+        <div class="lbl"><span>Prompt · pausar ou apagar</span><button class="copy" data-alvo="p3">Copiar</button></div>
+<pre id="p3">Lista as minhas automações de comentário ativas e pausa a <b>DIRECT</b>.</pre>
+      </div>
+      <p class="note">Regras e preços do Instagram e do Zernio podem mudar. Confira na sua conta antes de ligar uma automação grande.</p>
+    </section>
+
+    <section>
+      <div class="luck">
+        <div>
+          <div class="kicker">Boa sorte no seu projeto</div>
+          <h2>Não é a ferramenta. É <em>pedir</em> do jeito certo.</h2>
+          <p>Comece com um post e uma palavra. Quando a primeira DM chegar sozinha, você vai querer uma automação para cada conteúdo.</p>
+          <p>Quando a sua estiver de pé, me marca no Instagram. Quero ver o que você criou.</p>
+          <div class="sig" style="margin-top:24px">
+            <div class="wm">Jefferson <em>Lobo</em></div>
+            <div class="role">Head Executivo de Marketing · Consultor em IA · Palestrante</div>
+          </div>
+        </div>
+        <div class="links">
+          <a class="btn primary" href="/guias/guia-direct-automatico.pdf" download="Guia - Comentario que vira direct - Jefferson Lobo.pdf">Baixar o passo a passo</a>
+          <a class="btn ghost" href="/guia-editor.html">Guia: editar um reel por 10 centavos</a>
+          <a class="btn ghost" href="/guia-ilha.html">Guia da Ilha de Edição</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span class="ag">Agência de Inteligência <em>Vozes</em></span>
+    <span>lobo@aivozes.com.br</span>
+  </footer>
+</div>
+<script>
+  // vídeo do YouTube: preencha data-yt com o ID do vídeo (o trecho depois de v= ou de youtu.be/)
+  (function () {
+    var v = document.getElementById('video'); var id = (v.getAttribute('data-yt') || '').trim();
+    if (!id) return;
+    v.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0&modestbranding=1" title="Aula: comentário que vira direct sozinho" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+  })();
+  document.querySelectorAll('.copy').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var txt = document.getElementById(b.getAttribute('data-alvo')).innerText;
+      var ok = function () { b.textContent = 'Copiado'; b.classList.add('ok'); setTimeout(function () { b.textContent = 'Copiar'; b.classList.remove('ok'); }, 1800); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, function () {});
+      else { var t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); ok(); } catch (e) {} t.remove(); }
+    });
+  });
+</script>
+</body>
+</html>
