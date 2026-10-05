@@ -11,7 +11,7 @@ export interface ClaudiaLogEntry {
 interface UseClaudiaVoiceOptions {
   wakeWord?: string;
   greeting?: string;
-  onCommand: (transcript: string) => string;
+  onCommand: (transcript: string) => string | Promise<string>;
 }
 
 const normalize = (s: string) =>
@@ -45,7 +45,7 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
 
   const recognitionRef = useRef<SpeechRecognition | null>(null);
   const armedRef = useRef(false);
-  const modeRef = useRef<"wake" | "command">("wake");
+  const modeRef = useRef<"wake" | "command" | "executing">("wake");
 
   const supported = typeof window !== "undefined" && !!getRecognitionCtor() && "speechSynthesis" in window;
 
@@ -67,9 +67,26 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
     window.speechSynthesis.speak(utterance);
   }, [pushLog]);
 
+  // Chrome só permite UMA sessão de SpeechRecognition ativa por vez. Antes de criar
+  // uma nova, soltamos a anterior sem deixar os handlers dela reiniciarem nada.
+  const releaseRecognition = useCallback(() => {
+    const prev = recognitionRef.current;
+    if (!prev) return;
+    prev.onresult = null;
+    prev.onerror = null;
+    prev.onend = null;
+    try {
+      prev.abort();
+    } catch {
+      // ignore
+    }
+    recognitionRef.current = null;
+  }, []);
+
   const startWakeRecognition = useCallback(() => {
     const Ctor = getRecognitionCtor();
     if (!Ctor || !armedRef.current) return;
+    releaseRecognition();
     modeRef.current = "wake";
     const recognition = new Ctor();
     recognition.lang = "pt-BR";
@@ -117,11 +134,17 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
       // start() can throw if called while already running; safe to ignore.
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [wakeWord, greeting, speak]);
+  }, [wakeWord, greeting, speak, releaseRecognition]);
 
+  // ATENÇÃO ao alterar este fluxo: só UM caminho pode reiniciar a escuta.
+  // - Com resultado: onresult muda o modo para "executing" (o onend passa a ser no-op)
+  //   e a retomada da escuta do wake word acontece UMA vez, no fim da fala da resposta.
+  // - Sem resultado (silêncio/erro): onerror não reinicia; quem reinicia é o onend.
+  // Dois caminhos reiniciando = duas instâncias de SpeechRecognition = erro no Chrome.
   const startCommandRecognition = useCallback(() => {
     const Ctor = getRecognitionCtor();
     if (!Ctor || !armedRef.current) return;
+    releaseRecognition();
     modeRef.current = "command";
     const recognition = new Ctor();
     recognition.lang = "pt-BR";
@@ -129,11 +152,18 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
     recognition.interimResults = false;
     recognition.maxAlternatives = 1;
 
-    recognition.onresult = (event) => {
+    recognition.onresult = async (event) => {
       const transcript = event.results[0]?.[0]?.transcript ?? "";
+      modeRef.current = "executing";
       pushLog("heard", transcript);
       setPhase("executing");
-      const response = onCommand(transcript);
+      let response: string;
+      try {
+        response = await onCommand(transcript);
+      } catch {
+        response = "Tive um problema para executar esse comando.";
+      }
+      // Fala mesmo se o comando desarmou (ex.: "tchau"); o callback só reinicia se ainda armado.
       speak(response, () => {
         if (!armedRef.current) return;
         startWakeRecognition();
@@ -148,7 +178,7 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
         setPhase("off");
         return;
       }
-      if (armedRef.current) startWakeRecognition();
+      // Outros erros ("no-speech", "aborted"): o onend logo abaixo faz a retomada.
     };
 
     recognition.onend = () => {
@@ -165,7 +195,7 @@ export function useClaudiaVoice({ wakeWord = "claudia", greeting = "Olá Lobo, o
     } catch {
       // ignore
     }
-  }, [onCommand, speak, startWakeRecognition, pushLog]);
+  }, [onCommand, speak, startWakeRecognition, pushLog, releaseRecognition]);
 
   const arm = useCallback(() => {
     if (!supported) {
