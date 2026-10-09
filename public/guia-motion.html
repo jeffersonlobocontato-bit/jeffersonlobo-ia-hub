@@ -1,0 +1,434 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Sua aula chegou: vídeo com motion no automático · Jefferson Lobo</title>
+<meta name="description" content="Valeu por comentar LOBO! A aula e o passo a passo para criar reels com motion no automático: Claude Code conectado ao HeyGen, com o seu avatar e a sua voz. — Jefferson Lobo" />
+<link rel="canonical" href="https://jeffersonlobo.tech/guia-motion.html" />
+<meta name="theme-color" content="#12201E" />
+<link rel="icon" href="/favicon.ico" />
+
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Jefferson Lobo" />
+<meta property="og:locale" content="pt_BR" />
+<meta property="og:url" content="https://jeffersonlobo.tech/guia-motion.html" />
+<meta property="og:title" content="Sua aula chegou 🙌 Vídeo com motion no automático" />
+<meta property="og:description" content="A aula e o passo a passo para criar reels com motion no automático, com o Claude Code conectado ao HeyGen. — Jefferson Lobo" />
+<meta property="og:image" content="https://jeffersonlobo.tech/og/guia-motion.jpg" />
+<meta property="og:image:url" content="https://jeffersonlobo.tech/og/guia-motion.jpg" />
+<meta property="og:image:secure_url" content="https://jeffersonlobo.tech/og/guia-motion.jpg" />
+<meta property="og:image:type" content="image/jpeg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content="Sua aula chegou: vídeo com motion no automático." />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Sua aula chegou 🙌 Vídeo com motion no automático" />
+<meta name="twitter:description" content="A aula e o passo a passo para criar reels com motion no automático, com Claude Code e HeyGen." />
+<meta name="twitter:image" content="https://jeffersonlobo.tech/og/guia-motion.jpg" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Manrope:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --pet:#12201E; --s1:#1B2824; --s2:#232E2C; --line:#2E3B38; --deep:#0C1715;
+    --amb:#E29F65; --amb-d:#C77523; --paper:#F2EEE4;
+    --muted:rgba(242,238,228,.72); --faint:rgba(242,238,228,.48);
+    --serif:'Instrument Serif',Georgia,serif; --sans:'Manrope',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--pet);color:var(--paper)}
+  html{scroll-behavior:smooth}
+  body{font-family:var(--sans);font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 20px}
+  .glow{position:fixed;right:-220px;top:-200px;width:620px;height:620px;border-radius:50%;background:radial-gradient(circle,rgba(226,159,101,.18),rgba(226,159,101,0) 65%);pointer-events:none;z-index:0}
+  header,main,footer{position:relative;z-index:1}
+  header{padding:22px 0;display:flex;justify-content:space-between;align-items:center;gap:12px}
+  .wm{font-family:var(--serif);font-size:24px;line-height:1;text-decoration:none}
+  .wm em{font-style:italic;color:var(--amb)}
+  .kicker{font-family:var(--mono);font-size:11.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--amb)}
+  .hero{display:grid;grid-template-columns:1.2fr .8fr;gap:56px;align-items:center;padding:24px 0 64px}
+  h1{font-family:var(--serif);font-weight:400;font-size:clamp(40px,5.2vw,64px);line-height:1.02;margin:16px 0 20px;letter-spacing:-.005em}
+  h1 em{font-style:italic;color:var(--amb)}
+  .lead{font-size:18px;color:var(--muted);max-width:34em;margin:0 0 28px}
+  .lead b{color:var(--paper);font-weight:600}
+  .cta{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+  .btn{display:inline-flex;align-items:center;gap:10px;border-radius:999px;padding:15px 26px;font-weight:700;font-size:16px;text-decoration:none;transition:transform .15s ease, box-shadow .15s ease;border:0;cursor:pointer;font-family:inherit}
+  .btn.primary{background:var(--amb);color:#12201E;box-shadow:0 10px 28px rgba(226,159,101,.25)}
+  .btn.primary:hover{transform:translateY(-1px);box-shadow:0 14px 34px rgba(226,159,101,.32)}
+  .btn.ghost{border:1px solid var(--line);color:var(--paper);background:transparent}
+  .btn.ghost:hover{border-color:var(--amb)}
+  .btn svg{width:18px;height:18px}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:14px}
+  .cover{position:relative;justify-self:center;width:100%;max-width:290px}
+  .cover img{width:100%;height:auto;display:block;border-radius:14px;border:1px solid rgba(242,238,228,.14);box-shadow:0 30px 70px rgba(0,0,0,.45);transform:rotate(1.6deg)}
+  .cover .badge{position:absolute;left:-18px;bottom:28px;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--amb);box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  section{padding:56px 0;border-top:1px solid var(--line)}
+  h2{font-family:var(--serif);font-weight:400;font-size:clamp(32px,4.4vw,44px);line-height:1.08;margin:10px 0 28px}
+  h2 em{font-style:italic;color:var(--amb)}
+  .sub{color:var(--muted);font-size:17px;max-width:40em;margin:-12px 0 28px}
+  /* vídeo vertical */
+  .aula{display:flex;flex-direction:column;gap:28px}
+  .aula-info{display:grid;grid-template-columns:1.3fr 1fr;gap:24px;align-items:start}
+  .video{position:relative;aspect-ratio:16/9;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:linear-gradient(160deg,#1B2824,#0C1715);box-shadow:0 30px 70px rgba(0,0,0,.35)}
+  .video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+  .video .ph{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;text-align:center;padding:24px}
+  .video .play{width:84px;height:84px;border-radius:50%;background:rgba(226,159,101,.14);border:1px solid rgba(226,159,101,.5);display:grid;place-items:center}
+  .video .play i{display:block;width:0;height:0;border-left:24px solid var(--amb);border-top:15px solid transparent;border-bottom:15px solid transparent;margin-left:6px}
+  .video .ph b{font-family:var(--serif);font-weight:400;font-size:28px}
+  .video .ph span{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  .toc{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr 1fr;gap:10px;counter-reset:c}
+  .toc li{display:flex;gap:14px;align-items:baseline;background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:12px 16px;color:var(--muted)}
+  .toc li b{color:var(--paper);font-weight:600}
+  .toc li::before{counter-increment:c;content:counter(c,decimal-leading-zero);font-family:var(--mono);font-size:11px;letter-spacing:.14em;color:var(--amb)}
+  .follow{margin-top:0;background:var(--s2);border:1px solid var(--line);border-radius:14px;padding:18px 20px}
+  .follow p{margin:0 0 12px;color:var(--muted);font-size:15px}
+  .follow .cta{gap:10px}
+  .follow .btn{padding:11px 20px;font-size:14px}
+  /* fluxo */
+  .flow{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:8px 0 6px}
+  .node{background:var(--s1);border:1px solid var(--line);border-radius:14px;padding:20px 22px;position:relative}
+  .node .n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amb)}
+  .node .t{font-family:var(--serif);font-size:24px;line-height:1.1;margin:6px 0 6px}
+  .node p{margin:0;color:var(--muted);font-size:15px}
+  .node:not(:last-child)::after{content:"→";position:absolute;right:-14px;top:50%;transform:translateY(-50%);color:var(--amb);font-size:20px;z-index:2}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  .card{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:22px}
+  .card .n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amb)}
+  .card h3{font-family:var(--serif);font-weight:400;font-size:23px;line-height:1.15;margin:8px 0 8px}
+  .card p{margin:0;color:var(--muted);font-size:15px}
+  /* passos */
+  .steps{display:flex;flex-direction:column;gap:22px}
+  .step{display:grid;grid-template-columns:.95fr 1.05fr;gap:28px;align-items:start;background:var(--s1);border:1px solid var(--line);border-radius:16px;padding:26px}
+  .step.solo{grid-template-columns:1fr}
+  .step .n{font-family:var(--mono);font-size:11px;letter-spacing:.16em;color:var(--amb)}
+  .step h3{font-family:var(--serif);font-weight:400;font-size:28px;line-height:1.1;margin:8px 0 12px}
+  .step p{margin:0 0 12px;color:var(--muted)}
+  .step p b,.step li b{color:var(--paper);font-weight:600}
+  .step ol,.step ul{margin:0 0 12px;padding-left:20px;color:var(--muted)}
+  .step li{margin:0 0 6px}
+  .step li::marker{color:var(--amb)}
+  .step figure{margin:0}
+  .step figure img{width:100%;display:block;border-radius:10px;border:1px solid rgba(242,238,228,.12)}
+  .step figcaption{font-family:var(--mono);font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin-top:8px;line-height:1.5}
+  code,.kbd{font-family:var(--mono);font-size:13.5px;background:var(--deep);border:1px solid var(--line);border-radius:6px;padding:2px 7px;color:var(--paper);white-space:nowrap}
+  .alert{border-left:2px solid var(--amb);padding:4px 0 4px 14px;margin:10px 0 0;color:var(--paper);font-size:15px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 14px}
+  .chips span{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;background:var(--deep);border:1px solid var(--line);border-radius:999px;padding:6px 12px;color:var(--paper)}
+  /* prompts */
+  .prompt{background:var(--deep);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:4px 0 16px;position:relative}
+  .prompt .lbl{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+  .prompt .lbl span{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--amb)}
+  .prompt pre{margin:0;font-family:var(--mono);font-size:14px;line-height:1.65;color:var(--paper);white-space:pre-wrap;word-break:break-word}
+  .prompt pre b{color:var(--amb);font-weight:500}
+  .copy{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;background:transparent;color:var(--paper);border:1px solid var(--line);border-radius:999px;padding:7px 14px;cursor:pointer}
+  .copy:hover{border-color:var(--amb)}
+  .copy.ok{border-color:var(--amb);color:var(--amb)}
+  details.var{background:var(--deep);border:1px solid var(--line);border-radius:12px;margin:0 0 10px}
+  details.var summary{cursor:pointer;padding:14px 18px;font-weight:600;list-style:none;display:flex;justify-content:space-between;gap:12px}
+  details.var summary::after{content:"+";color:var(--amb);font-family:var(--mono)}
+  details.var[open] summary::after{content:"–"}
+  details.var .prompt{margin:0 14px 14px;background:#0a1412}
+  /* regras */
+  .limits{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .limit{background:var(--s1);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+  .limit b{display:block;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.15;margin-bottom:6px;color:var(--paper)}
+  .limit span{color:var(--muted);font-size:15px}
+  .note{color:var(--faint);font-size:13.5px;margin-top:14px}
+  .luck{display:grid;grid-template-columns:1.2fr .8fr;gap:40px;align-items:end}
+  .luck p{color:var(--muted);font-size:17px;margin:0 0 14px;max-width:34em}
+  .sig .wm{font-size:34px}
+  .role{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-top:8px}
+  .links{display:flex;flex-direction:column;gap:10px;align-items:flex-start}
+  footer{padding:28px 0 40px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+  footer span{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--faint)}
+  footer .ag{font-family:var(--serif);font-size:16px;letter-spacing:0;text-transform:none;color:var(--paper)}
+  footer .ag em{font-style:italic;color:var(--amb)}
+  [hidden]{display:none!important}
+  @media (max-width:820px){
+    .hero{grid-template-columns:1fr;gap:40px;padding:8px 0 48px}
+    .cover{max-width:240px}
+    .cover .badge{left:-8px}
+    .aula-info,.toc{grid-template-columns:1fr}
+    .grid,.flow,.limits{grid-template-columns:1fr}
+    .node:not(:last-child)::after{content:"↓";right:auto;left:50%;top:auto;bottom:-20px;transform:translateX(-50%)}
+    .step{grid-template-columns:1fr;padding:20px}
+    .luck{grid-template-columns:1fr;gap:28px}
+    .btn{width:100%;justify-content:center}
+    .cta{flex-direction:column;align-items:stretch}
+    code{white-space:normal;word-break:break-all}
+  }
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+<div class="wrap">
+  <header>
+    <a class="wm" href="https://jeffersonlobo.tech/">Jefferson <em>Lobo</em></a>
+    <span class="kicker">Aula gratuita</span>
+  </header>
+
+  <main>
+    <div class="hero">
+      <div>
+        <div class="kicker">Você comentou LOBO</div>
+        <h1>Vídeo com motion <em>no automático</em>.</h1>
+        <p class="lead">Valeu por acompanhar. Aqui está a aula que eu prometi. O reel que você viu <b>não teve câmera, nem gravação de tela, nem editor de vídeo</b>. Eu conectei o <b>Claude Code ao HeyGen</b> e só conversei: ele escreveu, gerou o meu avatar falando, criou as animações, montou e conferiu. Aqui você aprende a conectar tudo e a fazer igual.</p>
+        <div class="cta">
+          <a class="btn primary" href="#aula">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 5l11 7-11 7z"/></svg>
+            Assistir à aula
+          </a>
+          <a class="btn ghost" href="#prompt">Pegar o prompt mestre</a>
+        </div>
+        <div class="meta">Aula em vídeo · 7 passos · prompt mestre para copiar</div>
+      </div>
+      <div class="cover">
+        <img src="/guias/guia-motion-capa.jpg" alt="Quadro do reel: card animado em cima e o avatar do Jefferson embaixo" width="720" height="1280" />
+        <div class="badge">Claude Code + HeyGen</div>
+      </div>
+    </div>
+
+    <section id="aula">
+      <div class="kicker">A aula</div>
+      <h2>Conecte uma vez, peça <em>sempre</em>.</h2>
+      <p class="sub">Assista uma vez com calma e depois siga o passo a passo escrito logo abaixo. São menos de 5 minutos.</p>
+      <div class="aula">
+        <div>
+          <div class="video" id="video" data-yt="">
+            <div class="ph">
+              <div class="play"><i></i></div>
+              <b>A aula entra aqui</b>
+              <span>Enquanto isso, o passo a passo completo está logo abaixo</span>
+            </div>
+          </div>
+          <p class="note" id="ytlink" hidden style="margin-top:12px">Não carregou? <a id="ytlinka" href="#" target="_blank" rel="noopener">Abrir a aula no YouTube</a></p>
+        </div>
+        <div class="aula-info">
+          <ol class="toc">
+            <li><span><b>O segredo:</b> tudo conectado ao Claude Code</span></li>
+            <li><span><b>O que você precisa</b> para começar</span></li>
+            <li><span><b>Avatar e voz</b> no HeyGen</span></li>
+            <li><span><b>Conectar</b> o HeyGen ao Claude</span></li>
+            <li><span><b>O pedido</b> e a aprovação do roteiro</span></li>
+            <li><span><b>Ele gera e monta</b> sozinho</span></li>
+            <li><span><b>Ajustes</b> conversando</span></li>
+            <li><span><b>Publicar</b> e virar conversa</span></li>
+          </ol>
+          <div class="follow">
+            <p>Essa aula é gratuita. Se ela te ajudar, me segue: é o que mantém esses conteúdos no ar.</p>
+            <div class="cta">
+              <a class="btn primary" href="https://www.instagram.com/jeffersonlobo.tech/" target="_blank" rel="noopener">Seguir @jeffersonlobo.tech</a>
+              <a class="btn ghost" id="ytchan" href="#" target="_blank" rel="noopener" hidden>Inscrever-se no YouTube</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Como funciona</div>
+      <h2>Você conversa com <em>um</em>. Ele mexe no resto.</h2>
+      <div class="flow">
+        <div class="node"><div class="n">01 · VOCÊ</div><div class="t">Pede e aprova</div><p>Diz o tema, o público e a palavra do comentário. Aprova o roteiro antes de qualquer gasto.</p></div>
+        <div class="node"><div class="n">02 · CLAUDE CODE</div><div class="t">Faz o trabalho</div><p>Escreve, anima, monta o vídeo quadro a quadro e confere se o seu rosto ficou livre.</p></div>
+        <div class="node"><div class="n">03 · HEYGEN</div><div class="t">Empresta você</div><p>Pelo conector, gera o vídeo com o seu avatar e a sua voz clonada, e devolve a legenda.</p></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Antes de começar</div>
+      <h2>O que você vai <em>precisar</em></h2>
+      <div class="grid">
+        <div class="card"><div class="n">01</div><h3>Claude com Claude Code</h3><p>Um plano do Claude que inclua o <b>Claude Code</b>. Dá para usar pelo app do Claude no computador, na aba <b>Code</b>, sem mexer em terminal.</p></div>
+        <div class="card"><div class="n">02</div><h3>HeyGen com o seu avatar</h3><p>Uma conta no HeyGen com o seu avatar e a sua voz. Confira se o seu plano libera avatar próprio, voz clonada e o uso pelo conector.</p></div>
+        <div class="card"><div class="n">03</div><h3>Um computador</h3><p>Mac ou Windows. É nele que o Claude Code monta o vídeo. Ele mesmo instala o que faltar, sempre pedindo a sua permissão.</p></div>
+      </div>
+    </section>
+
+    <section id="passos">
+      <div class="kicker">Passo a passo</div>
+      <h2>Do zero ao primeiro reel <em>no automático</em></h2>
+      <div class="steps">
+
+        <div class="step solo">
+          <div>
+            <div class="n">PASSO 01</div>
+            <h3>Crie o seu avatar e a sua voz no HeyGen</h3>
+            <p>Você faz isso uma vez só e usa em todos os vídeos.</p>
+            <ol>
+              <li>No HeyGen, crie um <b>avatar a partir de fotos suas</b>: rosto bem iluminado, de frente, fundo limpo.</li>
+              <li>Clone a sua <b>voz</b> gravando um áudio curto, num lugar silencioso, falando naturalmente.</li>
+              <li>Dê nomes fáceis aos dois, como <code>Meu avatar</code> e <code>Minha voz</code>. Você vai citar esses nomes para o Claude.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="step solo">
+          <div>
+            <div class="n">PASSO 02</div>
+            <h3>Conecte o HeyGen ao Claude</h3>
+            <ol>
+              <li>No Claude, abra <b>Configurações</b> e vá em <b>Conectores</b>.</li>
+              <li>Procure <b>HeyGen</b> na lista e clique em <b>Conectar</b>. Se ele não aparecer, use <b>Adicionar conector personalizado</b> com o endereço que o HeyGen informa na página de integrações dele.</li>
+              <li>Entre com a sua conta do HeyGen e <b>autorize</b>.</li>
+              <li>Nas permissões, deixe as ações que <b>gastam créditos</b> (gerar vídeo) como <b>requer aprovação</b>. Assim nada é gerado sem você ver antes.</li>
+            </ol>
+            <div class="prompt">
+              <div class="lbl"><span>Prompt · testar a conexão</span><button class="copy" data-alvo="p0">Copiar</button></div>
+<pre id="p0">Liste os meus avatares e as minhas vozes do HeyGen.</pre>
+            </div>
+            <p>Se aparecer o seu avatar, está pronto.</p>
+          </div>
+        </div>
+
+        <div class="step solo">
+          <div>
+            <div class="n">PASSO 03</div>
+            <h3>Abra o Claude Code numa pasta</h3>
+            <ol>
+              <li>No app do Claude no computador, abra a aba <b>Code</b>.</li>
+              <li>Escolha ou crie uma pasta para o projeto, como <code>reels</code>. É ali que ficam o vídeo do HeyGen, as animações e o arquivo final.</li>
+              <li>Prefere o terminal? Funciona igual: abra a pasta e rode <code>claude</code>.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="step solo" id="prompt">
+          <div>
+            <div class="n">PASSO 04</div>
+            <h3>Cole o prompt mestre</h3>
+            <p>Troque o que está em laranja e cole na conversa do Claude Code. Ele trabalha em etapas e <b>para nos pontos de aprovação</b>.</p>
+            <div class="prompt">
+              <div class="lbl"><span>Prompt mestre · reel com motion</span><button class="copy" data-alvo="p1">Copiar</button></div>
+<pre id="p1">Você é o meu editor de vídeo. Quero um reel vertical (9:16) de até 45 segundos, com motion, usando o meu avatar e a minha voz do HeyGen, pelo conector.
+
+Tema: <b>[TEMA]</b>
+Público: <b>[PARA QUEM É]</b>
+Palavra do comentário: <b>[PALAVRA]</b>
+O que a pessoa recebe no direct: <b>[ENTREGA]</b>
+
+Trabalhe nestas etapas:
+1. Liste os meus avatares e vozes do HeyGen e confirme comigo quais usar.
+2. Escreva o roteiro: frases de até 12 palavras, do jeito que a gente fala; gancho nos 3 primeiros segundos; nada de número ou dado inventado; final pedindo para comentar [PALAVRA]. PARE e espere a minha aprovação.
+3. Com o roteiro aprovado, gere o vídeo no HeyGen, vertical e com legenda, e baixe o vídeo e a legenda para esta pasta. Me avise antes de gastar créditos.
+4. Crie as animações em HTML e monte o vídeo final quadro a quadro, com a minha voz:
+   - alterne: eu em tela cheia; tela dividida (card animado em cima, eu embaixo); card em tela cheia;
+   - fundo claro cor de papel, cards brancos com sombra e leve 3D, carimbos vermelhos inclinados, checklist marcando, cursor clicando;
+   - legendas palavra por palavra, sincronizadas com a legenda do HeyGen, em dois estilos: serifada itálica em caixa alta, e sem serifa com a palavra-chave em negrito;
+   - NUNCA coloque nada na frente do meu rosto. Confira isso automaticamente em todos os quadros antes de me entregar.
+5. Se precisar instalar alguma ferramenta, me peça permissão antes.
+6. Me entregue o MP4 e uma folha com miniaturas das cenas para eu revisar.</pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="step solo">
+          <div>
+            <div class="n">PASSO 05</div>
+            <h3>Aprove o roteiro e deixe ele trabalhar</h3>
+            <ol>
+              <li>Leia o roteiro <b>em voz alta</b>. Se uma frase travar, peça: <code>simplifique a frase da cena 3</code>.</li>
+              <li>Quando estiver bom, responda <code>aprovado</code>. Só então ele gera o vídeo no HeyGen.</li>
+              <li>O Claude Code vai pedir permissão para algumas ações, como baixar o vídeo e instalar ferramentas de montagem. Leia e aprove.</li>
+              <li>No fim, ele entrega o MP4 e a folha de cenas para você revisar.</li>
+            </ol>
+            <p class="alert">O avatar é a única parte que gasta créditos do HeyGen. Animações, legendas e montagem são feitas no seu computador.</p>
+          </div>
+        </div>
+
+        <div class="step solo">
+          <div>
+            <div class="n">PASSO 06</div>
+            <h3>Ajuste conversando</h3>
+            <p>Peça como pediria a um editor. Ele refaz só o que mudou, <b>sem gerar o avatar de novo</b>.</p>
+            <details class="var"><summary>Me colocar em miniatura no canto</summary><div class="prompt"><div class="lbl"><span>Prompt</span><button class="copy" data-alvo="v1">Copiar</button></div><pre id="v1">Nas cenas com card, me coloque em miniatura no canto inferior direito e deixe o conteúdo ocupar o resto da tela. Nada pode ficar na frente da miniatura.</pre></div></details>
+            <details class="var"><summary>Tirar ou trocar um elemento</summary><div class="prompt"><div class="lbl"><span>Prompt</span><button class="copy" data-alvo="v2">Copiar</button></div><pre id="v2">Tire o carimbo da cena <b>3</b> e troque por um checklist com <b>[ITENS]</b>. Mantenha o resto igual.</pre></div></details>
+            <details class="var"><summary>Versão horizontal para o YouTube</summary><div class="prompt"><div class="lbl"><span>Prompt</span><button class="copy" data-alvo="v3">Copiar</button></div><pre id="v3">Faça uma versão 16:9 para o YouTube, usando o mesmo vídeo do HeyGen. Conteúdo no centro, eu em miniatura no canto inferior direito, e eu em tela cheia só na abertura e no fim.</pre></div></details>
+            <details class="var"><summary>Thumbnail e capa</summary><div class="prompt"><div class="lbl"><span>Prompt</span><button class="copy" data-alvo="v4">Copiar</button></div><pre id="v4">Crie a capa do reel (1080x1920, com o texto dentro da área central 1080x1350) e a thumbnail do YouTube (1280x720), com um quadro meu do vídeo e no máximo 4 palavras grandes.</pre></div></details>
+          </div>
+        </div>
+
+        <div class="step solo">
+          <div>
+            <div class="n">PASSO 07</div>
+            <h3>Publique e transforme em conversa</h3>
+            <p>Antes de postar, confira: os <b>3 primeiros segundos</b> prendem? O <b>rosto aparece livre</b> em todas as cenas? O <b>final pede um comentário</b> com uma palavra só?</p>
+            <div class="prompt">
+              <div class="lbl"><span>Prompt · legenda do post</span><button class="copy" data-alvo="p5">Copiar</button></div>
+<pre id="p5">Escreva a legenda deste reel: uma primeira linha que prenda, até 4 linhas curtas, e o final "Comenta <b>[PALAVRA]</b> que eu te mando <b>[ENTREGA]</b> no direct." Use o roteiro que você escreveu.</pre>
+            </div>
+            <p>Quer que a resposta e o direct saiam sozinhos quando alguém comentar a palavra? Conecte o Instagram ao Claude pelo Zernio, como no <a href="/guia-direct.html">guia do comentário que vira direct</a>.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <section>
+      <div class="kicker">Regras de ouro</div>
+      <h2>O que faz o vídeo <em>segurar</em> a atenção</h2>
+      <div class="limits">
+        <div class="limit"><b>Rosto sempre livre</b><span>Nenhum card, carimbo ou legenda na frente do rosto. Peça ao Claude para conferir isso em todos os quadros.</span></div>
+        <div class="limit"><b>Aprove antes de gastar</b><span>Roteiro aprovado primeiro, avatar depois. Ajuste de animação não gasta crédito; refazer o avatar gasta.</span></div>
+        <div class="limit"><b>Frase curta</b><span>Até 12 palavras por frase. Frase longa vira legenda longa, e legenda longa ninguém lê.</span></div>
+        <div class="limit"><b>Alterne os formatos</b><span>Tela cheia, tela dividida e card em tela cheia. Trocar a cada 3 a 6 segundos mantém o ritmo.</span></div>
+        <div class="limit"><b>Uma palavra no final</b><span>Escolha uma palavra que ninguém escreveria por acaso. É ela que vira conversa no direct.</span></div>
+        <div class="limit"><b>Nada inventado</b><span>Número, preço e resultado só se forem verdadeiros. Na dúvida, mostre o processo, não a promessa.</span></div>
+      </div>
+      <p class="note">Planos, preços e recursos do Claude e do HeyGen podem mudar. Confira na sua conta antes de começar.</p>
+    </section>
+
+    <section>
+      <div class="luck">
+        <div>
+          <div class="kicker">Boa sorte no seu projeto</div>
+          <h2>Não é a câmera. É <em>pedir</em> do jeito certo.</h2>
+          <p>Comece com um reel curto, de três cenas. Quando o primeiro ficar pronto, o segundo sai na metade do tempo.</p>
+          <p>Quando o seu estiver no ar, me marca no Instagram, em <b>@jeffersonlobo.tech</b>. Quero ver o que você criou.</p>
+          <div class="sig" style="margin-top:24px">
+            <div class="wm">Jefferson <em>Lobo</em></div>
+            <div class="role">Head Executivo de Marketing · Consultor em IA · Palestrante</div>
+          </div>
+        </div>
+        <div class="links">
+          <a class="btn primary" href="https://www.instagram.com/jeffersonlobo.tech/" target="_blank" rel="noopener">Seguir no Instagram</a>
+          <a class="btn ghost" id="ytchan2" href="#" target="_blank" rel="noopener" hidden>Inscrever-se no YouTube</a>
+          <a class="btn ghost" href="/guia-direct.html">Guia: comentário que vira direct</a>
+          <a class="btn ghost" href="/guia-ilha.html">Guia da Ilha de Edição</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <span class="ag">Agência de Inteligência <em>Vozes</em></span>
+    <span>lobo@aivozes.com.br</span>
+  </footer>
+</div>
+<script>
+  // vídeo do YouTube: preencha data-yt com o ID do vídeo (o trecho depois de v= ou de youtu.be/)
+  // canal do YouTube: preencha YT_CANAL com o endereço do canal
+  var YT_CANAL = '';
+  (function () {
+    var v = document.getElementById('video'); var id = (v.getAttribute('data-yt') || '').trim();
+    if (id) {
+      v.innerHTML = '<iframe src="https://www.youtube-nocookie.com/embed/' + encodeURIComponent(id) + '?rel=0&modestbranding=1" title="Aula: vídeo com motion no automático" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>';
+      var l = document.getElementById('ytlink'); document.getElementById('ytlinka').href = 'https://youtu.be/' + encodeURIComponent(id); l.hidden = false;
+    }
+    if (YT_CANAL) ['ytchan', 'ytchan2'].forEach(function (k) { var a = document.getElementById(k); a.href = YT_CANAL; a.hidden = false; });
+  })();
+  document.querySelectorAll('.copy').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      e.preventDefault();
+      var txt = document.getElementById(b.getAttribute('data-alvo')).innerText;
+      var ok = function () { b.textContent = 'Copiado'; b.classList.add('ok'); setTimeout(function () { b.textContent = 'Copiar'; b.classList.remove('ok'); }, 1800); };
+      if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, function () {});
+      else { var t = document.createElement('textarea'); t.value = txt; document.body.appendChild(t); t.select(); try { document.execCommand('copy'); ok(); } catch (e) {} t.remove(); }
+    });
+  });
+</script>
+</body>
+</html>
