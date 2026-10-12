@@ -48,7 +48,7 @@ const Vitrine = () => {
         title="Cursos e livro | Jefferson Lobo"
         description="Ilha de Edição completa: 5 aulas para fazer seu conteúdo sozinho no Claude, com Tutor IA e o e-book O código invisível de bônus. E o livro do Método DEL, avulso."
         path="/cursos"
-        ogImage={`${SITE_URL}/cursos-ilha/produto.jpg`}
+        ogImage={`${SITE_URL}/cursos-ilha/produto-vitrine.jpg`}
       />
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
@@ -76,7 +76,7 @@ const Vitrine = () => {
               {/* Curso */}
               <article className="rounded-2xl border border-primary/40 bg-card/60 overflow-hidden flex flex-col min-w-0">
                 <Link to="/cursos/ilha" onClick={() => trackCTA('vitrine_curso_imagem', 'vitrine')}>
-                  <img src="/cursos-ilha/produto.jpg" alt="Ilha de Edição completa" className="w-full aspect-square object-cover sm:aspect-[16/10]" />
+                  <img src="/cursos-ilha/produto-vitrine.jpg" alt="Ilha de Edição completa" width={1600} height={1000} className="w-full aspect-[16/10] object-cover" />
                 </Link>
                 <div className="p-6 flex flex-col gap-4 flex-1">
                   <div className="flex flex-wrap gap-2 text-[11px] uppercase tracking-[0.18em]" style={mono}>
@@ -84,7 +84,7 @@ const Vitrine = () => {
                     <span className="rounded-full border border-foreground/20 px-3 py-1 text-muted-foreground">Lote {lote.lote}</span>
                   </div>
                   <h2 className="text-2xl font-bold leading-tight">
-                    {CURSO_ILHA.nome}: {CURSO_ILHA.chamada.toLowerCase()}
+                    {CURSO_ILHA.nome}: {CURSO_ILHA.chamada.charAt(0).toLowerCase() + CURSO_ILHA.chamada.slice(1)}
                   </h2>
                   <ul className="space-y-2 text-sm text-muted-foreground">
                     {[
