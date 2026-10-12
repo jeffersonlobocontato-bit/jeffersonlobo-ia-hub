@@ -56,3 +56,9 @@ verify_jwt = false
 
 [functions.publish-share-page]
 verify_jwt = true
+
+[functions.hotmart-webhook]
+verify_jwt = false
+
+[functions.curso-tutor]
+verify_jwt = true
