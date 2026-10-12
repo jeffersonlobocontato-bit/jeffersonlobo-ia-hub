@@ -296,6 +296,7 @@ function writeLlmsTxt(blogPosts: BlogPostRow[]) {
   lines.push('');
   lines.push(`- [O código invisível dos superagentes de inteligência artificial](${BASE_URL}/livro-del): livro de Jefferson Lobo sobre o Método DEL — como treinar agentes de IA com fidelidade autoral, sem programar. Disponível em e-book (R$ 47) e impresso.`);
   lines.push(`- [Materiais gratuitos do livro](${BASE_URL}/materiais): checklists de auditoria de fidelidade autoral e templates operacionais do Método DEL, sem cadastro.`);
+  lines.push(`- [Ilha de Edição completa](${BASE_URL}/cursos/ilha): curso de Jefferson Lobo com 5 aulas para instalar no Claude um estúdio de conteúdo para Instagram (reels, carrosséis, stories, direct automático e formatos), com Tutor IA e o e-book O código invisível de bônus. Vitrine de cursos em ${BASE_URL}/cursos.`);
   lines.push('');
   lines.push('## Recursos gratuitos');
   lines.push('');
@@ -360,6 +361,8 @@ async function main() {
   const entries: SitemapEntry[] = [
     { path: "/", lastmod: today, changefreq: "weekly", priority: "1.0" },
     { path: "/livro-del", lastmod: today, changefreq: "weekly", priority: "0.9" },
+    { path: "/cursos", lastmod: today, changefreq: "weekly", priority: "0.9" },
+    { path: "/cursos/ilha", lastmod: today, changefreq: "weekly", priority: "0.95" },
     { path: "/blog", lastmod: today, changefreq: "weekly", priority: "0.9" },
     { path: "/palestras-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/palestrante-inteligencia-artificial", lastmod: today, changefreq: "monthly", priority: "0.95" },
