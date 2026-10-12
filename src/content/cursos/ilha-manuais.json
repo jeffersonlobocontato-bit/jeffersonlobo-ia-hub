@@ -1,0 +1,475 @@
+{
+ "aula-1": {
+  "resultado": "A sua Ilha de Edição instalada no seu Claude e o seu primeiro reel editado por ela.",
+  "antes": [
+   "Plano pago do Claude: Pro, Max, Team ou Enterprise. No gratuito a Ilha não funciona.",
+   "Um computador, com o Claude no navegador ou no aplicativo. Depois de instalada, a Ilha abre até no celular.",
+   "O arquivo ilha-de-edicao.zip, baixado da área de membros. Não precisa abrir nem descompactar."
+  ],
+  "passos": [
+   {
+    "titulo": "Ligue os conectores, se quiser",
+    "itens": [
+     "Abra as configurações do Claude e clique em Conectores.",
+     "Procure pelo nome: HeyGen (avatar), Zernio (direct automático, aula 4) e Windsor (números do Instagram).",
+     "Nenhum é obrigatório para instalar. Dá para ligar depois."
+    ],
+    "dica": "Regra de ouro: ninguém, nem o Claude, pede senha ou chave pelo chat. Se pedirem, desconfie."
+   },
+   {
+    "titulo": "Instale com uma frase",
+    "itens": [
+     "Abra o Claude e comece uma conversa nova.",
+     "No campo de mensagem, clique no botão de anexar (+ ou clipe) e escolha ilha-de-edicao.zip.",
+     "Espere o arquivo carregar e escreva: \"Descompacte esse pacote e instale a Ilha de Edição seguindo o CLAUDE.md que está dentro dele.\"",
+     "Envie. A partir daqui é o Claude que trabalha e te guia."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Responda o seu perfil",
+    "itens": [
+     "O Claude pede, numa lista só: nome, cidade, @ do Instagram, site ou link da bio, cargo curto (vai na assinatura), quem você é, como você fala, para quem você fala e os assuntos do seu nicho.",
+     "Responda com calma, do seu jeito.",
+     "Não sabe o que escrever num campo? Diga isso: o Claude propõe um texto e pede a sua confirmação."
+    ],
+    "dica": "São essas respostas que fazem a Ilha escrever com a sua voz."
+   },
+   {
+    "titulo": "Aprove a tarefa e ligue \"Aprovar automaticamente\"",
+    "itens": [
+     "O Claude publica a sua Ilha e cria uma tarefa agendada: é o editor que trabalha nos bastidores.",
+     "Aprove o cartão da tarefa.",
+     "Na tarefa, ligue a opção Aprovar automaticamente."
+    ],
+    "dica": "É o passo que mais gente esquece. Sem ele, a cada vídeo a edição para esperando por você."
+   },
+   {
+    "titulo": "Abra e guarde o link da Ilha",
+    "itens": [
+     "No fim, o Claude testa tudo e entrega o link da sua Ilha.",
+     "Salve nos favoritos do navegador. No celular, adicione à tela de início.",
+     "A instalação leva de 10 a 20 minutos."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Grave o primeiro vídeo",
+    "itens": [
+     "Celular na vertical, em 1080p.",
+     "Olhe para a câmera e fale com calma. Pode errar: pausas, repetições e \"né\" a Ilha corta.",
+     "O vídeo precisa ter até 20 MB. Maior? Grave mais curto ou mande para você mesmo pelo WhatsApp, que ele chega comprimido."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Escolha o modelo",
+    "itens": [
+     "Na Ilha, abra a aba Reels: a primeira tela é a galeria de modelos.",
+     "Notícia e números: Dado em destaque. Opinião forte: Ritmo. Explicar: Direção. Contar história: Narrativa.",
+     "Clique em Usar este modelo."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Configure e envie",
+    "itens": [
+     "Arraste o vídeo para a área indicada (ou toque para escolher) e dê um nome.",
+     "Escolha a paleta: a Ilha não escolhe por você.",
+     "Escolha uma ou mais trilhas (dá para ouvir antes no botão de play). Com mais de uma, o vídeo muda de clima nas viradas da fala.",
+     "Se quiser, escreva o roteiro ou uma instrução, como \"destaque o número 37%\".",
+     "Clique em Editar com este modelo."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Acompanhe a edição",
+    "itens": [
+     "No topo aparece a faixa com a etapa: transcrevendo, montando, renderizando.",
+     "Um reel de 30 s a 1 min leva de 10 a 25 minutos. Pode fechar a página e voltar depois."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Ajuste e renderize",
+    "itens": [
+     "O reel pronto aparece em Seus reels. Abra para entrar no editor e aperte o play.",
+     "Na linha do tempo ficam o vídeo, as legendas, os letterings, a trilha e os efeitos, cada um na sua faixa.",
+     "Para trocar uma palavra da legenda: clique nela, corrija no painel da direita e salve.",
+     "Para pedir algo maior: botão Instruções, escrevendo como se falasse com um editor.",
+     "Quando estiver do seu jeito, clique em Renderizar."
+    ],
+    "dica": null
+   }
+  ],
+  "erros": [
+   "Vídeo acima de 20 MB: a Ilha recusa.",
+   "Aprovar automaticamente desligado: a edição fica parada.",
+   "Plano gratuito do Claude: a instalação nem começa."
+  ],
+  "checklist": [
+   "Ilha instalada e link salvo",
+   "Aprovar automaticamente ligado na tarefa",
+   "Primeiro reel editado e renderizado"
+  ],
+  "tarefa": "Edite pelo menos um reel antes da próxima aula."
+ },
+ "aula-2": {
+  "resultado": "Um carrossel pronto para postar, na sua paleta, mais o roteiro de um reel e as legendas para Instagram e LinkedIn.",
+  "antes": [
+   "A sua Ilha instalada (aula 1).",
+   "Uma notícia (o link) ou um tema seu, com fatos.",
+   "Uma foto sua de verdade para a capa."
+  ],
+  "passos": [
+   {
+    "titulo": "Abra a aba Carrossel",
+    "itens": [
+     "No topo há quatro botões: Notícia, Tema manual, Técnicas e Salvos.",
+     "Os três primeiros são jeitos de começar; Salvos guarda tudo o que você já criou."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Comece por uma notícia ou por um tema",
+    "itens": [
+     "Notícia: copie o link da matéria, cole em URL do artigo e clique em Ler artigo. A Ilha mostra o tema que encontrou.",
+     "Tema manual: escreva o tema ou cole um texto seu, uma anotação ou um trecho de aula. Quanto mais fatos, melhor."
+    ],
+    "dica": "A Ilha só usa números e nomes que estão no texto. Ela não inventa dado."
+   },
+   {
+    "titulo": "Escolha a técnica, o pilar e os slides",
+    "itens": [
+     "São seis técnicas. Para começar: Tutorial (passo a passo) ou Conflito universal (abre com um problema que o seu público vive).",
+     "Escolha o pilar (o assunto geral) e a quantidade de slides. Sete é um bom número: gancho, desenvolvimento e chamada.",
+     "Clique em Gerar carrossel e espere alguns instantes."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Ajuste paleta e slides",
+    "itens": [
+     "Escolha a paleta, a mesma dos seus reels.",
+     "Clique numa miniatura para editar: selo do topo, título, subtítulo, tamanho e fonte; dá para mover cada elemento."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Coloque a sua foto na capa",
+    "itens": [
+     "Clique em Foto da capa e envie uma foto sua de verdade, olhando para a câmera."
+    ],
+    "dica": "Nada de imagem gerada por inteligência artificial: gente para no carrossel que tem gente."
+   },
+   {
+    "titulo": "Confira antes de postar",
+    "itens": [
+     "Leia todos os slides.",
+     "Confira números e nomes com a fonte da notícia.",
+     "Mude o tom de qualquer frase: a palavra final é sua."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Baixe e poste",
+    "itens": [
+     "Instagram: baixe cada slide em PNG e suba como carrossel, na ordem.",
+     "LinkedIn: use Baixar PDF completo."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Use o bônus",
+    "itens": [
+     "Role até o fim: roteiro de um reel sobre o mesmo assunto e as legendas prontas para Instagram e LinkedIn.",
+     "Criar vídeo com esse roteiro leva o roteiro para a aba Reels; Criar stories com esse tema leva para a aba Stories."
+    ],
+    "dica": "Um assunto alimenta três frentes: carrossel, reel e stories."
+   },
+   {
+    "titulo": "Marque como postado",
+    "itens": [
+     "Tudo fica em Salvos. Depois de postar, clique em Marcar como postado.",
+     "Com a análise do Instagram ligada, a Ilha aprende o que funciona no seu perfil."
+    ],
+    "dica": null
+   }
+  ],
+  "erros": [
+   "Gerar sem fatos no texto: o carrossel sai raso.",
+   "Imagem gerada por IA na capa: o carrossel perde a força.",
+   "Postar sem conferir números e nomes."
+  ],
+  "checklist": [
+   "Carrossel gerado na sua paleta",
+   "Foto real na capa",
+   "Números conferidos",
+   "Postado e marcado como postado"
+  ],
+  "tarefa": "Crie e poste um carrossel."
+ },
+ "aula-3": {
+  "resultado": "A sequência de stories do dia, animada na sua paleta, com o guia de qual figurinha colar em cada um.",
+  "antes": [
+   "A sua Ilha instalada (aula 1).",
+   "Um tema: uma ideia, uma notícia, um trecho de livro ou algo que aconteceu com você."
+  ],
+  "passos": [
+   {
+    "titulo": "Escreva o tema",
+    "itens": [
+     "Abra a aba Stories e escreva o tema no primeiro campo, ou cole o material inteiro.",
+     "Quanto mais fatos, mais rica a sequência."
+    ],
+    "dica": "Números, nomes e depoimentos só entram se você escreveu."
+   },
+   {
+    "titulo": "Escolha o objetivo",
+    "itens": [
+     "Engajar e criar conexão (dia a dia), Aquecer para uma venda, Vender (dia da abertura) ou Ensinar.",
+     "Na dúvida, comece por Engajar e criar conexão."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Quantidade e paleta",
+    "itens": [
+     "Sete stories é um bom começo: gancho, história, pergunta e chamada sem cansar.",
+     "Escolha a paleta, a mesma dos reels e carrosséis."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Oferta e provas, se tiver",
+    "itens": [
+     "Oferta: o que você quer aquecer ou vender, com preço e prazo.",
+     "Provas reais: resultados e depoimentos que você pode mostrar."
+    ],
+    "dica": "Só use o que é verdade e o que você tem autorização para mostrar."
+   },
+   {
+    "titulo": "Crie",
+    "itens": [
+     "Deixe marcada a opção Renderizar assim que a sequência ficar pronta.",
+     "Clique em Criar stories. Leva de 5 a 12 minutos."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Confira antes de postar",
+    "itens": [
+     "A sequência aparece em Sequências salvas. Abra.",
+     "Leia o quadro Conferir antes de postar: datas, números e nomes para checar."
+    ],
+    "dica": "É o seu nome que vai no story."
+   },
+   {
+    "titulo": "Cada story e a sua figurinha",
+    "itens": [
+     "Cada story é um vídeo vertical com uma área livre para a figurinha.",
+     "O guia diz qual figurinha colar (enquete, quiz, caixinha, contagem ou link) e o que escrever nela.",
+     "Baixe um por um ou todos de uma vez (Baixar todos)."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Poste no Instagram",
+    "itens": [
+     "Suba o primeiro story, toque em figurinhas, escolha a indicada e cole na área livre. Publique.",
+     "Faça o mesmo com os próximos, na ordem: todos de uma vez ou ao longo do dia."
+    ],
+    "dica": "As figurinhas fazem o público responder, e quem responde passa a ver mais o seu conteúdo."
+   },
+   {
+    "titulo": "Marque como postada",
+    "itens": [
+     "Volte na Ilha e clique em Marcar como postada.",
+     "Com a análise ligada, a Ilha compara as sequências e aprende o formato que funciona com o seu público."
+    ],
+    "dica": null
+   }
+  ],
+  "erros": [
+   "Tema curto demais: a sequência sai genérica.",
+   "Postar sem colar as figurinhas.",
+   "Usar depoimento sem autorização."
+  ],
+  "checklist": [
+   "Tema com fatos",
+   "Objetivo e paleta escolhidos",
+   "Conferido antes de postar",
+   "Figurinhas coladas",
+   "Marcada como postada"
+  ],
+  "tarefa": "Poste uma sequência inteira."
+ },
+ "aula-4": {
+  "resultado": "Uma automação rodando: quem comenta a palavra no seu post recebe o material no direct, e você acompanha os números na Ilha.",
+  "antes": [
+   "Instagram profissional (comercial ou de criador).",
+   "Um material para entregar (um link).",
+   "A sua Ilha instalada (aula 1)."
+  ],
+  "passos": [
+   {
+    "titulo": "Entenda o caminho",
+    "itens": [
+     "Você posta, a pessoa comenta a palavra, a automação percebe e manda o link no direct dela.",
+     "Quem faz isso é a Zernio, que conversa com o Instagram de forma oficial."
+    ],
+    "dica": "Regra do Instagram: a mensagem automática sai em até 7 dias depois do comentário, uma por comentário. Respondendo na hora, você fica sempre dentro da regra."
+   },
+   {
+    "titulo": "Crie a conta na Zernio",
+    "itens": [
+     "Entre no site da Zernio e crie a sua conta. O plano gratuito atende até duas contas e dez mil mensagens por mês.",
+     "Conecte o seu Instagram profissional."
+    ],
+    "dica": "Conta pessoal? No Instagram: Configurações › Tipo de conta e ferramentas › Mudar para conta profissional."
+   },
+   {
+    "titulo": "Ligue a Zernio no Claude",
+    "itens": [
+     "Configurações do Claude › Conectores › adicionar conector personalizado.",
+     "Endereço: https://mcp.zernio.com/mcp",
+     "Entre com a sua conta da Zernio e autorize."
+    ],
+    "dica": "Em nenhum momento você cola senha ou chave no chat. Não conectou? Remova o conector e adicione de novo."
+   },
+   {
+    "titulo": "Crie a automação pedindo",
+    "itens": [
+     "Numa conversa com o Claude: \"Crie uma automação na Zernio: quem comentar GUIA no meu post mais recente recebe no direct esta mensagem, com este link.\" Cole a mensagem e o link.",
+     "O Claude mostra a automação antes de ativar. Confira a palavra, o post e a mensagem, e aprove.",
+     "Também dá para criar direto no painel da Zernio."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Escreva uma boa mensagem",
+    "itens": [
+     "Curta e simpática: agradeça, entregue o link e diga o que a pessoa vai encontrar.",
+     "Não peça e-mail nem telefone logo na primeira mensagem.",
+     "Palavra simples, sem acento: GUIA, PACK, QUERO."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Chame no post",
+    "itens": [
+     "No vídeo e na legenda: \"comenta GUIA que eu te mando o material no direct\".",
+     "Os modelos de reel da Ilha têm o componente com o comentário na tela.",
+     "Teste: peça para um amigo comentar e veja a mensagem chegar."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Acompanhe na Ilha",
+    "itens": [
+     "Aba Relacionamento › Atualizar agora.",
+     "Cada automação vira um cartão: comentaram, receberam, leram e clicaram.",
+     "Cruzado com o alcance do post: o problema está no post ou na mensagem?"
+    ],
+    "dica": null
+   }
+  ],
+  "erros": [
+   "Duas automações com a mesma palavra no mesmo post.",
+   "Divulgar sem testar.",
+   "Mandar mensagem para quem não pediu."
+  ],
+  "checklist": [
+   "Conta na Zernio com Instagram profissional",
+   "Conector ligado no Claude",
+   "Automação aprovada",
+   "Chamada no vídeo e na legenda",
+   "Teste feito",
+   "Números na aba Relacionamento"
+  ],
+  "tarefa": "Crie uma automação e teste com um amigo."
+ },
+ "aula-5": {
+  "resultado": "Um roteiro escrito a partir de um formato que já deu certo, com a sua voz, e o Radar para ter pauta todo dia.",
+  "antes": [
+   "A sua Ilha instalada (aula 1).",
+   "Para o garimpo: Zernio conectada com o Instagram ligado pelo Facebook.",
+   "Para o Placar: análise do Instagram ligada (Windsor)."
+  ],
+  "passos": [
+   {
+    "titulo": "Entenda o esqueleto",
+    "itens": [
+     "Todo vídeo que funciona tem gancho, promessa, virada, prova e chamada.",
+     "O Método DEL desmonta essa estrutura de um conteúdo que deu certo.",
+     "Você coloca o seu assunto, a sua história e o seu jeito de falar."
+    ],
+    "dica": "Copie a forma, nunca o conteúdo."
+   },
+   {
+    "titulo": "Escolha um dos 26 formatos",
+    "itens": [
+     "Aba Arsenal › Formatos.",
+     "Cada cartão mostra a ideia, o molde segundo a segundo e um exemplo.",
+     "Clique em Usar este formato."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Crie a sua versão",
+    "itens": [
+     "Em Criar minha versão o formato já vem escolhido.",
+     "Escreva o tema ou cole a notícia e os fatos. Em branco, a Ilha escolhe o melhor tema do seu nicho.",
+     "Escolha a paleta e peça a versão."
+    ],
+    "dica": "Fato que não estava no seu texto sai marcado para conferir. Gostou? Leve para a aba Reels e grave."
+   },
+   {
+    "titulo": "Salve uma referência",
+    "itens": [
+     "Em Referências: link do reel, @ do perfil, visualizações dele e quantas o perfil costuma ter.",
+     "Se puder, cole o que a pessoa fala ou envie uma gravação de tela.",
+     "Clique em Salvar e decompor: a Ilha mostra o esqueleto e você cria a sua versão."
+    ],
+    "dica": "A comparação com o normal do perfil é o que mostra um sucesso de verdade."
+   },
+   {
+    "titulo": "Garimpe automaticamente",
+    "itens": [
+     "No Garimpo, adicione os perfis que acompanha (comece com 5 a 10 do seu nicho e de nichos vizinhos).",
+     "A Ilha procura nos últimos vídeos os que foram muito acima da média de cada perfil."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Use o Radar do momento",
+    "itens": [
+     "Notícias das últimas 72 horas nos seus temas, com fonte conferida, ângulo, formato sugerido e urgência.",
+     "Escolha uma pauta e transforme em carrossel, stories ou reel."
+    ],
+    "dica": null
+   },
+   {
+    "titulo": "Acompanhe o Placar",
+    "itens": [
+     "Mostra os formatos que rendem mais no seu perfil, com os seus números.",
+     "Precisa da análise do Instagram ligada."
+    ],
+    "dica": null
+   }
+  ],
+  "erros": [
+   "Copiar frases da referência.",
+   "Escolher referência pelo número absoluto de views, sem comparar com o normal do perfil.",
+   "Postar fato marcado sem conferir."
+  ],
+  "checklist": [
+   "Formato escolhido",
+   "Versão criada com o seu tema",
+   "Uma referência salva e decomposta",
+   "Perfis no garimpo",
+   "Uma pauta do Radar usada"
+  ],
+  "tarefa": "Por semana: um reel, um carrossel e uma sequência de stories, com uma automação rodando no post da semana."
+ }
+}
