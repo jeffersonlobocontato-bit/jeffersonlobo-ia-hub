@@ -1,6 +1,6 @@
 // Compra direta dos cursos pelo Mercado Pago (Checkout Pro).
 //
-// POST { acao: 'criar', curso, email, nome? }
+// POST { acao: 'criar', curso, email, nome?, origem? }
 //   -> cria o pedido e a preferência no MP com o preço vigente (lote do curso
 //      ou preço fixo do pocket, calculado aqui, nunca vindo do navegador) e
 //      devolve { url } para o
@@ -17,6 +17,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { API_MP, emailValido, montarPreferencia } from '../_shared/mercadopago.ts';
 import { CATALOGO, SITE, precoAtual } from '../_shared/cursos/catalogo.ts';
+import { limparOrigem } from '../_shared/cursos/origem.ts';
 import { processarPagamento } from '../_shared/cursos/pagamento-mp.ts';
 
 const corsHeaders = {
@@ -85,11 +86,19 @@ Deno.serve(async (req) => {
       .gte('created_at', umaHora);
     if ((count ?? 0) >= LIMITE_POR_HORA) return json(429, { erro: 'Muitas tentativas com este e-mail. Espere alguns minutos.' });
 
-    const { data: pedido, error: erroPedido } = await supabase
+    // A origem (canal e campanha) alimenta o painel da Academia. Se a coluna
+    // ainda não existir no banco (migração do painel não aplicada), grava o
+    // pedido sem ela: a venda nunca depende do painel.
+    const novo = { curso_slug: curso, email, nome, lote: preco.lote, valor: preco.preco };
+    const origem = limparOrigem(corpo.origem);
+    let { data: pedido, error: erroPedido } = await supabase
       .from('curso_pedidos')
-      .insert({ curso_slug: curso, email, nome, lote: preco.lote, valor: preco.preco })
+      .insert({ ...novo, origem })
       .select('id')
       .single();
+    if (erroPedido && /origem/.test(erroPedido.message ?? '')) {
+      ({ data: pedido, error: erroPedido } = await supabase.from('curso_pedidos').insert(novo).select('id').single());
+    }
     if (erroPedido || !pedido) throw new Error(`criar pedido: ${erroPedido?.message}`);
 
     const preferencia = montarPreferencia({
