@@ -321,18 +321,21 @@ const Vitrine = () => {
             </div>
           </div>
 
-          {/* o surgir fica no invólucro: o palco usa transform para crescer ao rolar.
-              Com o podcast configurado, ele é o vídeo principal; sem ele, o leque de capas. */}
+          {/* o surgir fica no invólucro: o leque usa transform para crescer ao rolar.
+              Com o podcast configurado, ele ocupa o lugar da primeira capa larga,
+              atrás do livro; no play, vem para a frente. */}
           <div className="e-entra" style={comAtraso("0.65s")}>
-            {ESCOLA.podcast.src ? (
-              <PodcastTopo
-                src={ESCOLA.podcast.src}
-                poster={ESCOLA.podcast.poster || undefined}
-                titulo={ESCOLA.podcast.titulo}
-              />
-            ) : (
-              <div className={`e-leque e-leque--${capas.length}`}>
-                {capas.map((c, i) => (
+            <div className={`e-leque e-leque--${capas.length}`}>
+              {capas.map((c, i) =>
+                i === 0 && c.tipo === "curso" && ESCOLA.podcast.src ? (
+                  <PodcastTopo
+                    key="podcast"
+                    src={ESCOLA.podcast.src}
+                    poster={ESCOLA.podcast.poster || c.src}
+                    titulo={ESCOLA.podcast.titulo}
+                    indice={i}
+                  />
+                ) : (
                   <Link
                     key={c.src}
                     to={c.to}
@@ -343,9 +346,9 @@ const Vitrine = () => {
                   >
                     <img src={c.src} alt={c.alt} loading={i ? "lazy" : "eager"} />
                   </Link>
-                ))}
-              </div>
-            )}
+                ),
+              )}
+            </div>
           </div>
           <div className="e-hero__base" />
         </section>
