@@ -36,6 +36,13 @@
       "when": 1791930962867,
       "tag": "0004_cursos_pockets",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791930998355,
+      "tag": "0005_academia_painel",
+      "breakpoints": true
     }
   ]
 }

@@ -47,6 +47,36 @@ export type Database = {
         }
         Relationships: []
       }
+      academia_investimentos: {
+        Row: {
+          campanha: string | null
+          canal: string
+          created_at: string
+          data: string
+          id: string
+          observacao: string | null
+          valor: number
+        }
+        Insert: {
+          campanha?: string | null
+          canal: string
+          created_at?: string
+          data: string
+          id?: string
+          observacao?: string | null
+          valor: number
+        }
+        Update: {
+          campanha?: string | null
+          canal?: string
+          created_at?: string
+          data?: string
+          id?: string
+          observacao?: string | null
+          valor?: number
+        }
+        Relationships: []
+      }
       academia_leads: {
         Row: {
           consentimento_em: string
@@ -678,6 +708,7 @@ export type Database = {
           id: string
           lote: number | null
           nome: string | null
+          origem: Json
           pagamento_id: string | null
           parcelas: number | null
           preferencia_id: string | null
@@ -696,6 +727,7 @@ export type Database = {
           id?: string
           lote?: number | null
           nome?: string | null
+          origem?: Json
           pagamento_id?: string | null
           parcelas?: number | null
           preferencia_id?: string | null
@@ -714,6 +746,7 @@ export type Database = {
           id?: string
           lote?: number | null
           nome?: string | null
+          origem?: Json
           pagamento_id?: string | null
           parcelas?: number | null
           preferencia_id?: string | null
@@ -2252,6 +2285,7 @@ export type Database = {
       }
     }
     Functions: {
+      academia_canal: { Args: { _origem: string }; Returns: string }
       acesso_ativo_por_email: {
         Args: { _curso: string; _email: string }
         Returns: boolean
@@ -2387,6 +2421,7 @@ export type Database = {
         }
         Returns: number
       }
+      painel_academia: { Args: { p_ate: string; p_de: string }; Returns: Json }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {
