@@ -3,6 +3,7 @@
 // vídeos no Bunny e o ID do produto na Hotmart — fica na tabela curso_config,
 // editável na aba Cursos do /admin.
 import manuais from './ilha-manuais.json';
+import { POCKETS, VALOR_POCKETS, aulaDoPocket } from './pockets';
 
 export type Material = {
   id: string;
@@ -26,8 +27,13 @@ export type Aula = {
   pontos: string[];
   tarefa: string | null;
   materiais: Material[];
-  /** só para o bônus, que não tem vídeo */
+  /** só para o bônus e os pockets, que não têm vídeo */
   semVideo?: boolean;
+  /** cartão do topo de um item sem vídeo (capa, rótulo, título e texto) */
+  destaque?: { imagem: string; kicker: string; titulo: string; texto: string };
+  /** produto dono do material e do Tutor, quando não é o próprio curso
+   *  (os pockets dentro da Ilha: o acesso vem do curso, pela inclusão) */
+  produto?: string;
   manual?: {
     resultado: string;
     antes: string[];
@@ -48,6 +54,7 @@ const manual = (slug: string) => {
 
 export const CURSO_ILHA = {
   slug: 'ilha',
+  tipo: 'curso' as const,
   nome: 'Ilha de Edição completa',
   chamada: 'Agora você faz seu conteúdo sozinho no Claude',
   descricao:
@@ -66,6 +73,8 @@ export const CURSO_ILHA = {
     lote2: '',
   },
   bonus: { nome: 'E-book O código invisível', valor: 47 },
+  /** os 3 pockets também vêm de bônus (acesso pela tabela curso_inclusoes) */
+  bonusPockets: { nome: '3 pockets', valor: VALOR_POCKETS },
   garantiaDias: 7,
   suporteWhatsApp: 'https://wa.me/5545999864213?text=' + encodeURIComponent('Oi, Jefferson! Sou aluno da Ilha de Edição e preciso de ajuda.'),
   // Como o curso aparece na vitrine (/cursos), num card igual ao dos outros cursos.
@@ -73,7 +82,7 @@ export const CURSO_ILHA = {
     capa: '/cursos-ilha/produto-vitrine.jpg',
     pagina: '/cursos/ilha',
     categoria: 'Conteúdo para Instagram',
-    destaques: ['5 aulas com as telas reais', 'Instalador da Ilha e 5 manuais em PDF', 'Tutor IA dentro de cada aula', 'E-book O código invisível de bônus'],
+    destaques: ['5 aulas com as telas reais', 'Instalador da Ilha e 5 manuais em PDF', 'Tutor IA dentro de cada aula', 'De bônus: o e-book O código invisível e os 3 pockets'],
     acento: 'turquesa' as 'turquesa' | 'laranja' | 'azul' | 'verde',
     bonusLivro: true,
   },
@@ -81,6 +90,7 @@ export const CURSO_ILHA = {
     { slug: 'comece-aqui', nome: 'Módulo 1', titulo: 'Comece aqui', capa: '/cursos-ilha/modulos/modulo-1.jpg' },
     { slug: 'quatro-frentes', nome: 'Módulo 2', titulo: 'As quatro frentes', capa: '/cursos-ilha/modulos/modulo-2.jpg' },
     { slug: 'bonus', nome: 'Bônus', titulo: 'O código invisível', capa: '/cursos-ilha/modulos/modulo-3.jpg' },
+    { slug: 'pockets', nome: 'Bônus', titulo: '3 pockets', capa: '/cursos-pockets/pocket-1-capa.jpg' },
   ] satisfies Modulo[],
   aulas: [
     {
@@ -201,6 +211,12 @@ export const CURSO_ILHA = {
       duracao: null,
       capa: '/cursos-ilha/modulos/modulo-3.jpg',
       semVideo: true,
+      destaque: {
+        imagem: '/cursos-ilha/livro-del.webp',
+        kicker: 'Bônus do curso',
+        titulo: 'O código invisível',
+        texto: 'O livro do Método DEL, em PDF, para ler quando quiser.',
+      },
       resumo:
         'O livro do Método DEL: como transformar o jeito como você escreve, argumenta e escolhe palavras em orientações para agentes de IA, como o Claude. Na Aula 5 você usa o DEL para adaptar formatos; aqui está o método inteiro.',
       pontos: [
@@ -211,6 +227,7 @@ export const CURSO_ILHA = {
       tarefa: null,
       materiais: [{ id: 'ebook', nome: 'O código invisível (e-book)', caminho: 'ilha/bonus/o-codigo-invisivel.pdf', tipo: 'pdf' }],
     },
+    ...POCKETS.map((p) => aulaDoPocket(p, true)),
   ] satisfies Aula[],
 };
 
