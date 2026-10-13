@@ -13,7 +13,7 @@ const Termos = () => {
   const raiz = useRef<HTMLDivElement>(null);
   useEscola(raiz);
   const f = ESCOLA.fornecedor;
-  const identificacao = [f.nome, f.documento && `CPF/CNPJ ${f.documento}`, f.endereco, f.email].filter(Boolean).join(' · ');
+  const identificacao = [f.nome, f.documento && `CNPJ ${f.documento}`, f.endereco, f.email].filter(Boolean).join(' · ');
 
   return (
     <div className="escola" ref={raiz}>
