@@ -17,4 +17,13 @@ export const ESCOLA = {
   avisoNovos: 'https://wa.me/5545999864213?text=' + encodeURIComponent('Oi, Jefferson! Quero ser avisado quando sair um curso novo.'),
   /** mostra o card "Novos cursos em breve" no fim do catálogo */
   mostrarEmBreve: true,
+  /** Vídeo principal do topo da vitrine (o podcast da Academia). Com `src`
+   *  preenchido, ele toma o lugar do leque de capas no palco do hero; vazio,
+   *  o leque continua. O vídeo já traz as legendas gravadas, porque começa
+   *  sem som. */
+  podcast: {
+    src: '',
+    poster: '',
+    titulo: 'Podcast da Academia: Jefferson Lobo e a ArretádIA contam como nasceu a Academia jeffersonlobo.tech',
+  },
 };
