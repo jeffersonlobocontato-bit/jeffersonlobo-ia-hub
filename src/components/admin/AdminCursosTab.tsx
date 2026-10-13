@@ -13,12 +13,13 @@ type Acesso = {
   email: string;
   nome: string | null;
   status: 'ativo' | 'revogado';
-  origem: 'hotmart' | 'manual';
+  origem: 'hotmart' | 'manual' | 'mercadopago';
   hotmart_transacao: string | null;
   created_at: string;
 };
 type Pergunta = { id: string; email: string | null; aula_slug: string | null; pergunta: string; resposta: string | null; created_at: string };
 type Evento = { id: string; evento: string | null; email: string | null; acao: string | null; erro: string | null; created_at: string };
+type Pedido = { id: string; email: string; nome: string | null; valor: number; status: string; forma_pagamento: string | null; parcelas: number | null; created_at: string };
 
 const curso = CURSO_ILHA;
 const data = (s: string) => new Date(s).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
@@ -31,6 +32,7 @@ const AdminCursosTab = () => {
   const [config, setConfig] = useState<Record<string, string>>({});
   const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
   const [eventos, setEventos] = useState<Evento[]>([]);
+  const [pedidos, setPedidos] = useState<Pedido[]>([]);
   const [arquivos, setArquivos] = useState<Set<string>>(new Set());
   const [novoEmail, setNovoEmail] = useState('');
   const [novoNome, setNovoNome] = useState('');
@@ -40,17 +42,19 @@ const AdminCursosTab = () => {
   const erro = (titulo: string, e: { message: string } | null) => e && toast({ title: titulo, description: e.message, variant: 'destructive' });
 
   const carregar = async () => {
-    const [a, c, p, ev] = await Promise.all([
+    const [a, c, p, ev, pd] = await Promise.all([
       db.from('curso_acessos').select('*').eq('curso_slug', curso.slug).order('created_at', { ascending: false }),
       db.from('curso_config').select('chave, valor').eq('curso_slug', curso.slug),
       db.from('curso_tutor_mensagens').select('id, email, aula_slug, pergunta, resposta, created_at').eq('curso_slug', curso.slug).order('created_at', { ascending: false }).limit(50),
       db.from('hotmart_eventos').select('id, evento, email, acao, erro, created_at').order('created_at', { ascending: false }).limit(20),
+      db.from('curso_pedidos').select('id, email, nome, valor, status, forma_pagamento, parcelas, created_at').eq('curso_slug', curso.slug).order('created_at', { ascending: false }).limit(40),
     ]);
     erro('Erro ao carregar alunos', a.error);
     setAcessos((a.data ?? []) as Acesso[]);
     setConfig(Object.fromEntries((c.data ?? []).map((r: any) => [r.chave, r.valor])));
     setPerguntas((p.data ?? []) as Pergunta[]);
     setEventos((ev.data ?? []) as Evento[]);
+    setPedidos((pd.data ?? []) as Pedido[]);
 
     const presentes = new Set<string>();
     const pastas = Array.from(new Set(curso.aulas.flatMap((x) => x.materiais.map((m) => m.caminho.split('/').slice(0, -1).join('/')))));
@@ -286,6 +290,41 @@ const AdminCursosTab = () => {
             </div>
           ))}
           {!perguntas.length && <p className="text-sm text-muted-foreground">Nenhuma pergunta ainda.</p>}
+        </div>
+      </Card>
+
+      <Card className="p-5 space-y-3">
+        <h3 className="font-semibold">Pedidos pelo Mercado Pago</h3>
+        <p className="text-xs text-muted-foreground">
+          Cada clique em comprar vira um pedido. Aprovado libera o acesso sozinho; reembolsado ou contestado tira.
+        </p>
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <tbody>
+              {pedidos.map((pd) => (
+                <tr key={pd.id} className="border-t border-border">
+                  <td className="py-2 pr-3 whitespace-nowrap tabular-nums">{data(pd.created_at)}</td>
+                  <td className="py-2 pr-3 break-all">
+                    {pd.email}
+                    {pd.nome ? <span className="text-muted-foreground"> · {pd.nome}</span> : null}
+                  </td>
+                  <td className="py-2 pr-3 whitespace-nowrap tabular-nums">R$ {Number(pd.valor).toFixed(2).replace('.', ',')}</td>
+                  <td className="py-2 pr-3 whitespace-nowrap text-muted-foreground">
+                    {pd.forma_pagamento ?? '-'}
+                    {pd.parcelas && pd.parcelas > 1 ? ` · ${pd.parcelas}x` : ''}
+                  </td>
+                  <td className={`py-2 whitespace-nowrap ${pd.status === 'aprovado' ? 'text-primary font-medium' : pd.status === 'recusado' || pd.status === 'reembolsado' || pd.status === 'contestado' ? 'text-destructive' : 'text-muted-foreground'}`}>
+                    {pd.status}
+                  </td>
+                </tr>
+              ))}
+              {!pedidos.length && (
+                <tr>
+                  <td className="py-4 text-muted-foreground">Nenhum pedido ainda.</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </Card>
 
