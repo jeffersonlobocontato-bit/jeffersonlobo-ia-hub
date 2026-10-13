@@ -8,6 +8,13 @@
       "when": 1791924190202,
       "tag": "0000_academia_leads",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791930919677,
+      "tag": "0001_cursos_plataforma",
+      "breakpoints": true
     }
   ]
 }

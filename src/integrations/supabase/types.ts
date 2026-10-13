@@ -557,6 +557,120 @@ export type Database = {
         }
         Relationships: []
       }
+      curso_acessos: {
+        Row: {
+          created_at: string
+          curso_slug: string
+          email: string
+          hotmart_transacao: string | null
+          id: string
+          nome: string | null
+          observacao: string | null
+          origem: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          curso_slug: string
+          email: string
+          hotmart_transacao?: string | null
+          id?: string
+          nome?: string | null
+          observacao?: string | null
+          origem?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          curso_slug?: string
+          email?: string
+          hotmart_transacao?: string | null
+          id?: string
+          nome?: string | null
+          observacao?: string | null
+          origem?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      curso_config: {
+        Row: {
+          chave: string
+          curso_slug: string
+          updated_at: string
+          valor: string
+        }
+        Insert: {
+          chave: string
+          curso_slug: string
+          updated_at?: string
+          valor?: string
+        }
+        Update: {
+          chave?: string
+          curso_slug?: string
+          updated_at?: string
+          valor?: string
+        }
+        Relationships: []
+      }
+      curso_progresso: {
+        Row: {
+          aula_slug: string
+          concluida_em: string
+          curso_slug: string
+          user_id: string
+        }
+        Insert: {
+          aula_slug: string
+          concluida_em?: string
+          curso_slug: string
+          user_id: string
+        }
+        Update: {
+          aula_slug?: string
+          concluida_em?: string
+          curso_slug?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      curso_tutor_mensagens: {
+        Row: {
+          aula_slug: string | null
+          created_at: string
+          curso_slug: string
+          email: string | null
+          id: string
+          pergunta: string
+          resposta: string | null
+          user_id: string | null
+        }
+        Insert: {
+          aula_slug?: string | null
+          created_at?: string
+          curso_slug: string
+          email?: string | null
+          id?: string
+          pergunta: string
+          resposta?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          aula_slug?: string | null
+          created_at?: string
+          curso_slug?: string
+          email?: string | null
+          id?: string
+          pergunta?: string
+          resposta?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -698,6 +812,45 @@ export type Database = {
           subtitle?: string
           updated_at?: string | null
           updated_by?: string | null
+        }
+        Relationships: []
+      }
+      hotmart_eventos: {
+        Row: {
+          acao: string | null
+          created_at: string
+          curso_slug: string | null
+          email: string | null
+          erro: string | null
+          evento: string | null
+          id: string
+          payload: Json
+          produto_id: string | null
+          transacao: string | null
+        }
+        Insert: {
+          acao?: string | null
+          created_at?: string
+          curso_slug?: string | null
+          email?: string | null
+          erro?: string | null
+          evento?: string | null
+          id?: string
+          payload: Json
+          produto_id?: string | null
+          transacao?: string | null
+        }
+        Update: {
+          acao?: string | null
+          created_at?: string
+          curso_slug?: string | null
+          email?: string | null
+          erro?: string | null
+          evento?: string | null
+          id?: string
+          payload?: Json
+          produto_id?: string | null
+          transacao?: string | null
         }
         Relationships: []
       }
@@ -2120,6 +2273,7 @@ export type Database = {
           titulo: string
         }[]
       }
+      tem_acesso_curso: { Args: { _curso: string }; Returns: boolean }
       update_maturity_respostas: {
         Args: { p_id: string; p_respostas: Json; p_token: string }
         Returns: boolean
