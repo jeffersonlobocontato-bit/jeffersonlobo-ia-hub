@@ -15,6 +15,13 @@
       "when": 1791930919677,
       "tag": "0001_cursos_plataforma",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791930935710,
+      "tag": "0002_cursos_mercadopago",
+      "breakpoints": true
     }
   ]
 }

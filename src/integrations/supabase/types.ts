@@ -567,6 +567,7 @@ export type Database = {
           nome: string | null
           observacao: string | null
           origem: string
+          pedido_id: string | null
           status: string
           updated_at: string
         }
@@ -579,6 +580,7 @@ export type Database = {
           nome?: string | null
           observacao?: string | null
           origem?: string
+          pedido_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -591,6 +593,7 @@ export type Database = {
           nome?: string | null
           observacao?: string | null
           origem?: string
+          pedido_id?: string | null
           status?: string
           updated_at?: string
         }
@@ -614,6 +617,63 @@ export type Database = {
           curso_slug?: string
           updated_at?: string
           valor?: string
+        }
+        Relationships: []
+      }
+      curso_pedidos: {
+        Row: {
+          aprovado_em: string | null
+          created_at: string
+          curso_slug: string
+          email: string
+          forma_pagamento: string | null
+          id: string
+          lote: number | null
+          nome: string | null
+          pagamento_id: string | null
+          parcelas: number | null
+          preferencia_id: string | null
+          provedor: string
+          status: string
+          updated_at: string
+          valor: number
+          valor_pago: number | null
+        }
+        Insert: {
+          aprovado_em?: string | null
+          created_at?: string
+          curso_slug: string
+          email: string
+          forma_pagamento?: string | null
+          id?: string
+          lote?: number | null
+          nome?: string | null
+          pagamento_id?: string | null
+          parcelas?: number | null
+          preferencia_id?: string | null
+          provedor?: string
+          status?: string
+          updated_at?: string
+          valor: number
+          valor_pago?: number | null
+        }
+        Update: {
+          aprovado_em?: string | null
+          created_at?: string
+          curso_slug?: string
+          email?: string
+          forma_pagamento?: string | null
+          id?: string
+          lote?: number | null
+          nome?: string | null
+          pagamento_id?: string | null
+          parcelas?: number | null
+          preferencia_id?: string | null
+          provedor?: string
+          status?: string
+          updated_at?: string
+          valor?: number
+          valor_pago?: number | null
         }
         Relationships: []
       }
@@ -1094,6 +1154,42 @@ export type Database = {
           metadata?: Json | null
           titulo?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      pagamento_eventos: {
+        Row: {
+          acao: string | null
+          created_at: string
+          erro: string | null
+          id: string
+          payload: Json
+          pedido_id: string | null
+          provedor: string
+          recurso_id: string | null
+          tipo: string | null
+        }
+        Insert: {
+          acao?: string | null
+          created_at?: string
+          erro?: string | null
+          id?: string
+          payload?: Json
+          pedido_id?: string | null
+          provedor?: string
+          recurso_id?: string | null
+          tipo?: string | null
+        }
+        Update: {
+          acao?: string | null
+          created_at?: string
+          erro?: string | null
+          id?: string
+          payload?: Json
+          pedido_id?: string | null
+          provedor?: string
+          recurso_id?: string | null
+          tipo?: string | null
         }
         Relationships: []
       }
@@ -2273,6 +2369,7 @@ export type Database = {
           titulo: string
         }[]
       }
+      status_pedido_curso: { Args: { _id: string }; Returns: string }
       tem_acesso_curso: { Args: { _curso: string }; Returns: boolean }
       update_maturity_respostas: {
         Args: { p_id: string; p_respostas: Json; p_token: string }
