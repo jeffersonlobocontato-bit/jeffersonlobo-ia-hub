@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import {
@@ -45,6 +45,37 @@ const atraso = (i: number, passo = 0.08) =>
   ({ ["--d" as string]: `${(i * passo).toFixed(2)}s` }) as React.CSSProperties;
 const comAtraso = (d: string) =>
   ({ ["--d" as string]: d }) as React.CSSProperties;
+
+// Cena de bastidores no card "Novos cursos a caminho": vídeo mudo em loop que
+// só toca enquanto o card está na tela (e não toca para quem pediu menos
+// movimento; aí fica a imagem parada).
+const CenaBastidores = ({ src, poster }: { src: string; poster: string }) => {
+  const video = useRef<HTMLVideoElement>(null);
+  useEffect(() => {
+    const v = video.current;
+    if (!v) return;
+    v.muted = true;
+    if (window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) return;
+    if (!("IntersectionObserver" in window)) {
+      v.play().catch(() => undefined);
+      return;
+    }
+    const obs = new IntersectionObserver(
+      ([e]) => (e.isIntersecting ? v.play().catch(() => undefined) : v.pause()),
+      { threshold: 0.25 },
+    );
+    obs.observe(v);
+    return () => obs.disconnect();
+  }, []);
+  return (
+    <div className="e-card__thumb e-card__thumb--larga e-embreve__cena" aria-hidden>
+      <video ref={video} src={src} poster={poster} muted loop playsInline preload="metadata" />
+      <span className="e-embreve__gravando">
+        <i /> gravando
+      </span>
+    </div>
+  );
+};
 
 const ACENTOS: Record<string, string> = {
   turquesa: "",
@@ -424,9 +455,13 @@ const Vitrine = () => {
                 className="e-card e-card--embreve e-revela"
                 style={atraso(abertos.length + 1)}
               >
-                <span className="e-embreve__icone" aria-hidden>
-                  <Plus size={22} />
-                </span>
+                {ESCOLA.bastidores.src ? (
+                  <CenaBastidores src={ESCOLA.bastidores.src} poster={ESCOLA.bastidores.poster} />
+                ) : (
+                  <span className="e-embreve__icone" aria-hidden>
+                    <Plus size={22} />
+                  </span>
+                )}
                 <span className="e-olho">Em breve</span>
                 <h3 className="e-card__titulo">Novos cursos a caminho</h3>
                 <p className="e-card__texto">

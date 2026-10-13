@@ -520,6 +520,15 @@ html:has(.escola) { scroll-behavior: smooth; scroll-padding-top: 96px; }
 .e-card--embreve .e-card__rodape { margin-top: 10px; padding-top: 10px; }
 .e-embreve__icone { width: 52px; height: 52px; margin-bottom: 18px; border-radius: 16px; display: grid; place-items: center; border: 1px dashed rgb(255 255 255 / 0.25); color: var(--e-texto-3); transition: transform 0.4s var(--e-mola), color 0.3s; }
 .e-card--embreve:hover .e-embreve__icone { transform: rotate(90deg); color: #fff; }
+/* cena de bastidor no card "Novos cursos a caminho" */
+.e-card--embreve:has(.e-embreve__cena) { justify-content: flex-start; }
+.e-embreve__cena { position: relative; border-bottom-style: dashed; background: #000; }
+.e-embreve__cena video { display: block; width: 100%; height: 100%; object-fit: cover; }
+.e-card--embreve .e-embreve__cena { width: calc(100% + 64px); }
+.e-embreve__gravando { position: absolute; top: 14px; left: 14px; display: inline-flex; align-items: center; gap: 7px; padding: 4px 10px 4px 8px; border-radius: 999px; background: rgb(5 5 5 / 0.65); -webkit-backdrop-filter: blur(8px); backdrop-filter: blur(8px); font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #fff; }
+.e-embreve__gravando i { width: 8px; height: 8px; border-radius: 50%; background: #ef4444; box-shadow: 0 0 8px #ef4444; animation: e-pisca 1.2s steps(2, start) infinite; }
+@keyframes e-pisca { to { visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) { .e-embreve__gravando i { animation: none; } }
 
 /* ---------- leque de capas no topo ---------- */
 @keyframes e-flutua { 0%, 100% { translate: 0 0; } 50% { translate: 0 -10px; } }
