@@ -25,6 +25,30 @@
     <priority>0.95</priority>
   </url>
   <url>
+    <loc>https://jeffersonlobo.tech/cursos/pocket/configurei-o-claude-errado</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jeffersonlobo.tech/cursos/pocket/claude-com-a-sua-voz</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jeffersonlobo.tech/cursos/pocket/do-roteiro-a-postagem</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://jeffersonlobo.tech/cursos/privacidade</loc>
+    <lastmod>2026-10-13</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.2</priority>
+  </url>
+  <url>
     <loc>https://jeffersonlobo.tech/blog</loc>
     <lastmod>2026-10-13</lastmod>
     <changefreq>weekly</changefreq>
