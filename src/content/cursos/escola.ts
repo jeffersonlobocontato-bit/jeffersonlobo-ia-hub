@@ -18,9 +18,10 @@ export const ESCOLA = {
   /** mostra o card "Novos cursos em breve" no fim do catálogo */
   mostrarEmBreve: true,
   /** Vídeo principal do topo da vitrine (o podcast da Academia). Com `src`
-   *  preenchido, ele toma o lugar do leque de capas no palco do hero; vazio,
-   *  o leque continua. O vídeo já traz as legendas gravadas, porque começa
-   *  sem som. */
+   *  preenchido, ele ocupa o lugar da capa larga do curso no leque do topo,
+   *  atrás do livro, rodando sem som; no play, vem para a frente do livro e
+   *  toca com som. Vazio, fica a capa. Sem `poster`, usa a capa do curso.
+   *  O vídeo já traz as legendas gravadas, porque começa sem som. */
   podcast: {
     src: '',
     poster: '',
