@@ -420,7 +420,7 @@ html:has(.escola) body { background: #050505; }
 .e-rodape__links { display: flex; flex-wrap: wrap; gap: 8px 22px; font-size: 14px; }
 .e-rodape__links a { text-decoration: none; color: var(--e-texto-4); transition: color 0.2s; }
 .e-rodape__links a:hover { color: #fff; }
-.e-rodape__marca { width: 100%; height: auto; overflow: visible; }
+.e-rodape__marca { width: 33%; min-width: 200px; max-width: 420px; height: auto; overflow: visible; }
 .e-rodape__marca text { font: 600 120px var(--e-sans); letter-spacing: -0.04em; fill: url(#e-grad-marca); fill-opacity: 0; stroke: var(--e-acento-brilho); stroke-width: 1; stroke-opacity: 0.6; stroke-dasharray: 900; stroke-dashoffset: 900; }
 .e-rodape__marca.is-in text { animation: e-desenha 2.6s var(--e-padrao) forwards, e-assenta 1.2s ease 2.2s forwards; }
 .e-rodape__legal { font-size: 12.5px; line-height: 1.6; color: var(--e-texto-4); max-width: 60rem; }
