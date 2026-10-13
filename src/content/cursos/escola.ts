@@ -23,8 +23,8 @@ export const ESCOLA = {
    *  toca com som. Vazio, fica a capa. Sem `poster`, usa a capa do curso.
    *  O vídeo já traz as legendas gravadas, porque começa sem som. */
   podcast: {
-    src: '',
-    poster: '',
-    titulo: 'Podcast da Academia: Jefferson Lobo e a ArretádIA contam como nasceu a Academia jeffersonlobo.tech',
+    src: '/academia/podcast-academia.mp4',
+    poster: '/academia/podcast-academia.jpg',
+    titulo: 'Podcast da Academia: Jefferson Lobo conta como nasceu a Academia jeffersonlobo.tech',
   },
 };
