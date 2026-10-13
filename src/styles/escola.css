@@ -582,3 +582,23 @@ html:has(.escola) { scroll-behavior: smooth; scroll-padding-top: 96px; }
 .e-link { color: var(--e-acento-claro); text-underline-offset: 4px; }
 .e-cab .e-cab__extra { margin-top: 10px; font-size: 15px; }
 @media (prefers-reduced-motion: reduce) { .e-leque { transform: none !important; } .e-leque__item { animation: none !important; } }
+
+/* ---------- termos de uso ---------- */
+.e-termos { position: relative; max-width: 1180px; margin: 0 auto; padding: calc(64px + 56px) 20px 72px; }
+.e-termos__cab { max-width: 46rem; }
+.e-termos__cab p { margin-top: 12px; color: var(--e-texto-4); font-size: 14px; }
+.e-termos__corpo { display: grid; gap: 36px; margin-top: 40px; grid-template-columns: minmax(0, 1fr); }
+@media (min-width: 960px) { .e-termos__corpo { grid-template-columns: 260px minmax(0, 1fr); gap: 56px; } .e-termos__indice { position: sticky; top: 100px; align-self: start; } }
+.e-termos__indice ol { list-style: none; margin: 0; padding: 16px 18px; border-radius: 16px; border: 1px solid var(--e-borda); background: rgb(255 255 255 / 0.02); display: grid; gap: 8px; counter-reset: t; }
+.e-termos__indice li { counter-increment: t; display: grid; grid-template-columns: 24px minmax(0, 1fr); font-size: 13.5px; line-height: 1.4; }
+.e-termos__indice li::before { content: counter(t) '.'; color: var(--e-acento-claro); font-variant-numeric: tabular-nums; }
+.e-termos__indice a { color: var(--e-texto-3); text-decoration: none; transition: color 0.2s; }
+.e-termos__indice a:hover { color: #fff; }
+.e-termos__texto { max-width: 46rem; }
+.e-termos__texto section { padding-block: 22px; border-top: 1px solid var(--e-borda); scroll-margin-top: 100px; }
+.e-termos__texto section:first-child { border-top: 0; padding-top: 0; }
+.e-termos__texto h2 { font-size: 1.2rem; font-weight: 500; letter-spacing: -0.02em; margin-bottom: 10px; }
+.e-termos__texto p { color: var(--e-texto-2); font-size: 15.5px; line-height: 1.7; }
+.e-termos__texto p + p { margin-top: 10px; }
+.e-termos__texto a { color: var(--e-acento-claro); text-underline-offset: 3px; }
+.e-termos__id { font-size: 13.5px !important; color: var(--e-texto-4) !important; }
