@@ -7,24 +7,24 @@ type Props = { onCta?: () => void };
 const EscolaTopo = ({ onCta }: Props) => (
   <header className="e-topo">
     <nav className="e-topo__nav" aria-label="Cursos">
-      <Link to="/cursos" className="e-marca" aria-label="Jefferson Lobo · Cursos">
+      <Link to="/cursos" className="e-marca" aria-label="Academia jeffersonlobo.tech">
         <span className="e-marca__ponto" aria-hidden />
         Jefferson Lobo
-        <small>Cursos</small>
+        <small>Academia</small>
       </Link>
       <div className="e-topo__links">
-        <a href="#catalogo">Catálogo</a>
-        <Link to="/cursos/ilha">Ilha de Edição</Link>
-        <Link to="/livro-del">Livro</Link>
+        <a href="/cursos#catalogo">Cursos</a>
+        <a href="/cursos#livro">Livro</a>
+        <a href="/cursos#como-funciona">Como funciona</a>
         <Link to="/">Site</Link>
       </div>
       <div className="e-topo__acoes">
         <Link to="/cursos/entrar" className="e-btn e-btn--fantasma e-topo__entrar">
           Entrar
         </Link>
-        <Link to="/cursos/ilha" className="e-btn e-btn--cheio" onClick={onCta}>
-          Ver o curso
-        </Link>
+        <a href="/cursos#catalogo" className="e-btn e-btn--cheio" onClick={onCta}>
+          Ver os cursos
+        </a>
       </div>
     </nav>
   </header>

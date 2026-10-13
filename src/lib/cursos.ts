@@ -84,10 +84,29 @@ export function useCursoConfig(curso: string, habilitado: boolean) {
 }
 
 /** Link temporário (1 hora) para baixar um material do bucket privado. */
-export async function linkDoMaterial(caminho: string, nomeArquivo: string) {
-  const { data, error } = await db.storage.from('cursos').createSignedUrl(caminho, 3600, { download: nomeArquivo });
-  if (error || !data?.signedUrl) throw error ?? new Error('sem link');
-  return data.signedUrl;
+/**
+ * Baixa um material do curso pela função curso-material: PDF vem com marca
+ * d'água (e-mail do aluno em cada página); o resto vem por URL assinada.
+ */
+export async function baixarMaterial(curso: string, caminho: string, nomeArquivo: string) {
+  const { data, error } = await db.functions.invoke('curso-material', { body: { curso, caminho } });
+  if (error) throw error;
+  if (data instanceof Blob) {
+    const url = URL.createObjectURL(data);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nomeArquivo;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 60_000);
+    return;
+  }
+  if (data?.url) {
+    window.location.assign(data.url as string);
+    return;
+  }
+  throw new Error('sem material');
 }
 
 export const urlDoVideoBunny = (biblioteca: string, video: string) =>

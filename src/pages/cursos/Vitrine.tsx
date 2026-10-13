@@ -1,170 +1,352 @@
-import { useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
-import { ArrowRight, BookOpen, Check, ChevronDown, GraduationCap, ShieldCheck } from 'lucide-react';
-import { SEO, SITE_URL } from '@/components/SEO';
-import { useTrackCTA } from '@/hooks/useTrackCTA';
-import { CURSO_ILHA, LIVRO_DEL, loteAtual } from '@/content/cursos/ilha';
-import EscolaTopo from '@/components/cursos/escola/EscolaTopo';
-import EscolaRodape from '@/components/cursos/escola/EscolaRodape';
-import BotaoBrilho from '@/components/cursos/escola/BotaoBrilho';
-import { useEscola } from '@/components/cursos/escola/useEscola';
-import '@/styles/escola.css';
+import { useRef } from "react";
+import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
+import {
+  ArrowRight,
+  Bot,
+  ChevronDown,
+  Download,
+  MailCheck,
+  MonitorPlay,
+  Plus,
+  ShieldCheck,
+  TrendingUp,
+} from "lucide-react";
+import { SEO, SITE_URL } from "@/components/SEO";
+import { useTrackCTA } from "@/hooks/useTrackCTA";
+import {
+  CURSOS,
+  LIVRO_DEL,
+  loteAtual,
+  type Curso,
+} from "@/content/cursos/ilha";
+import { ESCOLA } from "@/content/cursos/escola";
+import EscolaTopo from "@/components/cursos/escola/EscolaTopo";
+import EscolaRodape from "@/components/cursos/escola/EscolaRodape";
+import BotaoBrilho from "@/components/cursos/escola/BotaoBrilho";
+import { useEscola } from "@/components/cursos/escola/useEscola";
+import PodcastTopo from "@/components/cursos/escola/PodcastTopo";
+import "@/styles/escola.css";
+
+// Vitrine da escola (/cursos). É um catálogo: o topo, o "como funciona", a
+// garantia e as perguntas valem para todos os cursos; cada curso entra como
+// um card igual aos outros, a partir da lista CURSOS. O que é de um curso só
+// (aulas, telas, comparações) fica na página de vendas daquele curso.
 
 const reais = (n: number) => `R$ ${n}`;
-const fimLote1Curto = new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', timeZone: 'America/Sao_Paulo' }).format(
-  new Date(CURSO_ILHA.precos.fimLote1),
-);
+const diaMes = (iso: string) =>
+  new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "America/Sao_Paulo",
+  }).format(new Date(iso));
+const atraso = (i: number, passo = 0.08) =>
+  ({ ["--d" as string]: `${(i * passo).toFixed(2)}s` }) as React.CSSProperties;
+const comAtraso = (d: string) =>
+  ({ ["--d" as string]: d }) as React.CSSProperties;
 
-// Atraso em cascata para os itens de uma lista que surgem juntos.
-const atraso = (i: number, passo = 0.08) => ({ ['--d' as string]: `${(i * passo).toFixed(2)}s` }) as React.CSSProperties;
-
-const TELAS = [
-  { img: '/cursos-ilha/img/ilha.jpg', nome: 'Galeria de modelos de reels' },
-  { img: '/cursos-ilha/img/carrossel.jpg', nome: 'Criador de carrossel' },
-  { img: '/cursos-ilha/img/stories.jpg', nome: 'Stories animados' },
-  { img: '/cursos-ilha/img/direct.jpg', nome: 'Direct automático e funil' },
-  { img: '/cursos-ilha/img/arsenal.jpg', nome: 'Arsenal de formatos' },
-  { img: '/cursos-ilha/img/editor.jpg', nome: 'Linha do tempo do editor' },
-];
-
-const CHAMADAS: Record<string, string> = {
-  'aula-1': 'A Ilha instalada no seu Claude e o seu primeiro reel editado.',
-  'aula-2': 'De uma notícia ou de um tema seu ao carrossel pronto para postar.',
-  'aula-3': 'A sequência do dia, animada, com a figurinha certa em cada story.',
-  'aula-4': 'Quem comenta a palavra no post recebe o material no direct, na hora.',
-  'aula-5': 'Formatos que já deram certo, desmontados e reescritos com a sua voz.',
-  ebook: 'O livro do Método DEL, em PDF, dentro da área do aluno.',
+const ACENTOS: Record<string, string> = {
+  turquesa: "",
+  laranja: "e-card--laranja",
+  azul: "e-card--azul",
+  verde: "e-card--verde",
 };
 
 const PULSOS = [
-  { left: '8.333%', dur: '3s', delay: '0s' },
-  { left: '41.666%', dur: '5s', delay: '1.5s' },
-  { left: '75%', dur: '4s', delay: '0.5s' },
-  { left: '91.666%', dur: '6s', delay: '2.6s' },
+  { left: "8.333%", dur: "3s", delay: "0s" },
+  { left: "41.666%", dur: "5s", delay: "1.5s" },
+  { left: "75%", dur: "4s", delay: "0.5s" },
+  { left: "91.666%", dur: "6s", delay: "2.6s" },
 ];
+
+const RECURSOS = [
+  {
+    icone: MonitorPlay,
+    titulo: "Aulas curtas, na tela de verdade",
+    texto:
+      "Cada aula mostra o passo a passo na ferramenta real, sem enrolação. Pause e faça junto.",
+  },
+  {
+    icone: Bot,
+    titulo: "Tutor IA em cada aula",
+    texto:
+      "Travou? Pergunte ao Tutor, que responde com base no conteúdo do curso, a qualquer hora.",
+  },
+  {
+    icone: Download,
+    titulo: "Materiais para baixar",
+    texto:
+      "Manuais em PDF, instaladores e modelos ficam junto da aula em que você usa.",
+  },
+  {
+    icone: TrendingUp,
+    titulo: "Seu progresso salvo",
+    texto:
+      "A área do aluno marca as aulas concluídas e te leva direto de onde você parou.",
+  },
+  {
+    icone: MailCheck,
+    titulo: "Entrada só com o e-mail",
+    texto:
+      "Sem senha para decorar: você recebe um link de acesso no e-mail da compra.",
+  },
+  {
+    icone: ShieldCheck,
+    titulo: `${ESCOLA.garantiaDias} dias de garantia`,
+    texto:
+      "Assistiu, testou e não era para você? Peça o reembolso dentro do prazo.",
+  },
+];
+
+function CardCurso({
+  curso,
+  i,
+  onClick,
+}: {
+  curso: Curso;
+  i: number;
+  onClick: () => void;
+}) {
+  const lote = loteAtual(curso);
+  const v = curso.vitrine;
+  const etiqueta =
+    lote.lote === 1
+      ? `Lote 1 até ${diaMes(curso.precos.fimLote1)}`
+      : "Inscrições abertas";
+  return (
+    <article
+      className={`e-card ${ACENTOS[v.acento] ?? ""} e-revela`}
+      style={atraso(i + 1)}
+    >
+      <span className="e-card__feixe" aria-hidden />
+      <span className="e-card__brilho" aria-hidden />
+      <span className="e-card__pontos" aria-hidden />
+      <Link
+        to={v.pagina}
+        className="e-card__thumb e-card__thumb--larga"
+        tabIndex={-1}
+        aria-hidden
+        onClick={onClick}
+      >
+        <img src={v.capa} alt="" width={1600} height={1000} loading="lazy" />
+      </Link>
+      <span className="e-olho">
+        {v.categoria} · {etiqueta}
+      </span>
+      <h3 className="e-card__titulo">
+        <Link to={v.pagina} onClick={onClick}>
+          {curso.nome}
+        </Link>
+      </h3>
+      <p className="e-card__texto">{curso.chamada}.</p>
+      <ul className="e-lista e-lista--pontos">
+        {v.destaques.map((t) => (
+          <li key={t}>
+            <span className="e-ponto" aria-hidden />
+            <span>{t}</span>
+          </li>
+        ))}
+      </ul>
+      <div className="e-card__rodape">
+        <div className="e-preco">
+          <b>{reais(lote.preco)}</b>
+          <span>pagamento único · até 12x</span>
+        </div>
+        <Link to={v.pagina} className="e-btn e-btn--cheio" onClick={onClick}>
+          Ver o curso <ArrowRight size={16} aria-hidden />
+        </Link>
+      </div>
+    </article>
+  );
+}
 
 const Vitrine = () => {
   const raiz = useRef<HTMLDivElement>(null);
   useEscola(raiz);
   const { trackCTA } = useTrackCTA();
-  const lote = loteAtual(CURSO_ILHA);
-  const diferenca = lote.preco - LIVRO_DEL.impresso.preco;
-  const linhaLote = lote.lote === 1 ? `Lote 1 até ${fimLote1Curto}` : 'Pagamento único';
+  const abertos = CURSOS;
+  const comLivro = abertos.filter((c) => c.vitrine.bonusLivro);
 
   const faq = [
     {
-      p: 'Como recebo o acesso ao curso?',
-      r: 'Assim que a Hotmart aprova o pagamento, você recebe um e-mail com o link da área do aluno, aqui no site. Você entra com o mesmo e-mail da compra, sem senha para decorar.',
+      p: "Como recebo o acesso a um curso?",
+      r: "Assim que o pagamento é aprovado (no Pix, em segundos), você recebe um e-mail com o link da área do aluno, aqui no site. Você entra com o e-mail informado na compra, sem senha para decorar.",
     },
-    { p: 'Preciso saber programar?', r: 'Não. Você anexa o instalador no seu Claude e escreve uma frase. Cada aula mostra o passo a passo na tela.' },
     {
-      p: 'Preciso pagar mais alguma coisa?',
-      r: 'Um plano pago do Claude (Pro ou superior). O direct automático usa a Zernio, grátis para até 2 contas. Avatar (HeyGen) e análise do Instagram (Windsor) são opcionais.',
+      p: "Quais são as formas de pagamento?",
+      r: "Pix, boleto ou cartão de crédito em até 12x, na página segura do Mercado Pago. Os dados do cartão não passam por este site.",
     },
-    { p: 'O e-book vem junto com o curso?', r: `Vem. ${LIVRO_DEL.curto} fica em PDF dentro da área do aluno, no módulo Bônus.` },
     {
-      p: 'Posso comprar só o livro?',
-      r: `Pode: o impresso sai por ${reais(LIVRO_DEL.impresso.preco)} + frete e o e-book por ${reais(LIVRO_DEL.ebook.preco)}. O curso já inclui o e-book.`,
+      p: "Preciso de conhecimento técnico?",
+      r: "Cada curso diz, na página dele, o que você precisa antes de começar. Os cursos são feitos para quem quer aplicar, não para programadores.",
     },
-    { p: 'E se eu não gostar?', r: `Você tem ${CURSO_ILHA.garantiaDias} dias de garantia pela Hotmart, com reembolso integral.` },
-    { p: 'Tem suporte?', r: 'Tem. O Tutor IA responde dentro de cada aula, e o suporte humano é pelo WhatsApp.' },
+    {
+      p: "E se eu não gostar?",
+      r: `Você tem ${ESCOLA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só me chamar no WhatsApp.`,
+    },
+    {
+      p: "Posso comprar só o livro?",
+      r: `Pode: o impresso sai por ${reais(LIVRO_DEL.impresso.preco)} + frete e o e-book por ${reais(LIVRO_DEL.ebook.preco)}.${comLivro.length ? ` O e-book também vem de bônus em ${comLivro.map((c) => c.nome).join(", ")}.` : ""}`,
+    },
+    {
+      p: "Por quanto tempo tenho acesso?",
+      r: `Por ${ESCOLA.prazoAcesso} a partir da compra, salvo se a página do curso disser outro prazo. Os arquivos que você baixar ficam com você, com uma marca d'água com o seu e-mail. Os detalhes estão nos termos de uso.`,
+    },
+    {
+      p: "Tem suporte?",
+      r: "Tem. O Tutor IA responde dentro de cada aula, e o suporte humano é pelo WhatsApp.",
+    },
   ];
 
   const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ItemList',
-    name: 'Cursos e livro de Jefferson Lobo',
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Cursos e livro de Jefferson Lobo",
     itemListElement: [
-      {
-        '@type': 'ListItem',
-        position: 1,
+      ...abertos.map((c, i) => ({
+        "@type": "ListItem",
+        position: i + 1,
         item: {
-          '@type': 'Course',
-          name: CURSO_ILHA.nome,
-          description: CURSO_ILHA.descricao,
-          url: `${SITE_URL}/cursos/ilha`,
-          provider: { '@type': 'Person', name: 'Jefferson Lobo', url: SITE_URL },
-          offers: { '@type': 'Offer', price: String(lote.preco), priceCurrency: 'BRL', category: 'Paid' },
+          "@type": "Course",
+          name: c.nome,
+          description: c.descricao,
+          url: `${SITE_URL}${c.vitrine.pagina}`,
+          provider: {
+            "@type": "Person",
+            name: "Jefferson Lobo",
+            url: SITE_URL,
+          },
+          offers: {
+            "@type": "Offer",
+            price: String(loteAtual(c).preco),
+            priceCurrency: "BRL",
+            category: "Paid",
+          },
+        },
+      })),
+      {
+        "@type": "ListItem",
+        position: abertos.length + 1,
+        item: {
+          "@type": "Book",
+          name: LIVRO_DEL.nome,
+          url: `${SITE_URL}${LIVRO_DEL.pagina}`,
         },
       },
-      { '@type': 'ListItem', position: 2, item: { '@type': 'Book', name: LIVRO_DEL.nome, url: `${SITE_URL}${LIVRO_DEL.pagina}` } },
     ],
   };
   const faqLd = {
-    '@context': 'https://schema.org',
-    '@type': 'FAQPage',
-    mainEntity: faq.map((f) => ({ '@type': 'Question', name: f.p, acceptedAnswer: { '@type': 'Answer', text: f.r } })),
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faq.map((f) => ({
+      "@type": "Question",
+      name: f.p,
+      acceptedAnswer: { "@type": "Answer", text: f.r },
+    })),
   };
+
+  // Capas do leque do topo: os cursos e o livro (até 4).
+  const capas = [
+    ...abertos.map((c) => ({
+      src: c.vitrine.capa,
+      alt: c.nome,
+      tipo: "curso",
+      to: c.vitrine.pagina,
+    })),
+    {
+      src: LIVRO_DEL.capa,
+      alt: LIVRO_DEL.curto,
+      tipo: "livro",
+      to: LIVRO_DEL.pagina,
+    },
+  ].slice(0, 4);
 
   return (
     <div className="escola" ref={raiz}>
       <SEO
-        title="Cursos e livro | Jefferson Lobo"
-        description="Ilha de Edição completa: 5 aulas para fazer seu conteúdo sozinho no Claude, com Tutor IA e o e-book O código invisível de bônus. E o livro do Método DEL, avulso."
+        title="Academia jeffersonlobo.tech | Cursos e livro de Jefferson Lobo"
+        description="Cursos práticos de IA aplicada e o livro do Método DEL, de Jefferson Lobo. Aulas curtas, Tutor IA em cada aula e acesso pelo seu e-mail."
         path="/cursos"
-        ogImage={`${SITE_URL}/cursos-ilha/produto-vitrine.jpg`}
+        ogImage={`${SITE_URL}${abertos[0]?.vitrine.capa ?? "/cursos-ilha/produto-vitrine.jpg"}`}
       />
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
         <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
       </Helmet>
 
-      <EscolaTopo onCta={() => trackCTA('vitrine_topo', 'vitrine')} />
+      <EscolaTopo onCta={() => trackCTA("vitrine_topo", "vitrine")} />
 
       <main>
-        {/* Hero */}
+        {/* Hero da escola */}
         <section className="e-hero">
           <div className="e-aura" aria-hidden>
             <div className="e-aura__grade" />
             {PULSOS.map((p) => (
-              <span key={p.left} className="e-pulso-v" style={{ left: p.left, animationDuration: p.dur, animationDelay: p.delay }} />
+              <span
+                key={p.left}
+                className="e-pulso-v"
+                style={{
+                  left: p.left,
+                  animationDuration: p.dur,
+                  animationDelay: p.delay,
+                }}
+              />
             ))}
-            <span className="e-pulso-h" style={{ top: '34%' }} />
+            <span className="e-pulso-h" style={{ top: "34%" }} />
             <div className="e-aura__arco" />
           </div>
 
           <span className="e-selo e-entra" style={atraso(0)}>
             <span className="e-selo__ponto" aria-hidden />
-            Cursos e livro · Jefferson Lobo
+            Academia jeffersonlobo.tech
           </span>
-          <h1 className="e-h1 e-entra" style={{ ['--d' as string]: '0.2s' } as React.CSSProperties}>
+          <h1 className="e-h1 e-entra" style={comAtraso("0.2s")}>
             Faça a IA trabalhar <span className="e-grad">com a sua voz.</span>
           </h1>
-          <p className="e-sub e-entra" style={{ ['--d' as string]: '0.35s' } as React.CSSProperties}>
-            O que eu uso no meu dia a dia, em formato de aula e de livro. Comece pelo curso: o livro já vem junto.
+          <p className="e-sub e-entra" style={comAtraso("0.35s")}>
+            Cursos práticos e o livro do Método DEL para quem cria conteúdo e
+            quer usar a IA no dia a dia, com método e sem promessa fácil.
           </p>
-          <div className="e-hero__acoes e-entra" style={{ ['--d' as string]: '0.5s' } as React.CSSProperties}>
-            <BotaoBrilho to="/cursos/ilha" onClick={() => trackCTA('vitrine_hero', 'vitrine')}>
-              Conhecer o curso
+          <div className="e-hero__acoes e-entra" style={comAtraso("0.5s")}>
+            <BotaoBrilho
+              to="#catalogo"
+              onClick={() => trackCTA("vitrine_hero", "vitrine")}
+            >
+              Ver os cursos
             </BotaoBrilho>
-            <div className="e-fichas" aria-label="O que vem no curso">
-              <span>5 aulas</span>
+            <div className="e-fichas" aria-label="Em todos os cursos">
+              <span>Aulas curtas</span>
               <span>Tutor IA</span>
-              <span>E-book bônus</span>
+              <span>Garantia de {ESCOLA.garantiaDias} dias</span>
             </div>
           </div>
 
-          <Link
-            to="/cursos/ilha"
-            className="e-hero__palco e-entra"
-            style={{ ['--d' as string]: '0.65s' } as React.CSSProperties}
-            onClick={() => trackCTA('vitrine_curso_imagem', 'vitrine')}
-            aria-label={`${CURSO_ILHA.nome}: ver o curso`}
-          >
-            <img src="/cursos-ilha/produto-vitrine.jpg" alt={`${CURSO_ILHA.nome}, curso de Jefferson Lobo`} width={1600} height={1000} />
-            <span className="e-hero__chip">
-              {lote.lote === 1 ? (
-                <>
-                  Lote 1 · <b>{reais(lote.preco)}</b> até {fimLote1Curto}
-                </>
-              ) : (
-                <>
-                  <b>{reais(lote.preco)}</b> · pagamento único
-                </>
-              )}
-            </span>
-          </Link>
+          {/* o surgir fica no invólucro: o palco usa transform para crescer ao rolar.
+              Com o podcast configurado, ele é o vídeo principal; sem ele, o leque de capas. */}
+          <div className="e-entra" style={comAtraso("0.65s")}>
+            {ESCOLA.podcast.src ? (
+              <PodcastTopo
+                src={ESCOLA.podcast.src}
+                poster={ESCOLA.podcast.poster || undefined}
+                titulo={ESCOLA.podcast.titulo}
+              />
+            ) : (
+              <div className={`e-leque e-leque--${capas.length}`}>
+                {capas.map((c, i) => (
+                  <Link
+                    key={c.src}
+                    to={c.to}
+                    className={`e-leque__item e-leque__item--${c.tipo}`}
+                    style={{ ["--i" as string]: i } as React.CSSProperties}
+                    aria-label={c.alt}
+                    onClick={() => trackCTA("vitrine_leque", "vitrine")}
+                  >
+                    <img src={c.src} alt={c.alt} loading={i ? "lazy" : "eager"} />
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
           <div className="e-hero__base" />
         </section>
 
@@ -172,223 +354,149 @@ const Vitrine = () => {
         <section className="e-secao" id="catalogo">
           <div className="e-cab e-revela">
             <span className="e-olho">Catálogo</span>
-            <h2 className="e-h2">Comece pelo curso. O livro já vem junto.</h2>
-            <p>Um curso prático para montar o seu estúdio de conteúdo no Claude e o livro do método por trás dele.</p>
+            <h2 className="e-h2">Cursos</h2>
+            <p>
+              Escolha um curso e veja a página dele: o que você vai aprender, as
+              aulas e o preço.
+            </p>
           </div>
-
-          <div className="e-cards">
-            <article className="e-card e-revela" style={atraso(1)}>
-              <span className="e-card__feixe" aria-hidden />
-              <span className="e-card__brilho" aria-hidden />
-              <span className="e-card__pontos" aria-hidden />
-              <Link to="/cursos/ilha" className="e-card__thumb" tabIndex={-1} aria-hidden onClick={() => trackCTA('vitrine_curso_imagem', 'vitrine')}>
-                <img src="/cursos-ilha/produto-vitrine.jpg" alt="" width={1600} height={1000} loading="lazy" />
-              </Link>
-              <span className="e-olho">Curso · {lote.lote === 1 ? 'Lote 1' : 'Lote 2'}</span>
-              <h3 className="e-card__titulo">
-                <Link to="/cursos/ilha">
-                  {CURSO_ILHA.nome}: {CURSO_ILHA.chamada.charAt(0).toLowerCase() + CURSO_ILHA.chamada.slice(1)}
-                </Link>
-              </h3>
-              <ul className="e-lista">
-                {[
-                  '5 aulas com as telas reais: reels, carrossel, stories, direct automático e formatos',
-                  'Instalador da Ilha para o seu Claude e 5 manuais em PDF',
-                  'Tutor IA que tira suas dúvidas dentro de cada aula',
-                  `Bônus: o e-book ${LIVRO_DEL.curto} (${reais(LIVRO_DEL.ebook.preco)})`,
-                ].map((t) => (
-                  <li key={t}>
-                    <span className="e-check" aria-hidden>
-                      <Check size={12} strokeWidth={3} />
-                    </span>
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <div className="e-card__rodape">
-                <div className="e-preco">
-                  <small>{linhaLote}</small>
-                  <b>{reais(lote.preco)}</b>
-                  <span>curso + e-book · até 12x</span>
+          <div className="e-catalogo">
+            {abertos.map((c, i) => (
+              <CardCurso
+                key={c.slug}
+                curso={c}
+                i={i}
+                onClick={() => trackCTA(`vitrine_curso_${c.slug}`, "vitrine")}
+              />
+            ))}
+            {ESCOLA.mostrarEmBreve && (
+              <article
+                className="e-card e-card--embreve e-revela"
+                style={atraso(abertos.length + 1)}
+              >
+                <span className="e-embreve__icone" aria-hidden>
+                  <Plus size={22} />
+                </span>
+                <span className="e-olho">Em breve</span>
+                <h3 className="e-card__titulo">Novos cursos a caminho</h3>
+                <p className="e-card__texto">
+                  Estou gravando os próximos cursos, no mesmo formato: aulas
+                  curtas, Tutor IA e materiais para baixar.
+                </p>
+                <div className="e-card__rodape">
+                  <a
+                    href={ESCOLA.avisoNovos}
+                    target="_blank"
+                    rel="noopener"
+                    className="e-btn e-btn--fantasma"
+                    onClick={() => trackCTA("vitrine_avisar_novos", "vitrine")}
+                  >
+                    Quero ser avisado
+                  </a>
                 </div>
-                <Link to="/cursos/ilha" className="e-btn e-btn--cheio" onClick={() => trackCTA('vitrine_curso', 'vitrine')}>
-                  Conhecer o curso <ArrowRight size={16} aria-hidden />
-                </Link>
-              </div>
-            </article>
+              </article>
+            )}
+          </div>
+        </section>
 
-            <article className="e-card e-card--laranja e-revela" style={atraso(2)}>
-              <span className="e-card__feixe" aria-hidden />
-              <span className="e-card__brilho" aria-hidden />
-              <span className="e-card__pontos" aria-hidden />
-              <Link to={LIVRO_DEL.pagina} className="e-card__thumb e-card__thumb--livro" tabIndex={-1} aria-hidden>
-                <img src={LIVRO_DEL.capa} alt="" loading="lazy" />
-              </Link>
-              <span className="e-olho">Livro avulso</span>
-              <h3 className="e-card__titulo">
-                <Link to={LIVRO_DEL.pagina}>{LIVRO_DEL.nome}</Link>
-              </h3>
-              <p className="e-card__texto">O Método DEL inteiro: como fazer agentes de IA escreverem com a identidade de uma marca ou de um autor.</p>
-              <div className="e-precos-livro">
+        {/* Livro */}
+        <section className="e-secao" id="livro">
+          <div className="e-livro e-revela">
+            <Link
+              to={LIVRO_DEL.pagina}
+              className="e-livro__capa"
+              aria-label={`Ver o livro ${LIVRO_DEL.curto}`}
+            >
+              <img
+                src={LIVRO_DEL.capa}
+                alt={`Capa do livro ${LIVRO_DEL.curto}`}
+                loading="lazy"
+              />
+            </Link>
+            <div className="e-livro__texto">
+              <span className="e-olho e-olho--laranja">Livro</span>
+              <h2 className="e-h2">{LIVRO_DEL.nome}</h2>
+              <p>
+                O Método DEL inteiro: como fazer agentes de IA escreverem com a
+                identidade de uma marca ou de um autor. É o método por trás dos
+                cursos.
+              </p>
+              <div className="e-livro__precos">
                 <div>
-                  <span>Impresso</span>
+                  <small>Impresso</small>
                   <b>
-                    {reais(LIVRO_DEL.impresso.preco)} <small>+ frete</small>
+                    {reais(LIVRO_DEL.impresso.preco)} <span>+ frete</span>
                   </b>
                 </div>
                 <div>
-                  <span>E-book</span>
+                  <small>E-book</small>
                   <b>{reais(LIVRO_DEL.ebook.preco)}</b>
                 </div>
               </div>
               <div className="e-botoes">
-                <a href={LIVRO_DEL.impresso.url} className="e-btn e-btn--fantasma" onClick={() => trackCTA('vitrine_livro_impresso', 'vitrine')}>
+                <a
+                  href={LIVRO_DEL.impresso.url}
+                  className="e-btn e-btn--laranja"
+                  onClick={() => trackCTA("vitrine_livro_impresso", "vitrine")}
+                >
                   Comprar o impresso
                 </a>
-                <Link to={LIVRO_DEL.pagina} className="e-btn e-btn--link" onClick={() => trackCTA('vitrine_livro_pagina', 'vitrine')}>
+                <a
+                  href={LIVRO_DEL.ebook.url}
+                  className="e-btn e-btn--fantasma e-btn--fantasma-laranja"
+                  onClick={() => trackCTA("vitrine_livro_ebook", "vitrine")}
+                >
+                  Comprar o e-book
+                </a>
+                <Link
+                  to={LIVRO_DEL.pagina}
+                  className="e-btn e-btn--link"
+                  onClick={() => trackCTA("vitrine_livro_pagina", "vitrine")}
+                >
                   Ver o livro <ArrowRight size={15} aria-hidden />
                 </Link>
               </div>
-            </article>
-          </div>
-        </section>
-
-        {/* Telas reais */}
-        <section className="e-secao" style={{ paddingBottom: 0 }}>
-          <div className="e-cab e-cab--centro e-revela">
-            <span className="e-olho">Por dentro da Ilha</span>
-            <h2 className="e-h2">As telas reais do estúdio que você instala.</h2>
-            <p>Reels, carrossel, stories, direct e formatos, rodando no seu Claude, com a sua paleta e a sua voz.</p>
-          </div>
-        </section>
-        <div className="e-faixa e-revela" style={{ paddingBottom: 'clamp(64px, 8vw, 96px)' }}>
-          <div className="e-faixa__trilho">
-            {[...TELAS, ...TELAS].map((t, i) => (
-              <figure className="e-tela" key={`${t.img}-${i}`} aria-hidden={i >= TELAS.length || undefined}>
-                <div className="e-tela__img">
-                  <img src={t.img} alt={i < TELAS.length ? t.nome : ''} loading="lazy" />
-                </div>
-                <figcaption>{t.nome}</figcaption>
-              </figure>
-            ))}
-          </div>
-        </div>
-
-        {/* Aulas */}
-        <section className="e-secao">
-          <div className="e-cab e-revela">
-            <span className="e-olho">O curso</span>
-            <h2 className="e-h2">Cinco aulas curtas e um livro de bônus.</h2>
-            <p>Cada aula mostra a tela de verdade, passo a passo, com manual em PDF e o Tutor IA para tirar dúvidas na hora.</p>
-          </div>
-          <ul className="e-aulas">
-            {CURSO_ILHA.aulas.map((a, i) => (
-              <li key={a.slug} className="e-revela" style={atraso(i % 2)}>
-                <Link to="/cursos/ilha" className="e-aula" onClick={() => trackCTA(`vitrine_aula_${a.slug}`, 'vitrine')}>
-                  <span className="e-aula__thumb">{a.capa && <img src={a.capa} alt="" loading="lazy" />}</span>
-                  <span className="e-aula__corpo">
-                    <span className="e-aula__olho">
-                      {a.numero ? `Aula ${a.numero}` : 'Bônus'}
-                      {a.duracao ? ` · ${a.duracao}` : ' · PDF'}
+              {comLivro.length > 0 && (
+                <p className="e-livro__bonus">
+                  O e-book também vem <b>de bônus</b> em:{" "}
+                  {comLivro.map((c, i) => (
+                    <span key={c.slug}>
+                      {i > 0 && ", "}
+                      <Link to={c.vitrine.pagina}>{c.nome}</Link>
                     </span>
-                    <span className="e-aula__titulo">{a.titulo}</span>
-                    <span className="e-aula__texto">{CHAMADAS[a.slug]}</span>
-                  </span>
-                  <ArrowRight size={18} className="e-aula__seta" aria-hidden />
-                </Link>
+                  ))}
+                  .
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Como funcionam os cursos */}
+        <section className="e-secao" id="como-funciona">
+          <div className="e-cab e-cab--centro e-revela">
+            <span className="e-olho">Em todos os cursos</span>
+            <h2 className="e-h2">Como funcionam os cursos</h2>
+            <p>
+              O mesmo formato em todos: você aprende fazendo, com ajuda quando
+              travar.
+            </p>
+          </div>
+          <ul className="e-recursos">
+            {RECURSOS.map((r, i) => (
+              <li
+                key={r.titulo}
+                className="e-recurso e-revela"
+                style={atraso(i % 3)}
+              >
+                <span className="e-recurso__icone" aria-hidden>
+                  <r.icone size={22} />
+                </span>
+                <h3>{r.titulo}</h3>
+                <p>{r.texto}</p>
               </li>
             ))}
           </ul>
-        </section>
-
-        {/* Comparação */}
-        <section className="e-secao">
-          <div className="e-cab e-cab--centro e-revela">
-            <span className="e-olho">Faça a conta</span>
-            <h2 className="e-h2">Escolha como começar.</h2>
-            <p>O livro sozinho, ou o curso completo com o livro em e-book.</p>
-          </div>
-          <div className="e-planos">
-            <article className="e-plano e-plano--destaque e-revela" style={atraso(1)}>
-              <span className="e-plano__selo">Mais vantajoso</span>
-              <div className="e-plano__topo">
-                <h3>Curso + e-book</h3>
-                <span className="e-plano__icone" aria-hidden>
-                  <GraduationCap size={18} />
-                </span>
-              </div>
-              <div className="e-plano__valor">
-                <b>{reais(lote.preco)}</b>
-                <small>pagamento único</small>
-              </div>
-              <p className="e-plano__nota">{lote.lote === 1 ? `Lote 1 até ${fimLote1Curto} · ` : ''}até 12x no cartão</p>
-              <ul className="e-lista">
-                {[
-                  <>
-                    <b>5 aulas</b> com as telas reais
-                  </>,
-                  <>Instalador da Ilha e 5 manuais em PDF</>,
-                  <>
-                    <b>Tutor IA</b> dentro de cada aula
-                  </>,
-                  <>
-                    E-book <b>{LIVRO_DEL.curto}</b> incluso
-                  </>,
-                  <>Área do aluno com o seu progresso</>,
-                ].map((t, i) => (
-                  <li key={i}>
-                    <span className="e-check" aria-hidden>
-                      <Check size={12} strokeWidth={3} />
-                    </span>
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <Link to="/cursos/ilha" className="e-btn e-btn--principal" onClick={() => trackCTA('vitrine_comparacao', 'vitrine')}>
-                Quero o curso
-              </Link>
-              <p className="e-plano__garantia">Garantia incondicional de {CURSO_ILHA.garantiaDias} dias</p>
-            </article>
-
-            <article className="e-plano e-revela" style={atraso(2)}>
-              <div className="e-plano__topo">
-                <h3>Só o livro impresso</h3>
-                <span className="e-plano__icone" aria-hidden>
-                  <BookOpen size={18} />
-                </span>
-              </div>
-              <div className="e-plano__valor">
-                <b>{reais(LIVRO_DEL.impresso.preco)}</b>
-                <small>+ frete</small>
-              </div>
-              <p className="e-plano__nota">Também em e-book por {reais(LIVRO_DEL.ebook.preco)}</p>
-              <ul className="e-lista">
-                {['O Método DEL completo', 'Edição impressa, entregue em casa', 'Oficina DEL com modelos para montar os seus arquivos'].map((t) => (
-                  <li key={t}>
-                    <span className="e-check" aria-hidden>
-                      <Check size={12} strokeWidth={3} />
-                    </span>
-                    <span>{t}</span>
-                  </li>
-                ))}
-              </ul>
-              <a href={LIVRO_DEL.impresso.url} className="e-btn e-btn--secundario" onClick={() => trackCTA('vitrine_comparacao_livro', 'vitrine')}>
-                Comprar o impresso <ArrowRight size={16} aria-hidden />
-              </a>
-              <p className="e-plano__garantia">Pagamento e entrega pela Hotmart</p>
-            </article>
-          </div>
-          <p className="e-conta e-revela">
-            {diferenca > 0 ? (
-              <>
-                Por <b>{reais(diferenca)} a mais</b> que o livro impresso, você leva as 5 aulas, o instalador, os manuais, o Tutor IA e o livro em
-                e-book, sem frete.
-              </>
-            ) : (
-              <>O curso completo com o e-book sai mais barato que o livro impresso sozinho.</>
-            )}{' '}
-            <Link to="/cursos/ilha">Ver o curso</Link>
-          </p>
         </section>
 
         {/* Garantia */}
@@ -399,37 +507,49 @@ const Vitrine = () => {
               <div className="e-selo-giro__texto">
                 <svg viewBox="0 0 200 200">
                   <defs>
-                    <path id="e-arco-garantia" d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0" />
+                    <path
+                      id="e-arco-garantia"
+                      d="M100,100 m-80,0 a80,80 0 1,1 160,0 a80,80 0 1,1 -160,0"
+                    />
                   </defs>
                   <text>
-                    <textPath href="#e-arco-garantia">Garantia incondicional · Garantia incondicional ·</textPath>
+                    <textPath href="#e-arco-garantia">
+                      Garantia em todos os cursos · Garantia em todos os cursos
+                      ·
+                    </textPath>
                   </text>
                 </svg>
               </div>
               <div className="e-selo-giro__miolo">
                 <ShieldCheck size={34} />
-                <b>{CURSO_ILHA.garantiaDias} dias</b>
+                <b>{ESCOLA.garantiaDias} dias</b>
               </div>
             </div>
             <div>
               <span className="e-olho">Risco zero</span>
-              <h2>{CURSO_ILHA.garantiaDias} dias de garantia incondicional</h2>
+              <h2>{ESCOLA.garantiaDias} dias de garantia em todos os cursos</h2>
               <p>
-                Você tem <b>{CURSO_ILHA.garantiaDias} dias depois da compra</b> para assistir às aulas, instalar a Ilha e testar. Se não for para você,
-                é só pedir o reembolso na Hotmart. Sem burocracia.
+                Você tem <b>{ESCOLA.garantiaDias} dias depois da compra</b> para
+                assistir, testar e decidir. Se não for para você, é só pedir o
+                reembolso. Sem burocracia.
               </p>
               <div className="e-passos">
                 <div>
                   <small>01</small>
-                  <span>Compre e receba o acesso por e-mail assim que o pagamento for aprovado</span>
+                  <span>
+                    Compre e receba o acesso por e-mail assim que o pagamento
+                    for aprovado
+                  </span>
                 </div>
                 <div>
                   <small>02</small>
-                  <span>Assista, instale e use por {CURSO_ILHA.garantiaDias} dias</span>
+                  <span>Assista e aplique por {ESCOLA.garantiaDias} dias</span>
                 </div>
                 <div>
                   <small>03</small>
-                  <span>Não gostou? Peça o reembolso pela Hotmart e receba 100% de volta</span>
+                  <span>
+                    Não gostou? Peça o reembolso e receba 100% de volta
+                  </span>
                 </div>
               </div>
             </div>
@@ -443,15 +563,20 @@ const Vitrine = () => {
               <span className="e-olho">Dúvidas</span>
               <h2 className="e-h2">Perguntas frequentes. Respostas diretas.</h2>
               <p>
-                Ainda ficou alguma dúvida?{' '}
-                <a href={CURSO_ILHA.suporteWhatsApp} target="_blank" rel="noopener" style={{ color: 'var(--e-acento-claro)', textUnderlineOffset: 4 }}>
+                Ainda ficou alguma dúvida?{" "}
+                <a
+                  href={ESCOLA.whatsapp}
+                  target="_blank"
+                  rel="noopener"
+                  className="e-link"
+                >
                   Fale comigo no WhatsApp
                 </a>
                 .
               </p>
-              <p style={{ marginTop: 10, fontSize: 15 }}>
-                Já é aluno?{' '}
-                <Link to="/cursos/entrar" style={{ color: 'var(--e-acento-claro)', textUnderlineOffset: 4 }}>
+              <p className="e-cab__extra">
+                Já é aluno?{" "}
+                <Link to="/cursos/entrar" className="e-link">
                   Entrar na área do aluno
                 </Link>
               </p>

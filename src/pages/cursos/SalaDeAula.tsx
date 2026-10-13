@@ -5,7 +5,7 @@ import { ArrowRight, Check, ChevronDown, Download, LifeBuoy, LogOut } from 'luci
 import { SEO } from '@/components/SEO';
 import { useAuth } from '@/hooks/useAuth';
 import { aulasComVideo, cursoPorSlug, type Aula, type Material } from '@/content/cursos/ilha';
-import { linkDoMaterial, modoDemo, urlDoVideoBunny, useAcessoCurso, useCursoConfig, useProgresso } from '@/lib/cursos';
+import { baixarMaterial, modoDemo, urlDoVideoBunny, useAcessoCurso, useCursoConfig, useProgresso } from '@/lib/cursos';
 import TutorChat from '@/components/cursos/TutorChat';
 import '@/styles/cursos-area.css';
 
@@ -27,14 +27,14 @@ const Tela = ({ children }: { children: React.ReactNode }) => (
 
 const nomeDaAula = (a: Aula) => (a.numero ? `Aula ${a.numero} · ${a.titulo}` : a.titulo);
 
-function MaterialItem({ m }: { m: Material }) {
+function MaterialItem({ m, curso }: { m: Material; curso: string }) {
   const [baixando, setBaixando] = useState(false);
   const baixar = async () => {
     if (modoDemo()) return toast('No modo demonstração o download fica desligado.');
     setBaixando(true);
     try {
       const nome = m.caminho.split('/').pop() ?? m.nome;
-      window.location.assign(await linkDoMaterial(m.caminho, nome));
+      await baixarMaterial(curso, m.caminho, nome);
     } catch {
       toast.error('Este material ainda não está disponível. Avise o suporte.');
     } finally {
@@ -263,7 +263,7 @@ const SalaDeAula = () => {
               <h2>Materiais</h2>
               <div className="i-materiais">
                 {aula.materiais.map((m) => (
-                  <MaterialItem key={m.id} m={m} />
+                  <MaterialItem key={m.id} m={m} curso={curso.slug} />
                 ))}
               </div>
             </section>
@@ -320,7 +320,7 @@ const SalaDeAula = () => {
           )}
 
           <p className="i-faint" style={{ fontSize: '.85rem', paddingBottom: '4rem' }}>
-            Garantia de {curso.garantiaDias} dias pela Hotmart. Claude é um produto da Anthropic; este curso não tem vínculo com a Anthropic.
+            Garantia de {curso.garantiaDias} dias. Claude é um produto da Anthropic; este curso não tem vínculo com a Anthropic.
           </p>
         </main>
       </div>
