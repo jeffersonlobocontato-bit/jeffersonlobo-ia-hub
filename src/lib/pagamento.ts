@@ -1,4 +1,5 @@
 import { db } from '@/lib/cursos';
+import { origemParaConversao } from '@/lib/traffic-source';
 
 // Compra direta pelo Mercado Pago (edge function mercadopago-checkout).
 // O preço é calculado no servidor; aqui só mandamos curso, e-mail e nome.
@@ -38,7 +39,7 @@ async function mensagemDoErro(error: unknown): Promise<string | null> {
 
 export async function criarCompra(curso: string, email: string, nome: string): Promise<RespostaCompra> {
   const { data, error } = await db.functions.invoke('mercadopago-checkout', {
-    body: { acao: 'criar', curso, email: email.trim().toLowerCase(), nome: nome.trim() || undefined },
+    body: { acao: 'criar', curso, email: email.trim().toLowerCase(), nome: nome.trim() || undefined, origem: origemParaConversao() },
   });
   if (error) {
     const msg = await mensagemDoErro(error);

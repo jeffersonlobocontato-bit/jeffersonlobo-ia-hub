@@ -7,6 +7,7 @@ import { useTrackCTA } from '@/hooks/useTrackCTA';
 import { SITE_URL } from '@/components/SEO';
 import { ISCA_SKILLS as ISCA } from '@/content/cursos/iscas';
 import { VERSAO_PRIVACIDADE } from '@/content/cursos/privacidade';
+import { origemParaConversao } from '@/lib/traffic-source';
 
 // E-book gratuito na vitrine (/cursos#ebook-gratis): captura nome, e-mail e
 // WhatsApp (obrigatório) com consentimento para comunicações e remarketing,
@@ -18,21 +19,6 @@ const ERROS: Record<string, string> = {
   email_invalido: 'Confira o e-mail.',
   whatsapp_invalido: 'Confira o WhatsApp, com DDD.',
 };
-
-const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
-
-function origemDaVisita() {
-  const q = new URLSearchParams(window.location.search);
-  const origem: Record<string, string> = {};
-  for (const k of UTM) {
-    const v = q.get(k);
-    if (v) origem[k] = v.slice(0, 200);
-  }
-  if (document.referrer && !document.referrer.startsWith(window.location.origin)) {
-    origem.referrer = document.referrer.slice(0, 200);
-  }
-  return origem;
-}
 
 const hoje = () => new Date().toISOString().slice(0, 10);
 
@@ -89,7 +75,7 @@ export default function IscaEbook() {
       p_whatsapp: zap,
       p_material: ISCA.material,
       p_politica_versao: VERSAO_PRIVACIDADE,
-      p_origem: origemDaVisita(),
+      p_origem: origemParaConversao(),
     });
     if (error) {
       setEnviando(false);

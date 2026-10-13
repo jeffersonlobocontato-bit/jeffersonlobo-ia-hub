@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { Check, ExternalLink, RotateCcw, Upload, UserPlus, X } from 'lucide-react';
+import { BarChart3, Check, ExternalLink, RotateCcw, Upload, UserPlus, X } from 'lucide-react';
 import { db } from '@/lib/cursos';
 import AdminLeadsAcademia from './AdminLeadsAcademia';
 import { PRODUTOS, produtoPorSlug } from '@/content/cursos/produtos';
@@ -42,7 +42,9 @@ const data = (s: string) => new Date(s).toLocaleString('pt-BR', { dateStyle: 'sh
 
 // Aba "Cursos" do /admin: alunos, configuração (Hotmart e vídeos do Bunny),
 // materiais do bucket privado, perguntas ao Tutor e eventos da Hotmart.
-const AdminCursosTab = () => {
+// Dentro do Painel da Academia (/cursos/painel) aparece sem o atalho para o
+// painel e sem a lista de leads, que lá tem aba própria.
+const AdminCursosTab = ({ dentroDoPainel = false }: { dentroDoPainel?: boolean }) => {
   const { toast } = useToast();
   // produto em foco: o curso ou um dos pockets (cada um tem alunos, pedidos e materiais próprios)
   const [slug, setSlug] = useState('ilha');
@@ -148,6 +150,19 @@ const AdminCursosTab = () => {
 
   return (
     <div className="space-y-6">
+      {!dentroDoPainel && (
+        <Card className="p-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="font-semibold">Painel da Academia</p>
+            <p className="text-sm text-muted-foreground">Tráfego orgânico e pago, vendas, leads, investimento em anúncios e status do sistema num lugar só.</p>
+          </div>
+          <Button asChild>
+            <a href="/cursos/painel" target="_blank" rel="noopener">
+              <BarChart3 className="w-4 h-4 mr-2" /> Abrir o painel
+            </a>
+          </Button>
+        </Card>
+      )}
       <div className="flex flex-wrap gap-2" role="tablist" aria-label="Produto">
         {PRODUTOS.map((p) => (
           <Button
@@ -418,7 +433,7 @@ const AdminCursosTab = () => {
         </div>
       </Card>
 
-      <AdminLeadsAcademia />
+      {!dentroDoPainel && <AdminLeadsAcademia />}
     </div>
   );
 };

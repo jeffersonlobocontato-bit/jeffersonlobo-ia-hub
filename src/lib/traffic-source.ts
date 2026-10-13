@@ -9,7 +9,7 @@ export interface TrafficAttribution {
   utm_content: string | null;
   referrer: string | null;
   referrer_domain: string | null;
-  traffic_source: string; // direct | organic | social | referral | paid | email
+  traffic_source: string; // direct | organic | ai | social | referral | paid | email
   landing_page: string;
 }
 
@@ -27,7 +27,11 @@ const SOCIAL_DOMAINS = [
   'telegram.org', 't.me',
   'reddit.com', 'pinterest.com', 'threads.net', 'bsky.app',
 ];
-const PAID_MEDIUMS = ['cpc', 'ppc', 'paid', 'paidsocial', 'paid-social', 'ads', 'display'];
+const PAID_MEDIUMS = ['cpc', 'ppc', 'cpm', 'cpv', 'paid', 'paidsocial', 'paid-social', 'paid_social', 'paidsearch', 'paid-search', 'paid_search', 'ads', 'ad', 'display', 'sponsored'];
+// Identificadores de clique que as plataformas de anúncio acrescentam ao link.
+const CLICK_IDS = ['gclid', 'gbraid', 'wbraid', 'fbclid', 'msclkid', 'ttclid', 'li_fat_id', 'twclid'];
+// Respostas de assistentes de IA (busca por IA), separadas da busca comum.
+const AI_DOMAINS = ['chatgpt.com', 'chat.openai.com', 'perplexity.ai', 'gemini.google.com', 'copilot.microsoft.com', 'claude.ai', 'you.com', 'meta.ai', 'grok.com'];
 
 const domainOf = (url: string): string | null => {
   try {
@@ -40,6 +44,7 @@ const domainOf = (url: string): string | null => {
 const classify = (params: URLSearchParams, refDomain: string | null, currentHost: string): string => {
   const utmMedium = (params.get('utm_medium') || '').toLowerCase();
   const utmSource = (params.get('utm_source') || '').toLowerCase();
+  if (CLICK_IDS.some((k) => params.has(k))) return 'paid';
   if (utmMedium || utmSource) {
     if (PAID_MEDIUMS.includes(utmMedium)) return 'paid';
     if (utmMedium === 'email') return 'email';
@@ -50,6 +55,7 @@ const classify = (params: URLSearchParams, refDomain: string | null, currentHost
   }
   if (!refDomain) return 'direct';
   if (refDomain === currentHost) return 'direct'; // navegação interna não conta
+  if (AI_DOMAINS.some((s) => refDomain === s || refDomain.endsWith('.' + s))) return 'ai';
   if (SEARCH_ENGINES.some((s) => refDomain.includes(s))) return 'organic';
   if (SOCIAL_DOMAINS.some((s) => refDomain === s || refDomain.endsWith('.' + s))) return 'social';
   return 'referral';
@@ -84,8 +90,61 @@ export const getTrafficAttribution = (): TrafficAttribution => {
 
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(attribution));
+    // Guarda a última origem que não foi "direto" por 30 dias: quem volta
+    // digitando o endereço para comprar ainda conta para o canal que trouxe.
+    if (attribution.traffic_source !== 'direct') {
+      localStorage.setItem(ULTIMA_KEY, JSON.stringify({ ...attribution, em: Date.now() }));
+    }
   } catch {
     /* ignore */
   }
   return attribution;
+};
+
+const ULTIMA_KEY = 'analytics_ultima_origem';
+const TRINTA_DIAS = 30 * 24 * 3600 * 1000;
+
+export type OrigemConversao = {
+  canal: string;
+  utm_source?: string;
+  utm_medium?: string;
+  utm_campaign?: string;
+  utm_content?: string;
+  utm_term?: string;
+  referrer_domain?: string;
+  landing_page?: string;
+  sessao?: string;
+};
+
+/** Origem para gravar num lead ou numa compra: a da sessão atual ou, se ela
+ *  for "direto", a última origem não direta dos últimos 30 dias. */
+export const origemParaConversao = (): OrigemConversao => {
+  let a: (TrafficAttribution & { em?: number }) | null = null;
+  try {
+    a = getTrafficAttribution();
+    if (a.traffic_source === 'direct') {
+      const guardada = JSON.parse(localStorage.getItem(ULTIMA_KEY) || 'null');
+      if (guardada && Date.now() - Number(guardada.em ?? 0) < TRINTA_DIAS) a = guardada;
+    }
+  } catch {
+    /* sem armazenamento: segue com o que tiver */
+  }
+  const limpa = (v: string | null | undefined) => (v ? v.slice(0, 200) : undefined);
+  let sessao: string | undefined;
+  try {
+    sessao = sessionStorage.getItem('analytics_session_id') ?? undefined;
+  } catch {
+    /* ignore */
+  }
+  return {
+    canal: a?.traffic_source ?? 'direct',
+    utm_source: limpa(a?.utm_source),
+    utm_medium: limpa(a?.utm_medium),
+    utm_campaign: limpa(a?.utm_campaign),
+    utm_content: limpa(a?.utm_content),
+    utm_term: limpa(a?.utm_term),
+    referrer_domain: limpa(a?.referrer_domain),
+    landing_page: limpa(a?.landing_page),
+    sessao,
+  };
 };
