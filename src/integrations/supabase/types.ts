@@ -650,6 +650,24 @@ export type Database = {
         }
         Relationships: []
       }
+      curso_inclusoes: {
+        Row: {
+          created_at: string
+          curso_slug: string
+          inclui_slug: string
+        }
+        Insert: {
+          created_at?: string
+          curso_slug: string
+          inclui_slug: string
+        }
+        Update: {
+          created_at?: string
+          curso_slug?: string
+          inclui_slug?: string
+        }
+        Relationships: []
+      }
       curso_pedidos: {
         Row: {
           aprovado_em: string | null
@@ -2234,6 +2252,10 @@ export type Database = {
       }
     }
     Functions: {
+      acesso_ativo_por_email: {
+        Args: { _curso: string; _email: string }
+        Returns: boolean
+      }
       create_maturity_lead: {
         Args: {
           p_email: string
