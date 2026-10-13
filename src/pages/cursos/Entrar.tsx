@@ -82,7 +82,9 @@ const Entrar = () => {
             </>
           ) : (
             <>
-              <h1>Entre com o e-mail da sua compra.</h1>
+              <h1>
+                Entre com o <span style={{ whiteSpace: 'nowrap' }}>e-mail</span> da sua compra.
+              </h1>
               <p className="i-muted">
                 {comSenha ? 'Use a senha que você criou.' : 'Você recebe um link de acesso na hora. Sem senha para decorar.'}
               </p>
