@@ -748,3 +748,4 @@ html:has(.escola) { scroll-behavior: smooth; scroll-padding-top: 96px; }
 .e-isca__ok { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 50%; background: rgb(20 184 166 / 0.16); border: 1px solid rgb(45 212 191 / 0.5); color: var(--e-acento-claro); }
 .e-isca__depois { font-size: 13.5px; }
 @media (prefers-reduced-motion: reduce) { .e-isca__visual img, .e-isca:hover .e-isca__visual img { transition: none; transform: rotate(-4deg); } .e-gira { animation: none; } }
+.e-campo small { font-size: 12px; color: var(--e-texto-4); }
