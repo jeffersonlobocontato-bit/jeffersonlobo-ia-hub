@@ -43,6 +43,13 @@
       "when": 1791930998355,
       "tag": "0005_academia_painel",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791931175437,
+      "tag": "0006_fix_product_cases_bucket_policy",
+      "breakpoints": true
     }
   ]
 }
