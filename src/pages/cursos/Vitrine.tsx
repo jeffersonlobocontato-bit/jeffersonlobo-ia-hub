@@ -25,6 +25,7 @@ import EscolaTopo from "@/components/cursos/escola/EscolaTopo";
 import EscolaRodape from "@/components/cursos/escola/EscolaRodape";
 import BotaoBrilho from "@/components/cursos/escola/BotaoBrilho";
 import { useEscola } from "@/components/cursos/escola/useEscola";
+import PodcastTopo from "@/components/cursos/escola/PodcastTopo";
 import "@/styles/escola.css";
 
 // Vitrine da escola (/cursos). É um catálogo: o topo, o "como funciona", a
@@ -320,22 +321,31 @@ const Vitrine = () => {
             </div>
           </div>
 
-          {/* o surgir fica no invólucro: o leque usa transform para crescer ao rolar */}
+          {/* o surgir fica no invólucro: o palco usa transform para crescer ao rolar.
+              Com o podcast configurado, ele é o vídeo principal; sem ele, o leque de capas. */}
           <div className="e-entra" style={comAtraso("0.65s")}>
-            <div className={`e-leque e-leque--${capas.length}`}>
-              {capas.map((c, i) => (
-                <Link
-                  key={c.src}
-                  to={c.to}
-                  className={`e-leque__item e-leque__item--${c.tipo}`}
-                  style={{ ["--i" as string]: i } as React.CSSProperties}
-                  aria-label={c.alt}
-                  onClick={() => trackCTA("vitrine_leque", "vitrine")}
-                >
-                  <img src={c.src} alt={c.alt} loading={i ? "lazy" : "eager"} />
-                </Link>
-              ))}
-            </div>
+            {ESCOLA.podcast.src ? (
+              <PodcastTopo
+                src={ESCOLA.podcast.src}
+                poster={ESCOLA.podcast.poster || undefined}
+                titulo={ESCOLA.podcast.titulo}
+              />
+            ) : (
+              <div className={`e-leque e-leque--${capas.length}`}>
+                {capas.map((c, i) => (
+                  <Link
+                    key={c.src}
+                    to={c.to}
+                    className={`e-leque__item e-leque__item--${c.tipo}`}
+                    style={{ ["--i" as string]: i } as React.CSSProperties}
+                    aria-label={c.alt}
+                    onClick={() => trackCTA("vitrine_leque", "vitrine")}
+                  >
+                    <img src={c.src} alt={c.alt} loading={i ? "lazy" : "eager"} />
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
           <div className="e-hero__base" />
         </section>
