@@ -303,6 +303,7 @@ function writeLlmsTxt(blogPosts: BlogPostRow[]) {
   lines.push('');
   lines.push('## Recursos gratuitos');
   lines.push('');
+  lines.push(`- [E-book grátis: 50 skills do Claude](${BASE_URL}/cursos#ebook-gratis): guia da Academia jeffersonlobo.tech com 50 skills do Claude para quem cria conteúdo, vende e organiza o trabalho sem programar, com onde cada uma funciona, como instalar e um exemplo de pedido.`);
   lines.push(`- [Teste de Maturidade em IA](${BASE_URL}/teste-ia): diagnóstico gratuito do nível de maturidade em IA de uma empresa ou profissional, com relatório em PDF.`);
   lines.push('');
   lines.push('## Imprensa');
@@ -369,6 +370,7 @@ async function main() {
     { path: "/cursos/pocket/configurei-o-claude-errado", lastmod: today, changefreq: "monthly", priority: "0.8" },
     { path: "/cursos/pocket/claude-com-a-sua-voz", lastmod: today, changefreq: "monthly", priority: "0.8" },
     { path: "/cursos/pocket/do-roteiro-a-postagem", lastmod: today, changefreq: "monthly", priority: "0.8" },
+    { path: "/cursos/privacidade", lastmod: today, changefreq: "yearly", priority: "0.2" },
     { path: "/blog", lastmod: today, changefreq: "weekly", priority: "0.9" },
     { path: "/palestras-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/palestrante-inteligencia-artificial", lastmod: today, changefreq: "monthly", priority: "0.95" },

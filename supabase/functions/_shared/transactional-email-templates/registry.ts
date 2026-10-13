@@ -13,10 +13,12 @@ import { template as briefingInternalNotification } from './briefing-internal-no
 import { template as briefingLeadConfirmation } from './briefing-lead-confirmation.tsx'
 import { template as cursoAcessoLiberado } from './curso-acesso-liberado.tsx'
 import { template as pocketAcessoLiberado } from './pocket-acesso-liberado.tsx'
+import { template as ebookSkillsEntrega } from './ebook-skills-entrega.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'briefing-internal-notification': briefingInternalNotification,
   'briefing-lead-confirmation': briefingLeadConfirmation,
   'curso-acesso-liberado': cursoAcessoLiberado,
   'pocket-acesso-liberado': pocketAcessoLiberado,
+  'ebook-skills-entrega': ebookSkillsEntrega,
 }

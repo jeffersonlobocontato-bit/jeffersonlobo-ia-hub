@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Check, ExternalLink, RotateCcw, Upload, UserPlus, X } from 'lucide-react';
 import { db } from '@/lib/cursos';
+import AdminLeadsAcademia from './AdminLeadsAcademia';
 import { PRODUTOS, produtoPorSlug } from '@/content/cursos/produtos';
 
 type Acesso = {
@@ -416,6 +417,8 @@ const AdminCursosTab = () => {
           </table>
         </div>
       </Card>
+
+      <AdminLeadsAcademia />
     </div>
   );
 };
