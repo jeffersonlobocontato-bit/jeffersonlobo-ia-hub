@@ -7,7 +7,7 @@ import type { Secao } from './termos';
 // Ao mudar algo relevante, atualize VERSAO_PRIVACIDADE e PRIVACIDADE_ATUALIZADA_EM:
 // a versão aceita fica gravada em cada cadastro.
 
-export const VERSAO_PRIVACIDADE = '1.0';
+export const VERSAO_PRIVACIDADE = '1.1';
 export const PRIVACIDADE_ATUALIZADA_EM = '13 de outubro de 2026';
 
 const f = ESCOLA.fornecedor;
@@ -25,7 +25,7 @@ export const PRIVACIDADE: Secao[] = [
     id: 'dados',
     titulo: '2. Que dados coletamos',
     paragrafos: [
-      'Pedimos só o necessário: nome, e-mail e, se você quiser, o WhatsApp. Junto, registramos qual material você pediu, a data e a hora do cadastro, a versão desta política que você aceitou e de onde veio a visita (os parâmetros de campanha do link, como utm_source, e a página anterior).',
+      'Pedimos só o necessário: nome, e-mail e WhatsApp. Junto, registramos qual material você pediu, a data e a hora do cadastro, a versão desta política que você aceitou e de onde veio a visita (os parâmetros de campanha do link, como utm_source, e a página anterior).',
       'Não pedimos CPF, endereço, dados de pagamento nem dados sensíveis. O material é destinado a maiores de 18 anos.',
     ],
   },
@@ -34,7 +34,7 @@ export const PRIVACIDADE: Secao[] = [
     titulo: '3. Para que usamos',
     paragrafos: [
       'Para enviar o material que você pediu, no seu e-mail.',
-      'Para mandar, por e-mail e, se você informou, por WhatsApp, conteúdos, novos materiais, avisos de cursos e ofertas da Academia.',
+      'Para mandar, por e-mail e por WhatsApp, conteúdos, atualizações dos materiais (como a lista de skills), avisos de cursos e ofertas da Academia.',
       'Para remarketing: mostrar anúncios da Academia para você em plataformas como Meta (Instagram e Facebook) e Google. Para isso, o e-mail e o telefone são enviados a essas plataformas em formato criptografado (hash), só para formar públicos de anúncio. A plataforma não recebe o seu nome nem o material que você baixou.',
       'Para saber quais canais e campanhas trazem pessoas à Academia, a partir da origem da visita.',
     ],
