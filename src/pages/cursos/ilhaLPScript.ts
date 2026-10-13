@@ -8,6 +8,8 @@ type Config = {
   fimLote1: string;
   precos: { lote1: number; lote2: number };
   bonusValor: number;
+  /** Compra direta (Mercado Pago): os botões abrem a janela de compra. */
+  aoComprar?: () => void;
 };
 
 export function iniciarLP(raiz: HTMLElement, cfg: Config) {
@@ -69,6 +71,11 @@ export function iniciarLP(raiz: HTMLElement, cfg: Config) {
   const aoClicar = (e: MouseEvent) => {
     const a = (e.target as HTMLElement).closest('[data-checkout]');
     if (!a) return;
+    if (cfg.aoComprar) {
+      e.preventDefault();
+      cfg.aoComprar();
+      return;
+    }
     const link = depois() ? cfg.checkout.lote2 : cfg.checkout.lote1;
     if (link) return;
     e.preventDefault();

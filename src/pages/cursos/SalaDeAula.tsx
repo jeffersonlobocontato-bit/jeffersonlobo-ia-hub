@@ -320,7 +320,7 @@ const SalaDeAula = () => {
           )}
 
           <p className="i-faint" style={{ fontSize: '.85rem', paddingBottom: '4rem' }}>
-            Garantia de {curso.garantiaDias} dias pela Hotmart. Claude é um produto da Anthropic; este curso não tem vínculo com a Anthropic.
+            Garantia de {curso.garantiaDias} dias. Claude é um produto da Anthropic; este curso não tem vínculo com a Anthropic.
           </p>
         </main>
       </div>
