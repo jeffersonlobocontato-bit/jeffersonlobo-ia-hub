@@ -8,6 +8,41 @@
       "when": 1791924190202,
       "tag": "0000_academia_leads",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791930919677,
+      "tag": "0001_cursos_plataforma",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791930935710,
+      "tag": "0002_cursos_mercadopago",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791930946368,
+      "tag": "0003_cursos_marca_dagua",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791930962867,
+      "tag": "0004_cursos_pockets",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791930998355,
+      "tag": "0005_academia_painel",
+      "breakpoints": true
     }
   ]
 }
