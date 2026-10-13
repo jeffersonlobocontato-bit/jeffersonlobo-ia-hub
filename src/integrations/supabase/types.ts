@@ -47,6 +47,48 @@ export type Database = {
         }
         Relationships: []
       }
+      academia_leads: {
+        Row: {
+          consentimento_em: string
+          created_at: string
+          email: string
+          id: string
+          material: string
+          nome: string
+          origem: Json
+          politica_versao: string
+          revogado_em: string | null
+          updated_at: string
+          whatsapp: string | null
+        }
+        Insert: {
+          consentimento_em: string
+          created_at?: string
+          email: string
+          id?: string
+          material: string
+          nome: string
+          origem?: Json
+          politica_versao: string
+          revogado_em?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Update: {
+          consentimento_em?: string
+          created_at?: string
+          email?: string
+          id?: string
+          material?: string
+          nome?: string
+          origem?: Json
+          politica_versao?: string
+          revogado_em?: string | null
+          updated_at?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           active: boolean | null
@@ -2051,6 +2093,17 @@ export type Database = {
           msg_id: number
           read_ct: number
         }[]
+      }
+      registrar_lead_academia: {
+        Args: {
+          p_email: string
+          p_material: string
+          p_nome: string
+          p_origem?: Json
+          p_politica_versao: string
+          p_whatsapp: string
+        }
+        Returns: string
       }
       search_knowledge: {
         Args: {
