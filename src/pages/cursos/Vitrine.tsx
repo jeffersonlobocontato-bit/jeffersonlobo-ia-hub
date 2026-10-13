@@ -27,6 +27,7 @@ import EscolaRodape from "@/components/cursos/escola/EscolaRodape";
 import BotaoBrilho from "@/components/cursos/escola/BotaoBrilho";
 import { useEscola } from "@/components/cursos/escola/useEscola";
 import PodcastTopo from "@/components/cursos/escola/PodcastTopo";
+import IscaEbook from "@/components/cursos/escola/IscaEbook";
 import "@/styles/escola.css";
 
 // Vitrine da escola (/cursos). É um catálogo: o topo, o "como funciona", a
@@ -398,6 +399,15 @@ const Vitrine = () => {
               <span>Garantia de {ESCOLA.garantiaDias} dias</span>
             </div>
           </div>
+          <a
+            href="#ebook-gratis"
+            className="e-hero__isca e-entra"
+            style={comAtraso("0.6s")}
+            onClick={() => trackCTA("vitrine_hero_ebook", "vitrine")}
+          >
+            <span>Grátis</span> E-book com 50 skills do Claude para quem não programa
+            <ArrowRight size={14} aria-hidden />
+          </a>
 
           {/* o surgir fica no invólucro: o leque usa transform para crescer ao rolar.
               Com o podcast configurado, ele ocupa o lugar da primeira capa larga,
@@ -512,6 +522,9 @@ const Vitrine = () => {
             ))}
           </div>
         </section>
+
+        {/* E-book grátis (captura de leads) */}
+        <IscaEbook />
 
         {/* Livro */}
         <section className="e-secao" id="livro">
