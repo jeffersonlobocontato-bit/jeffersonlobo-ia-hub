@@ -134,6 +134,13 @@ const CompraJanela = ({ aberta, onFechar, curso, nomeCurso, preco, linhaLote, su
             <p className="compra__seguro">
               <Lock size={13} aria-hidden /> Pagamento seguro na página do Mercado Pago. Seus dados de cartão não passam por este site.
             </p>
+            <p className="compra__termos">
+              Ao continuar, você concorda com os{' '}
+              <a href="/cursos/termos" target="_blank" rel="noopener">
+                termos de uso
+              </a>
+              , incluindo a licença pessoal e a marca d'água com o seu e-mail nos materiais.
+            </p>
           </form>
         )}
       </div>
