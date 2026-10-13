@@ -22,6 +22,7 @@ const EscolaRodape = () => (
           <a href="/cursos#catalogo">Cursos</a>
           <Link to="/livro-del">Livro</Link>
           <Link to="/cursos/entrar">Área do aluno</Link>
+          <Link to="/cursos/termos">Termos de uso</Link>
           <Link to="/">jeffersonlobo.tech</Link>
         </nav>
       </div>
