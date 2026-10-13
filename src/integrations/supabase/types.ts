@@ -620,6 +620,36 @@ export type Database = {
         }
         Relationships: []
       }
+      curso_downloads: {
+        Row: {
+          caminho: string
+          created_at: string
+          curso_slug: string
+          email: string | null
+          id: string
+          marca_dagua: boolean
+          user_id: string | null
+        }
+        Insert: {
+          caminho: string
+          created_at?: string
+          curso_slug: string
+          email?: string | null
+          id?: string
+          marca_dagua?: boolean
+          user_id?: string | null
+        }
+        Update: {
+          caminho?: string
+          created_at?: string
+          curso_slug?: string
+          email?: string | null
+          id?: string
+          marca_dagua?: boolean
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       curso_pedidos: {
         Row: {
           aprovado_em: string | null
