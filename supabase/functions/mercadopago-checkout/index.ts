@@ -1,8 +1,9 @@
 // Compra direta dos cursos pelo Mercado Pago (Checkout Pro).
 //
 // POST { acao: 'criar', curso, email, nome? }
-//   -> cria o pedido e a preferência no MP com o preço do lote vigente
-//      (calculado aqui, nunca vindo do navegador) e devolve { url } para o
+//   -> cria o pedido e a preferência no MP com o preço vigente (lote do curso
+//      ou preço fixo do pocket, calculado aqui, nunca vindo do navegador) e
+//      devolve { url } para o
 //      comprador pagar na página do Mercado Pago. Se o e-mail já tem acesso,
 //      devolve { jaTemAcesso: true }.
 // POST { acao: 'confirmar', pedido, pagamento? }
@@ -70,13 +71,11 @@ Deno.serve(async (req) => {
     const email = String(corpo.email).trim().toLowerCase();
     const nome = typeof corpo.nome === 'string' ? corpo.nome.trim().slice(0, 120) || null : null;
 
-    const { data: acesso } = await supabase
-      .from('curso_acessos')
-      .select('status')
-      .eq('email', email)
-      .eq('curso_slug', curso)
-      .maybeSingle();
-    if (acesso?.status === 'ativo') return json(200, { jaTemAcesso: true });
+    // Já tem acesso: pelo próprio produto ou por um curso que o inclui (a Ilha
+    // traz os pockets). A função do banco responde as duas coisas.
+    const { data: jaTem, error: erroAcesso } = await supabase.rpc('acesso_ativo_por_email', { _email: email, _curso: curso });
+    if (erroAcesso) console.error('acesso_ativo_por_email', erroAcesso.message);
+    if (jaTem === true) return json(200, { jaTemAcesso: true });
 
     const umaHora = new Date(Date.now() - 3600_000).toISOString();
     const { count } = await supabase
@@ -100,6 +99,7 @@ Deno.serve(async (req) => {
       imagem: info.imagem,
       preco: preco.preco,
       lote: preco.lote,
+      descricao: info.descricao(preco.lote),
       email,
       nome,
       site: SITE,
