@@ -9,14 +9,14 @@ import { ISCA_SKILLS as ISCA } from '@/content/cursos/iscas';
 import { VERSAO_PRIVACIDADE } from '@/content/cursos/privacidade';
 
 // E-book gratuito na vitrine (/cursos#ebook-gratis): captura nome, e-mail e
-// WhatsApp (opcional) com consentimento para comunicações e remarketing,
+// WhatsApp (obrigatório) com consentimento para comunicações e remarketing,
 // grava pelo RPC registrar_lead_academia e manda o link por e-mail. O PDF
 // também fica disponível na hora, na própria página.
 
 const ERROS: Record<string, string> = {
   nome_invalido: 'Escreva o seu nome.',
   email_invalido: 'Confira o e-mail.',
-  whatsapp_invalido: 'Confira o WhatsApp, com DDD. Ou deixe em branco.',
+  whatsapp_invalido: 'Confira o WhatsApp, com DDD.',
 };
 
 const UTM = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term'];
@@ -36,6 +36,31 @@ function origemDaVisita() {
 
 const hoje = () => new Date().toISOString().slice(0, 10);
 
+/** WhatsApp brasileiro com DDD: devolve só os dígitos (sem o 55) ou null se
+ *  não parecer um número de verdade (DDD inválido, celular sem o 9, número
+ *  repetido como 99999-9999 ou sequência como 12345-6789). */
+function whatsappValido(bruto: string): string | null {
+  let d = bruto.replace(/\D/g, '');
+  if ((d.length === 12 || d.length === 13) && d.startsWith('55')) d = d.slice(2);
+  if (d.length !== 10 && d.length !== 11) return null;
+  const ddd = Number(d.slice(0, 2));
+  if (ddd < 11 || ddd > 99 || d[0] === '0' || d[1] === '0') return null;
+  const numero = d.slice(2);
+  if (d.length === 11 && numero[0] !== '9') return null;
+  if (/^(\d)\1+$/.test(numero) || /^(\d)\1+$/.test(numero.slice(1))) return null;
+  if ('01234567890123456789'.includes(numero) || '98765432109876543210'.includes(numero)) return null;
+  return d;
+}
+
+/** Máscara leve enquanto digita: (41) 99999-0000 */
+function mascara(v: string) {
+  const d = v.replace(/\D/g, '').slice(0, 11);
+  if (d.length <= 2) return d.length ? `(${d}` : '';
+  if (d.length <= 6) return `(${d.slice(0, 2)}) ${d.slice(2)}`;
+  if (d.length <= 10) return `(${d.slice(0, 2)}) ${d.slice(2, 6)}-${d.slice(6)}`;
+  return `(${d.slice(0, 2)}) ${d.slice(2, 7)}-${d.slice(7)}`;
+}
+
 export default function IscaEbook() {
   const { trackCTA } = useTrackCTA();
   const [nome, setNome] = useState('');
@@ -51,17 +76,17 @@ export default function IscaEbook() {
     setErro('');
     const n = nome.trim();
     const em = email.trim().toLowerCase();
-    const zap = whatsapp.replace(/\D/g, '');
+    const zap = whatsappValido(whatsapp);
     if (n.length < 2) return setErro(ERROS.nome_invalido);
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) return setErro(ERROS.email_invalido);
-    if (zap && (zap.length < 10 || zap.length > 15)) return setErro(ERROS.whatsapp_invalido);
+    if (!zap) return setErro(ERROS.whatsapp_invalido);
     if (!aceite) return setErro('Para receber o e-book, marque a caixa de consentimento.');
 
     setEnviando(true);
     const { data: id, error } = await db.rpc('registrar_lead_academia', {
       p_nome: n,
       p_email: em,
-      p_whatsapp: zap || null,
+      p_whatsapp: zap,
       p_material: ISCA.material,
       p_politica_versao: VERSAO_PRIVACIDADE,
       p_origem: origemDaVisita(),
@@ -143,8 +168,9 @@ export default function IscaEbook() {
                 <input name="email" type="email" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} maxLength={254} required />
               </label>
               <label className="e-campo">
-                <span>WhatsApp <em>(opcional)</em></span>
-                <input name="whatsapp" type="tel" inputMode="tel" autoComplete="tel" placeholder="(41) 99999-0000" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} maxLength={20} />
+                <span>WhatsApp, com DDD</span>
+                <input name="whatsapp" type="tel" inputMode="tel" autoComplete="tel" placeholder="(41) 99999-0000" value={whatsapp} onChange={(e) => setWhatsapp(mascara(e.target.value))} maxLength={16} required />
+                <small>Para receber as atualizações da lista de skills.</small>
               </label>
               <label className="e-isca__aceite">
                 <input type="checkbox" checked={aceite} onChange={(e) => setAceite(e.target.checked)} />
