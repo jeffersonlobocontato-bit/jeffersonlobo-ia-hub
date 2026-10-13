@@ -31,7 +31,7 @@ export function useEscola(raiz: RefObject<HTMLElement>) {
     }
 
     const topo = el.querySelector<HTMLElement>('.e-topo');
-    const palco = el.querySelector<HTMLElement>('.e-hero__palco');
+    const palco = el.querySelector<HTMLElement>('.e-hero__palco, .e-leque');
     let quadro = 0;
     const aoRolar = () => {
       cancelAnimationFrame(quadro);

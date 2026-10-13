@@ -18,15 +18,15 @@ const EscolaRodape = () => (
       </svg>
       <div className="e-rodape__linha">
         <nav className="e-rodape__links" aria-label="Links do rodapé">
-          <Link to="/cursos">Cursos</Link>
-          <Link to="/cursos/ilha">Ilha de Edição</Link>
+          <Link to="/cursos">Academia</Link>
+          <a href="/cursos#catalogo">Cursos</a>
           <Link to="/livro-del">Livro</Link>
           <Link to="/cursos/entrar">Área do aluno</Link>
           <Link to="/">jeffersonlobo.tech</Link>
         </nav>
       </div>
       <p className="e-rodape__legal">
-        Pagamentos processados pela Hotmart. Claude é um produto da Anthropic; os cursos não têm vínculo com a Anthropic. ©{' '}
+        Pagamento do curso processado pelo Mercado Pago; o livro avulso, pela Hotmart. Claude é um produto da Anthropic; os cursos não têm vínculo com a Anthropic. ©{' '}
         {new Date().getFullYear()} Jefferson Lobo.
       </p>
     </div>
