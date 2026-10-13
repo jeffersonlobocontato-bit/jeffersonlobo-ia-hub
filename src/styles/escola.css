@@ -234,6 +234,25 @@ html:has(.escola) body { background: #050505; }
 .e-hero__chip { position: absolute; left: 22px; bottom: 22px; display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px 8px 10px; border-radius: 999px; border: 1px solid rgb(255 255 255 / 0.12); background: rgb(10 10 14 / 0.7); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px); font-size: 14px; color: rgb(255 255 255 / 0.9); text-align: left; }
 .e-hero__chip b { font-weight: 600; color: var(--e-acento-claro); font-variant-numeric: tabular-nums; }
 .e-hero__base { height: clamp(72px, 10vw, 120px); }
+
+/* Podcast no palco do hero (vídeo principal da vitrine) */
+.e-podcast { margin-bottom: 0; }
+.e-podcast video { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 19px; background: #000; }
+.e-podcast__som {
+  position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%);
+  display: inline-flex; align-items: center; gap: 10px; padding: 9px 18px 9px 9px;
+  border-radius: 999px; border: 1px solid rgb(94 234 212 / 0.45);
+  background: rgb(5 5 5 / 0.72); -webkit-backdrop-filter: blur(14px); backdrop-filter: blur(14px);
+  color: #fff; font: 600 15px/1 Inter, system-ui, sans-serif; white-space: nowrap; cursor: pointer;
+  box-shadow: 0 0 0 0 rgb(45 212 191 / 0.5); animation: e-podcast-pulso 2.4s ease-out infinite;
+}
+.e-podcast__som:hover { border-color: var(--e-acento-claro); }
+.e-podcast__som:focus-visible { outline: 2px solid var(--e-acento-claro); outline-offset: 3px; }
+.e-podcast__icone { display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: var(--e-acento); color: #041311; }
+.e-podcast__legenda { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+@keyframes e-podcast-pulso { 0% { box-shadow: 0 0 0 0 rgb(45 212 191 / 0.45); } 70%, 100% { box-shadow: 0 0 0 14px rgb(45 212 191 / 0); } }
+@media (max-width: 560px) { .e-podcast__som { bottom: 12px; gap: 8px; padding: 6px 14px 6px 6px; font-size: 13px; } .e-podcast__icone { width: 26px; height: 26px; } }
+@media (prefers-reduced-motion: reduce) { .e-podcast__som { animation: none; } }
 @media (max-width: 560px) {
   .e-hero__chip { position: static; display: flex; justify-content: center; margin: 10px 2px 2px; font-size: 13px; }
 }
