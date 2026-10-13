@@ -4,7 +4,7 @@ import { ESCOLA } from './escola';
 // A página /cursos/termos renderiza este texto. Ao mudar algo relevante,
 // atualize VERSAO e ATUALIZADO_EM.
 
-export const VERSAO = '1.1';
+export const VERSAO = '1.2';
 export const ATUALIZADO_EM = '13 de outubro de 2026';
 
 export type Secao = { id: string; titulo: string; paragrafos: string[] };
@@ -120,7 +120,7 @@ export const TERMOS: Secao[] = [
     titulo: '13. Privacidade e dados pessoais',
     paragrafos: [
       `A controladora dos seus dados pessoais é ${empresa}. Tratamos esses dados conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), só para vender e entregar os cursos, emitir a nota fiscal, dar suporte e cumprir obrigações legais.`,
-      'Coletamos: nome e e-mail informados na compra; dados do pedido e do pagamento repassados pelo Mercado Pago (status, forma de pagamento, valor, parcelas e o CPF informado no pagamento, usado na nota fiscal; nunca o número do cartão); aulas concluídas; downloads; e perguntas feitas ao Tutor IA.',
+      'Coletamos: nome e e-mail informados na compra; dados do pedido e do pagamento repassados pelo Mercado Pago (status, forma de pagamento, valor, parcelas e o CPF informado no pagamento, usado na nota fiscal; nunca o número do cartão); aulas concluídas; downloads; perguntas feitas ao Tutor IA; e a origem da visita que levou à compra (o site anterior e os parâmetros de campanha do link, como utm_source), para sabermos quais canais funcionam.',
       'Compartilhamos dados só com quem é necessário para o serviço funcionar: o Mercado Pago (pagamento), o emissor de notas fiscais e a prefeitura (nota fiscal), a infraestrutura do site e do banco de dados, o envio de e-mails e o provedor de IA do Tutor. Não vendemos seus dados.',
       'Você pode pedir acesso, correção ou exclusão dos seus dados pelo canal de contato. Alguns dados, como os de compra, precisam ser guardados pelo prazo exigido em lei.',
     ],
