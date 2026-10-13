@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { ESCOLA } from '@/content/cursos/escola';
 
 // Rodapé das páginas de cursos. A assinatura grande se desenha (traço) e
 // depois se preenche quando aparece na tela.
@@ -27,8 +28,8 @@ const EscolaRodape = () => (
         </nav>
       </div>
       <p className="e-rodape__legal">
-        Pagamento do curso processado pelo Mercado Pago; o livro avulso, pela Hotmart. Claude é um produto da Anthropic; os cursos não têm vínculo com a Anthropic. ©{' '}
-        {new Date().getFullYear()} Jefferson Lobo.
+        Cursos vendidos pela {ESCOLA.fornecedor.nome}, CNPJ {ESCOLA.fornecedor.documento}, com pagamento processado pelo Mercado Pago; o livro avulso é vendido pela Hotmart. Claude é um produto da
+        Anthropic; os cursos não têm vínculo com a Anthropic. © {new Date().getFullYear()} Jefferson Lobo.
       </p>
     </div>
   </footer>
