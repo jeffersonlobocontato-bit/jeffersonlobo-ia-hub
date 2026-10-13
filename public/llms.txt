@@ -22,6 +22,7 @@ Referência nacional em IA aplicada a negócios. Atende todo o Brasil, presencia
 
 - [O código invisível dos superagentes de inteligência artificial](https://jeffersonlobo.tech/livro-del): livro de Jefferson Lobo sobre o Método DEL — como treinar agentes de IA com fidelidade autoral, sem programar. Disponível em e-book (R$ 47) e impresso.
 - [Materiais gratuitos do livro](https://jeffersonlobo.tech/materiais): checklists de auditoria de fidelidade autoral e templates operacionais do Método DEL, sem cadastro.
+- [Ilha de Edição completa](https://jeffersonlobo.tech/cursos/ilha): curso de Jefferson Lobo com 5 aulas para instalar no Claude um estúdio de conteúdo para Instagram (reels, carrosséis, stories, direct automático e formatos), com Tutor IA e o e-book O código invisível de bônus. Vitrine de cursos em https://jeffersonlobo.tech/cursos.
 
 ## Recursos gratuitos
 
