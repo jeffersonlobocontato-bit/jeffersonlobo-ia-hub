@@ -57,6 +57,9 @@ export const CURSO_ILHA = {
     lote2: 98,
     fimLote1: '2026-10-25T23:59:59-03:00',
   },
+  // Como o curso é vendido: 'mercadopago' (compra direta no site, preço
+  // calculado no servidor) ou 'hotmart' (usa os links de checkout abaixo).
+  pagamento: 'mercadopago' as 'mercadopago' | 'hotmart',
   // Links de pagamento da Hotmart: preencha quando as ofertas existirem.
   checkout: {
     lote1: '',
@@ -65,6 +68,15 @@ export const CURSO_ILHA = {
   bonus: { nome: 'E-book O código invisível', valor: 47 },
   garantiaDias: 7,
   suporteWhatsApp: 'https://wa.me/5545999864213?text=' + encodeURIComponent('Oi, Jefferson! Sou aluno da Ilha de Edição e preciso de ajuda.'),
+  // Como o curso aparece na vitrine (/cursos), num card igual ao dos outros cursos.
+  vitrine: {
+    capa: '/cursos-ilha/produto-vitrine.jpg',
+    pagina: '/cursos/ilha',
+    categoria: 'Conteúdo para Instagram',
+    destaques: ['5 aulas com as telas reais', 'Instalador da Ilha e 5 manuais em PDF', 'Tutor IA dentro de cada aula', 'E-book O código invisível de bônus'],
+    acento: 'turquesa' as 'turquesa' | 'laranja' | 'azul' | 'verde',
+    bonusLivro: true,
+  },
   modulos: [
     { slug: 'comece-aqui', nome: 'Módulo 1', titulo: 'Comece aqui', capa: '/cursos-ilha/modulos/modulo-1.jpg' },
     { slug: 'quatro-frentes', nome: 'Módulo 2', titulo: 'As quatro frentes', capa: '/cursos-ilha/modulos/modulo-2.jpg' },
