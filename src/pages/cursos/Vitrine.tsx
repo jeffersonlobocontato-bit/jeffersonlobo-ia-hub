@@ -188,6 +188,10 @@ const Vitrine = () => {
       r: `Pode: o impresso sai por ${reais(LIVRO_DEL.impresso.preco)} + frete e o e-book por ${reais(LIVRO_DEL.ebook.preco)}.${comLivro.length ? ` O e-book também vem de bônus em ${comLivro.map((c) => c.nome).join(", ")}.` : ""}`,
     },
     {
+      p: "Por quanto tempo tenho acesso?",
+      r: `Por ${ESCOLA.prazoAcesso} a partir da compra, salvo se a página do curso disser outro prazo. Os arquivos que você baixar ficam com você, com uma marca d'água com o seu e-mail. Os detalhes estão nos termos de uso.`,
+    },
+    {
       p: "Tem suporte?",
       r: "Tem. O Tutor IA responde dentro de cada aula, e o suporte humano é pelo WhatsApp.",
     },
