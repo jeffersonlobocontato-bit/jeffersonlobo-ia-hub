@@ -17,6 +17,12 @@ export const ESCOLA = {
   avisoNovos: 'https://wa.me/5545999864213?text=' + encodeURIComponent('Oi, Jefferson! Quero ser avisado quando sair um curso novo.'),
   /** mostra o card "Novos cursos em breve" no fim do catálogo */
   mostrarEmBreve: true,
+  /** Cena de bastidor no topo do card "Novos cursos a caminho" (5 s, sem
+   *  som, em loop). Vazio, o card fica só com o ícone. */
+  bastidores: {
+    src: '/academia/bastidores.mp4',
+    poster: '/academia/bastidores.jpg',
+  },
   /** Vídeo principal do topo da vitrine (o podcast da Academia). Com `src`
    *  preenchido, ele ocupa o lugar da capa larga do curso no leque do topo,
    *  atrás do livro, rodando sem som; no play, vem para a frente do livro e
