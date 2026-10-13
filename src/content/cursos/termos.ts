@@ -5,19 +5,21 @@ import { ESCOLA } from './escola';
 // atualize VERSAO e ATUALIZADO_EM.
 
 export const VERSAO = '1.0';
-export const ATUALIZADO_EM = '13 de outubro de 2026';
+export const ATUALIZADO_EM = '12 de outubro de 2026';
 
 export type Secao = { id: string; titulo: string; paragrafos: string[] };
 
 const g = ESCOLA.garantiaDias;
 const prazo = ESCOLA.prazoAcesso;
+const f = ESCOLA.fornecedor;
+const empresa = `${f.nome}, CNPJ ${f.documento}`;
 
 export const TERMOS: Secao[] = [
   {
     id: 'quem-somos',
     titulo: '1. Quem somos e o que estes termos cobrem',
     paragrafos: [
-      `A Academia jeffersonlobo.tech é a escola de cursos online de Jefferson Lobo, oferecida em jeffersonlobo.tech/cursos (a "Academia"). Estes termos valem para a compra e o uso de todos os cursos vendidos neste site, com as aulas, os materiais para baixar, os instaladores, os bônus e o Tutor IA de cada curso (o "Conteúdo").`,
+      `A Academia jeffersonlobo.tech é a escola de cursos online de Jefferson Lobo, oferecida em jeffersonlobo.tech/cursos (a "Academia"). Os cursos são vendidos e operados pela ${empresa}, empresa de Jefferson Lobo, que é quem contrata com você. Estes termos valem para a compra e o uso de todos os cursos vendidos neste site, com as aulas, os materiais para baixar, os instaladores, os bônus e o Tutor IA de cada curso (o "Conteúdo").`,
       'Ao comprar um curso ou usar a área do aluno, você declara que leu e concorda com estes termos. Se não concordar, não conclua a compra.',
     ],
   },
@@ -28,6 +30,7 @@ export const TERMOS: Secao[] = [
       'O preço, o lote vigente, o que está incluído e as condições de cada curso aparecem na página de vendas dele no momento da compra. O preço cobrado é sempre o calculado pelo site na hora em que você abre o pagamento.',
       'O pagamento é feito na página segura do Mercado Pago, por Pix, boleto ou cartão de crédito. No parcelamento, os juros do cartão são cobrados do comprador, conforme mostrado pelo Mercado Pago antes da confirmação. Os dados do seu cartão não passam por este site.',
       'O acesso é liberado depois que o pagamento é aprovado: no Pix e no cartão, em geral, em instantes; no boleto, em até 3 dias úteis após o pagamento.',
+      `Cada compra tem nota fiscal de serviço (NFS-e), emitida pela ${f.nome} em nome de quem comprou e enviada para o e-mail da compra. Se precisar da nota em nome de uma empresa, avise pelo suporte antes de pagar.`,
     ],
   },
   {
@@ -43,7 +46,7 @@ export const TERMOS: Secao[] = [
     id: 'licenca',
     titulo: '4. Licença de uso',
     paragrafos: [
-      'A compra dá a você uma licença de uso pessoal, intransferível e não exclusiva do Conteúdo, para aprender e aplicar o que é ensinado. A licença não transfere a propriedade de nenhum material: aulas, textos, roteiros, manuais, instaladores, códigos, modelos, trilhas, imagens e marcas continuam sendo de Jefferson Lobo ou de quem os licenciou para a Academia, protegidos pela Lei de Direitos Autorais (Lei 9.610/1998) e pela Lei de Software (Lei 9.609/1998).',
+      'A compra dá a você uma licença de uso pessoal, intransferível e não exclusiva do Conteúdo, para aprender e aplicar o que é ensinado. A licença não transfere a propriedade de nenhum material: aulas, textos, roteiros, manuais, instaladores, códigos, modelos, trilhas, imagens e marcas continuam sendo de Jefferson Lobo, da Agência de Inteligência Vozes ou de quem os licenciou para a Academia, protegidos pela Lei de Direitos Autorais (Lei 9.610/1998) e pela Lei de Software (Lei 9.609/1998).',
       'Você pode usar o que aprendeu e as ferramentas instaladas para criar conteúdo próprio e para clientes seus. O que é seu, o conteúdo que você cria com as ferramentas, é seu.',
     ],
   },
@@ -68,7 +71,7 @@ export const TERMOS: Secao[] = [
     titulo: '7. Direito de arrependimento e reembolso',
     paragrafos: [
       `Você pode desistir da compra em até ${g} dias contados da data em que o acesso foi liberado, sem precisar justificar, como garante o artigo 49 do Código de Defesa do Consumidor. Para pedir o reembolso, fale pelo WhatsApp de suporte informando o e-mail da compra.`,
-      'O reembolso é integral e feito pelo mesmo meio de pagamento, pelo Mercado Pago. No cartão, o estorno aparece na fatura conforme o prazo da operadora; no Pix e no boleto, o valor volta para a conta de origem.',
+      'O reembolso é integral e feito pelo mesmo meio de pagamento, pelo Mercado Pago. No cartão, o estorno aparece na fatura conforme o prazo da operadora; no Pix e no boleto, o valor volta para a conta de origem. A nota fiscal da compra é cancelada.',
       'Com o reembolso, a licença de uso é encerrada: o acesso à área do aluno, ao Tutor IA e às atualizações é retirado, e você se compromete a apagar os arquivos baixados e a não usar mais o instalador nem os materiais. O mesmo vale quando o pagamento é contestado junto ao banco ou ao cartão (chargeback).',
       'Depois desse prazo, a compra não é reembolsável, salvo nos casos previstos em lei.',
     ],
@@ -115,9 +118,9 @@ export const TERMOS: Secao[] = [
     id: 'privacidade',
     titulo: '13. Privacidade e dados pessoais',
     paragrafos: [
-      'Tratamos seus dados pessoais conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), só para vender e entregar os cursos, dar suporte e cumprir obrigações legais.',
-      'Coletamos: nome e e-mail informados na compra; dados do pedido e do pagamento repassados pelo Mercado Pago (status, forma de pagamento, valor e parcelas, nunca o número do cartão); aulas concluídas; downloads; e perguntas feitas ao Tutor IA.',
-      'Compartilhamos dados só com os fornecedores necessários para o serviço funcionar: o Mercado Pago (pagamento), a infraestrutura do site e do banco de dados, o envio de e-mails e o provedor de IA do Tutor. Não vendemos seus dados.',
+      `A controladora dos seus dados pessoais é ${empresa}. Tratamos esses dados conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), só para vender e entregar os cursos, emitir a nota fiscal, dar suporte e cumprir obrigações legais.`,
+      'Coletamos: nome e e-mail informados na compra; dados do pedido e do pagamento repassados pelo Mercado Pago (status, forma de pagamento, valor, parcelas e o CPF informado no pagamento, usado na nota fiscal; nunca o número do cartão); aulas concluídas; downloads; e perguntas feitas ao Tutor IA.',
+      'Compartilhamos dados só com quem é necessário para o serviço funcionar: o Mercado Pago (pagamento), o emissor de notas fiscais e a prefeitura (nota fiscal), a infraestrutura do site e do banco de dados, o envio de e-mails e o provedor de IA do Tutor. Não vendemos seus dados.',
       'Você pode pedir acesso, correção ou exclusão dos seus dados pelo canal de contato. Alguns dados, como os de compra, precisam ser guardados pelo prazo exigido em lei.',
     ],
   },
