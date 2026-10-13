@@ -4,7 +4,9 @@ import { toast } from 'sonner';
 import { ArrowRight, Check, ChevronDown, Download, LifeBuoy, LogOut } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { useAuth } from '@/hooks/useAuth';
-import { aulasComVideo, cursoPorSlug, type Aula, type Material } from '@/content/cursos/ilha';
+import type { Aula, Material } from '@/content/cursos/ilha';
+import { produtoPorSlug } from '@/content/cursos/produtos';
+import { POCKETS } from '@/content/cursos/pockets';
 import { baixarMaterial, modoDemo, urlDoVideoBunny, useAcessoCurso, useCursoConfig, useProgresso } from '@/lib/cursos';
 import TutorChat from '@/components/cursos/TutorChat';
 import '@/styles/cursos-area.css';
@@ -16,7 +18,10 @@ const SUGESTOES: Record<string, string[]> = {
   'aula-4': ['Como ligo a Zernio no Claude?', 'Meu Instagram precisa ser profissional?', 'Que palavra uso no post?'],
   'aula-5': ['Como salvo uma referência de outro perfil?', 'O que é o Radar do momento?', 'O que o Placar precisa para funcionar?'],
   ebook: ['O que é o Método DEL?', 'Como o DEL aparece na Ilha?'],
+  ...Object.fromEntries(POCKETS.map((p) => [p.slug, p.perguntasTutor])),
 };
+
+const semVideo = (a: Aula) => Boolean(a.semVideo);
 
 const Tela = ({ children }: { children: React.ReactNode }) => (
   <div className="ilha-area">
@@ -27,6 +32,8 @@ const Tela = ({ children }: { children: React.ReactNode }) => (
 
 const nomeDaAula = (a: Aula) => (a.numero ? `Aula ${a.numero} · ${a.titulo}` : a.titulo);
 
+// O produto dono do arquivo é a pasta do caminho (um pocket dentro da Ilha
+// é baixado como o pocket; o acesso vem da Ilha pela inclusão).
 function MaterialItem({ m, curso }: { m: Material; curso: string }) {
   const [baixando, setBaixando] = useState(false);
   const baixar = async () => {
@@ -58,7 +65,8 @@ function MaterialItem({ m, curso }: { m: Material; curso: string }) {
 const SalaDeAula = () => {
   const { curso: slugCurso = 'ilha', aula: slugAula } = useParams();
   const location = useLocation();
-  const curso = cursoPorSlug(slugCurso);
+  const curso = produtoPorSlug(slugCurso);
+  const ehPocket = curso?.tipo === 'pocket';
   const { user, loading, signOut } = useAuth();
   const estado = useAcessoCurso(slugCurso, user?.id, loading);
   const { concluidas, alternar } = useProgresso(slugCurso, user?.id);
@@ -101,8 +109,8 @@ const SalaDeAula = () => {
               depois da aprovação.
             </p>
             <div className="i-acoes">
-              <Link className="i-btn i-btn--cheio" to={`/cursos/${curso.slug}`}>
-                Conhecer o curso
+              <Link className="i-btn i-btn--cheio" to={curso.pagina}>
+                {ehPocket ? 'Conhecer o pocket' : 'Conhecer o curso'}
               </Link>
               <a className="i-btn" href={curso.suporteWhatsApp} target="_blank" rel="noopener">
                 Falar com o suporte
@@ -119,13 +127,13 @@ const SalaDeAula = () => {
 
   // Sem aula na URL (ou aula inexistente): continua de onde parou.
   if (!aula) {
-    const proxima = aulasComVideo(curso).find((a) => !concluidas.has(a.slug)) ?? curso.aulas[0];
+    const proxima = curso.aulas.filter((a) => !semVideo(a)).find((a) => !concluidas.has(a.slug)) ?? curso.aulas[0];
     return <Navigate to={`/cursos/${curso.slug}/aulas/${proxima.slug}${location.search}`} replace />;
   }
 
-  const comVideo = aulasComVideo(curso);
+  const comVideo = curso.aulas.filter((a) => !semVideo(a));
   const feitas = comVideo.filter((a) => concluidas.has(a.slug)).length;
-  const pct = Math.round((feitas / comVideo.length) * 100);
+  const pct = comVideo.length ? Math.round((feitas / comVideo.length) * 100) : 0;
   const indice = curso.aulas.findIndex((a) => a.slug === aula.slug);
   const proximaAula = curso.aulas[indice + 1];
   const feita = concluidas.has(aula.slug);
@@ -139,17 +147,25 @@ const SalaDeAula = () => {
         <Link to={`/cursos/${curso.slug}/aulas${sufixo}`} className="i-topo__marca" style={{ textDecoration: 'none' }}>
           <span className="i-kicker">Área do aluno</span>
           <b>
-            Ilha de Edição <em>completa</em>
+            {curso.slug === 'ilha' ? (
+              <>
+                Ilha de Edição <em>completa</em>
+              </>
+            ) : (
+              curso.nome
+            )}
           </b>
         </Link>
-        <div className="i-topo__prog" title={`${feitas} de ${comVideo.length} aulas concluídas`}>
-          <span className="i-barra" aria-hidden>
-            <i style={{ width: `${pct}%` }} />
-          </span>
-          <small>
-            {feitas}/{comVideo.length} · {pct}%
-          </small>
-        </div>
+        {comVideo.length > 0 && (
+          <div className="i-topo__prog" title={`${feitas} de ${comVideo.length} aulas concluídas`}>
+            <span className="i-barra" aria-hidden>
+              <i style={{ width: `${pct}%` }} />
+            </span>
+            <small>
+              {feitas}/{comVideo.length} · {pct}%
+            </small>
+          </div>
+        )}
         <div className="i-topo__acoes">
           <a className="i-btn i-btn--pequeno" href={curso.suporteWhatsApp} target="_blank" rel="noopener" title="Suporte no WhatsApp">
             <LifeBuoy size={15} aria-hidden /> <span className="hidden sm:inline">Suporte</span>
@@ -162,9 +178,9 @@ const SalaDeAula = () => {
       </header>
 
       <div className="i-sala">
-        <nav className="i-lista" aria-label="Aulas do curso">
+        <nav className="i-lista" aria-label={ehPocket ? 'Conteúdo' : 'Aulas do curso'}>
           <button className="i-btn i-lista__abrir" onClick={() => setListaAberta((v) => !v)} aria-expanded={listaAberta}>
-            <span>Aulas do curso</span>
+            <span>{ehPocket ? 'Conteúdo' : 'Aulas do curso'}</span>
             <ChevronDown size={18} aria-hidden style={{ transform: listaAberta ? 'rotate(180deg)' : undefined }} />
           </button>
           <div className="i-lista__conteudo" data-aberta={listaAberta}>
@@ -199,13 +215,17 @@ const SalaDeAula = () => {
         </nav>
 
         <main className="i-palco">
-          {'semVideo' in aula && aula.semVideo ? (
+          {semVideo(aula) ? (
             <div className="i-cartao" style={{ display: 'grid', gap: '1.2rem', gridTemplateColumns: 'minmax(0,180px) minmax(0,1fr)', alignItems: 'center' }}>
-              <img src="/cursos-ilha/livro-del.webp" alt="Capa do e-book O código invisível" style={{ width: '100%', maxWidth: 180, filter: 'drop-shadow(0 20px 30px rgba(0,0,0,.5))' }} />
+              <img
+                src={aula.destaque?.imagem ?? '/cursos-ilha/livro-del.webp'}
+                alt={`Capa de ${aula.destaque?.titulo ?? aula.titulo}`}
+                style={{ width: '100%', maxWidth: 180, borderRadius: aula.produto ? 8 : 0, filter: 'drop-shadow(0 20px 30px rgba(0,0,0,.5))' }}
+              />
               <div style={{ display: 'grid', gap: '.6rem' }}>
-                <span className="i-kicker">Bônus do curso</span>
-                <h2 style={{ fontWeight: 900, fontSize: '1.5rem' }}>O código invisível</h2>
-                <p className="i-muted">O livro do Método DEL, em PDF, para ler quando quiser.</p>
+                <span className="i-kicker">{aula.destaque?.kicker ?? 'Bônus do curso'}</span>
+                <h2 style={{ fontWeight: 900, fontSize: '1.5rem' }}>{aula.destaque?.titulo ?? aula.titulo}</h2>
+                <p className="i-muted">{aula.destaque?.texto ?? 'Material em PDF, para baixar abaixo.'}</p>
               </div>
             </div>
           ) : (
@@ -229,7 +249,7 @@ const SalaDeAula = () => {
 
           <div className="i-cabeca">
             <span className="i-kicker">
-              {aula.numero ? `Aula ${aula.numero}` : 'Bônus'}
+              {aula.numero ? `Aula ${aula.numero}` : ehPocket ? 'Pocket' : 'Bônus'}
               {aula.duracao ? ` · ${aula.duracao}` : ''}
             </span>
             <h1>{aula.titulo}</h1>
@@ -246,13 +266,13 @@ const SalaDeAula = () => {
           </div>
 
           <section className="i-cartao">
-            <span className="i-kicker">Resumo da aula</span>
+            <span className="i-kicker">{ehPocket || aula.produto ? 'Resumo' : 'Resumo da aula'}</span>
             <p className="i-resumo">{aula.resumo}</p>
           </section>
 
           <div className="i-grade2">
             <section className="i-cartao">
-              <h2>Pontos-chave</h2>
+              <h2>{aula.produto ? 'Os passos' : 'Pontos-chave'}</h2>
               <ul className="i-pontos">
                 {aula.pontos.map((p) => (
                   <li key={p}>{p}</li>
@@ -314,18 +334,19 @@ const SalaDeAula = () => {
 
           {aula.tarefa && (
             <section className="i-tarefa">
-              <span className="i-kicker">Tarefa da aula</span>
+              <span className="i-kicker">{aula.produto ? 'Depois de ler' : 'Tarefa da aula'}</span>
               <p>{aula.tarefa}</p>
             </section>
           )}
 
           <p className="i-faint" style={{ fontSize: '.85rem', paddingBottom: '4rem' }}>
-            Garantia de {curso.garantiaDias} dias. Claude é um produto da Anthropic; este curso não tem vínculo com a Anthropic.
+            Garantia de {curso.garantiaDias} dias. Claude é um produto da Anthropic; {ehPocket ? 'este pocket não tem' : 'este curso não tem'} vínculo com a Anthropic.
           </p>
         </main>
       </div>
 
-      <TutorChat curso={curso.slug} aula={nomeDaAula(aula)} sugestoes={SUGESTOES[aula.slug] ?? []} suporte={curso.suporteWhatsApp} />
+      {/* um pocket dentro da Ilha usa o Tutor do pocket (base com o texto do PDF) */}
+      <TutorChat curso={aula.produto ?? curso.slug} aula={nomeDaAula(aula)} sugestoes={SUGESTOES[aula.slug] ?? []} suporte={curso.suporteWhatsApp} />
     </Tela>
   );
 };

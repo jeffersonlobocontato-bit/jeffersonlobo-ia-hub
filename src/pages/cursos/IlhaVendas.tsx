@@ -42,7 +42,7 @@ const IlhaVendas = () => {
           checkout: CURSO_ILHA.checkout,
           fimLote1: CURSO_ILHA.precos.fimLote1,
           precos: { lote1: CURSO_ILHA.precos.lote1, lote2: CURSO_ILHA.precos.lote2 },
-          bonusValor: CURSO_ILHA.bonus.valor,
+          bonusValor: CURSO_ILHA.bonus.valor + CURSO_ILHA.bonusPockets.valor,
           aoComprar: direto ? () => abrirRef.current() : undefined,
         })
       : () => {};

@@ -21,6 +21,7 @@ import {
   type Curso,
 } from "@/content/cursos/ilha";
 import { ESCOLA } from "@/content/cursos/escola";
+import { POCKETS, reais as reaisBR, type Pocket } from "@/content/cursos/pockets";
 import EscolaTopo from "@/components/cursos/escola/EscolaTopo";
 import EscolaRodape from "@/components/cursos/escola/EscolaRodape";
 import BotaoBrilho from "@/components/cursos/escola/BotaoBrilho";
@@ -160,6 +161,36 @@ function CardCurso({
   );
 }
 
+function CardPocket({ p, i, onClick }: { p: Pocket; i: number; onClick: () => void }) {
+  return (
+    <article className="e-card e-card--pocket e-revela" style={atraso(i + 1)}>
+      <span className="e-card__feixe" aria-hidden />
+      <span className="e-card__brilho" aria-hidden />
+      <Link to={p.pagina} className="e-card__thumb e-card__thumb--pocket" tabIndex={-1} aria-hidden onClick={onClick}>
+        <img src={p.capa} alt="" width={840} height={1189} loading="lazy" />
+      </Link>
+      <span className="e-olho">
+        Pocket {p.numero} · {p.categoria}
+      </span>
+      <h3 className="e-card__titulo">
+        <Link to={p.pagina} onClick={onClick}>
+          {p.nome}
+        </Link>
+      </h3>
+      <p className="e-card__texto">{p.chamada}</p>
+      <div className="e-card__rodape">
+        <div className="e-preco">
+          <b>{reaisBR(p.preco)}</b>
+          <span>PDF · acesso na hora</span>
+        </div>
+        <Link to={p.pagina} className="e-btn e-btn--fantasma" onClick={onClick}>
+          Ver o pocket <ArrowRight size={16} aria-hidden />
+        </Link>
+      </div>
+    </article>
+  );
+}
+
 const Vitrine = () => {
   const raiz = useRef<HTMLDivElement>(null);
   useEscola(raiz);
@@ -183,6 +214,10 @@ const Vitrine = () => {
     {
       p: "E se eu não gostar?",
       r: `Você tem ${ESCOLA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só me chamar no WhatsApp.`,
+    },
+    {
+      p: "O que são os pockets?",
+      r: `Tutoriais curtos em PDF, por ${reaisBR(POCKETS[0].preco)} cada, que resolvem uma coisa só: configurar o Claude, fazer ele escrever com a sua voz e ir do roteiro à postagem. Têm as telas do Claude em português e modelos para copiar. Os três vêm de bônus no curso Ilha de Edição completa.`,
     },
     {
       p: "Posso comprar só o livro?",
@@ -224,9 +259,21 @@ const Vitrine = () => {
           },
         },
       })),
+      ...POCKETS.map((p, i) => ({
+        "@type": "ListItem",
+        position: abertos.length + 1 + i,
+        item: {
+          "@type": "Product",
+          name: `Pocket ${p.numero}: ${p.nome}`,
+          description: p.chamada,
+          url: `${SITE_URL}${p.pagina}`,
+          image: `${SITE_URL}${p.quadrada}`,
+          offers: { "@type": "Offer", price: p.preco.toFixed(2), priceCurrency: "BRL" },
+        },
+      })),
       {
         "@type": "ListItem",
-        position: abertos.length + 1,
+        position: abertos.length + POCKETS.length + 1,
         item: {
           "@type": "Book",
           name: LIVRO_DEL.nome,
@@ -399,6 +446,35 @@ const Vitrine = () => {
                 </div>
               </article>
             )}
+          </div>
+        </section>
+
+        {/* Pockets */}
+        <section className="e-secao" id="pockets">
+          <div className="e-cab e-revela">
+            <span className="e-olho">Pockets · {reaisBR(POCKETS[0].preco)} cada</span>
+            <h2 className="e-h2">Tutoriais de bolso</h2>
+            <p>
+              Um problema, um PDF, uma tarde. Cada pocket resolve uma coisa só,
+              com as telas do Claude em português e modelos para copiar.
+            </p>
+            <p className="e-cab__extra">
+              Comprou a{" "}
+              <Link to="/cursos/ilha" className="e-link">
+                Ilha de Edição completa
+              </Link>
+              ? Os três já estão na sua área do aluno, de bônus.
+            </p>
+          </div>
+          <div className="e-catalogo e-catalogo--pockets">
+            {POCKETS.map((p, i) => (
+              <CardPocket
+                key={p.slug}
+                p={p}
+                i={i}
+                onClick={() => trackCTA(`vitrine_pocket_${p.numero}`, "vitrine")}
+              />
+            ))}
           </div>
         </section>
 
