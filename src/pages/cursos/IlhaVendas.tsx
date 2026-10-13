@@ -66,7 +66,7 @@ const IlhaVendas = () => {
         title="Ilha de Edição completa: agora você faz seu conteúdo sozinho no Claude | Jefferson Lobo"
         description={CURSO_ILHA.descricao}
         path="/cursos/ilha"
-        ogImage="https://jeffersonlobo.tech/cursos-ilha/produto.jpg"
+        ogImage="https://jeffersonlobo.tech/cursos-ilha/og.jpg"
       />
       <div ref={raiz} className="ilha-lp" dangerouslySetInnerHTML={{ __html: LP_HTML }} />
       {direto && (

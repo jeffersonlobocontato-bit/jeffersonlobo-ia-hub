@@ -345,7 +345,7 @@ const Vitrine = () => {
         title="Academia jeffersonlobo.tech | Cursos e livro de Jefferson Lobo"
         description="Cursos práticos de IA aplicada e o livro do Método DEL, de Jefferson Lobo. Aulas curtas, Tutor IA em cada aula e acesso pelo seu e-mail."
         path="/cursos"
-        ogImage={`${SITE_URL}${abertos[0]?.vitrine.capa ?? "/cursos-ilha/produto-vitrine.jpg"}`}
+        ogImage={`${SITE_URL}/academia/og-cursos.jpg`}
       />
       <Helmet>
         <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
