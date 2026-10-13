@@ -43,9 +43,10 @@ async function liberar(supabase: SupabaseClient, p: Pedido, pagamentoId: string)
   if (error) throw new Error(`gravar acesso: ${error.message}`);
 
   const nomeCurso = CATALOGO[p.curso_slug]?.nome ?? p.curso_slug;
+  const ehPocket = CATALOGO[p.curso_slug]?.tipo === 'pocket';
   const { error: erroEmail } = await supabase.functions.invoke('send-transactional-email', {
     body: {
-      templateName: 'curso-acesso-liberado',
+      templateName: ehPocket ? 'pocket-acesso-liberado' : 'curso-acesso-liberado',
       recipientEmail: p.email,
       idempotencyKey: `curso-acesso-${p.curso_slug}-mp-${p.id}`,
       templateData: { nome: p.nome ?? undefined, curso: nomeCurso, link: linkDeEntrada(p.email, p.curso_slug) },
@@ -55,7 +56,7 @@ async function liberar(supabase: SupabaseClient, p: Pedido, pagamentoId: string)
 
   await avisarTelegram(
     supabase,
-    `🎓 <b>Nova matrícula</b> (Mercado Pago)\n${nomeCurso} · R$ ${Number(p.valor).toFixed(2).replace('.', ',')}\n${p.nome ?? ''} · ${p.email}\nPagamento ${pagamentoId}` +
+    `${ehPocket ? '📘 <b>Pocket vendido</b>' : '🎓 <b>Nova matrícula</b>'} (Mercado Pago)\n${nomeCurso} · R$ ${Number(p.valor).toFixed(2).replace('.', ',')}\n${p.nome ?? ''} · ${p.email}\nPagamento ${pagamentoId}` +
       (erroEmail ? '\n⚠️ O e-mail de acesso não saiu: confira em /admin › Cursos.' : ''),
   );
   return erroEmail ? 'acesso liberado, e-mail falhou' : 'acesso liberado';

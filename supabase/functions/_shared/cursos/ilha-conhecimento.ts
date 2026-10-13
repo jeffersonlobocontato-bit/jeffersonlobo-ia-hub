@@ -6,8 +6,9 @@ O curso tem 5 aulas em vídeo e um bônus:
 - Módulo 1 · Comece aqui: Aula 1 · Instalação e Reels (6min14).
 - Módulo 2 · As quatro frentes: Aula 2 · Carrossel (3min27), Aula 3 · Stories (3min18), Aula 4 · Direct automático (3min57), Aula 5 · Arsenal (3min48).
 - Bônus: e-book O código invisível dos superagentes de inteligência artificial, o livro do Método DEL (PDF na área do aluno).
+- Bônus: 3 pockets em PDF, no módulo Bônus da área do aluno: Pocket 1 · Configurei o Claude errado (configuração do Claude do zero: instruções, projetos, contexto, memória e conectores); Pocket 2 · Claude com a sua voz (Método DEL na prática num projeto); Pocket 3 · Do roteiro à postagem (roteiro, legenda e agendamento pela Zernio). Cada pocket tem o próprio Tutor, dentro dele.
 
-O que o aluno recebe: as aulas, o instalador ilha-de-edicao.zip (fica nos materiais da Aula 1; não precisa descompactar, quem abre é o Claude), um manual em PDF por aula e o e-book bônus.
+O que o aluno recebe: as aulas, o instalador ilha-de-edicao.zip (fica nos materiais da Aula 1; não precisa descompactar, quem abre é o Claude), um manual em PDF por aula, o e-book bônus e os 3 pockets bônus.
 
 Requisitos: plano pago do Claude (Pro, Max, Team ou Enterprise) e um computador para instalar. No plano gratuito a Ilha não funciona. Depois de instalada, a Ilha abre também no celular.
 
@@ -17,7 +18,7 @@ Conectores opcionais do Claude (Configurações › Conectores): HeyGen (avatar)
 
 Regra de segurança: ninguém, nem o Claude, pede senha ou chave pelo chat. Conectores se ligam nas configurações do Claude.
 
-Garantia: 7 dias. O reembolso é pedido pela Hotmart.
+Garantia: 7 dias. O reembolso é pedido pelo WhatsApp do Jefferson.
 Suporte humano: WhatsApp do Jefferson, pelo botão "Falar com o suporte" na área do aluno.
 Acesso: o aluno entra em jeffersonlobo.tech/cursos/entrar com o mesmo e-mail da compra e recebe um link de acesso.
 

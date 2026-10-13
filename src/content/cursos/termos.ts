@@ -4,8 +4,8 @@ import { ESCOLA } from './escola';
 // A página /cursos/termos renderiza este texto. Ao mudar algo relevante,
 // atualize VERSAO e ATUALIZADO_EM.
 
-export const VERSAO = '1.0';
-export const ATUALIZADO_EM = '12 de outubro de 2026';
+export const VERSAO = '1.1';
+export const ATUALIZADO_EM = '13 de outubro de 2026';
 
 export type Secao = { id: string; titulo: string; paragrafos: string[] };
 
@@ -19,7 +19,7 @@ export const TERMOS: Secao[] = [
     id: 'quem-somos',
     titulo: '1. Quem somos e o que estes termos cobrem',
     paragrafos: [
-      `A Academia jeffersonlobo.tech é a escola de cursos online de Jefferson Lobo, oferecida em jeffersonlobo.tech/cursos (a "Academia"). Os cursos são vendidos e operados pela ${empresa}, empresa de Jefferson Lobo, que é quem contrata com você. Estes termos valem para a compra e o uso de todos os cursos vendidos neste site, com as aulas, os materiais para baixar, os instaladores, os bônus e o Tutor IA de cada curso (o "Conteúdo").`,
+      `A Academia jeffersonlobo.tech é a escola de cursos online de Jefferson Lobo, oferecida em jeffersonlobo.tech/cursos (a "Academia"). Os cursos são vendidos e operados pela ${empresa}, empresa de Jefferson Lobo, que é quem contrata com você. Estes termos valem para a compra e o uso de todos os cursos vendidos neste site e dos pockets (tutoriais avulsos em PDF), com as aulas, os materiais para baixar, os instaladores, os bônus e o Tutor IA de cada um (o "Conteúdo"). Onde estes termos falam em curso, valem também para os pockets.`,
       'Ao comprar um curso ou usar a área do aluno, você declara que leu e concorda com estes termos. Se não concordar, não conclua a compra.',
     ],
   },
@@ -39,6 +39,7 @@ export const TERMOS: Secao[] = [
     paragrafos: [
       'O acesso fica ligado ao e-mail informado na compra. Você entra na área do aluno com esse e-mail, por um link enviado na hora ou por senha, se tiver criado uma. Confira o e-mail antes de pagar: é por ele que o acesso é liberado.',
       `O acesso a cada curso vale por ${prazo} contados da data da compra, salvo se a página de vendas do curso informar outro prazo. Os arquivos que você baixar durante esse período, dentro das regras destes termos, continuam com você.`,
+      'Quando um curso traz pockets ou outros produtos de bônus, o acesso a eles acompanha o do curso: vale pelo mesmo prazo e termina junto se o curso for reembolsado ou cancelado.',
       'O acesso é pessoal. Não compartilhe o seu login, os links de acesso nem a sua conta. Acessos simultâneos ou em volume fora do padrão de uso individual podem ser bloqueados.',
     ],
   },

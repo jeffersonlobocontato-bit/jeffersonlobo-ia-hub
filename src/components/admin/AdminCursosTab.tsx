@@ -6,7 +6,7 @@ import { Card } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
 import { Check, ExternalLink, RotateCcw, Upload, UserPlus, X } from 'lucide-react';
 import { db } from '@/lib/cursos';
-import { CURSO_ILHA, aulasComVideo } from '@/content/cursos/ilha';
+import { PRODUTOS, produtoPorSlug } from '@/content/cursos/produtos';
 
 type Acesso = {
   id: string;
@@ -17,17 +17,36 @@ type Acesso = {
   hotmart_transacao: string | null;
   created_at: string;
 };
-type Pergunta = { id: string; email: string | null; aula_slug: string | null; pergunta: string; resposta: string | null; created_at: string };
+type Pergunta = {
+  id: string;
+  email: string | null;
+  aula_slug: string | null;
+  pergunta: string;
+  resposta: string | null;
+  created_at: string;
+};
 type Evento = { id: string; evento: string | null; email: string | null; acao: string | null; erro: string | null; created_at: string };
-type Pedido = { id: string; email: string; nome: string | null; valor: number; status: string; forma_pagamento: string | null; parcelas: number | null; created_at: string };
+type Pedido = {
+  id: string;
+  email: string;
+  nome: string | null;
+  valor: number;
+  status: string;
+  forma_pagamento: string | null;
+  parcelas: number | null;
+  created_at: string;
+};
 
-const curso = CURSO_ILHA;
 const data = (s: string) => new Date(s).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
 // Aba "Cursos" do /admin: alunos, configuração (Hotmart e vídeos do Bunny),
 // materiais do bucket privado, perguntas ao Tutor e eventos da Hotmart.
 const AdminCursosTab = () => {
   const { toast } = useToast();
+  // produto em foco: o curso ou um dos pockets (cada um tem alunos, pedidos e materiais próprios)
+  const [slug, setSlug] = useState('ilha');
+  const curso = produtoPorSlug(slug) ?? PRODUTOS[0];
+  const comVideo = curso.aulas.filter((a) => !a.semVideo);
   const [acessos, setAcessos] = useState<Acesso[]>([]);
   const [config, setConfig] = useState<Record<string, string>>({});
   const [perguntas, setPerguntas] = useState<Pergunta[]>([]);
@@ -39,15 +58,26 @@ const AdminCursosTab = () => {
   const [filtro, setFiltro] = useState('');
   const [enviando, setEnviando] = useState<string | null>(null);
 
-  const erro = (titulo: string, e: { message: string } | null) => e && toast({ title: titulo, description: e.message, variant: 'destructive' });
+  const erro = (titulo: string, e: { message: string } | null) =>
+    e && toast({ title: titulo, description: e.message, variant: 'destructive' });
 
   const carregar = async () => {
     const [a, c, p, ev, pd] = await Promise.all([
       db.from('curso_acessos').select('*').eq('curso_slug', curso.slug).order('created_at', { ascending: false }),
       db.from('curso_config').select('chave, valor').eq('curso_slug', curso.slug),
-      db.from('curso_tutor_mensagens').select('id, email, aula_slug, pergunta, resposta, created_at').eq('curso_slug', curso.slug).order('created_at', { ascending: false }).limit(50),
+      db
+        .from('curso_tutor_mensagens')
+        .select('id, email, aula_slug, pergunta, resposta, created_at')
+        .eq('curso_slug', curso.slug)
+        .order('created_at', { ascending: false })
+        .limit(50),
       db.from('hotmart_eventos').select('id, evento, email, acao, erro, created_at').order('created_at', { ascending: false }).limit(20),
-      db.from('curso_pedidos').select('id, email, nome, valor, status, forma_pagamento, parcelas, created_at').eq('curso_slug', curso.slug).order('created_at', { ascending: false }).limit(40),
+      db
+        .from('curso_pedidos')
+        .select('id, email, nome, valor, status, forma_pagamento, parcelas, created_at')
+        .eq('curso_slug', curso.slug)
+        .order('created_at', { ascending: false })
+        .limit(40),
     ]);
     erro('Erro ao carregar alunos', a.error);
     setAcessos((a.data ?? []) as Acesso[]);
@@ -67,14 +97,18 @@ const AdminCursosTab = () => {
 
   useEffect(() => {
     carregar();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [slug]);
 
   const liberar = async () => {
     const email = novoEmail.trim().toLowerCase();
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast({ title: 'Confira o e-mail', variant: 'destructive' });
     const { error } = await db
       .from('curso_acessos')
-      .upsert({ email, nome: novoNome.trim() || null, curso_slug: curso.slug, status: 'ativo', origem: 'manual' }, { onConflict: 'email,curso_slug' });
+      .upsert(
+        { email, nome: novoNome.trim() || null, curso_slug: curso.slug, status: 'ativo', origem: 'manual' },
+        { onConflict: 'email,curso_slug' },
+      );
     if (error) return erro('Não liberou', error);
     toast({ title: 'Acesso liberado', description: `${email} já pode entrar em /cursos/entrar` });
     setNovoEmail('');
@@ -89,7 +123,9 @@ const AdminCursosTab = () => {
   };
 
   const salvarConfig = async (chave: string, valor: string) => {
-    const { error } = await db.from('curso_config').upsert({ curso_slug: curso.slug, chave, valor: valor.trim() }, { onConflict: 'curso_slug,chave' });
+    const { error } = await db
+      .from('curso_config')
+      .upsert({ curso_slug: curso.slug, chave, valor: valor.trim() }, { onConflict: 'curso_slug,chave' });
     if (error) return erro('Não salvou', error);
     toast({ title: 'Salvo' });
   };
@@ -111,11 +147,27 @@ const AdminCursosTab = () => {
 
   return (
     <div className="space-y-6">
+      <div className="flex flex-wrap gap-2" role="tablist" aria-label="Produto">
+        {PRODUTOS.map((p) => (
+          <Button
+            key={p.slug}
+            size="sm"
+            variant={p.slug === slug ? 'default' : 'outline'}
+            onClick={() => setSlug(p.slug)}
+            role="tab"
+            aria-selected={p.slug === slug}
+          >
+            {p.tipo === 'pocket' ? p.nome.replace(/ · .*/, '') : p.nome}
+          </Button>
+        ))}
+      </div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-2xl font-bold">{curso.nome}</h2>
           <p className="text-sm text-muted-foreground">
-            {ativos} aluno(s) com acesso ativo · {perguntas.length ? `${perguntas.length} perguntas recentes ao Tutor` : 'nenhuma pergunta ao Tutor ainda'}
+            {ativos} {curso.tipo === 'pocket' ? 'comprador(es) avulso(s)' : 'aluno(s)'} com acesso ativo ·{' '}
+            {perguntas.length ? `${perguntas.length} perguntas recentes ao Tutor` : 'nenhuma pergunta ao Tutor ainda'}
+            {curso.tipo === 'pocket' && ' · quem tem a Ilha também acessa este pocket'}
           </p>
         </div>
         <div className="flex gap-2">
@@ -125,7 +177,7 @@ const AdminCursosTab = () => {
             </a>
           </Button>
           <Button variant="outline" asChild>
-            <a href={`/cursos/${curso.slug}`} target="_blank" rel="noopener">
+            <a href={curso.pagina} target="_blank" rel="noopener">
               Página de vendas <ExternalLink className="ml-2 h-4 w-4" />
             </a>
           </Button>
@@ -177,7 +229,13 @@ const AdminCursosTab = () => {
                   <td className="py-2 pr-3">{a.nome ?? '—'}</td>
                   <td className="py-2 pr-3">{a.origem === 'hotmart' ? `Hotmart ${a.hotmart_transacao ?? ''}` : 'Manual'}</td>
                   <td className="py-2 pr-3 whitespace-nowrap tabular-nums">{data(a.created_at)}</td>
-                  <td className="py-2 pr-3">{a.status === 'ativo' ? <span className="text-green-500">Ativo</span> : <span className="text-destructive">Revogado</span>}</td>
+                  <td className="py-2 pr-3">
+                    {a.status === 'ativo' ? (
+                      <span className="text-green-500">Ativo</span>
+                    ) : (
+                      <span className="text-destructive">Revogado</span>
+                    )}
+                  </td>
                   <td className="py-2 text-right">
                     {a.status === 'ativo' ? (
                       <Button size="sm" variant="ghost" onClick={() => mudarStatus(a, 'revogado')}>
@@ -203,36 +261,40 @@ const AdminCursosTab = () => {
         </div>
       </Card>
 
-      <Card className="p-5 space-y-4">
-        <h3 className="font-semibold">Hotmart e vídeos</h3>
-        <ConfigCampo
-          rotulo="ID do produto na Hotmart"
-          ajuda="Aparece em Produtos › o curso › ID do produto. O webhook usa este número para saber de qual curso é a compra."
-          valor={config.hotmart_produto_id ?? ''}
-          onSalvar={(v) => salvarConfig('hotmart_produto_id', v)}
-        />
-        <ConfigCampo
-          rotulo="ID da biblioteca no Bunny Stream"
-          ajuda="Bunny › Stream › a sua biblioteca › API: Library ID (só números)."
-          valor={config.bunny_library_id ?? ''}
-          onSalvar={(v) => salvarConfig('bunny_library_id', v)}
-        />
-        <div className="grid gap-3 md:grid-cols-2">
-          {aulasComVideo(curso).map((a) => (
-            <ConfigCampo
-              key={a.slug}
-              rotulo={`Vídeo · Aula ${a.numero} · ${a.titulo}`}
-              ajuda="Bunny › o vídeo › Video ID (o código longo)."
-              valor={config[`video:${a.slug}`] ?? ''}
-              onSalvar={(v) => salvarConfig(`video:${a.slug}`, v)}
-            />
-          ))}
-        </div>
-      </Card>
+      {curso.tipo === 'curso' && (
+        <Card className="p-5 space-y-4">
+          <h3 className="font-semibold">Hotmart e vídeos</h3>
+          <ConfigCampo
+            rotulo="ID do produto na Hotmart"
+            ajuda="Aparece em Produtos › o curso › ID do produto. O webhook usa este número para saber de qual curso é a compra."
+            valor={config.hotmart_produto_id ?? ''}
+            onSalvar={(v) => salvarConfig('hotmart_produto_id', v)}
+          />
+          <ConfigCampo
+            rotulo="ID da biblioteca no Bunny Stream"
+            ajuda="Bunny › Stream › a sua biblioteca › API: Library ID (só números)."
+            valor={config.bunny_library_id ?? ''}
+            onSalvar={(v) => salvarConfig('bunny_library_id', v)}
+          />
+          <div className="grid gap-3 md:grid-cols-2">
+            {comVideo.map((a) => (
+              <ConfigCampo
+                key={a.slug}
+                rotulo={`Vídeo · Aula ${a.numero} · ${a.titulo}`}
+                ajuda="Bunny › o vídeo › Video ID (o código longo)."
+                valor={config[`video:${a.slug}`] ?? ''}
+                onSalvar={(v) => salvarConfig(`video:${a.slug}`, v)}
+              />
+            ))}
+          </div>
+        </Card>
+      )}
 
       <Card className="p-5 space-y-3">
         <h3 className="font-semibold">Materiais para baixar</h3>
-        <p className="text-sm text-muted-foreground">Ficam num armazenamento privado: só quem tem acesso ao curso baixa, por um link que vence em 1 hora.</p>
+        <p className="text-sm text-muted-foreground">
+          Ficam num armazenamento privado: só quem tem acesso ao curso baixa, por um link que vence em 1 hora.
+        </p>
         <div className="divide-y divide-border">
           {curso.aulas.flatMap((a) =>
             a.materiais.map((m) => {
@@ -278,7 +340,9 @@ const AdminCursosTab = () => {
 
       <Card className="p-5 space-y-3">
         <h3 className="font-semibold">Perguntas ao Tutor</h3>
-        <p className="text-sm text-muted-foreground">As 50 mais recentes. Mostram onde os alunos travam: bom material para melhorar as aulas.</p>
+        <p className="text-sm text-muted-foreground">
+          As 50 mais recentes. Mostram onde os alunos travam: bom material para melhorar as aulas.
+        </p>
         <div className="space-y-3">
           {perguntas.map((p) => (
             <div key={p.id} className="rounded-lg border border-border p-3 text-sm space-y-1">
@@ -313,7 +377,9 @@ const AdminCursosTab = () => {
                     {pd.forma_pagamento ?? '-'}
                     {pd.parcelas && pd.parcelas > 1 ? ` · ${pd.parcelas}x` : ''}
                   </td>
-                  <td className={`py-2 whitespace-nowrap ${pd.status === 'aprovado' ? 'text-primary font-medium' : pd.status === 'recusado' || pd.status === 'reembolsado' || pd.status === 'contestado' ? 'text-destructive' : 'text-muted-foreground'}`}>
+                  <td
+                    className={`py-2 whitespace-nowrap ${pd.status === 'aprovado' ? 'text-primary font-medium' : pd.status === 'recusado' || pd.status === 'reembolsado' || pd.status === 'contestado' ? 'text-destructive' : 'text-muted-foreground'}`}
+                  >
                     {pd.status}
                   </td>
                 </tr>

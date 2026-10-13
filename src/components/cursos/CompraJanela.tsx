@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, X } from 'lucide-react';
 import { criarCompra, lembrarEmail } from '@/lib/pagamento';
+import { reais } from '@/content/cursos/pockets';
 import '@/styles/compra.css';
 
 type Props = {
@@ -11,6 +12,8 @@ type Props = {
   nomeCurso: string;
   preco: number;
   linhaLote: string;
+  /** linha das formas de pagamento, abaixo do preço */
+  formas?: string;
   suporte: string;
   /** 'escola' (turquesa, vitrine) ou 'ilha' (sálvia, página de vendas) */
   tema?: 'escola' | 'ilha';
@@ -22,7 +25,19 @@ type Props = {
 // Antes de ir para o Mercado Pago, pede o e-mail que vai receber o acesso:
 // é por ele que o aluno entra nas aulas, então não depende do e-mail que a
 // pessoa usa no Mercado Pago.
-const CompraJanela = ({ aberta, onFechar, curso, nomeCurso, preco, linhaLote, suporte, tema = 'escola', onAbrirPagamento, aviso }: Props) => {
+const CompraJanela = ({
+  aberta,
+  onFechar,
+  curso,
+  nomeCurso,
+  preco,
+  linhaLote,
+  formas = 'pagamento único · Pix, boleto ou até 12x no cartão',
+  suporte,
+  tema = 'escola',
+  onAbrirPagamento,
+  aviso,
+}: Props) => {
   const [email, setEmail] = useState('');
   const [nome, setNome] = useState('');
   const [enviando, setEnviando] = useState(false);
@@ -95,7 +110,7 @@ const CompraJanela = ({ aberta, onFechar, curso, nomeCurso, preco, linhaLote, su
         ) : (
           <form onSubmit={enviar} noValidate>
             <h2 id="compra-titulo">Para onde vai o seu acesso?</h2>
-            <p className="compra__texto">Use o e-mail em que você quer receber o acesso. É com ele que você entra nas aulas.</p>
+            <p className="compra__texto">Use o e-mail em que você quer receber o acesso. É com ele que você entra na área do aluno.</p>
             <div className="compra__campo">
               <label htmlFor="compra-email">E-mail</label>
               <input
@@ -125,8 +140,8 @@ const CompraJanela = ({ aberta, onFechar, curso, nomeCurso, preco, linhaLote, su
               </div>
             )}
             <div className="compra__total">
-              <b>R$ {preco}</b>
-              <span>pagamento único · Pix, boleto ou até 12x no cartão</span>
+              <b>{reais(preco)}</b>
+              <span>{formas}</span>
             </div>
             <button className="compra__botao" type="submit" disabled={enviando}>
               {enviando ? 'Abrindo o Mercado Pago…' : 'Ir para o pagamento'}

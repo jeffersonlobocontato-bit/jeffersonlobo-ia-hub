@@ -3,7 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { SEO } from '@/components/SEO';
-import { cursoPorSlug, CURSO_ILHA } from '@/content/cursos/ilha';
+import { produtoPorSlug } from '@/content/cursos/produtos';
 import '@/styles/cursos-area.css';
 
 // Entrada da área do aluno. O padrão é o link mágico por e-mail (sem senha);
@@ -13,7 +13,7 @@ const Entrar = () => {
   const [params] = useSearchParams();
   const navigate = useNavigate();
   const { user, loading, signIn } = useAuth();
-  const curso = cursoPorSlug(params.get('curso') ?? 'ilha') ?? CURSO_ILHA;
+  const curso = produtoPorSlug(params.get('curso') ?? 'ilha') ?? produtoPorSlug('ilha')!;
   const voltaParam = params.get('volta');
   const volta = voltaParam && voltaParam.startsWith('/cursos/') ? voltaParam : `/cursos/${curso.slug}/aulas`;
 
@@ -118,7 +118,7 @@ const Entrar = () => {
 
           <hr style={{ border: 0, borderTop: '1px solid var(--i-line2)', margin: '0.2rem 0' }} />
           <p className="i-faint" style={{ fontSize: '0.88rem' }}>
-            Ainda não é aluno? <Link to={`/cursos/${curso.slug}`}>Conheça o curso</Link>. Precisa de ajuda?{' '}
+            Ainda não é aluno? <Link to={curso.pagina}>{curso.tipo === 'pocket' ? 'Conheça o pocket' : 'Conheça o curso'}</Link>. Precisa de ajuda?{' '}
             <a href={curso.suporteWhatsApp} target="_blank" rel="noopener">
               Fale com o suporte
             </a>

@@ -26,8 +26,8 @@ const CursoAcessoLiberado = ({ nome, curso = 'Ilha de Edição completa', link =
 
         <Section style={body}>
           <Text style={paragraph}>
-            Obrigado por entrar. As 5 aulas, os manuais, o instalador e o seu bônus,
-            o e-book <strong>O código invisível</strong>, já estão na sua área do aluno.
+            Obrigado por entrar. As 5 aulas, os manuais, o instalador e os seus bônus,
+            o e-book <strong>O código invisível</strong> e os <strong>3 pockets</strong>, já estão na sua área do aluno.
           </Text>
           <Text style={paragraph}>
             Para entrar, use <strong>este mesmo e-mail</strong>. Você recebe um link de acesso
@@ -52,7 +52,7 @@ const CursoAcessoLiberado = ({ nome, curso = 'Ilha de Edição completa', link =
             Uma regra que vale para sempre: ninguém, nem o Claude, vai te pedir senha ou chave pelo chat.
           </Text>
           <Text style={note}>
-            Você tem 7 dias de garantia. Se não fizer sentido para você, é só pedir o reembolso pela Hotmart.
+            Você tem 7 dias de garantia. Se não fizer sentido para você, é só pedir o reembolso pelo WhatsApp.
           </Text>
         </Section>
 

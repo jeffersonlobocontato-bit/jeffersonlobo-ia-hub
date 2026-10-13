@@ -296,7 +296,10 @@ function writeLlmsTxt(blogPosts: BlogPostRow[]) {
   lines.push('');
   lines.push(`- [O código invisível dos superagentes de inteligência artificial](${BASE_URL}/livro-del): livro de Jefferson Lobo sobre o Método DEL — como treinar agentes de IA com fidelidade autoral, sem programar. Disponível em e-book (R$ 47) e impresso.`);
   lines.push(`- [Materiais gratuitos do livro](${BASE_URL}/materiais): checklists de auditoria de fidelidade autoral e templates operacionais do Método DEL, sem cadastro.`);
-  lines.push(`- [Ilha de Edição completa](${BASE_URL}/cursos/ilha): curso de Jefferson Lobo com 5 aulas para instalar no Claude um estúdio de conteúdo para Instagram (reels, carrosséis, stories, direct automático e formatos), com Tutor IA e o e-book O código invisível de bônus. Vitrine de cursos em ${BASE_URL}/cursos.`);
+  lines.push(`- [Ilha de Edição completa](${BASE_URL}/cursos/ilha): curso de Jefferson Lobo com 5 aulas para instalar no Claude um estúdio de conteúdo para Instagram (reels, carrosséis, stories, direct automático e formatos), com Tutor IA, o e-book O código invisível e 3 pockets de bônus. Vitrine de cursos em ${BASE_URL}/cursos.`);
+  lines.push(`- [Pocket: Configurei o Claude errado](${BASE_URL}/cursos/pocket/configurei-o-claude-errado): tutorial em PDF (R$ 9,90) para configurar o Claude do zero: instruções gerais, projetos, contexto, memória e conectores, com as telas em português.`);
+  lines.push(`- [Pocket: Claude com a sua voz](${BASE_URL}/cursos/pocket/claude-com-a-sua-voz): tutorial em PDF (R$ 9,90) com o Método DEL na prática, para montar um projeto no Claude que escreve com a voz do autor e testar a fidelidade.`);
+  lines.push(`- [Pocket: Do roteiro à postagem](${BASE_URL}/cursos/pocket/do-roteiro-a-postagem): tutorial em PDF (R$ 9,90) com modelos de pedido para reels, carrossel e stories, legenda, calendário da semana e agendamento pela Zernio.`);
   lines.push('');
   lines.push('## Recursos gratuitos');
   lines.push('');
@@ -363,6 +366,9 @@ async function main() {
     { path: "/livro-del", lastmod: today, changefreq: "weekly", priority: "0.9" },
     { path: "/cursos", lastmod: today, changefreq: "weekly", priority: "0.9" },
     { path: "/cursos/ilha", lastmod: today, changefreq: "weekly", priority: "0.95" },
+    { path: "/cursos/pocket/configurei-o-claude-errado", lastmod: today, changefreq: "monthly", priority: "0.8" },
+    { path: "/cursos/pocket/claude-com-a-sua-voz", lastmod: today, changefreq: "monthly", priority: "0.8" },
+    { path: "/cursos/pocket/do-roteiro-a-postagem", lastmod: today, changefreq: "monthly", priority: "0.8" },
     { path: "/blog", lastmod: today, changefreq: "weekly", priority: "0.9" },
     { path: "/palestras-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/palestrante-inteligencia-artificial", lastmod: today, changefreq: "monthly", priority: "0.95" },

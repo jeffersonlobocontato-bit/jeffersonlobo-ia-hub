@@ -7,6 +7,7 @@
 // resposta em curso_tutor_mensagens (o admin vê na aba Cursos).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { CONHECIMENTO_ILHA } from '../_shared/cursos/ilha-conhecimento.ts';
+import { CONHECIMENTO_POCKETS } from '../_shared/cursos/pockets-conhecimento.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -16,15 +17,18 @@ const corsHeaders = {
 const json = (status: number, body: unknown) =>
   new Response(JSON.stringify(body), { status, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
 
-const CONHECIMENTO: Record<string, { nome: string; texto: string }> = {
+// Uma base por produto. Os pockets têm o texto dos PDFs; quem tem a Ilha usa
+// o Tutor do pocket pelo bônus (o acesso vem pela inclusão no banco).
+const CONHECIMENTO: Record<string, { nome: string; texto: string; tipo?: 'curso' | 'pocket' }> = {
   ilha: { nome: 'Ilha de Edição completa', texto: CONHECIMENTO_ILHA },
+  ...Object.fromEntries(Object.entries(CONHECIMENTO_POCKETS).map(([k, v]) => [k, { ...v, tipo: 'pocket' as const }])),
 };
 
 const LIMITE_DIA = 40;
 const MAX_HISTORICO = 12;
 const MAX_CARACTERES = 1500;
 
-const sistema = (nomeCurso: string, aula: string | null, conhecimento: string) => `Você é o Tutor da Ilha, o assistente de dúvidas do curso "${nomeCurso}", do Jefferson Lobo.
+const sistema = (nomeCurso: string, aula: string | null, conhecimento: string, pocket = false) => `Você é o ${pocket ? 'Tutor da Academia' : 'Tutor da Ilha'}, o assistente de dúvidas ${pocket ? 'do pocket' : 'do curso'} "${nomeCurso}", do Jefferson Lobo.
 Você é uma IA e, se perguntarem, diz isso com naturalidade. Não se apresente como o Jefferson.
 
 Como responder:
@@ -94,7 +98,7 @@ Deno.serve(async (req) => {
     headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'google/gemini-2.5-flash',
-      messages: [{ role: 'system', content: sistema(base.nome, aula, base.texto) }, ...historico],
+      messages: [{ role: 'system', content: sistema(base.nome, aula, base.texto, base.tipo === 'pocket') }, ...historico],
     }),
   });
 

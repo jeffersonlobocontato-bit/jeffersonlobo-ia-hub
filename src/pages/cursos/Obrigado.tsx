@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { SEO } from '@/components/SEO';
-import { CURSO_ILHA } from '@/content/cursos/ilha';
+import { produtoPorSlug } from '@/content/cursos/produtos';
 import EscolaTopo from '@/components/cursos/escola/EscolaTopo';
 import { useEscola } from '@/components/cursos/escola/useEscola';
 import { confirmarCompra, emailLembrado, statusDoPedido } from '@/lib/pagamento';
@@ -24,7 +24,9 @@ const Obrigado = () => {
   const [status, setStatus] = useState<string | null>(null);
   const [acompanhando, setAcompanhando] = useState(true);
   const email = emailLembrado();
-  const curso = CURSO_ILHA;
+  // o Mercado Pago devolve com ?curso=<slug> (pedidos antigos não têm: Ilha)
+  const curso = produtoPorSlug(params.get('curso')) ?? produtoPorSlug('ilha')!;
+  const ehPocket = curso.tipo === 'pocket';
 
   useEffect(() => {
     if (!pedido || !/^[0-9a-f-]{36}$/i.test(pedido)) {
@@ -71,7 +73,7 @@ const Obrigado = () => {
                 <CheckCircle2 size={30} aria-hidden />
               </span>
               <span className="e-olho">Pagamento aprovado</span>
-              <h1>Bem-vindo à Ilha!</h1>
+              <h1>{ehPocket ? 'O seu pocket chegou!' : 'Bem-vindo à Ilha!'}</h1>
               <p>
                 {email ? (
                   <>
@@ -83,7 +85,7 @@ const Obrigado = () => {
                 Você também pode entrar agora mesmo:
               </p>
               <Link to={entrar} className="e-btn e-btn--principal">
-                Entrar na área do aluno
+                {ehPocket ? 'Baixar o meu pocket' : 'Entrar na área do aluno'}
               </Link>
               <small>Não achou o e-mail? Olhe a caixa de spam e as promoções.</small>
             </>
@@ -95,7 +97,7 @@ const Obrigado = () => {
               <span className="e-olho">Pagamento não aprovado</span>
               <h1>Não deu certo desta vez.</h1>
               <p>Nenhum valor foi cobrado. Tente de novo, com outro cartão ou com Pix.</p>
-              <Link to="/cursos/ilha" className="e-btn e-btn--principal">
+              <Link to={curso.pagina} className="e-btn e-btn--principal">
                 Tentar de novo
               </Link>
             </>

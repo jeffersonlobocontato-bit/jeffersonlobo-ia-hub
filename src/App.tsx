@@ -38,6 +38,7 @@ const CursosEntrar = lazy(() => import("./pages/cursos/Entrar"));
 const CursoSalaDeAula = lazy(() => import("./pages/cursos/SalaDeAula"));
 const CursosObrigado = lazy(() => import("./pages/cursos/Obrigado"));
 const CursosTermos = lazy(() => import("./pages/cursos/Termos"));
+const CursoPocketVendas = lazy(() => import("./pages/cursos/PocketVendas"));
 const carregando = <div className="min-h-screen bg-[#111A17]" />;
 const comSuspense = (el: JSX.Element) => <Suspense fallback={carregando}>{el}</Suspense>;
 
@@ -78,6 +79,7 @@ const App = () => (
               <Route path="/cursos/obrigado" element={comSuspense(<CursosObrigado />)} />
               <Route path="/cursos/termos" element={comSuspense(<CursosTermos />)} />
               <Route path="/cursos/ilha" element={comSuspense(<CursoIlhaVendas />)} />
+              <Route path="/cursos/pocket/:pocket" element={comSuspense(<CursoPocketVendas />)} />
               <Route path="/cursos/:curso/aulas" element={comSuspense(<CursoSalaDeAula />)} />
               <Route path="/cursos/:curso/aulas/:aula" element={comSuspense(<CursoSalaDeAula />)} />
               <Route

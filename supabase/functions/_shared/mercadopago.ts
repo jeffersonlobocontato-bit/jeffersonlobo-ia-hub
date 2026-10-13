@@ -108,20 +108,24 @@ export function montarPreferencia(p: {
   nomeCurso: string;
   imagem: string;
   preco: number;
-  lote: number;
+  /** null para produto de preço fixo (pockets) */
+  lote: number | null;
+  /** texto do item na página do Mercado Pago */
+  descricao?: string;
   email: string;
   nome?: string | null;
   site: string;
   pagina: string;
   notificacao: string;
 }) {
-  const volta = (estado: string) => `${p.site}/cursos/obrigado?pedido=${p.pedidoId}&estado=${estado}`;
+  const volta = (estado: string) =>
+    `${p.site}/cursos/obrigado?pedido=${p.pedidoId}&estado=${estado}&curso=${encodeURIComponent(p.curso)}`;
   return {
     items: [
       {
-        id: `${p.curso}-lote${p.lote}`,
+        id: p.lote ? `${p.curso}-lote${p.lote}` : p.curso,
         title: p.nomeCurso,
-        description: `Curso online ${p.nomeCurso} (lote ${p.lote}) com o e-book bônus`,
+        description: p.descricao ?? `Curso online ${p.nomeCurso}${p.lote ? ` (lote ${p.lote})` : ''}`,
         picture_url: p.imagem,
         category_id: 'learnings',
         quantity: 1,

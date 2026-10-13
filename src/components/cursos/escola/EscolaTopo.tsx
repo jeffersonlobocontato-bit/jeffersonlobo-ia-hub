@@ -14,6 +14,7 @@ const EscolaTopo = ({ onCta }: Props) => (
       </Link>
       <div className="e-topo__links">
         <a href="/cursos#catalogo">Cursos</a>
+        <a href="/cursos#pockets">Pockets</a>
         <a href="/cursos#livro">Livro</a>
         <a href="/cursos#como-funciona">Como funciona</a>
         <Link to="/">Site</Link>

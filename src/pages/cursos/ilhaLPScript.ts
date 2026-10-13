@@ -26,7 +26,9 @@ export function iniciarLP(raiz: HTMLElement, cfg: Config) {
     const preco = l2 ? cfg.precos.lote2 : cfg.precos.lote1;
     $$('[data-preco-curto]').forEach((e) => (e.textContent = `R$ ${preco}`));
     $$('[data-preco-valor]').forEach((e) => (e.textContent = String(preco)));
-    $$('[data-total]').forEach((e) => (e.textContent = `R$ ${preco + cfg.bonusValor}`));
+    const total = Math.round((preco + cfg.bonusValor) * 100) / 100;
+    const totalTexto = total.toLocaleString('pt-BR', Number.isInteger(total) ? { maximumFractionDigits: 0 } : { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    $$('[data-total]').forEach((e) => (e.textContent = `R$ ${totalTexto}`));
     const n = $('[data-lote-nome]');
     if (n) n.textContent = l2 ? 'Lote 2' : `Lote 1 · até ${diaMes}, 23h59`;
     const d = $('[data-depois]');
