@@ -5,10 +5,13 @@
 // POST { curso, caminho }  (caminho dentro do bucket privado `cursos`)
 // verify_jwt = true: só aluno logado. Conferimos o acesso com o próprio token
 // do aluno (tem_acesso_curso) e lemos o arquivo com a service role.
+// O acesso vale para o produto dono da pasta do arquivo (a primeira parte do
+// caminho): um pocket baixado de dentro da Ilha é conferido como o pocket, e
+// quem tem a Ilha passa pela inclusão (curso_inclusoes).
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import * as pdfLib from 'npm:pdf-lib@1.17.1';
 import { carimbarPdf } from '../_shared/cursos/marca-dagua.ts';
-import { CATALOGO } from '../_shared/cursos/catalogo.ts';
+import { CATALOGO, produtoDoCaminho } from '../_shared/cursos/catalogo.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -37,9 +40,9 @@ Deno.serve(async (req) => {
   } catch {
     return json(400, { erro: 'JSON inválido' });
   }
-  const curso = String(corpo?.curso ?? '');
   const caminho = String(corpo?.caminho ?? '');
-  if (!CATALOGO[curso] || !caminho.startsWith(`${curso}/`) || caminho.includes('..') || caminho.length > 300) {
+  const curso = produtoDoCaminho(caminho);
+  if (!curso || caminho.includes('..') || caminho.includes('//') || caminho.length > 300) {
     return json(400, { erro: 'material inválido' });
   }
 
