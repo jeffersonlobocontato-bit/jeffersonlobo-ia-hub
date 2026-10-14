@@ -50,6 +50,13 @@
       "when": 1791931175437,
       "tag": "0006_fix_product_cases_bucket_policy",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791938781873,
+      "tag": "0007_painel_sem_robos",
+      "breakpoints": true
     }
   ]
 }

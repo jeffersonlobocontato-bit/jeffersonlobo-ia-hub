@@ -2286,6 +2286,10 @@ export type Database = {
     }
     Functions: {
       academia_canal: { Args: { _origem: string }; Returns: string }
+      academia_visita_robo: {
+        Args: { _altura: number; _largura: number; _ua: string }
+        Returns: boolean
+      }
       acesso_ativo_por_email: {
         Args: { _curso: string; _email: string }
         Returns: boolean
