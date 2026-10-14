@@ -7,8 +7,8 @@ import type { Secao } from './termos';
 // Ao mudar algo relevante, atualize VERSAO_PRIVACIDADE e PRIVACIDADE_ATUALIZADA_EM:
 // a versão aceita fica gravada em cada cadastro.
 
-export const VERSAO_PRIVACIDADE = '1.2';
-export const PRIVACIDADE_ATUALIZADA_EM = '13 de outubro de 2026';
+export const VERSAO_PRIVACIDADE = '1.3';
+export const PRIVACIDADE_ATUALIZADA_EM = '14 de outubro de 2026';
 
 const f = ESCOLA.fornecedor;
 
@@ -84,7 +84,8 @@ export const PRIVACIDADE: Secao[] = [
     paragrafos: [
       'Para saber quais canais trazem pessoas à Academia, o site registra as páginas visitadas, a origem da visita (o site anterior e os parâmetros de campanha do link, como utm_source) e os cliques em botões, ligados a um identificador anônimo da sessão do navegador. Esses registros não incluem nome, e-mail ou WhatsApp.',
       'O navegador guarda localmente, por até 30 dias, a última origem que não foi um acesso direto, para atribuir corretamente um cadastro ou uma compra feita depois. Quando você se cadastra ou compra, essa origem fica junto do cadastro ou do pedido.',
-      'Não usamos cookies de publicidade nem pixels de anúncio. Se passarmos a usar, esta política será atualizada antes.',
+      'O site usa o Pixel da Meta (Instagram e Facebook) para medir os anúncios da Academia: ele registra, pelo navegador, as páginas visitadas, o início de uma compra e a compra aprovada, com o valor e o nome do produto. A Meta pode associar esses eventos à sua conta nas plataformas dela, conforme a política de dados da Meta. O pixel não recebe o seu nome, e-mail, WhatsApp, CPF nem dados de pagamento.',
+      'Você pode bloquear o pixel com as configurações de privacidade do navegador ou com um bloqueador de anúncios, sem prejuízo para a compra ou para o acesso às aulas. Também pode ajustar os anúncios que vê nas configurações de anúncios da sua conta na Meta.',
     ],
   },
   {
