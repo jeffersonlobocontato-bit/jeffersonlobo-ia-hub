@@ -358,3 +358,9 @@
   .pn-card-acesso,
   .pn-card-acesso:hover { transition: none; transform: none; }
 }
+
+/* ---------- seus acessos (Operação) ---------- */
+.pn-meus-acessos { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; padding: 12px 14px; border-radius: 12px; border: 1px solid rgb(45 212 191 / 0.25); background: rgb(20 184 166 / 0.06); }
+.pn-meus-acessos > div { display: grid; gap: 2px; min-width: 0; flex: 1 1 220px; font-size: 13px; }
+.pn-meus-acessos b { color: #fff; font-weight: 600; }
+.pn-meus-acessos span { color: var(--e-texto-3); }
