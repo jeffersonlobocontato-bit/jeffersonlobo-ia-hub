@@ -8,6 +8,7 @@ import { SITE_URL } from '@/components/SEO';
 import { ISCA_SKILLS as ISCA } from '@/content/cursos/iscas';
 import { VERSAO_PRIVACIDADE } from '@/content/cursos/privacidade';
 import { origemParaConversao } from '@/lib/traffic-source';
+import { trackLead } from '@/lib/metaPixel';
 
 // E-book gratuito na vitrine (/cursos#ebook-gratis): captura nome, e-mail e
 // WhatsApp (obrigatório) com consentimento para comunicações e remarketing,
@@ -94,6 +95,7 @@ export default function IscaEbook() {
         },
       })
       .catch(() => null);
+    trackLead({ content_name: '50 skills do Claude' });
     void trackCTA(`isca_${ISCA.material}_cadastro`, 'vitrine');
     setEnviando(false);
     setPronto({ nome: n.split(' ')[0], email: em });

@@ -29,6 +29,7 @@ import MaterialDetalhe from "./pages/MaterialDetalhe";
 import PressCampaignKiosk from "./pages/admin/PressCampaignKiosk";
 import Claudia from "./pages/Claudia";
 import NotFound from "./pages/NotFound";
+import MetaPixelRouteTracker from "@/components/MetaPixelRouteTracker";
 import { lazy, Suspense } from "react";
 
 // Plataforma de cursos: carregada sob demanda para não pesar no resto do site.
@@ -53,6 +54,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <MetaPixelRouteTracker />
           <AnalyticsTracker>
             <Routes>
               <Route path="/" element={<Index />} />
