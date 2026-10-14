@@ -13,14 +13,32 @@
 // nada é liberado só pelo aviso: vale o que a API do MP responde.
 // Responde 200 depois de processar (o MP reenvia a cada 15 minutos se não
 // receber 200/201), inclusive quando há erro, que fica em pagamento_eventos.
+//
+// GET é só a checagem de saúde do Painel da Academia (aba Operação): diz se a
+// função está no ar e se os dois segredos existem (sim/não, nunca o valor).
+// Não grava nada e não processa pagamento.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { assinaturaValida } from '../_shared/mercadopago.ts';
 import { processarPagamento } from '../_shared/cursos/pagamento-mp.ts';
 
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+};
 const json = (status: number, body: unknown) =>
-  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+  new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json', ...CORS } });
 
 Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers: CORS });
+  if (req.method === 'GET') {
+    return json(200, {
+      ok: true,
+      servico: 'mercadopago-webhook',
+      token: Boolean(Deno.env.get('MERCADOPAGO_ACCESS_TOKEN')),
+      assinatura: Boolean(Deno.env.get('MERCADOPAGO_WEBHOOK_SECRET')),
+    });
+  }
   if (req.method !== 'POST') return json(405, { erro: 'use POST' });
 
   const token = Deno.env.get('MERCADOPAGO_ACCESS_TOKEN') ?? '';
