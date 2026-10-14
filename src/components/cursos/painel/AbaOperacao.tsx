@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { db } from '@/lib/cursos';
 import { dataHora } from '@/lib/painelAcademia';
+import { estadoInterno, marcarInterno } from '@/lib/rastreio';
 import { POCKETS } from '@/content/cursos/pockets';
 
 const AdminCursosTab = lazy(() => import('@/components/admin/AdminCursosTab'));
@@ -34,12 +35,12 @@ async function tabelaExiste(tabela: string) {
   return !(error.code === 'PGRST205' || /does not exist|Could not find/.test(error.message ?? ''));
 }
 
-async function chamarFuncao(nome: string): Promise<{ publicada: boolean; status?: number; texto?: string }> {
+async function chamarFuncao(nome: string, metodo: 'POST' | 'GET' = 'POST'): Promise<{ publicada: boolean; status?: number; texto?: string }> {
   try {
     const r = await fetch(`${URL_SUPA}/functions/v1/${nome}`, {
-      method: 'POST',
+      method: metodo,
       headers: { apikey: CHAVE, Authorization: `Bearer ${CHAVE}`, 'Content-Type': 'application/json' },
-      body: '{}',
+      body: metodo === 'POST' ? '{}' : undefined,
     });
     const texto = await r.text();
     if (r.status === 404 && /not found|NOT_FOUND/i.test(texto)) return { publicada: false, status: 404 };
@@ -58,7 +59,8 @@ async function checarTudo(): Promise<Item[]> {
     tabelaExiste('academia_investimentos'),
     db.rpc('painel_academia', { p_de: '2026-01-01', p_ate: '2026-01-01' }).then(({ error }) => !error || !/PGRST202|Could not find/.test(`${error.code} ${error.message}`)),
     chamarFuncao('mercadopago-checkout'),
-    chamarFuncao('mercadopago-webhook'),
+    // o webhook responde GET com a checagem de saúde (não grava nada)
+    chamarFuncao('mercadopago-webhook', 'GET'),
     chamarFuncao('curso-material'),
     chamarFuncao('curso-tutor'),
     chamarFuncao('send-transactional-email'),
@@ -76,6 +78,13 @@ async function checarTudo(): Promise<Item[]> {
   }
 
   const tokenOk = checkout.publicada && checkout.status !== 503;
+  let saudeWebhook: { token?: boolean; assinatura?: boolean } = {};
+  try {
+    saudeWebhook = JSON.parse(webhook.texto ?? '{}');
+  } catch {
+    /* versão antiga da função, sem checagem de saúde */
+  }
+  const webhookSemSegredo = webhook.publicada && saudeWebhook.assinatura === false;
   return [
     { id: 'cursos', nome: 'Tabelas de cursos e acessos', estado: cursos ? 'ok' : 'falta', detalhe: cursos ? 'Área do aluno, acessos e materiais prontos no banco.' : 'Faltam as migrações de cursos.', acao: cursos ? undefined: 'Aplicar no Lovable: 20261012190000_cursos_plataforma, 20261013010000_cursos_mercadopago, 20261013020000_cursos_marca_dagua e 20261013160000_cursos_pockets.' },
     { id: 'pedidos', nome: 'Tabela de pedidos', estado: pedidos ? 'ok' : 'falta', detalhe: pedidos ? `${aprovados} venda(s) aprovada(s) até hoje.` : 'Vem com a migração 20261013010000_cursos_mercadopago.' },
@@ -91,9 +100,21 @@ async function checarTudo(): Promise<Item[]> {
     {
       id: 'webhook',
       nome: 'Aviso de pagamento (webhook)',
-      estado: !webhook.publicada ? 'falta' : ultimoAviso ? 'ok' : 'aviso',
-      detalhe: !webhook.publicada ? 'A função mercadopago-webhook não está publicada.' : ultimoAviso ? `Último aviso recebido em ${dataHora(ultimoAviso)}.` : 'Publicada, mas nenhum aviso do Mercado Pago chegou ainda.',
-      acao: !webhook.publicada ? 'Publicar a função mercadopago-webhook.' : ultimoAviso ? undefined : 'Configurar o webhook no Mercado Pago e fazer a compra de teste.',
+      estado: !webhook.publicada || webhookSemSegredo ? 'falta' : ultimoAviso ? 'ok' : 'aviso',
+      detalhe: !webhook.publicada
+        ? 'A função mercadopago-webhook não está publicada (ou é a versão antiga, sem checagem).'
+        : webhookSemSegredo
+          ? 'Publicada, mas falta o segredo MERCADOPAGO_WEBHOOK_SECRET.'
+          : ultimoAviso
+            ? `Último aviso recebido em ${dataHora(ultimoAviso)}.`
+            : 'Publicada e configurada; nenhum aviso do Mercado Pago chegou ainda.',
+      acao: !webhook.publicada
+        ? 'Publicar a função mercadopago-webhook.'
+        : webhookSemSegredo
+          ? 'Copiar a assinatura secreta do webhook para Lovable › Cloud › Secrets.'
+          : ultimoAviso
+            ? undefined
+            : 'Simular uma notificação no Mercado Pago ou fazer a compra de teste.',
     },
     { id: 'material', nome: 'Download de materiais', estado: material.publicada ? 'ok' : 'falta', detalhe: material.publicada ? 'Função curso-material publicada.' : 'Publicar a função curso-material.' },
     { id: 'tutor', nome: 'Tutor IA das aulas', estado: tutor.publicada ? 'ok' : 'falta', detalhe: tutor.publicada ? 'Função curso-tutor publicada.' : 'Publicar a função curso-tutor.' },
@@ -187,6 +208,30 @@ function GeradorLinks() {
         <button type="button" className="e-btn e-btn--cheio" onClick={copiar}>{copiado ? <Check size={16} aria-hidden /> : <Copy size={16} aria-hidden />} {copiado ? 'Copiado' : 'Copiar'}</button>
       </div>
       <p className="pn-nota">Nos anúncios, use o meio <b>paid_social</b> (Meta) ou <b>cpc</b> (Google) e lance o gasto com a mesma campanha na aba Investimento.</p>
+    </div>
+  );
+}
+
+// ---------- seus acessos ----------
+function MeusAcessos() {
+  const [naoConta, setNaoConta] = useState(() => estadoInterno() === '1');
+  const trocar = () => {
+    marcarInterno(!naoConta);
+    setNaoConta(!naoConta);
+  };
+  return (
+    <div className="pn-meus-acessos">
+      <div>
+        <b>Seus acessos</b>
+        <span>
+          {naoConta
+            ? 'Este navegador não entra nas estatísticas. Abra o painel uma vez no celular para ele também deixar de contar.'
+            : 'Este navegador está contando nas estatísticas como se fosse um visitante.'}
+        </span>
+      </div>
+      <button type="button" className="e-btn e-btn--fantasma e-btn--pequeno" onClick={trocar}>
+        {naoConta ? 'Voltar a contar' : 'Não contar meus acessos'}
+      </button>
     </div>
   );
 }
@@ -290,6 +335,7 @@ export default function AbaOperacao({ irPara }: { irPara: (aba: string) => void 
 
         <div className="pn-cartao">
           <h3><BookOpen size={18} aria-hidden /> Páginas e ferramentas</h3>
+          <MeusAcessos />
           <ul className="pn-links pn-links--duas">
             {paginas.map((p) => (
               <li key={p.url}><a href={p.url} target="_blank" rel="noopener">{p.nome} <ExternalLink size={13} aria-hidden /></a></li>
