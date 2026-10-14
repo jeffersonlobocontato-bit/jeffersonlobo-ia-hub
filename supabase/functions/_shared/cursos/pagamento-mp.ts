@@ -4,6 +4,7 @@
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { API_MP, acaoDoStatus, statusDoPagamento, type StatusPedido } from '../mercadopago.ts';
 import { CATALOGO, linkDeEntrada } from './catalogo.ts';
+import { documentoDoPagador, nomeDoPagador } from './comprador.ts';
 
 export type Resultado = { pedidoId: string | null; status: StatusPedido | null; acao: string; erro: string | null };
 
@@ -114,17 +115,25 @@ export async function processarPagamento(
     acao = 'nada';
   }
 
-  const { error: erroUpd } = await supabase
-    .from('curso_pedidos')
-    .update({
-      status,
-      pagamento_id: String(pg.id),
-      forma_pagamento: pg.payment_type_id ?? pg.payment_method_id ?? null,
-      parcelas: pg.installments ?? null,
-      valor_pago: pg.transaction_amount ?? null,
-      aprovado_em: pg.date_approved ?? null,
-    })
-    .eq('id', pedidoId);
+  const dados = {
+    status,
+    pagamento_id: String(pg.id),
+    forma_pagamento: pg.payment_type_id ?? pg.payment_method_id ?? null,
+    parcelas: pg.installments ?? null,
+    valor_pago: pg.transaction_amount ?? null,
+    aprovado_em: pg.date_approved ?? null,
+  };
+  // CPF/CNPJ e nome do pagador vão para a nota fiscal. Só grava o que veio
+  // (não apaga o que o admin completou no painel). Se as colunas ainda não
+  // existirem (migração das notas não aplicada), atualiza sem elas: o
+  // pagamento nunca depende da nota.
+  const doc = documentoDoPagador(pg);
+  const nomePagador = nomeDoPagador(pg);
+  const comprador = { ...(doc ? { comprador_doc: doc } : {}), ...(nomePagador ? { comprador_nome: nomePagador } : {}) };
+  let { error: erroUpd } = await supabase.from('curso_pedidos').update({ ...dados, ...comprador }).eq('id', pedidoId);
+  if (erroUpd && Object.keys(comprador).length && /comprador_/.test(erroUpd.message ?? '')) {
+    ({ error: erroUpd } = await supabase.from('curso_pedidos').update(dados).eq('id', pedidoId));
+  }
   if (erroUpd) throw new Error(`atualizar pedido: ${erroUpd.message}`);
 
   let resultado = `status ${status}`;
