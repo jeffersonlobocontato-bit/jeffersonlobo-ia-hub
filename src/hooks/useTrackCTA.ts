@@ -1,4 +1,5 @@
 import { supabase } from '@/integrations/supabase/client';
+import { deveRastrear } from '@/lib/rastreio';
 
 // Get or create session ID
 const getSessionId = (): string => {
@@ -12,6 +13,7 @@ const getSessionId = (): string => {
 
 export const useTrackCTA = () => {
   const trackCTA = async (ctaName: string, ctaLocation: string) => {
+    if (!deveRastrear()) return;
     try {
       const sessionId = getSessionId();
       await supabase.from('cta_events').insert({

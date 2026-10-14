@@ -2,6 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { getTrafficAttribution } from '@/lib/traffic-source';
+import { deveRastrear } from '@/lib/rastreio';
 
 // Generate or retrieve session ID
 const getSessionId = (): string => {
@@ -46,6 +47,8 @@ export const useAnalytics = () => {
   // Track page view
   const trackPageView = useCallback(async () => {
     const attribution = getTrafficAttribution();
+    // robôs, prévia do Lovable e o navegador do admin não entram nas estatísticas
+    if (!deveRastrear()) return;
     const analytics = {
       session_id: sessionId,
       page_path: location.pathname,
@@ -72,6 +75,7 @@ export const useAnalytics = () => {
 
   // Update page duration on leave
   const updatePageDuration = useCallback(async () => {
+    if (!deveRastrear()) return;
     const duration = Math.floor((Date.now() - pageStartTime.current) / 1000);
     if (duration > 0) {
       await supabase
@@ -86,6 +90,7 @@ export const useAnalytics = () => {
 
   // Track click events
   const trackClick = useCallback((event: MouseEvent) => {
+    if (!deveRastrear()) return;
     const target = event.target as HTMLElement;
     
     clickEventsBatch.push({
@@ -105,6 +110,7 @@ export const useAnalytics = () => {
 
   // Track scroll depth
   const trackScroll = useCallback(() => {
+    if (!deveRastrear()) return;
     const now = Date.now();
     // Throttle: only update every 500ms
     if (now - lastScrollUpdate.current < 500) return;
