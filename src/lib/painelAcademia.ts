@@ -263,6 +263,28 @@ export const STATUS_NOTA: Record<NotaStatus, { nome: string; tom: 'ok' | 'espera
 
 export const EMISSOR_NACIONAL = 'https://www.nfse.gov.br/EmissorNacional';
 
+/** Dias da garantia de reembolso (termos de uso). A nota é emitida depois dela, sem cruzar o mês. */
+export const DIAS_GARANTIA = 7;
+
+export type Garantia = { dentro: boolean; ate: Date; viraMes: boolean; diasRestantes: number };
+
+/** Situação da garantia de uma venda, no fuso de São Paulo. */
+export function garantiaDaVenda(p: Pedido, agora = new Date()): Garantia {
+  const inicio = new Date(p.aprovado_em ?? p.created_at);
+  const ate = new Date(inicio.getTime() + DIAS_GARANTIA * 86400000);
+  const mes = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }).slice(0, 7);
+  const dentro = agora < ate;
+  // a garantia termina em outro mês: emitir até o fim deste mês, mesmo em garantia
+  const viraMes = dentro && mes(ate) !== mes(inicio);
+  return { dentro, ate, viraMes, diasRestantes: Math.max(0, Math.ceil((ate.getTime() - agora.getTime()) / 86400000)) };
+}
+
+/** Pode emitir agora: fora da garantia, ou a garantia termina só no mês que vem (emite no mês da venda). */
+export const liberadaParaEmitir = (p: Pedido, agora = new Date()) => {
+  const g = garantiaDaVenda(p, agora);
+  return !g.dentro || g.viraMes;
+};
+
 /** 12345678909 -> 123.456.789-09; 14 dígitos -> CNPJ formatado. */
 export function documentoFormatado(doc: string | null | undefined) {
   const d = String(doc ?? '').replace(/\D/g, '');
