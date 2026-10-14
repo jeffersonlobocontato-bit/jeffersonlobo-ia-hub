@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ExternalLink } from 'lucide-react';
 import Kpi from './Kpi';
+import NotasAEmitir from './NotasAEmitir';
 import { Barras } from './Graficos';
 import {
   CANAIS,
   NOMES_PRODUTO,
+  STATUS_NOTA,
   STATUS_PEDIDO,
   carregarPedidos,
   dataHora,
@@ -28,6 +30,7 @@ export default function AbaVendas({ r, de, ate }: { r: Resumo; de: string; ate: 
   const [pedidos, setPedidos] = useState<Pedido[] | null>(null);
   const [falha, setFalha] = useState<Falha | null>(null);
   const [filtro, setFiltro] = useState<'todos' | 'aprovado' | 'abertos' | 'problema'>('todos');
+  const [versao, setVersao] = useState(0);
 
   useEffect(() => {
     let vivo = true;
@@ -40,7 +43,7 @@ export default function AbaVendas({ r, de, ate }: { r: Resumo; de: string; ate: 
     return () => {
       vivo = false;
     };
-  }, [de, ate]);
+  }, [de, ate, versao]);
 
   const visiveis = useMemo(() => {
     const lista = pedidos ?? [];
@@ -55,6 +58,8 @@ export default function AbaVendas({ r, de, ate }: { r: Resumo; de: string; ate: 
 
   return (
     <div className="pn-aba">
+      <NotasAEmitir aoMudar={() => setVersao((v) => v + 1)} />
+
       <section className="pn-kpis">
         <Kpi rotulo="Vendas aprovadas" valor={inteiro(t.vendas)} />
         <Kpi rotulo="Receita" valor={reais(t.receita)} />
@@ -111,7 +116,7 @@ export default function AbaVendas({ r, de, ate }: { r: Resumo; de: string; ate: 
           <div className="pn-tabela-rola">
             <table className="pn-tabela">
               <thead>
-                <tr><th>Data</th><th>Produto</th><th>Comprador</th><th>Valor</th><th>Status</th><th>Pagamento</th><th>Canal</th></tr>
+                <tr><th>Data</th><th>Produto</th><th>Comprador</th><th>Valor</th><th>Status</th><th>Pagamento</th><th>Canal</th><th>Nota</th></tr>
               </thead>
               <tbody>
                 {visiveis.map((p) => {
@@ -125,6 +130,16 @@ export default function AbaVendas({ r, de, ate }: { r: Resumo; de: string; ate: 
                       <td><span className={`pn-status is-${st.tom}`}>{st.nome}</span></td>
                       <td>{formaPagamento(p.forma_pagamento, p.parcelas)}</td>
                       <td>{canalDoPedido(p)}{p.origem?.utm_campaign ? <small>{p.origem.utm_campaign}</small> : null}</td>
+                      <td>
+                        {p.nf_status ? (
+                          <>
+                            <span className={`pn-status is-${STATUS_NOTA[p.nf_status].tom}`}>{STATUS_NOTA[p.nf_status].nome}</span>
+                            {p.nf_numero ? <small>nº {p.nf_numero}</small> : null}
+                          </>
+                        ) : (
+                          '—'
+                        )}
+                      </td>
                     </tr>
                   );
                 })}

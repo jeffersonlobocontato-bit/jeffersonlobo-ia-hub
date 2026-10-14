@@ -182,7 +182,7 @@ export type Falha = { tipo: 'sem-migracao' | 'sem-permissao' | 'erro'; mensagem:
 
 const falhaDe = (e: { message?: string; code?: string } | null): Falha => {
   const m = e?.message ?? '';
-  if (e?.code === 'PGRST202' || e?.code === 'PGRST205' || /does not exist|Could not find/.test(m)) return { tipo: 'sem-migracao', mensagem: m };
+  if (e?.code === 'PGRST202' || e?.code === 'PGRST205' || e?.code === '42703' || /does not exist|Could not find/.test(m)) return { tipo: 'sem-migracao', mensagem: m };
   if (/sem_permissao|permission denied/.test(m)) return { tipo: 'sem-permissao', mensagem: m };
   return { tipo: 'erro', mensagem: m || 'Erro desconhecido' };
 };
@@ -210,6 +210,14 @@ export type Pedido = {
   forma_pagamento: string | null;
   parcelas: number | null;
   origem?: Record<string, string> | null;
+  pagamento_id?: string | null;
+  aprovado_em?: string | null;
+  comprador_doc?: string | null;
+  comprador_nome?: string | null;
+  nf_status?: NotaStatus | null;
+  nf_numero?: string | null;
+  nf_observacao?: string | null;
+  nf_atualizada_em?: string | null;
 };
 
 export async function carregarPedidos(de: string, ate: string): Promise<{ pedidos?: Pedido[]; falha?: Falha }> {
@@ -237,4 +245,96 @@ export async function carregarInvestimentos(de: string, ate: string): Promise<{ 
     .order('data', { ascending: false });
   if (error) return { falha: falhaDe(error) };
   return { itens: (data ?? []) as Investimento[] };
+}
+
+// ---------- notas fiscais (NFS-e) ----------
+// Enquanto a emissão é manual no Emissor Nacional, o painel lista as vendas
+// aprovadas com os dados prontos para copiar, e o admin marca o que emitiu.
+
+export type NotaStatus = 'pendente' | 'emitida' | 'cancelar' | 'cancelada' | 'dispensada';
+
+export const STATUS_NOTA: Record<NotaStatus, { nome: string; tom: 'ok' | 'espera' | 'ruim' | 'neutro' }> = {
+  pendente: { nome: 'A emitir', tom: 'espera' },
+  emitida: { nome: 'Emitida', tom: 'ok' },
+  cancelar: { nome: 'Cancelar nota', tom: 'ruim' },
+  cancelada: { nome: 'Cancelada', tom: 'neutro' },
+  dispensada: { nome: 'Dispensada', tom: 'neutro' },
+};
+
+export const EMISSOR_NACIONAL = 'https://www.nfse.gov.br/EmissorNacional';
+
+/** Dias da garantia de reembolso (termos de uso). A nota é emitida depois dela, sem cruzar o mês. */
+export const DIAS_GARANTIA = 7;
+
+export type Garantia = { dentro: boolean; ate: Date; viraMes: boolean; diasRestantes: number };
+
+/** Situação da garantia de uma venda, no fuso de São Paulo. */
+export function garantiaDaVenda(p: Pedido, agora = new Date()): Garantia {
+  const inicio = new Date(p.aprovado_em ?? p.created_at);
+  const ate = new Date(inicio.getTime() + DIAS_GARANTIA * 86400000);
+  const mes = (d: Date) => d.toLocaleDateString('en-CA', { timeZone: 'America/Sao_Paulo' }).slice(0, 7);
+  const dentro = agora < ate;
+  // a garantia termina em outro mês: emitir até o fim deste mês, mesmo em garantia
+  const viraMes = dentro && mes(ate) !== mes(inicio);
+  return { dentro, ate, viraMes, diasRestantes: Math.max(0, Math.ceil((ate.getTime() - agora.getTime()) / 86400000)) };
+}
+
+/** Pode emitir agora: fora da garantia, ou a garantia termina só no mês que vem (emite no mês da venda). */
+export const liberadaParaEmitir = (p: Pedido, agora = new Date()) => {
+  const g = garantiaDaVenda(p, agora);
+  return !g.dentro || g.viraMes;
+};
+
+/** 12345678909 -> 123.456.789-09; 14 dígitos -> CNPJ formatado. */
+export function documentoFormatado(doc: string | null | undefined) {
+  const d = String(doc ?? '').replace(/\D/g, '');
+  if (d.length === 11) return d.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+  if (d.length === 14) return d.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, '$1.$2.$3/$4-$5');
+  return d;
+}
+
+/** Texto da descrição do serviço na nota. */
+export function descricaoDaNota(p: Pedido) {
+  const produto = NOMES_PRODUTO[p.curso_slug] ?? p.curso_slug;
+  const tipo = p.curso_slug.startsWith('pocket') ? 'Tutorial digital (curso livre online)' : 'Curso livre online';
+  return `${tipo}: ${produto}. Acesso individual à área do aluno em jeffersonlobo.tech/cursos. Pedido ${p.id.slice(0, 8)}${p.pagamento_id ? `, pagamento Mercado Pago ${p.pagamento_id}` : ''}.`;
+}
+
+/** Valor em formato de digitação no portal: 9,90 */
+export const valorDigitavel = (v: number) => Number(v).toFixed(2).replace('.', ',');
+
+export async function carregarNotasPendentes(): Promise<{ pedidos?: Pedido[]; falha?: Falha }> {
+  const { data, error } = await db
+    .from('curso_pedidos')
+    .select('*')
+    .in('nf_status', ['pendente', 'cancelar'])
+    .order('created_at', { ascending: true })
+    .limit(300);
+  if (error) return { falha: falhaDe(error) };
+  return { pedidos: (data ?? []) as Pedido[] };
+}
+
+export async function atualizarNota(p: {
+  pedido: string;
+  status: NotaStatus;
+  numero?: string;
+  observacao?: string;
+  doc?: string;
+  nome?: string;
+}): Promise<string | null> {
+  const { error } = await db.rpc('atualizar_nota_pedido', {
+    p_pedido: p.pedido,
+    p_status: p.status,
+    p_numero: p.numero ?? null,
+    p_observacao: p.observacao ?? null,
+    p_doc: p.doc ?? null,
+    p_nome: p.nome ?? null,
+  });
+  if (!error) return null;
+  const m = error.message ?? '';
+  if (/numero_obrigatorio/.test(m)) return 'Informe o número da nota.';
+  if (/documento_invalido/.test(m)) return 'O CPF precisa ter 11 dígitos (ou o CNPJ, 14).';
+  if (/sem_permissao/.test(m)) return 'Esta conta não é admin.';
+  if (/Could not find|PGRST202/.test(m)) return 'Falta aplicar a migração das notas (20261014010000_notas_fiscais).';
+  return m || 'Não consegui salvar.';
 }
