@@ -4,6 +4,7 @@ import { Helmet } from 'react-helmet-async';
 import { ExternalLink, Loader2, RefreshCw } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { PERIODOS, carregarResumo, intervalo, type Falha, type PeriodoId, type Resumo } from '@/lib/painelAcademia';
+import { marcarAdminSeNuncaDecidiu } from '@/lib/rastreio';
 import AbaVisao from '@/components/cursos/painel/AbaVisao';
 import AbaTrafego from '@/components/cursos/painel/AbaTrafego';
 import AbaVendas from '@/components/cursos/painel/AbaVendas';
@@ -61,6 +62,12 @@ export default function Painel() {
   useEffect(() => {
     void carregar();
   }, [carregar]);
+
+  // quem abre o painel é o admin: este navegador deixa de contar nas
+  // estatísticas (dá para desfazer na aba Operação)
+  useEffect(() => {
+    marcarAdminSeNuncaDecidiu();
+  }, []);
 
   useEffect(() => {
     setAba(lerAba(location.hash));
