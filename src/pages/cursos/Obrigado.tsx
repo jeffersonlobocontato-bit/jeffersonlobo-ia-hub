@@ -3,9 +3,12 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Clock, XCircle } from 'lucide-react';
 import { SEO } from '@/components/SEO';
 import { produtoPorSlug } from '@/content/cursos/produtos';
+import { CURSO_ILHA, loteAtual } from '@/content/cursos/ilha';
+import { pocketPorSlug } from '@/content/cursos/pockets';
 import EscolaTopo from '@/components/cursos/escola/EscolaTopo';
 import { useEscola } from '@/components/cursos/escola/useEscola';
 import { confirmarCompra, emailLembrado, statusDoPedido } from '@/lib/pagamento';
+import { trackPurchase } from '@/lib/metaPixel';
 import '@/styles/escola.css';
 
 const FINAIS = new Set(['aprovado', 'recusado', 'cancelado', 'reembolsado', 'contestado']);
@@ -51,6 +54,16 @@ const Obrigado = () => {
       window.clearTimeout(relogio);
     };
   }, [pedido, pagamento]);
+
+  // Compra aprovada: um único evento Purchase por pedido (a marca fica no
+  // localStorage, dentro da própria função).
+  useEffect(() => {
+    if (status !== 'aprovado' || !pedido) return;
+    const preco = ehPocket ? pocketPorSlug(curso.slug)?.preco : loteAtual(CURSO_ILHA).preco;
+    if (preco == null) return;
+    trackPurchase({ value: preco, content_name: curso.nome, pedido });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [status, pedido]);
 
   const entrar = `/cursos/entrar?curso=${curso.slug}${email ? `&email=${encodeURIComponent(email)}` : ''}`;
   const aprovado = status === 'aprovado';
