@@ -1,4 +1,11 @@
 // Dados da escola (vitrine /cursos), que valem para todos os cursos.
+
+/** Bot de atendimento no Telegram. */
+export const BOT_ATENDIMENTO = 'JeffersonLoboBot';
+
+/** Link para o bot. A `origem` chega ao bot no /start e diz de onde a pessoa
+ *  veio (só letras, números, _ e -, até 64 caracteres). */
+export const atendimento = (origem: string) => `https://t.me/${BOT_ATENDIMENTO}?start=${origem}`;
 export const ESCOLA = {
   garantiaDias: 7,
   /** prazo de acesso aos cursos (termos de uso e perguntas frequentes) */
@@ -13,8 +20,10 @@ export const ESCOLA = {
     endereco: 'Rua Alberto Folloni, 963, ap. 105, Ahú, Curitiba/PR, CEP 80540-000',
     email: 'lobo@aivozes.com.br',
   },
-  whatsapp: 'https://wa.me/5545999864213?text=' + encodeURIComponent('Oi, Jefferson! Vi a página de cursos e tenho uma dúvida.'),
-  avisoNovos: 'https://wa.me/5545999864213?text=' + encodeURIComponent('Oi, Jefferson! Quero ser avisado quando sair um curso novo.'),
+  /** Atendimento: o assistente do @JeffersonLoboBot no Telegram, que chama o
+   *  Jefferson quando precisa (função telegram-atendimento). */
+  atendimento: atendimento('duvida_cursos'),
+  avisoNovos: atendimento('avisar_novos'),
   /** mostra o card "Novos cursos em breve" no fim do catálogo */
   mostrarEmBreve: true,
   /** Cena de bastidor no topo do card "Novos cursos a caminho" (5 s, sem

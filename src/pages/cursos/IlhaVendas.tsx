@@ -330,8 +330,8 @@ const IlhaVendas = () => {
       p: 'Por quanto tempo tenho acesso?',
       r: `As aulas ficam disponíveis por ${ESCOLA.prazoAcesso} a partir da compra. Os instaladores e manuais que você baixar ficam com você.`,
     },
-    { p: 'Tem suporte?', r: 'Tem. O Tutor IA responde dentro de cada aula, a qualquer hora, e o suporte humano é pelo WhatsApp.' },
-    { p: 'E se eu não gostar?', r: `Você tem ${CURSO_ILHA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só me chamar no WhatsApp.` },
+    { p: 'Tem suporte?', r: 'Tem. O Tutor IA responde dentro de cada aula, a qualquer hora, e o atendimento é pelo Telegram: um assistente responde na hora e me chama quando precisa.' },
+    { p: 'E se eu não gostar?', r: `Você tem ${CURSO_ILHA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só pedir no atendimento, pelo Telegram.` },
   ];
 
   const ld = {
@@ -784,7 +784,7 @@ const IlhaVendas = () => {
               <span className="e-olho">Risco zero</span>
               <h2>{CURSO_ILHA.garantiaDias} dias. Entrou, instalou, não gostou: devolvo cada centavo.</h2>
               <p>
-                É só pedir o reembolso <b>dentro de {CURSO_ILHA.garantiaDias} dias</b>, pelo WhatsApp. Sem perguntas.
+                É só pedir o reembolso <b>dentro de {CURSO_ILHA.garantiaDias} dias</b>, pelo atendimento no Telegram. Sem perguntas.
               </p>
             </div>
           </div>
@@ -836,8 +836,8 @@ const IlhaVendas = () => {
               <h2 className="e-h2">Antes de entrar</h2>
               <p>
                 Ficou alguma dúvida?{' '}
-                <a href={ESCOLA.whatsapp} target="_blank" rel="noopener" className="e-link">
-                  Fale comigo no WhatsApp
+                <a href={ESCOLA.atendimento} target="_blank" rel="noopener" className="e-link">
+                  Fale com o atendimento no Telegram
                 </a>
                 .
               </p>
@@ -913,7 +913,7 @@ const IlhaVendas = () => {
           nomeCurso={CURSO_ILHA.nome}
           preco={lote.preco}
           linhaLote={lote1 ? `Lote 1 até ${fimCurto}` : 'Lote 2'}
-          suporte={CURSO_ILHA.suporteWhatsApp}
+          suporte={CURSO_ILHA.suporte}
           tema="escola"
           aviso={aviso}
           onAbrirPagamento={() => trackCTA('ilha_pagamento_aberto', 'ilha_vendas')}

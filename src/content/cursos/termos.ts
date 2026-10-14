@@ -1,11 +1,11 @@
-import { ESCOLA } from './escola';
+import { BOT_ATENDIMENTO, ESCOLA } from './escola';
 
 // Termos de uso da Academia jeffersonlobo.tech (cursos vendidos no site).
 // A página /cursos/termos renderiza este texto. Ao mudar algo relevante,
 // atualize VERSAO e ATUALIZADO_EM.
 
-export const VERSAO = '1.2';
-export const ATUALIZADO_EM = '13 de outubro de 2026';
+export const VERSAO = '1.3';
+export const ATUALIZADO_EM = '14 de outubro de 2026';
 
 export type Secao = { id: string; titulo: string; paragrafos: string[] };
 
@@ -71,7 +71,7 @@ export const TERMOS: Secao[] = [
     id: 'arrependimento',
     titulo: '7. Direito de arrependimento e reembolso',
     paragrafos: [
-      `Você pode desistir da compra em até ${g} dias contados da data em que o acesso foi liberado, sem precisar justificar, como garante o artigo 49 do Código de Defesa do Consumidor. Para pedir o reembolso, fale pelo WhatsApp de suporte informando o e-mail da compra.`,
+      `Você pode desistir da compra em até ${g} dias contados da data em que o acesso foi liberado, sem precisar justificar, como garante o artigo 49 do Código de Defesa do Consumidor. Para pedir o reembolso, fale pelo atendimento no Telegram (@${BOT_ATENDIMENTO}) ou escreva para ${f.email}, informando o e-mail da compra.`,
       'O reembolso é integral e feito pelo mesmo meio de pagamento, pelo Mercado Pago. No cartão, o estorno aparece na fatura conforme o prazo da operadora; no Pix e no boleto, o valor volta para a conta de origem. A nota fiscal da compra é cancelada.',
       'Com o reembolso, a licença de uso é encerrada: o acesso à área do aluno, ao Tutor IA e às atualizações é retirado, e você se compromete a apagar os arquivos baixados e a não usar mais o instalador nem os materiais. O mesmo vale quando o pagamento é contestado junto ao banco ou ao cartão (chargeback).',
       'Depois desse prazo, a compra não é reembolsável, salvo nos casos previstos em lei.',
@@ -87,10 +87,11 @@ export const TERMOS: Secao[] = [
   },
   {
     id: 'tutor',
-    titulo: '9. Tutor IA',
+    titulo: '9. Tutor IA e atendimento',
     paragrafos: [
       'O Tutor IA responde dúvidas com base no conteúdo do curso, usando inteligência artificial. As respostas podem conter erros e não substituem as aulas nem o suporte humano. O Tutor não dá orientação jurídica, médica, financeira ou contábil.',
       'Há um limite diário de perguntas por aluno, para manter o serviço disponível para todos. As perguntas e respostas ficam registradas e podem ser lidas pela Academia para melhorar o curso e o suporte. Não escreva senhas, chaves de acesso ou dados sensíveis no Tutor.',
+      `O atendimento é feito no Telegram, pelo @${BOT_ATENDIMENTO}. Primeiro responde um assistente de inteligência artificial, com base nas informações do site; quando o caso pede uma pessoa (reembolso, pagamento, acesso ou um pedido seu), ele passa a conversa para o Jefferson, que responde no mesmo chat. Quem não usa o Telegram pode escrever para ${f.email}.`,
     ],
   },
   {
@@ -120,8 +121,8 @@ export const TERMOS: Secao[] = [
     titulo: '13. Privacidade e dados pessoais',
     paragrafos: [
       `A controladora dos seus dados pessoais é ${empresa}. Tratamos esses dados conforme a Lei Geral de Proteção de Dados (Lei 13.709/2018), só para vender e entregar os cursos, emitir a nota fiscal, dar suporte e cumprir obrigações legais.`,
-      'Coletamos: nome e e-mail informados na compra; dados do pedido e do pagamento repassados pelo Mercado Pago (status, forma de pagamento, valor, parcelas e o CPF informado no pagamento, usado na nota fiscal; nunca o número do cartão); aulas concluídas; downloads; perguntas feitas ao Tutor IA; e a origem da visita que levou à compra (o site anterior e os parâmetros de campanha do link, como utm_source), para sabermos quais canais funcionam.',
-      'Compartilhamos dados só com quem é necessário para o serviço funcionar: o Mercado Pago (pagamento), o emissor de notas fiscais e a prefeitura (nota fiscal), a infraestrutura do site e do banco de dados, o envio de e-mails e o provedor de IA do Tutor. Não vendemos seus dados.',
+      'Coletamos: nome e e-mail informados na compra; dados do pedido e do pagamento repassados pelo Mercado Pago (status, forma de pagamento, valor, parcelas e o CPF informado no pagamento, usado na nota fiscal; nunca o número do cartão); aulas concluídas; downloads; perguntas feitas ao Tutor IA; as mensagens trocadas no atendimento pelo Telegram, com o nome e o usuário do Telegram; e a origem da visita que levou à compra (o site anterior e os parâmetros de campanha do link, como utm_source), para sabermos quais canais funcionam.',
+      'Compartilhamos dados só com quem é necessário para o serviço funcionar: o Mercado Pago (pagamento), o emissor de notas fiscais e a prefeitura (nota fiscal), a infraestrutura do site e do banco de dados, o envio de e-mails, o Telegram (atendimento) e o provedor de IA do Tutor e do assistente de atendimento. Não vendemos seus dados.',
       'Você pode pedir acesso, correção ou exclusão dos seus dados pelo canal de contato. Alguns dados, como os de compra, precisam ser guardados pelo prazo exigido em lei.',
     ],
   },

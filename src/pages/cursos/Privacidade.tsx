@@ -4,7 +4,7 @@ import { SEO } from '@/components/SEO';
 import EscolaTopo from '@/components/cursos/escola/EscolaTopo';
 import EscolaRodape from '@/components/cursos/escola/EscolaRodape';
 import { useEscola } from '@/components/cursos/escola/useEscola';
-import { ESCOLA } from '@/content/cursos/escola';
+import { BOT_ATENDIMENTO, ESCOLA } from '@/content/cursos/escola';
 import { PRIVACIDADE, PRIVACIDADE_ATUALIZADA_EM, VERSAO_PRIVACIDADE } from '@/content/cursos/privacidade';
 import '@/styles/escola.css';
 
@@ -57,8 +57,8 @@ const Privacidade = () => {
               <p>
                 Pedidos sobre dados pessoais:{' '}
                 <a href={`mailto:${f.email}`}>{f.email}</a> ou{' '}
-                <a href={ESCOLA.whatsapp} target="_blank" rel="noopener">
-                  WhatsApp de suporte
+                <a href={ESCOLA.atendimento} target="_blank" rel="noopener">
+                  atendimento no Telegram (@{BOT_ATENDIMENTO})
                 </a>
                 .
               </p>

@@ -119,7 +119,7 @@ const Entrar = () => {
           <hr style={{ border: 0, borderTop: '1px solid var(--i-line2)', margin: '0.2rem 0' }} />
           <p className="i-faint" style={{ fontSize: '0.88rem' }}>
             Ainda não é aluno? <Link to={curso.pagina}>{curso.tipo === 'pocket' ? 'Conheça o pocket' : 'Conheça o curso'}</Link>. Precisa de ajuda?{' '}
-            <a href={curso.suporteWhatsApp} target="_blank" rel="noopener">
+            <a href={curso.suporte} target="_blank" rel="noopener">
               Fale com o suporte
             </a>
             .

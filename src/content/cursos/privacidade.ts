@@ -1,4 +1,4 @@
-import { ESCOLA } from './escola';
+import { BOT_ATENDIMENTO, ESCOLA } from './escola';
 import type { Secao } from './termos';
 
 // Política de privacidade da Academia jeffersonlobo.tech (/cursos/privacidade).
@@ -7,8 +7,8 @@ import type { Secao } from './termos';
 // Ao mudar algo relevante, atualize VERSAO_PRIVACIDADE e PRIVACIDADE_ATUALIZADA_EM:
 // a versão aceita fica gravada em cada cadastro.
 
-export const VERSAO_PRIVACIDADE = '1.2';
-export const PRIVACIDADE_ATUALIZADA_EM = '13 de outubro de 2026';
+export const VERSAO_PRIVACIDADE = '1.3';
+export const PRIVACIDADE_ATUALIZADA_EM = '14 de outubro de 2026';
 
 const f = ESCOLA.fornecedor;
 
@@ -68,7 +68,7 @@ export const PRIVACIDADE: Secao[] = [
     titulo: '7. Seus direitos',
     paragrafos: [
       'Pela LGPD (art. 18), você pode, a qualquer momento: confirmar se tratamos os seus dados; acessar os dados; corrigir dados incompletos ou errados; pedir a anonimização, o bloqueio ou a eliminação de dados desnecessários; pedir a portabilidade; saber com quem compartilhamos; e revogar o consentimento.',
-      `Para qualquer um desses pedidos, escreva para ${f.email} ou chame no WhatsApp de suporte. Também há um link para sair da lista em todos os e-mails. Respondemos em até 15 dias.`,
+      `Para qualquer um desses pedidos, escreva para ${f.email} ou fale com o atendimento no Telegram (@${BOT_ATENDIMENTO}). Também há um link para sair da lista em todos os e-mails. Respondemos em até 15 dias.`,
     ],
   },
   {

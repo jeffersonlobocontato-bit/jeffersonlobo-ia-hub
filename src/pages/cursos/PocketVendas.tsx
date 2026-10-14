@@ -90,7 +90,7 @@ function Pagina({ pocket }: { pocket: Pocket }) {
     },
     {
       p: 'E se não servir para mim?',
-      r: `Você tem ${ESCOLA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só me chamar no WhatsApp.`,
+      r: `Você tem ${ESCOLA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só pedir no atendimento, pelo Telegram.`,
     },
     {
       p: 'Posso compartilhar o PDF?',
@@ -324,8 +324,8 @@ function Pagina({ pocket }: { pocket: Pocket }) {
               <h2 className="e-h2">Perguntas frequentes</h2>
               <p>
                 Ficou alguma dúvida?{' '}
-                <a href={ESCOLA.whatsapp} target="_blank" rel="noopener" className="e-link">
-                  Fale comigo no WhatsApp
+                <a href={ESCOLA.atendimento} target="_blank" rel="noopener" className="e-link">
+                  Fale com o atendimento no Telegram
                 </a>
                 .
               </p>
@@ -383,7 +383,7 @@ function Pagina({ pocket }: { pocket: Pocket }) {
         preco={pocket.preco}
         linhaLote="PDF · acesso na hora"
         formas="pagamento único · Pix, boleto ou cartão"
-        suporte={ESCOLA.whatsapp}
+        suporte={ESCOLA.atendimento}
         tema="escola"
         aviso={aviso}
         onAbrirPagamento={() => trackCTA(`pocket_${pocket.numero}_pagamento_aberto`, 'pocket_vendas')}

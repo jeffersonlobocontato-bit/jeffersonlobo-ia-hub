@@ -8,6 +8,7 @@
 // função curso-material. O preço precisa bater com
 // supabase/functions/_shared/cursos/catalogo.ts.
 import type { Aula, Material, Modulo } from './ilha';
+import { atendimento } from './escola';
 
 export type Pocket = {
   slug: string;
@@ -40,7 +41,7 @@ export type Pocket = {
   perguntasTutor: string[];
 };
 
-const suporte = 'https://wa.me/5545999864213?text=' + encodeURIComponent('Oi, Jefferson! Comprei um pocket e preciso de ajuda.');
+const suporte = atendimento('aluno_pocket');
 
 export const POCKETS: Pocket[] = [
   {
@@ -191,7 +192,7 @@ export const salaDoPocket = (p: Pocket) => ({
   nome: `Pocket ${p.numero} · ${p.nome}`,
   tipo: 'pocket' as const,
   pagina: p.pagina,
-  suporteWhatsApp: suporte,
+  suporte,
   garantiaDias: 7,
   modulos: [{ slug: 'pocket', nome: `Pocket ${p.numero}`, titulo: p.nome, capa: p.capa }] satisfies Modulo[],
   aulas: [aulaDoPocket(p)],

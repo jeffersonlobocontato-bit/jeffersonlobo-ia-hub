@@ -4,6 +4,7 @@
 // editável na aba Cursos do /admin.
 import manuais from './ilha-manuais.json';
 import { POCKETS, VALOR_POCKETS, aulaDoPocket } from './pockets';
+import { atendimento } from './escola';
 
 export type Material = {
   id: string;
@@ -76,7 +77,7 @@ export const CURSO_ILHA = {
   /** os 3 pockets também vêm de bônus (acesso pela tabela curso_inclusoes) */
   bonusPockets: { nome: '3 pockets', valor: VALOR_POCKETS },
   garantiaDias: 7,
-  suporteWhatsApp: 'https://wa.me/5545999864213?text=' + encodeURIComponent('Oi, Jefferson! Sou aluno da Ilha de Edição e preciso de ajuda.'),
+  suporte: atendimento('aluno_ilha'),
   // Como o curso aparece na vitrine (/cursos), num card igual ao dos outros cursos.
   vitrine: {
     capa: '/cursos-ilha/produto-vitrine.jpg',
