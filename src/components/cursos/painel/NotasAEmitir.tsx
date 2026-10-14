@@ -8,6 +8,8 @@ import {
   carregarNotasPendentes,
   dataHora,
   descricaoDaNota,
+  garantiaDaVenda,
+  liberadaParaEmitir,
   documentoFormatado,
   reais,
   valorDigitavel,
@@ -50,6 +52,8 @@ function ItemNota({ p, aoSalvar }: { p: Pedido; aoSalvar: () => void }) {
   const cancelar = p.nf_status === 'cancelar';
   const st = STATUS_NOTA[p.nf_status ?? 'pendente'];
   const data = p.aprovado_em ?? p.created_at;
+  const g = garantiaDaVenda(p);
+  const liberada = cancelar || liberadaParaEmitir(p);
   const nomeTomador = p.comprador_nome || p.nome || '';
 
   const salvar = async (dados: Parameters<typeof atualizarNota>[0]) => {
@@ -72,7 +76,7 @@ function ItemNota({ p, aoSalvar }: { p: Pedido; aoSalvar: () => void }) {
   };
 
   return (
-    <li className={`pn-nota-item${cancelar ? ' is-cancelar' : ''}`}>
+    <li className={`pn-nota-item${cancelar ? ' is-cancelar' : ''}${!liberada ? ' is-garantia' : ''}`}>
       <div className="pn-nota-item__topo">
         <div>
           <b>{NOMES_PRODUTO[p.curso_slug] ?? p.curso_slug}</b>
@@ -80,7 +84,14 @@ function ItemNota({ p, aoSalvar }: { p: Pedido; aoSalvar: () => void }) {
             {dataHora(data)} · {p.email}
           </small>
         </div>
-        <span className={`pn-status is-${st.tom}`}>{st.nome}</span>
+        <span className="pn-nota-item__selos">
+          {!cancelar && g.dentro ? (
+            <span className={`pn-status ${g.viraMes ? 'is-ruim' : 'is-neutro'}`} title={g.viraMes ? 'A garantia termina no mês que vem: emita ainda neste mês.' : undefined}>
+              {g.viraMes ? 'Emitir até o fim do mês' : `Em garantia até ${g.ate.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' })}`}
+            </span>
+          ) : null}
+          <span className={`pn-status is-${st.tom}`}>{st.nome}</span>
+        </span>
       </div>
 
       {cancelar ? (
@@ -175,7 +186,12 @@ export default function NotasAEmitir({ aoMudar }: { aoMudar: () => void }) {
     aoMudar();
   };
 
-  const total = (itens ?? []).reduce((s, p) => s + (p.nf_status === 'pendente' ? Number(p.valor_pago ?? p.valor) : 0), 0);
+  const pendentes = (itens ?? []).filter((p) => p.nf_status === 'pendente');
+  const liberadas = pendentes.filter((p) => liberadaParaEmitir(p));
+  const emGarantia = pendentes.length - liberadas.length;
+  const total = liberadas.reduce((s, p) => s + Number(p.valor_pago ?? p.valor), 0);
+  // liberadas e cancelamentos primeiro; em garantia por último
+  const ordenados = [...(itens ?? [])].sort((a, b) => Number(!liberadaParaEmitir(b) && b.nf_status !== 'cancelar') - Number(!liberadaParaEmitir(a) && a.nf_status !== 'cancelar'));
 
   return (
     <section className="pn-cartao pn-notas" id="notas">
@@ -192,6 +208,10 @@ export default function NotasAEmitir({ aoMudar }: { aoMudar: () => void }) {
         Emita cada nota no portal do governo (login gov.br da AIV), copiando os dados abaixo, e marque aqui com o número. Simples Nacional: ISS não retido.
         Use o código de serviço indicado pelo contador.
       </p>
+      <p className="pn-nota">
+        <b>Regra:</b> a nota é emitida depois dos 7 dias de garantia, para não precisar cancelar em caso de reembolso. Venda cuja garantia termina no mês seguinte é emitida
+        ainda no mês da venda, para ficar na competência certa.
+      </p>
 
       {falha?.tipo === 'sem-migracao' ? (
         <p className="pn-aviso">Falta aplicar no Lovable a migração 20261014010000_notas_fiscais.sql.</p>
@@ -201,9 +221,12 @@ export default function NotasAEmitir({ aoMudar }: { aoMudar: () => void }) {
         <p className="pn-vazio">Carregando…</p>
       ) : itens.length ? (
         <>
-          {total > 0 ? <p className="pn-nota">Total a emitir: <b>{reais(total)}</b> em {itens.filter((p) => p.nf_status === 'pendente').length} nota(s).</p> : null}
+          <p className="pn-nota">
+            {liberadas.length ? <>Liberadas para emitir: <b>{liberadas.length}</b> nota(s), {reais(total)}. </> : <>Nenhuma nota liberada para emitir agora. </>}
+            {emGarantia ? <>{emGarantia} venda(s) ainda em garantia.</> : null}
+          </p>
           <ul className="pn-notas-lista">
-            {itens.map((p) => (
+            {ordenados.map((p) => (
               <ItemNota key={`${p.id}-${p.nf_status}`} p={p} aoSalvar={depoisDeSalvar} />
             ))}
           </ul>
