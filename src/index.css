@@ -89,6 +89,10 @@ All colors MUST be HSL.
     letter-spacing: 0;
   }
 
+  p:not(.escola *):not(.compra *) {
+    color: hsl(var(--muted-foreground));
+  }
+
   h4, h5, h6 {
     font-weight: 600;
     letter-spacing: 0;
@@ -297,9 +301,16 @@ All colors MUST be HSL.
 .site-header__subtitle { max-width: 310px; font-family: var(--font-data); font-size: 10px; line-height: 1.5; color: hsl(var(--muted-foreground)); }
 .site-header__nav { gap: 20px; }
 .site-header__nav a, .site-header__nav button { font-family: var(--font-body); font-size: 12px; letter-spacing: 0; text-transform: none; }
+.site-header__nav a { font-family: var(--font-body) !important; }
 .site-mobile-menu { max-height: calc(100dvh - 110px); overflow-y: auto; border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
 .site-footer { border-top: 1px solid hsl(var(--border)); background: hsl(var(--background)); }
 .site-footer__signature { font-family: var(--font-display); font-size: 72px; font-weight: 500; line-height: 1.1; letter-spacing: 0; overflow-wrap: anywhere; }
 @media (max-width: 1199px) { .site-header__subtitle { max-width: 270px; } }
 @media (max-width: 639px) { .site-header__inner { padding: 0 22px; } .site-header__subtitle { max-width: 265px; font-size: 9px; } .site-footer__signature { font-size: 38px; } }
 @media (prefers-reduced-motion: reduce) { .site-header__inner, .site-header__inner::before { transition: none; } }
+
+/* Shared heading scale, excluding the untouched Academy and its purchase window. */
+h1:not(.escola *):not(.compra *) { font-size: 42px; font-weight: 500; letter-spacing: 0; }
+h2:not(.escola *):not(.compra *) { font-size: 32px; font-weight: 500; letter-spacing: 0; }
+h3:not(.escola *):not(.compra *):not(.site-footer__signature) { font-size: 20px; font-weight: 500; letter-spacing: 0; }
+@media (max-width: 639px) { h1:not(.escola *):not(.compra *) { font-size: 40px; } }
