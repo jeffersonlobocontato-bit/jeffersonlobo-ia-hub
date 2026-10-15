@@ -238,3 +238,31 @@ export async function carregarInvestimentos(de: string, ate: string): Promise<{ 
   if (error) return { falha: falhaDe(error) };
   return { itens: (data ?? []) as Investimento[] };
 }
+
+// ---- Meta Ads (sincronizado do Windsor.ai pela função sync-meta-ads) ----
+export type AdsMetricas = { spend: number; impressions: number; video_views: number; thruplays: number; link_clicks: number; landing_page_views: number };
+export type AdsCampanha = AdsMetricas & { campanha: string };
+export type AdsAnuncio = AdsMetricas & { ad_id: string; ad_name: string | null; label: string | null; utm_campaign: string | null; active: boolean; reach_max_dia: number };
+export type AdsResumo = {
+  campanhas: AdsCampanha[];
+  anuncios: AdsAnuncio[];
+  sem_campanha: { ad_id: string; label: string | null; ad_name: string | null }[];
+  utms: string[];
+  status: { last_run_at: string | null; last_ok_at: string | null; last_error: string | null; rows_upserted: number | null } | null;
+};
+
+export async function carregarAds(de: string, ate: string): Promise<AdsResumo | null> {
+  const { data, error } = await db.rpc('painel_ads' as never, { p_de: de, p_ate: ate } as never);
+  if (error) return null;
+  return data as unknown as AdsResumo;
+}
+
+export async function sincronizarAds(): Promise<{ ok: boolean; erro?: string }> {
+  const { data, error } = await db.functions.invoke('sync-meta-ads', { body: {} });
+  if (error) return { ok: false, erro: error.message };
+  return data?.ok ? { ok: true } : { ok: false, erro: data?.error };
+}
+
+export async function ligarAnuncio(ad_id: string, utm_campaign: string) {
+  return db.from('ads_utm_map' as never).update({ utm_campaign } as never).eq('ad_id', ad_id);
+}
