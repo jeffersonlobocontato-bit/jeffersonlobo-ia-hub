@@ -50,7 +50,7 @@ const mdComponents = {
     if (!hasLetters(extractText(children))) return null;
     return <h3 id={headingId(children)} className="text-xl md:text-2xl mt-10 mb-3 scroll-mt-24" {...p}>{children}</h3>;
   },
-  h4: ({ node, ...p }: any) => <h4 className="font-serif text-lg font-normal mt-8 mb-2" {...p} />,
+  h4: ({ node, ...p }: any) => <h4 className="font-sans text-lg font-normal mt-8 mb-2" {...p} />,
   p: ({ node, ...p }: any) => <p className="blog-p" {...p} />,
   ul: ({ node, ...p }: any) => <ul className="blog-ul" {...p} />,
   ol: ({ node, ...p }: any) => <ol className="blog-ol" {...p} />,

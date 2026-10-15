@@ -7,7 +7,7 @@ interface Props {
 /**
  * Capa do vídeo (1080×1350, proporção do card de feed), no mesmo padrão
  * visual do Carrossel Jefferson: fundo escuro, badge em âmbar, título em
- * DM Sans 900, @handle em Fira Code. Usa um quadro do próprio vídeo (ou
+ * Inter 900, @handle em Fira Code. Usa um quadro do próprio vídeo (ou
  * uma foto de referência) como imagem de fundo.
  */
 export const CoverPreview = ({ config }: Props) => {
@@ -35,7 +35,7 @@ export const CoverPreview = ({ config }: Props) => {
         </span>
         <h3
           className="text-[16px] font-black leading-[1.05] tracking-tight"
-          style={{ color: pal.text, fontFamily: "'DM Sans', sans-serif" }}
+          style={{ color: pal.text, fontFamily: "'Inter', sans-serif" }}
         >
           {capa.titulo}
         </h3>

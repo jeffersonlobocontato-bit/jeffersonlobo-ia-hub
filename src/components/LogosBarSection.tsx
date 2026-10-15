@@ -20,7 +20,7 @@ const LogosBarSection = () => {
                   className="h-10 md:h-12 w-auto object-contain opacity-80 hover:opacity-100 transition-opacity"
                 />
               ) : (
-                <span className="text-xl md:text-2xl font-serif text-foreground/70 hover:text-foreground transition-colors">
+                <span className="text-xl md:text-2xl font-sans text-foreground/70 hover:text-foreground transition-colors">
                   {logo.name}
                 </span>
               )}

@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { Calendar, ExternalLink, ArrowRight } from 'lucide-react';
@@ -12,10 +11,6 @@ const SITE_URL = 'https://jeffersonlobo.tech';
 
 const BlogIndex = () => {
   const { data: posts = [] } = useBlogPosts();
-
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
 
   const blogListJsonLd = {
     '@context': 'https://schema.org',

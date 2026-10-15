@@ -34,39 +34,35 @@ const Header = () => {
 
   return (
     <header
-      className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
-        isScrolled
-          ? 'border-primary/20 bg-background/95 backdrop-blur-md shadow-[0_16px_40px_hsl(var(--foreground)/0.15)]'
-          : 'border-transparent bg-transparent'
-      }`}
+      className={`site-header ${isScrolled ? 'is-scrolled' : ''}`}
     >
       {/* Debug banner removed for production polish */}
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-20 gap-4">
+      <div className="site-header__inner">
+        <div className="flex items-center justify-between min-h-20 gap-4">
           {/* Logo */}
           <Link
             to="/"
-            className="group flex items-center hover:opacity-90 transition-opacity text-foreground"
+            className="site-header__brand group flex items-center hover:opacity-90 transition-opacity text-foreground"
           >
             <span className="flex flex-col leading-none">
-              <span className="font-serif text-lg text-foreground">
+              <span className="font-sans text-lg font-medium text-foreground">
                 Jefferson <span className="highlight-yellow">Lobo</span>
               </span>
-              <span className="text-[11px] font-medium uppercase tracking-wider text-foreground/60" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Palestrante de Inteligência Artificial · Consultor em IA · Head Executivo de Marketing</span>
+              <span className="site-header__subtitle">Palestrante de Inteligência Artificial · Consultor em IA · Head Executivo de Marketing</span>
             </span>
           </Link>
 
           {/* Desktop Navigation — ordem alinhada com a ordem real das seções na página */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+          <nav className="site-header__nav hidden xl:flex items-center">
             {['home', 'palestras', 'sobre', 'produtos', 'contato'].map((item) => (
-              <button
+              <Button
+                variant="ghost"
                 key={item}
                 onClick={() => scrollToSection(item)}
-                className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
-                style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                className="h-auto p-0 text-xs font-medium text-muted-foreground hover:bg-transparent hover:text-primary"
               >
                 {item}
-              </button>
+              </Button>
             ))}
             <Link
               to="/livro-del"
@@ -93,7 +89,7 @@ const Header = () => {
           </nav>
 
           {/* Desktop CTA Buttons */}
-          <div className="hidden md:flex items-center gap-4">
+          <div className="hidden xl:flex items-center gap-2">
             {isAdmin && (
               <Button
                 asChild
@@ -119,29 +115,31 @@ const Header = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <button
+          <Button
+            variant="ghost"
+            size="icon"
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? 'Fechar menu' : 'Abrir menu'}
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-menu"
-            className={`md:hidden ${isScrolled ? 'text-foreground' : 'text-foreground'}`}
+            className="xl:hidden shrink-0 text-foreground"
           >
             {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
-          </button>
+          </Button>
         </div>
 
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
-          <div className="md:hidden py-6 space-y-4 animate-fade-in bg-background border-t border-primary/20">
+          <div id="mobile-menu" className="site-mobile-menu xl:hidden p-6 space-y-2 animate-fade-in bg-popover border border-border">
             {['home', 'palestras', 'sobre', 'produtos', 'contato'].map((item) => (
-              <button
+              <Button
+                variant="ghost"
                 key={item}
                 onClick={() => scrollToSection(item)}
-                className="block w-full text-left py-3 text-sm font-medium uppercase tracking-wider text-foreground hover:text-primary transition-colors"
-                style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+                className="flex w-full justify-start py-3 text-sm font-medium text-foreground hover:text-primary"
               >
                 {item}
-              </button>
+              </Button>
             ))}
             <Link
               to="/livro-del"

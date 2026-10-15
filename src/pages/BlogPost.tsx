@@ -28,7 +28,6 @@ const BlogPost = () => {
   const { trackCTA } = useTrackCTA();
 
   useEffect(() => {
-    document.documentElement.classList.add('dark');
     window.scrollTo(0, 0);
   }, [slug]);
 
@@ -194,7 +193,7 @@ const BlogPost = () => {
               {post.title}
             </h1>
             {post.subtitle && (
-              <p className="font-serif text-xl md:text-2xl text-foreground/85 leading-snug font-light mb-6">
+              <p className="font-sans text-xl md:text-2xl text-foreground/85 leading-snug font-light mb-6">
                 {post.subtitle}
               </p>
             )}

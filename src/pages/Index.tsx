@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { SEO } from '@/components/SEO';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
@@ -27,10 +26,6 @@ const Divider = ({ accent = 'primary' }: { accent?: 'primary' | 'secondary' }) =
 );
 
 const Index = () => {
-  useEffect(() => {
-    document.documentElement.classList.add('dark');
-  }, []);
-
   return (
     <div className="min-h-screen bg-background">
       <SEO

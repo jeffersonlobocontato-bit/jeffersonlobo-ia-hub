@@ -47,7 +47,7 @@ const StagePhotoCard = ({
             </span>
           )}
           {photo.caption && (
-            <div className="text-base sm:text-lg font-serif text-white leading-tight tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+            <div className="text-base sm:text-lg font-sans text-white leading-tight tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
               {photo.caption}
             </div>
           )}

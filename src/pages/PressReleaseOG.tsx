@@ -93,7 +93,7 @@ const PressReleaseOG = () => {
       <article className="min-h-screen bg-background text-foreground">
         <header className="border-b border-border bg-card py-3 px-6">
           <div className="max-w-3xl mx-auto flex items-center justify-between">
-            <Link to="/" className="font-serif text-lg text-foreground">Jefferson Lobo</Link>
+            <Link to="/" className="font-sans text-lg text-foreground">Jefferson Lobo</Link>
             <Link to="/imprensa" className="text-xs uppercase tracking-wider font-semibold text-muted-foreground underline underline-offset-2" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Sala de Imprensa</Link>
           </div>
         </header>

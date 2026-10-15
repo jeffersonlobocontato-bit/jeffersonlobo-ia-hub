@@ -4,7 +4,8 @@ import * as RechartsPrimitive from "recharts";
 import { cn } from "@/lib/utils";
 
 // Format: { THEME_NAME: CSS_SELECTOR }
-const THEMES = { light: "", dark: ".dark" } as const;
+// Keep the public config keys compatible; dark values always apply in the single theme.
+const THEMES = { light: "", dark: ":root" } as const;
 
 export type ChartConfig = {
   [k in string]: {

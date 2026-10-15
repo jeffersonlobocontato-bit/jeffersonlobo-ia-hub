@@ -148,7 +148,7 @@ export const VideoStagePreview = ({
               <div className="absolute inset-x-0 top-[8%] px-[12%] flex flex-col gap-2">
                 <div
                   className="text-[13px] font-extrabold leading-tight"
-                  style={{ color: pal.accent, fontFamily: "'DM Sans', sans-serif" }}
+                  style={{ color: pal.accent, fontFamily: "'Inter', sans-serif" }}
                 >
                   {config.cardDados.titulo}
                 </div>
@@ -260,7 +260,7 @@ export const VideoStagePreview = ({
         {config.legenda.ativa && config.legenda.estilo === 'manchete' && (
           <div
             className="pointer-events-none absolute inset-x-[8%] flex flex-col items-start gap-[2px] text-left leading-[1.05]"
-            style={{ bottom: `${ZONA_SEGURA.baixoPct + 6}%`, fontFamily: "'DM Sans', sans-serif" }}
+            style={{ bottom: `${ZONA_SEGURA.baixoPct + 6}%`, fontFamily: "'Inter', sans-serif" }}
           >
             {config.legenda.manchete.map((linha, i) => (
               <span
@@ -277,7 +277,7 @@ export const VideoStagePreview = ({
         {config.legenda.ativa && config.legenda.estilo === 'frase' && (
           <div
             className="pointer-events-none absolute inset-x-[8%] text-left text-[8px] font-semibold"
-            style={{ bottom: `${ZONA_SEGURA.baixoPct + 5}%`, color: pal.text, textShadow: '0 1px 4px rgba(0,0,0,.6)', fontFamily: "'DM Sans', sans-serif" }}
+            style={{ bottom: `${ZONA_SEGURA.baixoPct + 5}%`, color: pal.text, textShadow: '0 1px 4px rgba(0,0,0,.6)', fontFamily: "'Inter', sans-serif" }}
           >
             {config.legenda.textoExemplo}
           </div>
@@ -290,7 +290,7 @@ export const VideoStagePreview = ({
               top: telaCheia ? undefined : `${moldura.yPct + alturaMoldura / 2 + 3}%`,
               bottom: telaCheia ? `${ZONA_SEGURA.baixoPct + 5}%` : undefined,
               color: pal.text,
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Inter', sans-serif",
             }}
           >
             {config.legenda.textoExemplo.split(config.legenda.palavraDestaque).map((parte, i, arr) => (
