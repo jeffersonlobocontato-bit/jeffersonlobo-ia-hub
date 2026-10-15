@@ -75,29 +75,7 @@ const BriefingForm = () => {
       (data.mensagem ? `\n💬 ${data.mensagem}` : '');
     void Promise.allSettled([
       supabase.functions.invoke('notify-telegram', { body: { text: telegramText } }),
-      supabase.functions.invoke('send-transactional-email', {
-        body: {
-          templateName: 'briefing-internal-notification',
-          recipientEmail: 'lobo@aivozes.com.br',
-          idempotencyKey: `briefing-internal-${briefingId}`,
-          templateData: { ...data, briefingId },
-        },
-      }),
-      supabase.functions.invoke('send-transactional-email', {
-        body: {
-          templateName: 'briefing-lead-confirmation',
-          recipientEmail: data.email,
-          idempotencyKey: `briefing-lead-${briefingId}`,
-          templateData: {
-            nome: data.nome,
-            tipo: data.tipo,
-            data_evento: data.data_evento || undefined,
-            formato: data.formato || undefined,
-            publico: data.publico || undefined,
-            cidade: data.cidade || undefined,
-          },
-        },
-      }),
+      supabase.functions.invoke('briefing-emails', { body: { briefingId } }),
     ]).then((results) => {
       results.forEach((r, i) => {
         if (r.status === 'rejected') {
