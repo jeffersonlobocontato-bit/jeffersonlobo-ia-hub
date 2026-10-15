@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useState } from "react";
 import { SEO } from "@/components/SEO";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, AlertTriangle } from "lucide-react";
@@ -73,10 +73,6 @@ export default function Claudia() {
     greeting: "Olá Lobo, o que precisa?",
     onCommand: handleCommand,
   });
-
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-  }, []);
 
   const visualState =
     voice.phase === "greeting" ? "speaking" : voice.phase === "executing" ? "executing" : voice.phase === "listening-command" ? "listening" : "idle";

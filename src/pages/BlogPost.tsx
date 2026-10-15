@@ -28,7 +28,6 @@ const BlogPost = () => {
   const { trackCTA } = useTrackCTA();
 
   useEffect(() => {
-    document.documentElement.classList.add('dark');
     window.scrollTo(0, 0);
   }, [slug]);
 

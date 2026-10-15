@@ -136,7 +136,7 @@ const LivroDel = () => {
   };
 
   return (
-    <div className="dark min-h-screen flex flex-col bg-background text-foreground">
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
       <SEO
         title="O código invisível dos superagentes de IA — Jefferson Lobo | Método DEL"
         description="Transforme IA genérica em agentes personalizados com DNA linguístico fiel à sua marca. O Método DEL, em livro — e-book ou impresso."
@@ -175,7 +175,7 @@ const LivroDel = () => {
                 marca, sua voz e seu propósito.
               </p>
 
-              <blockquote className="font-serif italic text-xl sm:text-2xl mx-auto max-w-md">
+              <blockquote className="font-sans italic text-xl sm:text-2xl mx-auto max-w-md">
                 "Não é sobre usar IA. É sobre fazer a IA falar com sua identidade."
               </blockquote>
 
@@ -246,7 +246,7 @@ const LivroDel = () => {
               />
               <div>
                 <span className="section-kicker">Criador do Método DEL</span>
-                <h2 className="font-serif text-3xl mt-3 mb-3">
+                <h2 className="font-sans text-3xl mt-3 mb-3">
                   Jefferson <span className="highlight-yellow">Lobo</span>
                 </h2>
                 <p className="text-muted-foreground text-[15px] max-w-xl">
@@ -304,7 +304,7 @@ const LivroDel = () => {
                 <h2 className="display-title text-3xl sm:text-4xl mt-4 mb-3">
                   Descubra como personalizar sua IA com rigor técnico e estilo inconfundível
                 </h2>
-                <p className="font-serif italic text-lg text-primary border-l-2 border-primary pl-4 my-5">
+                <p className="font-sans italic text-lg text-primary border-l-2 border-primary pl-4 my-5">
                   Dos superagentes de inteligência artificial
                 </p>
                 <p className="text-muted-foreground max-w-md mb-7">
@@ -338,7 +338,7 @@ const LivroDel = () => {
                 >
                   Adaptável a qualquer dispositivo
                 </p>
-                <p className="font-serif text-5xl">
+                <p className="font-sans text-5xl">
                   R$ 47<span className="text-2xl">,00</span>
                 </p>
                 <p className="text-sm text-muted-foreground mt-2">Em até 3 parcelas</p>

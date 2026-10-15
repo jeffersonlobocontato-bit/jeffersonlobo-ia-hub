@@ -34,7 +34,7 @@ const TrustBarSection = () => {
                 <div className="w-12 h-12 mx-auto mb-4 rounded-full bg-primary/10 flex items-center justify-center">
                   <IconComponent className="w-6 h-6 text-primary" />
                 </div>
-                <div className="font-serif text-3xl text-primary mb-1">
+                <div className="font-sans text-3xl text-primary mb-1">
                   {stat.value}
                 </div>
                 <div className="text-sm text-muted-foreground font-medium">

@@ -22,10 +22,6 @@ export default function TesteIA() {
   const [finalidade, setFinalidade] = useState<"PF" | "PJ">("PF");
 
   // Force dark mode for brutalist aesthetic
-  useEffect(() => {
-    document.documentElement.classList.add("dark");
-  }, []);
-
   // Resume from localStorage on mount
   useEffect(() => {
     try {
