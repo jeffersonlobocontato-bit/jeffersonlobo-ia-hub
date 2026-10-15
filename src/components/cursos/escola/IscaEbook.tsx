@@ -86,14 +86,7 @@ export default function IscaEbook() {
 
     // o e-mail é um extra: se falhar, o download na página continua valendo
     void supabase.functions
-      .invoke('send-transactional-email', {
-        body: {
-          templateName: ISCA.emailModelo,
-          recipientEmail: em,
-          idempotencyKey: `isca-${ISCA.material}-${id}-${hoje()}`,
-          templateData: { nome: n, link: `${SITE_URL}${ISCA.arquivo}` },
-        },
-      })
+      .invoke('isca-ebook-email', { body: { leadId: id } })
       .catch(() => null);
     trackLead({ content_name: '50 skills do Claude' });
     void trackCTA(`isca_${ISCA.material}_cadastro`, 'vitrine');

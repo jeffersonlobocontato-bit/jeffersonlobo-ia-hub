@@ -10,7 +10,7 @@ export type Isca = {
   arquivo: string;
   capa: string;
   paginas: number;
-  /** modelo do e-mail de entrega (send-transactional-email) */
+  /** modelo do e-mail de entrega (isca-ebook-email) */
   emailModelo: string;
 };
 

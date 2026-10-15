@@ -63,7 +63,7 @@ async function checarTudo(): Promise<Item[]> {
     chamarFuncao('mercadopago-webhook', 'GET'),
     chamarFuncao('curso-material'),
     chamarFuncao('curso-tutor'),
-    chamarFuncao('send-transactional-email'),
+    chamarFuncao('isca-ebook-email'),
   ]);
 
   let ultimoAviso: string | null = null;
@@ -118,7 +118,7 @@ async function checarTudo(): Promise<Item[]> {
     },
     { id: 'material', nome: 'Download de materiais', estado: material.publicada ? 'ok' : 'falta', detalhe: material.publicada ? 'Função curso-material publicada.' : 'Publicar a função curso-material.' },
     { id: 'tutor', nome: 'Tutor IA das aulas', estado: tutor.publicada ? 'ok' : 'falta', detalhe: tutor.publicada ? 'Função curso-tutor publicada.' : 'Publicar a função curso-tutor.' },
-    { id: 'email', nome: 'E-mails transacionais', estado: email.publicada ? 'ok' : 'falta', detalhe: email.publicada ? 'Envio de e-mail ativo (acesso liberado, e-book).' : 'Publicar a função send-transactional-email.' },
+    { id: 'email', nome: 'E-mails transacionais', estado: email.publicada ? 'ok' : 'falta', detalhe: email.publicada ? 'Envio de e-mail ativo (acesso liberado, e-book).' : 'Publicar a função isca-ebook-email.' },
   ];
 }
 
