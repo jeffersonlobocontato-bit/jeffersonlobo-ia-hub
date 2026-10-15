@@ -22,14 +22,9 @@ Referência nacional em IA aplicada a negócios. Atende todo o Brasil, presencia
 
 - [O código invisível dos superagentes de inteligência artificial](https://jeffersonlobo.tech/livro-del): livro de Jefferson Lobo sobre o Método DEL — como treinar agentes de IA com fidelidade autoral, sem programar. Disponível em e-book (R$ 47) e impresso.
 - [Materiais gratuitos do livro](https://jeffersonlobo.tech/materiais): checklists de auditoria de fidelidade autoral e templates operacionais do Método DEL, sem cadastro.
-- [Ilha de Edição completa](https://jeffersonlobo.tech/cursos/ilha): curso de Jefferson Lobo com 5 aulas para instalar no Claude um estúdio de conteúdo para Instagram (reels, carrosséis, stories, direct automático e formatos), com Tutor IA, o e-book O código invisível e 3 pockets de bônus. Vitrine de cursos em https://jeffersonlobo.tech/cursos.
-- [Pocket: Configurei o Claude errado](https://jeffersonlobo.tech/cursos/pocket/configurei-o-claude-errado): tutorial em PDF (R$ 9,90) para configurar o Claude do zero: instruções gerais, projetos, contexto, memória e conectores, com as telas em português.
-- [Pocket: Claude com a sua voz](https://jeffersonlobo.tech/cursos/pocket/claude-com-a-sua-voz): tutorial em PDF (R$ 9,90) com o Método DEL na prática, para montar um projeto no Claude que escreve com a voz do autor e testar a fidelidade.
-- [Pocket: Do roteiro à postagem](https://jeffersonlobo.tech/cursos/pocket/do-roteiro-a-postagem): tutorial em PDF (R$ 9,90) com modelos de pedido para reels, carrossel e stories, legenda, calendário da semana e agendamento pela Zernio.
 
 ## Recursos gratuitos
 
-- [E-book grátis: 50 skills do Claude](https://jeffersonlobo.tech/cursos#ebook-gratis): guia da Academia jeffersonlobo.tech com 50 skills do Claude para quem cria conteúdo, vende e organiza o trabalho sem programar, com onde cada uma funciona, como instalar e um exemplo de pedido.
 - [Teste de Maturidade em IA](https://jeffersonlobo.tech/teste-ia): diagnóstico gratuito do nível de maturidade em IA de uma empresa ou profissional, com relatório em PDF.
 
 ## Imprensa
