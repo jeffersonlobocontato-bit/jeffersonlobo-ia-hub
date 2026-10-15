@@ -13,6 +13,7 @@
 // reenviando; o erro fica registrado em hotmart_eventos e avisa no Telegram.
 import { createClient, type SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { hottokValido, interpretarEvento, semSegredo, type EventoHotmart } from '../_shared/hotmart.ts';
+import { sendTemplateEmailLogged } from '../_shared/transactional-email-templates/send-and-log.ts';
 import { CATALOGO, linkDeEntrada } from '../_shared/cursos/catalogo.ts';
 
 const json = (status: number, body: unknown) =>
@@ -53,18 +54,19 @@ async function liberar(supabase: SupabaseClient, ev: EventoHotmart, curso: strin
   if (atual?.status === 'ativo') return 'já estava ativo';
 
   const nomeCurso = CATALOGO[curso]?.nome ?? curso;
-  const { error: erroEmail } = await supabase.functions.invoke('send-transactional-email', {
-    body: {
-      templateName: 'curso-acesso-liberado',
-      recipientEmail: ev.email,
+  let erroEmail: unknown = null;
+  try {
+    await sendTemplateEmailLogged('curso-acesso-liberado', ev.email!, {
       idempotencyKey: `curso-acesso-${curso}-${ev.transacao ?? ev.email}`,
       templateData: {
         nome: ev.nome ?? undefined,
         curso: nomeCurso,
         link: linkDeEntrada(ev.email!, curso),
       },
-    },
-  });
+    });
+  } catch (e) {
+    erroEmail = e;
+  }
   if (erroEmail) console.error('e-mail de acesso falhou', erroEmail);
 
   await avisarTelegram(

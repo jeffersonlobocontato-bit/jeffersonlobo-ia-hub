@@ -10,7 +10,7 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
 const SITE_URL = 'https://jeffersonlobo.tech'
 // material -> modelo e arquivo (fixos no servidor)
 const ISCAS: Record<string, { modelo: string; arquivo: string }> = {
-  'skills-claude': { modelo: 'ebook-skills-entrega', arquivo: '/ebooks/50-skills-claude.pdf' },
+  '50-skills-claude': { modelo: 'ebook-skills-entrega', arquivo: '/academia/50-skills-do-claude.pdf' },
 }
 
 Deno.serve(async (req) => {

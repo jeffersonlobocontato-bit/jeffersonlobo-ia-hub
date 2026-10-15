@@ -4,6 +4,7 @@
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { API_MP, acaoDoStatus, statusDoPagamento, type StatusPedido } from '../mercadopago.ts';
 import { CATALOGO, linkDeEntrada } from './catalogo.ts';
+import { sendTemplateEmailLogged } from '../transactional-email-templates/send-and-log.ts';
 
 export type Resultado = { pedidoId: string | null; status: StatusPedido | null; acao: string; erro: string | null };
 
@@ -44,14 +45,15 @@ async function liberar(supabase: SupabaseClient, p: Pedido, pagamentoId: string)
 
   const nomeCurso = CATALOGO[p.curso_slug]?.nome ?? p.curso_slug;
   const ehPocket = CATALOGO[p.curso_slug]?.tipo === 'pocket';
-  const { error: erroEmail } = await supabase.functions.invoke('send-transactional-email', {
-    body: {
-      templateName: ehPocket ? 'pocket-acesso-liberado' : 'curso-acesso-liberado',
-      recipientEmail: p.email,
+  let erroEmail: unknown = null;
+  try {
+    await sendTemplateEmailLogged(ehPocket ? 'pocket-acesso-liberado' : 'curso-acesso-liberado', p.email, {
       idempotencyKey: `curso-acesso-${p.curso_slug}-mp-${p.id}`,
       templateData: { nome: p.nome ?? undefined, curso: nomeCurso, link: linkDeEntrada(p.email, p.curso_slug) },
-    },
-  });
+    });
+  } catch (e) {
+    erroEmail = e;
+  }
   if (erroEmail) console.error('e-mail de acesso falhou', erroEmail);
 
   await avisarTelegram(
