@@ -119,6 +119,102 @@ export type Database = {
         }
         Relationships: []
       }
+      ads_metrics_daily: {
+        Row: {
+          ad_id: string
+          ad_name: string | null
+          adset_id: string | null
+          campaign_id: string | null
+          date: string
+          impressions: number
+          landing_page_views: number
+          link_clicks: number
+          reach: number
+          spend: number
+          synced_at: string
+          thruplays: number
+          video_views: number
+        }
+        Insert: {
+          ad_id: string
+          ad_name?: string | null
+          adset_id?: string | null
+          campaign_id?: string | null
+          date: string
+          impressions?: number
+          landing_page_views?: number
+          link_clicks?: number
+          reach?: number
+          spend?: number
+          synced_at?: string
+          thruplays?: number
+          video_views?: number
+        }
+        Update: {
+          ad_id?: string
+          ad_name?: string | null
+          adset_id?: string | null
+          campaign_id?: string | null
+          date?: string
+          impressions?: number
+          landing_page_views?: number
+          link_clicks?: number
+          reach?: number
+          spend?: number
+          synced_at?: string
+          thruplays?: number
+          video_views?: number
+        }
+        Relationships: []
+      }
+      ads_sync_status: {
+        Row: {
+          cron_token: string
+          id: number
+          last_error: string | null
+          last_ok_at: string | null
+          last_run_at: string | null
+          rows_upserted: number | null
+        }
+        Insert: {
+          cron_token?: string
+          id?: number
+          last_error?: string | null
+          last_ok_at?: string | null
+          last_run_at?: string | null
+          rows_upserted?: number | null
+        }
+        Update: {
+          cron_token?: string
+          id?: number
+          last_error?: string | null
+          last_ok_at?: string | null
+          last_run_at?: string | null
+          rows_upserted?: number | null
+        }
+        Relationships: []
+      }
+      ads_utm_map: {
+        Row: {
+          active: boolean
+          ad_id: string
+          label: string | null
+          utm_campaign: string | null
+        }
+        Insert: {
+          active?: boolean
+          ad_id: string
+          label?: string | null
+          utm_campaign?: string | null
+        }
+        Update: {
+          active?: boolean
+          ad_id?: string
+          label?: string | null
+          utm_campaign?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           active: boolean | null
@@ -706,6 +802,7 @@ export type Database = {
           email: string
           forma_pagamento: string | null
           id: string
+          is_test: boolean
           lote: number | null
           nome: string | null
           origem: Json
@@ -725,6 +822,7 @@ export type Database = {
           email: string
           forma_pagamento?: string | null
           id?: string
+          is_test?: boolean
           lote?: number | null
           nome?: string | null
           origem?: Json
@@ -744,6 +842,7 @@ export type Database = {
           email?: string
           forma_pagamento?: string | null
           id?: string
+          is_test?: boolean
           lote?: number | null
           nome?: string | null
           origem?: Json
@@ -2426,6 +2525,7 @@ export type Database = {
         Returns: number
       }
       painel_academia: { Args: { p_ate: string; p_de: string }; Returns: Json }
+      painel_ads: { Args: { p_ate: string; p_de: string }; Returns: Json }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
         Returns: {

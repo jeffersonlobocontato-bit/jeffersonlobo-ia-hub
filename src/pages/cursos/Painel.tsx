@@ -173,7 +173,7 @@ export default function Painel() {
         ) : aba === 'visao' ? (
           <AbaVisao r={resumo} />
         ) : aba === 'trafego' ? (
-          <AbaTrafego r={resumo} />
+          <AbaTrafego r={resumo} de={de} ate={ate} />
         ) : aba === 'vendas' ? (
           <AbaVendas r={resumo} de={de} ate={ate} />
         ) : aba === 'investimento' ? (

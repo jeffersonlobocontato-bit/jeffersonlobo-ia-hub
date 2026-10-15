@@ -57,6 +57,13 @@
       "when": 1791938781873,
       "tag": "0007_painel_sem_robos",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1792082545121,
+      "tag": "0008_meta_ads_painel",
+      "breakpoints": true
     }
   ]
 }
