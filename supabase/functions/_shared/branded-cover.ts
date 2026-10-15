@@ -36,7 +36,11 @@ async function fetchGoogleFontTTF(cssFamilyQuery: string): Promise<ArrayBuffer> 
     headers: { 'User-Agent': OLD_UA },
   });
   const css = await cssRes.text();
-  const match = css.match(/src: url\(([^)]+)\) format\('truetype'\)/) || css.match(/url\(([^)]+)\)/);
+  // O Google devolve vários subconjuntos (latin-ext, latin…). Pegar o primeiro
+  // (latin-ext) deixava as letras comuns sem desenho → capas com quadradinhos.
+  // Usamos sempre o bloco "/* latin */", que cobre A–Z e os acentos do português.
+  const latinBlock = css.split('/* latin */')[1] ?? css;
+  const match = latinBlock.match(/src: url\(([^)]+)\) format\('(?:truetype|woff)'\)/) || latinBlock.match(/url\(([^)]+)\)/);
   if (!match) throw new Error(`Não achei a URL da fonte no CSS retornado pelo Google Fonts (${cssFamilyQuery})`);
   const fontRes = await fetch(match[1]);
   return fontRes.arrayBuffer();
