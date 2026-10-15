@@ -31,6 +31,7 @@ import AdminProductsCasesTab from '@/components/admin/AdminProductsCasesTab';
 import AdminCursosTab from '@/components/admin/AdminCursosTab';
 import { SEO } from '@/components/SEO';
 import { TelegramTestCard } from '@/components/admin/TelegramTestCard';
+import { AtendimentoTelegramCard } from '@/components/admin/AtendimentoTelegramCard';
 
 
 const Admin = () => {
@@ -444,6 +445,7 @@ const Admin = () => {
 
       <main className="container mx-auto px-4 py-8">
         <TelegramTestCard />
+        <AtendimentoTelegramCard />
         <Tabs
           value={activeTab}
           onValueChange={(v) => {

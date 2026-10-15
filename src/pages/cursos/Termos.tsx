@@ -4,7 +4,7 @@ import { SEO } from '@/components/SEO';
 import EscolaTopo from '@/components/cursos/escola/EscolaTopo';
 import EscolaRodape from '@/components/cursos/escola/EscolaRodape';
 import { useEscola } from '@/components/cursos/escola/useEscola';
-import { ESCOLA } from '@/content/cursos/escola';
+import { BOT_ATENDIMENTO, ESCOLA } from '@/content/cursos/escola';
 import { ATUALIZADO_EM, TERMOS, VERSAO } from '@/content/cursos/termos';
 import '@/styles/escola.css';
 
@@ -55,8 +55,8 @@ const Termos = () => {
               <h2>17. Contato</h2>
               <p>
                 Suporte, reembolso e pedidos sobre dados pessoais:{' '}
-                <a href={ESCOLA.whatsapp} target="_blank" rel="noopener">
-                  WhatsApp de suporte
+                <a href={ESCOLA.atendimento} target="_blank" rel="noopener">
+                  atendimento no Telegram (@{BOT_ATENDIMENTO})
                 </a>
                 {f.email ? (
                   <>

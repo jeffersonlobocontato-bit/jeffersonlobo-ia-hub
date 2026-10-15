@@ -25,6 +25,13 @@ Site pessoal, blog e hub de conteúdo de Jefferson Lobo (palestrante e consultor
 - Navegação disparada por comando de voz usa `window.location.assign` (mesma aba), nunca `window.open` — pop-up bloqueado pelo navegador porque o evento não vem de um clique real do usuário.
 - Hoje os "comandos" só navegam para páginas que já existem no site — não aciona skills ou automações reais.
 
+## Atendimento no Telegram (@JeffersonLoboBot)
+- Função `telegram-atendimento` (webhook do bot, `verify_jwt = false`, autenticada pelo `secret_token` do Telegram) + tabelas `atendimento_*` (migração `20261014120000_atendimento_telegram.sql`)
+- O assistente responde com a base `supabase/functions/_shared/atendimento/conhecimento.ts` (gerada) + o conteúdo dos cursos do Tutor. Passa a conversa para o Jefferson com o marcador `[[HUMANO: motivo]]` ou o comando `/humano`; o Jefferson responde dando *reply* no chat dos avisos (`TELEGRAM_CHAT_ID`) e devolve com `/encerrar`
+- **Mudou preço, lote, termos, privacidade ou páginas?** Rode `npm run gerar:atendimento` e commite o arquivo gerado, senão o assistente responde com o dado antigo
+- Ligar/desligar e conferir: card "Atendimento no Telegram" no `/admin`
+- Links de suporte do site: `atendimento(origem)` em `src/content/cursos/escola.ts` (`t.me/JeffersonLoboBot?start=<origem>`)
+
 ## Supabase
 - 80+ migrations em `supabase/migrations/` — schema já é grande, sempre olhar migrations recentes antes de assumir estrutura de tabela
 - Edge functions relevantes: `content-pipeline-fetch`/`content-pipeline-publish` (pipeline de conteúdo), `chat-uivo-lobo` (chatbot do site), `sync-podcast-rss`, `publish-linkedin`, `video-ai-instrucoes`, sistema de e-mail transacional (`send-transactional-email`, `process-email-queue`, `handle-email-unsubscribe`/`handle-email-suppression`)

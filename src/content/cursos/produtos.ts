@@ -9,7 +9,8 @@ export type ProdutoSala = {
   tipo: 'curso' | 'pocket';
   /** página de vendas */
   pagina: string;
-  suporteWhatsApp: string;
+  /** link do atendimento (Telegram) */
+  suporte: string;
   garantiaDias: number;
   modulos: Modulo[];
   aulas: Aula[];
@@ -21,7 +22,7 @@ export const PRODUTOS: ProdutoSala[] = [
     nome: c.nome,
     tipo: c.tipo,
     pagina: c.vitrine.pagina,
-    suporteWhatsApp: c.suporteWhatsApp,
+    suporte: c.suporte,
     garantiaDias: c.garantiaDias,
     modulos: c.modulos,
     aulas: c.aulas as Aula[],

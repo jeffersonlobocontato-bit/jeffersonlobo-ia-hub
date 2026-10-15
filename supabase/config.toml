@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.curso-material]
 verify_jwt = true
+
+[functions.telegram-atendimento]
+verify_jwt = false

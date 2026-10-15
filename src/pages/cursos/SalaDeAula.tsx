@@ -112,7 +112,7 @@ const SalaDeAula = () => {
               <Link className="i-btn i-btn--cheio" to={curso.pagina}>
                 {ehPocket ? 'Conhecer o pocket' : 'Conhecer o curso'}
               </Link>
-              <a className="i-btn" href={curso.suporteWhatsApp} target="_blank" rel="noopener">
+              <a className="i-btn" href={curso.suporte} target="_blank" rel="noopener">
                 Falar com o suporte
               </a>
             </div>
@@ -167,7 +167,7 @@ const SalaDeAula = () => {
           </div>
         )}
         <div className="i-topo__acoes">
-          <a className="i-btn i-btn--pequeno" href={curso.suporteWhatsApp} target="_blank" rel="noopener" title="Suporte no WhatsApp">
+          <a className="i-btn i-btn--pequeno" href={curso.suporte} target="_blank" rel="noopener" title="Suporte no Telegram">
             <LifeBuoy size={15} aria-hidden /> <span className="hidden sm:inline">Suporte</span>
           </a>
           <span className="i-topo__email hidden md:inline">{user?.email ?? 'demo@exemplo.com'}</span>
@@ -346,7 +346,7 @@ const SalaDeAula = () => {
       </div>
 
       {/* um pocket dentro da Ilha usa o Tutor do pocket (base com o texto do PDF) */}
-      <TutorChat curso={aula.produto ?? curso.slug} aula={nomeDaAula(aula)} sugestoes={SUGESTOES[aula.slug] ?? []} suporte={curso.suporteWhatsApp} />
+      <TutorChat curso={aula.produto ?? curso.slug} aula={nomeDaAula(aula)} sugestoes={SUGESTOES[aula.slug] ?? []} suporte={curso.suporte} />
     </Tela>
   );
 };

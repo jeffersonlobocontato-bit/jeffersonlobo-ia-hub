@@ -135,7 +135,7 @@ const CompraJanela = ({
               <div className="compra__erro" role="alert">
                 {erro}{' '}
                 <a href={suporte} target="_blank" rel="noopener">
-                  WhatsApp
+                  Fale com o atendimento
                 </a>
               </div>
             )}

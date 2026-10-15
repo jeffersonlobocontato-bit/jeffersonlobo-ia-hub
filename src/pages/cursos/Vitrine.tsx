@@ -245,7 +245,7 @@ const Vitrine = () => {
     },
     {
       p: "E se eu não gostar?",
-      r: `Você tem ${ESCOLA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só me chamar no WhatsApp.`,
+      r: `Você tem ${ESCOLA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só pedir no atendimento, pelo Telegram.`,
     },
     {
       p: "O que são os pockets?",
@@ -261,7 +261,7 @@ const Vitrine = () => {
     },
     {
       p: "Tem suporte?",
-      r: "Tem. O Tutor IA responde dentro de cada aula, e o suporte humano é pelo WhatsApp.",
+      r: "Tem. O Tutor IA responde dentro de cada aula, e o atendimento é pelo Telegram: um assistente responde na hora e me chama quando precisa.",
     },
   ];
 
@@ -692,12 +692,12 @@ const Vitrine = () => {
               <p>
                 Ainda ficou alguma dúvida?{" "}
                 <a
-                  href={ESCOLA.whatsapp}
+                  href={ESCOLA.atendimento}
                   target="_blank"
                   rel="noopener"
                   className="e-link"
                 >
-                  Fale comigo no WhatsApp
+                  Fale com o atendimento no Telegram
                 </a>
                 .
               </p>

@@ -121,7 +121,7 @@ const Obrigado = () => {
               </span>
               <span className="e-olho">Pedido encerrado</span>
               <h1>Este pagamento foi devolvido.</h1>
-              <p>Se isso foi um engano, fale comigo no WhatsApp.</p>
+              <p>Se isso foi um engano, fale com o atendimento no Telegram.</p>
             </>
           ) : pedido ? (
             <>
@@ -156,8 +156,8 @@ const Obrigado = () => {
           )}
           <p className="e-obrigado__ajuda">
             Precisa de ajuda?{' '}
-            <a href={curso.suporteWhatsApp} target="_blank" rel="noopener">
-              Fale comigo no WhatsApp
+            <a href={curso.suporte} target="_blank" rel="noopener">
+              Fale com o atendimento no Telegram
             </a>
             .
           </p>
