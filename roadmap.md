@@ -3,3 +3,6 @@
 - [ ] Atualizar controles compartilhados, Header e Footer.
 - [ ] Verificar preservação da Academia, navegação, tracking e contraste.
 - [ ] Entregar alterações por arquivo e pendências; aguardar Fase 4.
+
+# Correção pontual do blog
+- [ ] Restaurar o texto das duas capas apontadas e verificar sua exibição no blog, sem iniciar a Fase 4.
