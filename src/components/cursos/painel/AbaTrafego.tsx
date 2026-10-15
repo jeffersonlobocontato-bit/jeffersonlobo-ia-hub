@@ -1,5 +1,7 @@
+import { useEffect, useState } from 'react';
+import { RefreshCw } from 'lucide-react';
 import { Barras } from './Graficos';
-import { CANAIS, inteiro, nomePagina, pct, razao, reais, reaisCurto, type Canal, type Resumo } from '@/lib/painelAcademia';
+import { CANAIS, carregarAds, inteiro, ligarAnuncio, nomePagina, pct, razao, reais, reaisCurto, sincronizarAds, type AdsMetricas, type AdsResumo, type Canal, type Resumo } from '@/lib/painelAcademia';
 
 const soma = (linhas: Resumo['canais'], filtro: (c: Canal) => boolean) =>
   linhas.filter((l) => filtro(l.canal as Canal)).reduce(
@@ -7,7 +9,143 @@ const soma = (linhas: Resumo['canais'], filtro: (c: Canal) => boolean) =>
     { sessoes: 0, leads: 0, vendas: 0, receita: 0 },
   );
 
-export default function AbaTrafego({ r }: { r: Resumo }) {
+const n = (v: unknown) => Number(v) || 0;
+const x = (v: number) => `${v.toLocaleString('pt-BR', { maximumFractionDigits: 2 })}x`;
+const div = (a: number, b: number, f: (v: number) => string) => (b > 0 ? f(a / b) : '—');
+const dataHora = (s: string | null | undefined) => (s ? new Date(s).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' }) : 'nunca');
+const vazio: AdsMetricas = { spend: 0, impressions: 0, video_views: 0, thruplays: 0, link_clicks: 0, landing_page_views: 0 };
+
+function CampanhasAds({ r, de, ate }: { r: Resumo; de: string; ate: string }) {
+  const [ads, setAds] = useState<AdsResumo | null>(null);
+  const [sinc, setSinc] = useState(false);
+  const [msg, setMsg] = useState('');
+  const carregar = () => carregarAds(de, ate).then(setAds);
+  useEffect(() => { void carregar(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [de, ate]);
+
+  const atualizar = async () => {
+    setSinc(true); setMsg('');
+    const res = await sincronizarAds();
+    setSinc(false);
+    if (!res.ok) setMsg(res.erro ?? 'Falhou');
+    await carregar();
+  };
+  const ligar = async (id: string, utm: string) => { if (utm) { await ligarAnuncio(id, utm); await carregar(); } };
+
+  const metaDe = (c: string) => ads?.campanhas.find((a) => a.campanha === c) ?? vazio;
+  const nomes = Array.from(new Set([...r.campanhas.map((c) => c.campanha), ...(ads?.campanhas.map((c) => c.campanha) ?? [])]));
+  const linhas = nomes.map((nome) => {
+    const u = r.campanhas.find((c) => c.campanha === nome);
+    const m = metaDe(nome);
+    const spend = n(m.spend);
+    return { nome, u, m, inv: spend > 0 ? spend : n(u?.investimento), fonte: spend > 0 ? 'Meta' : 'manual' };
+  });
+  const utms = Array.from(new Set([...(ads?.utms ?? []), ...r.campanhas.map((c) => c.campanha)]));
+  const st = ads?.status;
+
+  return (
+    <>
+      <section className="pn-cartao">
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+          <h3>Campanhas (utm_campaign)</h3>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <small className="pn-nota">Meta Ads · última atualização: {dataHora(st?.last_ok_at)}</small>
+            <button type="button" className="e-btn e-btn--fantasma e-btn--pequeno" onClick={atualizar} disabled={sinc}>
+              <RefreshCw size={13} className={sinc ? 'e-gira' : ''} aria-hidden /> Atualizar agora
+            </button>
+          </div>
+        </div>
+        {msg || st?.last_error ? <p className="pn-aviso">Erro na última sincronização: {msg || st?.last_error}</p> : null}
+        {linhas.length ? (
+          <div className="pn-tabela-rola">
+            <table className="pn-tabela">
+              <thead>
+                <tr><th>Campanha</th><th>Impressões</th><th>Visualiz. vídeo</th><th>Cliques no link</th><th>Visitas</th><th>CTR</th><th>Clique → visita</th><th>Custo/clique</th><th>Custo/visita</th><th>Leads</th><th>Vendas</th><th>Receita</th><th>Investimento</th><th>CPA</th><th>ROAS</th></tr>
+              </thead>
+              <tbody>
+                {linhas.map(({ nome, u, m, inv, fonte }) => {
+                  const vis = n(u?.sessoes), cl = n(m.link_clicks), imp = n(m.impressions), vendas = n(u?.vendas), rec = n(u?.receita);
+                  return (
+                    <tr key={nome}>
+                      <td><b>{nome}</b><small>{[u?.origem, u?.meio].filter(Boolean).join(' · ')}</small></td>
+                      <td>{imp ? inteiro(imp) : '—'}</td>
+                      <td>{n(m.video_views) ? inteiro(n(m.video_views)) : '—'}</td>
+                      <td>{cl ? inteiro(cl) : '—'}</td>
+                      <td>{inteiro(vis)}</td>
+                      <td>{imp ? pct(razao(cl, imp)) : '—'}</td>
+                      <td>{cl ? pct(razao(vis, cl)) : '—'}</td>
+                      <td>{n(m.spend) ? div(n(m.spend), cl, reais) : '—'}</td>
+                      <td>{div(inv, vis, reais)}</td>
+                      <td>{inteiro(n(u?.leads))}</td>
+                      <td>{inteiro(vendas)}</td>
+                      <td>{reais(rec)}</td>
+                      <td>{inv ? <>{reais(inv)}<small>{fonte}</small></> : '—'}</td>
+                      <td>{div(inv, vendas, reais)}</td>
+                      <td>{div(rec, inv, x)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="pn-vazio">Nenhuma campanha com UTM no período. Gere os links na aba Operação.</p>
+        )}
+      </section>
+
+      <section className="pn-cartao">
+        <h3>Por anúncio (Meta)</h3>
+        {ads?.anuncios.length ? (
+          <div className="pn-tabela-rola">
+            <table className="pn-tabela">
+              <thead>
+                <tr><th>Anúncio</th><th>Campanha</th><th>Gasto</th><th>Impressões</th><th>Alcance (maior dia)</th><th>Visualiz. vídeo</th><th>ThruPlays</th><th>Cliques no link</th><th>Visitas à página</th><th>CTR</th><th>Custo/clique</th></tr>
+              </thead>
+              <tbody>
+                {ads.anuncios.map((a) => (
+                  <tr key={a.ad_id}>
+                    <td><b>{a.label || a.ad_name || a.ad_id}</b><small>{a.active ? '● ativo' : '○ pausado'} · {a.ad_id}</small></td>
+                    <td>{a.utm_campaign ?? 'sem campanha'}</td>
+                    <td>{reais(n(a.spend))}</td>
+                    <td>{inteiro(n(a.impressions))}</td>
+                    <td>{inteiro(n(a.reach_max_dia))}</td>
+                    <td>{inteiro(n(a.video_views))}</td>
+                    <td>{inteiro(n(a.thruplays))}</td>
+                    <td>{inteiro(n(a.link_clicks))}</td>
+                    <td>{inteiro(n(a.landing_page_views))}</td>
+                    <td>{pct(razao(n(a.link_clicks), n(a.impressions)))}</td>
+                    <td>{div(n(a.spend), n(a.link_clicks), reais)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <p className="pn-vazio">Sem dados do Meta no período. Depois de cadastrar a chave do Windsor, clique em "Atualizar agora".</p>
+        )}
+        <p className="pn-nota">Alcance não se soma entre dias nem entre anúncios; mostramos o maior alcance diário de cada anúncio.</p>
+      </section>
+
+      {ads?.sem_campanha.length ? (
+        <section className="pn-cartao">
+          <h3>Anúncios sem campanha</h3>
+          <ul className="pn-links">
+            {ads.sem_campanha.map((s) => (
+              <li key={s.ad_id}>
+                <span>{s.ad_name || s.label || s.ad_id}</span>
+                <select defaultValue="" onChange={(e) => ligar(s.ad_id, e.target.value)} aria-label="Ligar à campanha">
+                  <option value="" disabled>Ligar a utm_campaign…</option>
+                  {utms.map((u) => <option key={u} value={u}>{u}</option>)}
+                </select>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+    </>
+  );
+}
+
+export default function AbaTrafego({ r, de, ate }: { r: Resumo; de: string; ate: string }) {
   const organico = soma(r.canais, (c) => CANAIS[c]?.grupo === 'organico');
   const pago = soma(r.canais, (c) => c === 'pago');
   const direto = soma(r.canais, (c) => c === 'direto' || c === 'email');
@@ -76,34 +214,7 @@ export default function AbaTrafego({ r }: { r: Resumo }) {
         </div>
       </section>
 
-      <section className="pn-cartao">
-        <h3>Campanhas (utm_campaign)</h3>
-        {r.campanhas.length ? (
-          <div className="pn-tabela-rola">
-            <table className="pn-tabela">
-              <thead>
-                <tr><th>Campanha</th><th>Origem · meio</th><th>Visitas</th><th>Leads</th><th>Vendas</th><th>Receita</th><th>Investimento</th><th>ROAS</th></tr>
-              </thead>
-              <tbody>
-                {r.campanhas.map((c) => (
-                  <tr key={c.campanha}>
-                    <td><b>{c.campanha}</b></td>
-                    <td>{[c.origem, c.meio].filter(Boolean).join(' · ') || '—'}</td>
-                    <td>{inteiro(c.sessoes)}</td>
-                    <td>{inteiro(c.leads)}</td>
-                    <td>{inteiro(c.vendas)}</td>
-                    <td>{reais(Number(c.receita))}</td>
-                    <td>{Number(c.investimento) ? reais(Number(c.investimento)) : '—'}</td>
-                    <td>{Number(c.investimento) ? `${(Number(c.receita) / Number(c.investimento)).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}x` : '—'}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : (
-          <p className="pn-vazio">Nenhuma campanha com UTM no período. Gere os links na aba Operação.</p>
-        )}
-      </section>
+      <CampanhasAds r={r} de={de} ate={ate} />
 
       <section className="pn-tres">
         <div className="pn-cartao">
