@@ -79,6 +79,22 @@ export const AdminAnalyticsTab = () => {
     loadAnalytics();
   }, [period]);
 
+  // Busca todas as linhas em lotes de 1.000 — o banco limita cada
+  // consulta a 1.000 registros, o que travava os números do painel.
+  const fetchAllRows = async <T,>(fetchPage: (from: number, to: number) => PromiseLike<{ data: T[] | null }>): Promise<T[]> => {
+    const pageSize = 1000;
+    const all: T[] = [];
+    let from = 0;
+    for (;;) {
+      const { data } = await fetchPage(from, from + pageSize - 1);
+      if (!data || data.length === 0) break;
+      all.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+    return all;
+  };
+
   const loadAnalytics = async () => {
     setLoading(true);
     try {
