@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, startTransition, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -42,11 +42,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         if (mounted) {
           const isAdminUser = data?.role === 'admin';
           console.log('✅ Setting isAdmin to:', isAdminUser);
-          setIsAdmin(isAdminUser);
+          startTransition(() => setIsAdmin(isAdminUser));
         }
       } catch (err) {
         console.error('❌ Erro ao checar admin:', err);
-        if (mounted) setIsAdmin(false);
+        if (mounted) startTransition(() => setIsAdmin(false));
       }
     };
 
@@ -62,24 +62,28 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
         
-        setSession(session);
-        setUser(session?.user ?? null);
-        
+        startTransition(() => {
+          setSession(session);
+          setUser(session?.user ?? null);
+        });
+
         if (session?.user) {
           console.log('👤 Usuário encontrado, checando role...');
           await checkAdminRole(session.user.id);
         } else {
           console.log('👤 Nenhum usuário, setando isAdmin=false');
-          setIsAdmin(false);
+          startTransition(() => setIsAdmin(false));
         }
-        
+
         console.log('✅ Finalizando loading - setLoading(false)');
-        setLoading(false);
+        startTransition(() => setLoading(false));
       } catch (err) {
         console.error('❌ Erro na inicialização:', err);
         if (mounted) {
-          setIsAdmin(false);
-          setLoading(false);
+          startTransition(() => {
+            setIsAdmin(false);
+            setLoading(false);
+          });
         }
       }
     };
@@ -94,15 +98,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
           return;
         }
         
-        setSession(session);
-        setUser(session?.user ?? null);
-        
+        startTransition(() => {
+          setSession(session);
+          setUser(session?.user ?? null);
+        });
+
         if (session?.user) {
           console.log('👤 Usuário no listener, checando role...');
           checkAdminRole(session.user.id);
         } else {
           console.log('👤 Nenhum usuário no listener');
-          setIsAdmin(false);
+          startTransition(() => setIsAdmin(false));
         }
       }
     );
