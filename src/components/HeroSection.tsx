@@ -64,7 +64,7 @@ const HeroSection = () => {
           alt="Jefferson Lobo - Especialista em IA"
           width={1920}
           height={1080}
-          fetchpriority="high"
+          ref={(el) => el?.setAttribute("fetchpriority", "high")}
           decoding="async"
           className="w-full h-full object-cover object-[50%_18%] md:object-[70%_22%]"
         />
