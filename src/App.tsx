@@ -6,31 +6,33 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import AdminRoute from "@/components/AdminRoute";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
-import Index from "./pages/Index";
-import Auth from "./pages/Auth";
-import Admin from "./pages/Admin";
-import ResetPassword from "./pages/ResetPassword";
-import TesteIA from "./pages/TesteIA";
-import PoliticaPrivacidade from "./pages/PoliticaPrivacidade";
-import Unsubscribe from "./pages/Unsubscribe";
-import Imprensa from "./pages/Imprensa";
-import JeffersonLobo from "./pages/JeffersonLobo";
-import PalestrasIA from "./pages/PalestrasIA";
-import PalestranteIA from "./pages/PalestranteIA";
-import PalestranteIAParana from "./pages/PalestranteIAParana";
-import WorkshopIA from "./pages/WorkshopIA";
-import ConsultoriaIA from "./pages/ConsultoriaIA";
-import BlogIndex from "./pages/BlogIndex";
-import BlogPost from "./pages/BlogPost";
-import PressReleaseOG from "./pages/PressReleaseOG";
-import Materiais from "./pages/Materiais";
-import LivroDel from "./pages/LivroDel";
-import MaterialDetalhe from "./pages/MaterialDetalhe";
-import PressCampaignKiosk from "./pages/admin/PressCampaignKiosk";
-import Claudia from "./pages/Claudia";
-import NotFound from "./pages/NotFound";
 import MetaPixelRouteTracker from "@/components/MetaPixelRouteTracker";
 import { lazy, Suspense } from "react";
+
+// Todas as páginas carregam sob demanda: nenhuma rota pesa no bundle inicial das outras.
+const Index = lazy(() => import("./pages/Index"));
+const Auth = lazy(() => import("./pages/Auth"));
+const Admin = lazy(() => import("./pages/Admin"));
+const ResetPassword = lazy(() => import("./pages/ResetPassword"));
+const TesteIA = lazy(() => import("./pages/TesteIA"));
+const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const Imprensa = lazy(() => import("./pages/Imprensa"));
+const JeffersonLobo = lazy(() => import("./pages/JeffersonLobo"));
+const PalestrasIA = lazy(() => import("./pages/PalestrasIA"));
+const PalestranteIA = lazy(() => import("./pages/PalestranteIA"));
+const PalestranteIAParana = lazy(() => import("./pages/PalestranteIAParana"));
+const WorkshopIA = lazy(() => import("./pages/WorkshopIA"));
+const ConsultoriaIA = lazy(() => import("./pages/ConsultoriaIA"));
+const BlogIndex = lazy(() => import("./pages/BlogIndex"));
+const BlogPost = lazy(() => import("./pages/BlogPost"));
+const PressReleaseOG = lazy(() => import("./pages/PressReleaseOG"));
+const Materiais = lazy(() => import("./pages/Materiais"));
+const LivroDel = lazy(() => import("./pages/LivroDel"));
+const MaterialDetalhe = lazy(() => import("./pages/MaterialDetalhe"));
+const PressCampaignKiosk = lazy(() => import("./pages/admin/PressCampaignKiosk"));
+const Claudia = lazy(() => import("./pages/Claudia"));
+const NotFound = lazy(() => import("./pages/NotFound"));
 
 // Plataforma de cursos: carregada sob demanda para não pesar no resto do site.
 const CursosVitrine = lazy(() => import("./pages/cursos/Vitrine"));
@@ -42,7 +44,7 @@ const CursosTermos = lazy(() => import("./pages/cursos/Termos"));
 const CursosPrivacidade = lazy(() => import("./pages/cursos/Privacidade"));
 const CursoPocketVendas = lazy(() => import("./pages/cursos/PocketVendas"));
 const CursosPainel = lazy(() => import("./pages/cursos/Painel"));
-const carregando = <div className="min-h-screen bg-[#111A17]" />;
+const carregando = <div className="min-h-screen bg-background" />;
 const comSuspense = (el: JSX.Element) => <Suspense fallback={carregando}>{el}</Suspense>;
 
 const queryClient = new QueryClient();
@@ -57,27 +59,27 @@ const App = () => (
           <MetaPixelRouteTracker />
           <AnalyticsTracker>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/teste-ia" element={<TesteIA />} />
-              <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
-              <Route path="/unsubscribe" element={<Unsubscribe />} />
-              <Route path="/imprensa" element={<Imprensa />} />
-              <Route path="/jefferson-lobo" element={<JeffersonLobo />} />
-              <Route path="/imprensa/r/:slug" element={<PressReleaseOG />} />
-              <Route path="/palestras-ia" element={<PalestrasIA />} />
-              <Route path="/palestrante-inteligencia-artificial" element={<PalestranteIA />} />
-              <Route path="/palestrante-inteligencia-artificial-parana-brasil" element={<PalestranteIAParana />} />
+              <Route path="/" element={comSuspense(<Index />)} />
+              <Route path="/auth" element={comSuspense(<Auth />)} />
+              <Route path="/reset-password" element={comSuspense(<ResetPassword />)} />
+              <Route path="/teste-ia" element={comSuspense(<TesteIA />)} />
+              <Route path="/politica-privacidade" element={comSuspense(<PoliticaPrivacidade />)} />
+              <Route path="/unsubscribe" element={comSuspense(<Unsubscribe />)} />
+              <Route path="/imprensa" element={comSuspense(<Imprensa />)} />
+              <Route path="/jefferson-lobo" element={comSuspense(<JeffersonLobo />)} />
+              <Route path="/imprensa/r/:slug" element={comSuspense(<PressReleaseOG />)} />
+              <Route path="/palestras-ia" element={comSuspense(<PalestrasIA />)} />
+              <Route path="/palestrante-inteligencia-artificial" element={comSuspense(<PalestranteIA />)} />
+              <Route path="/palestrante-inteligencia-artificial-parana-brasil" element={comSuspense(<PalestranteIAParana />)} />
               <Route path="/palestrante-inteligencia-artificial-parana" element={<Navigate to="/palestrante-inteligencia-artificial-parana-brasil" replace />} />
-              <Route path="/workshop-ia" element={<WorkshopIA />} />
-              <Route path="/consultoria-ia" element={<ConsultoriaIA />} />
-              <Route path="/blog" element={<BlogIndex />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/materiais" element={<Materiais />} />
-              <Route path="/materiais/:slug" element={<MaterialDetalhe />} />
-              <Route path="/livro-del" element={<LivroDel />} />
-              <Route path="/claudia" element={<Claudia />} />
+              <Route path="/workshop-ia" element={comSuspense(<WorkshopIA />)} />
+              <Route path="/consultoria-ia" element={comSuspense(<ConsultoriaIA />)} />
+              <Route path="/blog" element={comSuspense(<BlogIndex />)} />
+              <Route path="/blog/:slug" element={comSuspense(<BlogPost />)} />
+              <Route path="/materiais" element={comSuspense(<Materiais />)} />
+              <Route path="/materiais/:slug" element={comSuspense(<MaterialDetalhe />)} />
+              <Route path="/livro-del" element={comSuspense(<LivroDel />)} />
+              <Route path="/claudia" element={comSuspense(<Claudia />)} />
               <Route path="/cursos" element={comSuspense(<CursosVitrine />)} />
               <Route path="/cursos/entrar" element={comSuspense(<CursosEntrar />)} />
               <Route path="/cursos/obrigado" element={comSuspense(<CursosObrigado />)} />
@@ -92,7 +94,7 @@ const App = () => (
                 path="/admin"
                 element={
                   <AdminRoute>
-                    <Admin />
+                    {comSuspense(<Admin />)}
                   </AdminRoute>
                 }
               />
@@ -100,12 +102,12 @@ const App = () => (
                 path="/admin/press/disparar/:campaignId"
                 element={
                   <AdminRoute>
-                    <PressCampaignKiosk />
+                    {comSuspense(<PressCampaignKiosk />)}
                   </AdminRoute>
                 }
               />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
+              <Route path="*" element={comSuspense(<NotFound />)} />
             </Routes>
           </AnalyticsTracker>
         </BrowserRouter>

@@ -20,5 +20,13 @@ export default defineConfig(({ mode }) => ({
     minify: 'esbuild',
     target: 'es2015',
     cssMinify: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+        },
+      },
+    },
   },
 }));
