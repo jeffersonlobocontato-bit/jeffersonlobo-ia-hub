@@ -86,15 +86,20 @@ export const AdminAnalyticsTab = () => {
       startDate.setDate(startDate.getDate() - parseInt(period));
 
       // Load summary stats
-      const { data: analyticsData } = await supabase
-        .from('site_analytics')
-        .select('*')
-        .gte('created_at', startDate.toISOString());
+      const analyticsData = await fetchAllRows((from, to) =>
+        supabase
+          .from('site_analytics')
+          .select('session_id, page_path, duration_seconds, created_at, traffic_source, referrer_domain, utm_source, utm_campaign')
+          .gte('created_at', startDate.toISOString())
+          .order('created_at', { ascending: true })
+          .range(from, to)
+      );
 
-      const { data: clicksData } = await supabase
+      const { count: clicksCount } = await supabase
         .from('click_events')
-        .select('id')
+        .select('id', { count: 'exact', head: true })
         .gte('created_at', startDate.toISOString());
+      const clicksData = { length: clicksCount ?? 0 };
 
       if (analyticsData) {
         const uniqueSessions = new Set(analyticsData.map(a => a.session_id));
