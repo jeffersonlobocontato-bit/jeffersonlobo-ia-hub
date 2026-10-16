@@ -94,7 +94,7 @@ const App = () => (
                 path="/admin"
                 element={
                   <AdminRoute>
-                    <Admin />
+                    {comSuspense(<Admin />)}
                   </AdminRoute>
                 }
               />
@@ -102,12 +102,12 @@ const App = () => (
                 path="/admin/press/disparar/:campaignId"
                 element={
                   <AdminRoute>
-                    <PressCampaignKiosk />
+                    {comSuspense(<PressCampaignKiosk />)}
                   </AdminRoute>
                 }
               />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-              <Route path="*" element={<NotFound />} />
+              <Route path="*" element={comSuspense(<NotFound />)} />
             </Routes>
           </AnalyticsTracker>
         </BrowserRouter>
