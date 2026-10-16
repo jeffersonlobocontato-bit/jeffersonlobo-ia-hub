@@ -27,27 +27,20 @@ export const Heatmap = ({ pagePath, period }: HeatmapProps) => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - period);
 
-      const { data } = await supabase
-        .from('click_events')
-        .select('x_position, y_position')
-        .eq('page_path', pagePath)
-        .gte('created_at', startDate.toISOString());
+      // Agregação no banco (get_click_density) — antes, a consulta direta a
+      // click_events parava no limite de 1.000 linhas e o mapa ficava incompleto.
+      const { data } = await supabase.rpc('get_click_density', {
+        target_page: pagePath,
+        start_date: startDate.toISOString(),
+        end_date: new Date().toISOString(),
+      });
 
       if (data) {
-        // Group clicks by position (with small tolerance for clustering)
-        const clickMap = new Map<string, number>();
-        data.forEach(click => {
-          // Round to nearest 10px for clustering
-          const x = Math.round(click.x_position / 10) * 10;
-          const y = Math.round(click.y_position / 10) * 10;
-          const key = `${x},${y}`;
-          clickMap.set(key, (clickMap.get(key) || 0) + 1);
-        });
-
-        const points: ClickPoint[] = Array.from(clickMap.entries()).map(([key, count]) => {
-          const [x, y] = key.split(',').map(Number);
-          return { x, y, count };
-        });
+        const points: ClickPoint[] = data.map((p: { x: number; y: number; count: number }) => ({
+          x: p.x,
+          y: p.y,
+          count: Number(p.count),
+        }));
 
         setClickPoints(points);
       }
