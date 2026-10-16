@@ -44,7 +44,7 @@ const CursosTermos = lazy(() => import("./pages/cursos/Termos"));
 const CursosPrivacidade = lazy(() => import("./pages/cursos/Privacidade"));
 const CursoPocketVendas = lazy(() => import("./pages/cursos/PocketVendas"));
 const CursosPainel = lazy(() => import("./pages/cursos/Painel"));
-const carregando = <div className="min-h-screen bg-[#111A17]" />;
+const carregando = <div className="min-h-screen bg-background" />;
 const comSuspense = (el: JSX.Element) => <Suspense fallback={carregando}>{el}</Suspense>;
 
 const queryClient = new QueryClient();
@@ -59,27 +59,27 @@ const App = () => (
           <MetaPixelRouteTracker />
           <AnalyticsTracker>
             <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/auth" element={<Auth />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="/teste-ia" element={<TesteIA />} />
-              <Route path="/politica-privacidade" element={<PoliticaPrivacidade />} />
-              <Route path="/unsubscribe" element={<Unsubscribe />} />
-              <Route path="/imprensa" element={<Imprensa />} />
-              <Route path="/jefferson-lobo" element={<JeffersonLobo />} />
-              <Route path="/imprensa/r/:slug" element={<PressReleaseOG />} />
-              <Route path="/palestras-ia" element={<PalestrasIA />} />
-              <Route path="/palestrante-inteligencia-artificial" element={<PalestranteIA />} />
-              <Route path="/palestrante-inteligencia-artificial-parana-brasil" element={<PalestranteIAParana />} />
+              <Route path="/" element={comSuspense(<Index />)} />
+              <Route path="/auth" element={comSuspense(<Auth />)} />
+              <Route path="/reset-password" element={comSuspense(<ResetPassword />)} />
+              <Route path="/teste-ia" element={comSuspense(<TesteIA />)} />
+              <Route path="/politica-privacidade" element={comSuspense(<PoliticaPrivacidade />)} />
+              <Route path="/unsubscribe" element={comSuspense(<Unsubscribe />)} />
+              <Route path="/imprensa" element={comSuspense(<Imprensa />)} />
+              <Route path="/jefferson-lobo" element={comSuspense(<JeffersonLobo />)} />
+              <Route path="/imprensa/r/:slug" element={comSuspense(<PressReleaseOG />)} />
+              <Route path="/palestras-ia" element={comSuspense(<PalestrasIA />)} />
+              <Route path="/palestrante-inteligencia-artificial" element={comSuspense(<PalestranteIA />)} />
+              <Route path="/palestrante-inteligencia-artificial-parana-brasil" element={comSuspense(<PalestranteIAParana />)} />
               <Route path="/palestrante-inteligencia-artificial-parana" element={<Navigate to="/palestrante-inteligencia-artificial-parana-brasil" replace />} />
-              <Route path="/workshop-ia" element={<WorkshopIA />} />
-              <Route path="/consultoria-ia" element={<ConsultoriaIA />} />
-              <Route path="/blog" element={<BlogIndex />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/materiais" element={<Materiais />} />
-              <Route path="/materiais/:slug" element={<MaterialDetalhe />} />
-              <Route path="/livro-del" element={<LivroDel />} />
-              <Route path="/claudia" element={<Claudia />} />
+              <Route path="/workshop-ia" element={comSuspense(<WorkshopIA />)} />
+              <Route path="/consultoria-ia" element={comSuspense(<ConsultoriaIA />)} />
+              <Route path="/blog" element={comSuspense(<BlogIndex />)} />
+              <Route path="/blog/:slug" element={comSuspense(<BlogPost />)} />
+              <Route path="/materiais" element={comSuspense(<Materiais />)} />
+              <Route path="/materiais/:slug" element={comSuspense(<MaterialDetalhe />)} />
+              <Route path="/livro-del" element={comSuspense(<LivroDel />)} />
+              <Route path="/claudia" element={comSuspense(<Claudia />)} />
               <Route path="/cursos" element={comSuspense(<CursosVitrine />)} />
               <Route path="/cursos/entrar" element={comSuspense(<CursosEntrar />)} />
               <Route path="/cursos/obrigado" element={comSuspense(<CursosObrigado />)} />
