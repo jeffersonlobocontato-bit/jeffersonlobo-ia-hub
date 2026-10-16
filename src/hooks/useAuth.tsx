@@ -169,7 +169,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    setIsAdmin(false);
+    startTransition(() => setIsAdmin(false));
     toast({
       title: "Logout realizado",
       description: "Você saiu da sua conta.",
