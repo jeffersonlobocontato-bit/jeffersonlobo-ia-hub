@@ -199,10 +199,14 @@ export const AdminAnalyticsTab = () => {
 
 
       // Load CTA stats
-      const { data: ctaData } = await supabase
-        .from('cta_events')
-        .select('*')
-        .gte('created_at', startDate.toISOString());
+      const ctaData = await fetchAllRows((from, to) =>
+        supabase
+          .from('cta_events')
+          .select('cta_name, cta_location, session_id')
+          .gte('created_at', startDate.toISOString())
+          .order('created_at', { ascending: true })
+          .range(from, to)
+      );
 
       if (ctaData) {
         const ctaMap = new Map<string, CTAStat>();
