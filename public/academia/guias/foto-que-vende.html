@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>A Foto que Vende em 3 Minutos</title>
+<meta name="description" content="Guia grátis: transforme a foto do seu produto feita no celular em foto de anúncio com IA, em 3 minutos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050505; --surface:#0E0F0F; --surface-2:#151717; --line:#232626;
+    --text:#F2F2EF; --muted:#9BA3A1; --accent:#5EEAD4; --accent-ink:#04201C;
+    --warn:#F5C26B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.6;font-size:17px}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px}
+  .mono{font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.14em;font-size:12px}
+  header{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{color:var(--accent)}
+  h1{font-size:clamp(34px,8vw,54px);line-height:1.05;font-weight:800;letter-spacing:-.02em;margin:18px 0 18px}
+  h1 em{font-style:normal;color:var(--accent)}
+  .lead{color:var(--muted);font-size:19px;max-width:560px}
+  .needs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:28px}
+  @media(min-width:600px){.needs{grid-template-columns:repeat(4,1fr)}}
+  .need{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .need b{display:block;font-size:15px}
+  .need span{color:var(--muted);font-size:13px}
+  section{padding:44px 0;border-bottom:1px solid var(--line)}
+  .step-n{color:var(--accent)}
+  h2{font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-.01em;margin:10px 0 14px}
+  p+p{margin-top:12px}
+  ul.rules{list-style:none;margin-top:18px;display:grid;gap:10px}
+  ul.rules li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  ul.rules li b{color:var(--text)}
+  ul.rules li span{color:var(--muted)}
+  .prompt{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:22px;overflow:hidden}
+  .prompt-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .prompt-head h3{font-size:17px;font-weight:600}
+  .prompt-head .mono{color:var(--muted);font-size:11px}
+  .prompt-body{padding:16px;font-family:"IBM Plex Mono",monospace;font-size:14px;line-height:1.65;color:#DDE3E1;white-space:pre-wrap}
+  .prompt-body mark{background:rgba(94,234,212,.14);color:var(--accent);padding:0 4px;border-radius:4px}
+  .prompt-foot{padding:0 16px 16px}
+  .copy{appearance:none;border:0;background:var(--accent);color:var(--accent-ink);font:600 15px Inter,sans-serif;padding:12px 18px;border-radius:999px;cursor:pointer;width:100%}
+  .copy.ok{background:#fff}
+  .tip{color:var(--muted);font-size:14px;margin-top:10px}
+  .check{list-style:none;margin-top:16px;display:grid;gap:8px}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"";position:absolute;left:0;top:5px;width:18px;height:18px;border-radius:6px;border:2px solid var(--accent)}
+  .fix{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 16px;margin-top:18px;font-family:"IBM Plex Mono",monospace;font-size:14px}
+  .note{background:rgba(245,194,107,.07);border:1px solid rgba(245,194,107,.25);border-radius:12px;padding:14px 16px;margin-top:20px;font-size:15px;color:#E9DCC4}
+  .cta{text-align:center;padding:56px 0}
+  .cta h2{font-size:32px}
+  .cta p{color:var(--muted);max-width:520px;margin:0 auto}
+  .btn{display:inline-block;margin-top:24px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:700;padding:16px 28px;border-radius:999px}
+  .next{margin-top:36px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;text-align:left}
+  .next p{margin:6px 0 0;max-width:none}
+  .next a{color:var(--accent);font-weight:600}
+  footer{padding:28px 0 44px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  footer b{color:var(--text)}
+  @media print{
+    body{background:#fff;color:#111;font-size:12pt}
+    :root{--bg:#fff;--surface:#F4F6F5;--surface-2:#EAEEED;--line:#D6DCDA;--text:#111;--muted:#555;--accent:#0F766E;--accent-ink:#fff}
+    .prompt-body{color:#111}
+    .copy{display:none}
+    .btn{background:none;color:var(--accent);padding:0}
+    .btn::after{content:' · ' attr(data-print)}
+    section,.prompt{break-inside:avoid}
+    .note{color:#5b4a2a}
+  }
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}
+  .ba figure{margin:0}
+  .ba .frame{aspect-ratio:4/5;border-radius:10px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line)}
+  .ba img{width:100%;height:100%;object-fit:cover;display:block}
+  .ba img.contain{object-fit:contain;background:#000}
+  .ba figcaption{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+  .ba figcaption b{color:var(--accent);font-weight:500}
+  .ba-note{padding:0 16px 16px;color:var(--muted);font-size:14px;margin-top:-6px}
+  @media print{.ba{break-inside:avoid}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="mono kicker">Guia grátis · Academia jeffersonlobo.tech</div>
+  <h1>A foto que vende em <em>3 minutos</em></h1>
+  <p class="lead">Pegue a foto do seu produto tirada no celular e transforme em foto de anúncio. Sem fotógrafo, sem estúdio, sem pagar nada.</p>
+  <div class="needs">
+    <div class="need"><b>Seu produto</b><span>qualquer um</span></div>
+    <div class="need"><b>Um celular</b><span>com câmera</span></div>
+    <div class="need"><b>App Gemini</b><span>grátis</span></div>
+    <div class="need"><b>3 minutos</b><span>de verdade</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="mono step-n">Passo 1</div>
+  <h2>Tire a foto de base direito</h2>
+  <p>A IA melhora a foto, mas não inventa o que ela não vê. Uma foto de base honesta é metade do resultado.</p>
+  <ul class="rules">
+    <li><b>Luz de janela, de lado.</b> <span>Sem flash e sem luz amarela do teto.</span></li>
+    <li><b>Fundo liso.</b> <span>Uma parede, uma folha branca ou um lençol. Nada de bagunça atrás.</span></li>
+    <li><b>Produto inteiro e nítido.</b> <span>Não corte as bordas e não use zoom. Chegue perto com o celular.</span></li>
+  </ul>
+</section>
+
+<section>
+  <div class="mono step-n">Passo 2</div>
+  <h2>Abra o Gemini, anexe a foto e cole um prompt</h2>
+  <p>Os exemplos abaixo foram feitos com uma única foto de celular e os prompts exatamente como estão aqui. Escolha o que você precisa agora. Troque o trecho <mark style="background:rgba(94,234,212,.14);color:var(--accent);padding:0 4px;border-radius:4px">destacado</mark> pelo seu caso.</p>
+
+  <div class="prompt">
+    <div class="prompt-head"><h3>1 · Foto de vitrine</h3><span class="mono">feed e loja</span></div>
+    <div class="prompt-body" id="p1">Use a foto anexada como referência exata do produto. Crie uma foto profissional de produto sobre <mark>fundo branco infinito</mark>, com iluminação suave de estúdio e uma sombra natural leve embaixo. Produto centralizado, ocupando cerca de 70% do quadro, em formato quadrado 1:1.
+
+REGRA PRINCIPAL: não altere o produto. Mantenha exatamente a mesma forma, cor, proporção, textura, rótulo, logotipo e qualquer texto que apareça nele. Não acrescente nem remova nenhum detalhe do produto e não espelhe a imagem: o produto fica virado para o mesmo lado da foto original.</div>
+    <div class="prompt-foot"><button class="copy" data-target="p1">Copiar prompt</button></div>
+    <div class="ba">
+      <figure><div class="frame"><img src="img/antes.jpg" alt="Foto original de uma garrafa térmica preta tirada com celular"></div><figcaption>Antes · celular</figcaption></figure>
+      <figure><div class="frame"><img src="img/depois-vitrine.jpg" alt="A mesma garrafa em foto de estúdio com fundo branco"></div><figcaption><b>Depois</b> · Gemini grátis</figcaption></figure>
+    </div>
+  </div>
+
+  <div class="prompt">
+    <div class="prompt-head"><h3>2 · Produto em uso</h3><span class="mono">feed e anúncio</span></div>
+    <div class="prompt-body" id="p2">Use a foto anexada como referência exata do produto. Coloque este produto em uma cena realista onde ele é usado: <mark>mesa de café da manhã com luz da manhã entrando pela janela</mark>. Luz natural, aparência de foto feita com câmera profissional, fundo levemente desfocado. Formato vertical 4:5.
+
+REGRA PRINCIPAL: não altere o produto. Mantenha exatamente a mesma forma, cor, proporção, textura, rótulo, logotipo e qualquer texto que apareça nele. Não acrescente nem remova nenhum detalhe do produto e não espelhe a imagem: o produto fica virado para o mesmo lado da foto original.</div>
+    <div class="prompt-foot"><button class="copy" data-target="p2">Copiar prompt</button></div>
+    <div class="ba">
+      <figure><div class="frame"><img src="img/antes.jpg" alt="Foto original de uma garrafa térmica preta tirada com celular"></div><figcaption>Antes · celular</figcaption></figure>
+      <figure><div class="frame"><img src="img/depois-uso.jpg" alt="A mesma garrafa numa mesa de café da manhã com luz de janela"></div><figcaption><b>Depois</b> · Gemini grátis</figcaption></figure>
+    </div>
+    <p class="ba-note">Na primeira tentativa a IA espelhou a garrafa (o cabo foi para o outro lado). Um pedido de correção, como o do passo 3, resolveu.</p>
+    </div>
+
+  <div class="prompt">
+    <div class="prompt-head"><h3>3 · Story de Black Friday</h3><span class="mono">story 9:16</span></div>
+    <div class="prompt-body" id="p3">Use a foto anexada como referência exata do produto. Crie uma imagem vertical 9:16 para story de oferta de Black Friday, com o produto em destaque sobre um fundo escuro e elegante, com luzes de destaque <mark>em tom dourado</mark> apenas no fundo, sem mudar a cor nem criar bordas douradas no produto. Deixe o terço superior da imagem livre para eu colocar o texto da oferta depois. Não escreva nenhum texto na imagem.
+
+REGRA PRINCIPAL: não altere o produto. Mantenha exatamente a mesma forma, cor, proporção, textura, rótulo, logotipo e qualquer texto que apareça nele. Não acrescente nem remova nenhum detalhe do produto e não espelhe a imagem: o produto fica virado para o mesmo lado da foto original.</div>
+    <div class="prompt-foot"><button class="copy" data-target="p3">Copiar prompt</button></div>
+    <div class="ba">
+      <figure><div class="frame"><img src="img/antes.jpg" alt="Foto original de uma garrafa térmica preta tirada com celular"></div><figcaption>Antes · celular</figcaption></figure>
+      <figure><div class="frame"><img class="contain" src="img/depois-story.jpg" alt="A mesma garrafa em fundo escuro com luzes douradas, espaço livre no topo para texto"></div><figcaption><b>Depois</b> · Gemini grátis</figcaption></figure>
+    </div>
+  </div>
+  <p class="tip">Por que pedir "sem texto" no story? A IA ainda erra letras. Coloque o preço depois, no próprio Instagram.</p>
+</section>
+
+<section>
+  <div class="mono step-n">Passo 3</div>
+  <h2>Confira antes de postar</h2>
+  <p>A IA às vezes muda o produto sem avisar. Compare com a foto original:</p>
+  <ul class="check">
+    <li>A cor é a mesma?</li>
+    <li>O rótulo e o logotipo estão iguais e legíveis?</li>
+    <li>O formato e o tamanho batem com o produto real?</li>
+    <li>O produto está virado para o mesmo lado? (Se a IA espelhar, todo texto do rótulo sai invertido.)</li>
+    <li>Não apareceu nenhum detalhe que o produto não tem?</li>
+  </ul>
+  <p style="margin-top:18px">Se algo mudou, responda no mesmo chat:</p>
+  <div class="fix">Você alterou <mark style="background:none;color:var(--accent)">a cor da tampa</mark>. Refaça mantendo o produto idêntico à foto original.</div>
+  <div class="note"><b>Regra de ouro:</b> a foto pode ter cenário bonito, mas o produto tem que ser o que o cliente vai receber. Foto que engana gera devolução e reclamação. E alguns marketplaces pedem que você informe quando a imagem foi feita com IA.</div>
+</section>
+
+<section class="cta">
+  <div class="mono kicker">Sua vez</div>
+  <h2>Ficou bom? Me mostra.</h2>
+  <p>Manda o seu antes e depois no meu direct. Eu respondo pessoalmente e te digo o que dá para melhorar.</p>
+  <a class="btn" data-print="instagram.com/jeffersonlobo.tech" href="https://ig.me/m/jeffersonlobo.tech?ref=foto-resultado">Mandar meu antes e depois</a>
+
+  <div class="next">
+    <div class="mono kicker">Quer ir além de uma foto?</div>
+    <p>Foto boa é o começo. Na <b>Ilha de Edição</b> eu mostro como transformar seus produtos em reels, carrosséis e stories que vendem, sem equipe.</p>
+    <p style="margin-top:12px"><a href="https://jeffersonlobo.tech/cursos/ilha">Conhecer a Ilha de Edição →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span><b>Jefferson Lobo</b> · Head Executivo de Marketing · Consultor em IA</span>
+  <span>jeffersonlobo.tech</span>
+</footer>
+
+</div>
+<script>
+  document.querySelectorAll('.copy').forEach(function(b){
+    b.addEventListener('click',function(){
+      var t=document.getElementById(b.dataset.target).innerText;
+      var done=function(){b.textContent='Copiado ✓';b.classList.add('ok');setTimeout(function(){b.textContent='Copiar prompt';b.classList.remove('ok')},1800)};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(fallback)}else{fallback()}
+      function fallback(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){}a.remove()}
+    });
+  });
+</script>
+</body>
+</html>

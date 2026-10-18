@@ -28,6 +28,7 @@ import BotaoBrilho from "@/components/cursos/escola/BotaoBrilho";
 import { useEscola } from "@/components/cursos/escola/useEscola";
 import PodcastTopo from "@/components/cursos/escola/PodcastTopo";
 import IscaEbook from "@/components/cursos/escola/IscaEbook";
+import { EVENTO_ISCA, ISCAS, type Isca } from "@/content/cursos/iscas";
 import "@/styles/escola.css";
 
 // Vitrine da escola (/cursos). É um catálogo: o topo, o "como funciona", a
@@ -188,6 +189,40 @@ function CardCurso({
         <Link to={v.pagina} className="e-btn e-btn--cheio" onClick={onClick}>
           Ver o curso <ArrowRight size={16} aria-hidden />
         </Link>
+      </div>
+    </article>
+  );
+}
+
+function CardIsca({ isca, i, onClick }: { isca: Isca; i: number; onClick: () => void }) {
+  // não navega: seleciona o material no formulário da seção #ebook-gratis
+  const abrir = (ev: React.MouseEvent) => {
+    ev.preventDefault();
+    onClick();
+    window.dispatchEvent(new CustomEvent(EVENTO_ISCA, { detail: isca.material }));
+  };
+  return (
+    <article className="e-card e-card--pocket e-card--isca e-revela" style={atraso(i + 1)}>
+      <span className="e-card__feixe" aria-hidden />
+      <span className="e-card__brilho" aria-hidden />
+      <a href="#ebook-gratis" className="e-card__thumb e-card__thumb--pocket" tabIndex={-1} aria-hidden onClick={abrir}>
+        <img src={isca.capa} alt="" width={640} height={906} loading="lazy" />
+      </a>
+      <span className="e-olho">Grátis · {isca.tema}</span>
+      <h3 className="e-card__titulo">
+        <a href="#ebook-gratis" onClick={abrir}>
+          {isca.titulo}
+        </a>
+      </h3>
+      <p className="e-card__texto">{isca.resumo}</p>
+      <div className="e-card__rodape">
+        <div className="e-preco">
+          <b>Grátis</b>
+          <span>cadastro rápido · acesso na hora</span>
+        </div>
+        <a href="#ebook-gratis" className="e-btn e-btn--fantasma" onClick={abrir}>
+          Quero grátis <ArrowRight size={16} aria-hidden />
+        </a>
       </div>
     </article>
   );
@@ -405,7 +440,7 @@ const Vitrine = () => {
             style={comAtraso("0.6s")}
             onClick={() => trackCTA("vitrine_hero_ebook", "vitrine")}
           >
-            <span>Grátis</span> E-book com 50 skills do Claude para quem não programa
+            <span>Grátis</span> E-book e guias práticos de IA para quem vende sozinho
             <ArrowRight size={14} aria-hidden />
           </a>
 
@@ -445,10 +480,10 @@ const Vitrine = () => {
         <section className="e-secao" id="catalogo">
           <div className="e-cab e-revela">
             <span className="e-olho">Catálogo</span>
-            <h2 className="e-h2">Cursos</h2>
+            <h2 className="e-h2">Cursos e materiais grátis</h2>
             <p>
               Escolha um curso e veja a página dele: o que você vai aprender, as
-              aulas e o preço.
+              aulas e o preço. Ou comece por um material grátis.
             </p>
           </div>
           <div className="e-catalogo">
@@ -460,10 +495,18 @@ const Vitrine = () => {
                 onClick={() => trackCTA(`vitrine_curso_${c.slug}`, "vitrine")}
               />
             ))}
+            {ISCAS.map((isca, i) => (
+              <CardIsca
+                key={isca.material}
+                isca={isca}
+                i={abertos.length + i}
+                onClick={() => trackCTA(`vitrine_catalogo_${isca.material}`, "vitrine")}
+              />
+            ))}
             {ESCOLA.mostrarEmBreve && (
               <article
                 className="e-card e-card--embreve e-revela"
-                style={atraso(abertos.length + 1)}
+                style={atraso(abertos.length + ISCAS.length + 1)}
               >
                 {ESCOLA.bastidores.src ? (
                   <CenaBastidores src={ESCOLA.bastidores.src} poster={ESCOLA.bastidores.poster} />
@@ -523,7 +566,7 @@ const Vitrine = () => {
           </div>
         </section>
 
-        {/* E-book grátis (captura de leads) */}
+        {/* Materiais grátis: e-book e guias (captura de leads) */}
         <IscaEbook />
 
         {/* Livro */}

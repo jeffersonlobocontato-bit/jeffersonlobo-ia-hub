@@ -14,6 +14,7 @@ import { template as briefingLeadConfirmation } from './briefing-lead-confirmati
 import { template as cursoAcessoLiberado } from './curso-acesso-liberado.tsx'
 import { template as pocketAcessoLiberado } from './pocket-acesso-liberado.tsx'
 import { template as ebookSkillsEntrega } from './ebook-skills-entrega.tsx'
+import { template as guiaEntrega } from './guia-entrega.tsx'
 
 export const TEMPLATES: Record<string, TemplateEntry> = {
   'briefing-internal-notification': briefingInternalNotification,
@@ -21,4 +22,5 @@ export const TEMPLATES: Record<string, TemplateEntry> = {
   'curso-acesso-liberado': cursoAcessoLiberado,
   'pocket-acesso-liberado': pocketAcessoLiberado,
   'ebook-skills-entrega': ebookSkillsEntrega,
+  'guia-entrega': guiaEntrega,
 }
