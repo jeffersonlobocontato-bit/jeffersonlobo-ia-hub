@@ -2,6 +2,7 @@ import { SEO } from '@/components/SEO';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import TesteIASection from '@/components/TesteIASection';
+import AcademiaSection from '@/components/AcademiaSection';
 import LogosBarSection from '@/components/LogosBarSection';
 import PalestrasSection from '@/components/PalestrasSection';
 import TrustBarSection from '@/components/TrustBarSection';
@@ -38,6 +39,7 @@ const Index = () => {
         <HeroSection />
         <Divider />
         <TesteIASection />
+        <AcademiaSection />
         <LogosBarSection />
         <Divider accent="secondary" />
         <PalestrasSection />
