@@ -2,12 +2,12 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import AdminRoute from "@/components/AdminRoute";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 import MetaPixelRouteTracker from "@/components/MetaPixelRouteTracker";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 
 // Todas as páginas carregam sob demanda: nenhuma rota pesa no bundle inicial das outras.
 const Index = lazy(() => import("./pages/Index"));
@@ -47,6 +47,32 @@ const CursosPainel = lazy(() => import("./pages/cursos/Painel"));
 const carregando = <div className="min-h-screen bg-background" />;
 const comSuspense = (el: JSX.Element) => <Suspense fallback={carregando}>{el}</Suspense>;
 
+// Links com âncora (ex.: /cursos#ebook-gratis) precisam rolar até a seção depois
+// do carregamento preguiçoso da página — o navegador não faz isso sozinho.
+const RolagemParaAncora = () => {
+  const { pathname, hash } = useLocation();
+  useEffect(() => {
+    if (!hash) return;
+    const id = hash.slice(1);
+    const buscar = () => {
+      const alvo = document.getElementById(id);
+      if (alvo) {
+        alvo.scrollIntoView({ block: "start" });
+        return true;
+      }
+      return false;
+    };
+    if (buscar()) return;
+    let tentativas = 0;
+    const timer = window.setInterval(() => {
+      tentativas += 1;
+      if (buscar() || tentativas > 40) window.clearInterval(timer);
+    }, 150);
+    return () => window.clearInterval(timer);
+  }, [pathname, hash]);
+  return null;
+};
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -56,6 +82,7 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+          <RolagemParaAncora />
           <MetaPixelRouteTracker />
           <AnalyticsTracker>
             <Routes>
