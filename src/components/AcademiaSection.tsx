@@ -84,7 +84,7 @@ const AcademiaSection = () => {
                 <Link to="/cursos">Ver os cursos <ArrowRight aria-hidden="true" /></Link>
               </Button>
               <Button asChild variant="outline" className="min-h-12 w-full whitespace-normal px-5 text-center sm:w-auto">
-                <Link to="/cursos#gratis">Começar por um material grátis</Link>
+                <Link to="/cursos#ebook-gratis">Começar por um material grátis</Link>
               </Button>
             </div>
             <ul className="mt-7 flex flex-wrap gap-x-5 gap-y-3 font-mono text-xs uppercase tracking-[0.6px] text-muted-foreground">
@@ -127,7 +127,7 @@ const AcademiaSection = () => {
 
         <div className="mt-10 grid gap-5 md:mt-12 md:grid-cols-2 xl:grid-cols-[1fr_1fr_2fr]">
           <Card className="min-w-0 transition-colors hover:border-button-border">
-            <Link to="/cursos#gratis" className={linkCard}>
+            <Link to="/cursos#ebook-gratis" className={linkCard}>
               <span className={selo}>Grátis</span>
               <h3 className="!text-xl leading-snug">4 materiais para começar</h3>
               <p className="text-sm leading-relaxed text-muted-foreground">E-book com 50 skills do Claude, foto de produto, 30 dias de conteúdo e atendimento no WhatsApp.</p>
