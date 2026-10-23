@@ -343,7 +343,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
       <p class="lede">Mais de 30 anos de comunicação institucional, governamental e política, nas três esferas do poder: município, Estado e União.</p>
       <div class="cta-row">
         <a class="btn" href="#trajetoria">Ver trajetória <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
-        <a class="btn ghost" href="#formacao">Formação MIT</a>
+        <a class="btn ghost" href="#mit">Formação MIT</a>
       </div>
       <div class="contact-line">
         <span>Curitiba (PR)</span>
@@ -408,7 +408,7 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
     <div class="wrap">
       <div class="sec-head"><div><div class="kicker">Formação</div><h2>Base acadêmica e atualização em IA</h2></div></div>
 
-      <div class="mit">
+      <div class="mit" id="mit">
         <div class="seal">Destaque internacional · out. 2025</div>
         <h3>Imersão Internacional em Inteligência Artificial — Massachusetts Institute of Technology (MIT)</h3>
         <p>Programa de extensão em IA, tecnologia e transformação digital, com metodologias e estudos de caso internacionais para decisão estratégica.</p>
@@ -629,15 +629,24 @@ footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; g
 
   // Navegação ativa
   var links = Array.prototype.slice.call(document.querySelectorAll("nav.sections a"));
+  var navEl = document.querySelector("nav.sections");
   var map = {};
+  // Rola só o menu na horizontal; scrollIntoView aqui arrastava a página e travava o scroll manual
+  function revealInNav(a) {
+    if (navEl.scrollWidth <= navEl.clientWidth) return;
+    var left = a.offsetLeft - navEl.offsetLeft;
+    if (left < navEl.scrollLeft || left + a.offsetWidth > navEl.scrollLeft + navEl.clientWidth) {
+      navEl.scrollLeft = Math.max(0, left - 12);
+    }
+  }
   links.forEach(function (a) { map[a.getAttribute("href").slice(1)] = a; });
   if ("IntersectionObserver" in window) {
     var io = new IntersectionObserver(function (ents) {
       ents.forEach(function (en) {
-        if (en.isIntersecting && map[en.target.id]) {
+        if (en.isIntersecting && map[en.target.id] && !map[en.target.id].classList.contains("active")) {
           links.forEach(function (l) { l.classList.remove("active"); });
           map[en.target.id].classList.add("active");
-          map[en.target.id].scrollIntoView({ block: "nearest", inline: "nearest" });
+          revealInNav(map[en.target.id]);
         }
       });
     }, { rootMargin: "-45% 0px -50% 0px" });
