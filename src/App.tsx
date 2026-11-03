@@ -7,28 +7,41 @@ import { AuthProvider } from "@/hooks/useAuth";
 import AdminRoute from "@/components/AdminRoute";
 import { AnalyticsTracker } from "@/components/AnalyticsTracker";
 import MetaPixelRouteTracker from "@/components/MetaPixelRouteTracker";
-import { lazy, Suspense, useEffect } from "react";
+import { lazy, Suspense, useEffect, type ComponentType, type ReactNode } from "react";
+
+// Páginas pré-renderizadas no build (scripts/prerender.mjs): o módulo pode ser
+// carregado antes da primeira renderização, para o React trocar o HTML pronto
+// pela página real sem passar pelo fallback vazio do Suspense (sem "piscar").
+type Precarregavel = ComponentType & { preload: () => Promise<unknown> };
+function lazyComPreload(factory: () => Promise<{ default: ComponentType }>): Precarregavel {
+  let Pronto: ComponentType | null = null;
+  const preload = () => factory().then((m) => { Pronto = m.default; return m; });
+  const Lazy = lazy(preload);
+  const Comp = (() => (Pronto ? <Pronto /> : <Lazy />)) as Precarregavel;
+  Comp.preload = preload;
+  return Comp;
+}
 
 // Todas as páginas carregam sob demanda: nenhuma rota pesa no bundle inicial das outras.
-const Index = lazy(() => import("./pages/Index"));
+const Index = lazyComPreload(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
 const Admin = lazy(() => import("./pages/Admin"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
-const TesteIA = lazy(() => import("./pages/TesteIA"));
-const PoliticaPrivacidade = lazy(() => import("./pages/PoliticaPrivacidade"));
+const TesteIA = lazyComPreload(() => import("./pages/TesteIA"));
+const PoliticaPrivacidade = lazyComPreload(() => import("./pages/PoliticaPrivacidade"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
-const Imprensa = lazy(() => import("./pages/Imprensa"));
-const JeffersonLobo = lazy(() => import("./pages/JeffersonLobo"));
-const PalestrasIA = lazy(() => import("./pages/PalestrasIA"));
-const PalestranteIA = lazy(() => import("./pages/PalestranteIA"));
-const PalestranteIAParana = lazy(() => import("./pages/PalestranteIAParana"));
-const WorkshopIA = lazy(() => import("./pages/WorkshopIA"));
-const ConsultoriaIA = lazy(() => import("./pages/ConsultoriaIA"));
+const Imprensa = lazyComPreload(() => import("./pages/Imprensa"));
+const JeffersonLobo = lazyComPreload(() => import("./pages/JeffersonLobo"));
+const PalestrasIA = lazyComPreload(() => import("./pages/PalestrasIA"));
+const PalestranteIA = lazyComPreload(() => import("./pages/PalestranteIA"));
+const PalestranteIAParana = lazyComPreload(() => import("./pages/PalestranteIAParana"));
+const WorkshopIA = lazyComPreload(() => import("./pages/WorkshopIA"));
+const ConsultoriaIA = lazyComPreload(() => import("./pages/ConsultoriaIA"));
 const BlogIndex = lazy(() => import("./pages/BlogIndex"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const PressReleaseOG = lazy(() => import("./pages/PressReleaseOG"));
-const Materiais = lazy(() => import("./pages/Materiais"));
-const LivroDel = lazy(() => import("./pages/LivroDel"));
+const Materiais = lazyComPreload(() => import("./pages/Materiais"));
+const LivroDel = lazyComPreload(() => import("./pages/LivroDel"));
 const MaterialDetalhe = lazy(() => import("./pages/MaterialDetalhe"));
 const PressCampaignKiosk = lazy(() => import("./pages/admin/PressCampaignKiosk"));
 const Claudia = lazy(() => import("./pages/Claudia"));
@@ -75,13 +88,32 @@ const RolagemParaAncora = () => {
 
 const queryClient = new QueryClient();
 
-const App = () => (
+/** Rotas estáticas pré-renderizadas no build (a home fica fora: ver AGENTS.md). */
+export const ROTAS_PRERENDER: Record<string, Precarregavel> = {
+  "/palestrante-inteligencia-artificial": PalestranteIA,
+  "/palestrante-inteligencia-artificial-parana-brasil": PalestranteIAParana,
+  "/palestras-ia": PalestrasIA,
+  "/workshop-ia": WorkshopIA,
+  "/consultoria-ia": ConsultoriaIA,
+  "/livro-del": LivroDel,
+  "/jefferson-lobo": JeffersonLobo,
+  "/imprensa": Imprensa,
+  "/teste-ia": TesteIA,
+  "/materiais": Materiais,
+  "/politica-privacidade": PoliticaPrivacidade,
+};
+
+const RoteadorPadrao = ({ children }: { children: ReactNode }) => (
+  <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>{children}</BrowserRouter>
+);
+
+const App = ({ Roteador = RoteadorPadrao }: { Roteador?: ComponentType<{ children: ReactNode }> }) => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <Roteador>
           <RolagemParaAncora />
           <MetaPixelRouteTracker />
           <AnalyticsTracker>
@@ -137,7 +169,7 @@ const App = () => (
               <Route path="*" element={comSuspense(<NotFound />)} />
             </Routes>
           </AnalyticsTracker>
-        </BrowserRouter>
+        </Roteador>
       </TooltipProvider>
     </AuthProvider>
   </QueryClientProvider>
