@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
-import App from "./App.tsx";
+import App, { ROTAS_PRERENDER } from "./App.tsx";
 import "./index.css";
 
 // Aviso benigno do Chrome disparado por bibliotecas de UI (Radix/gráficos)
@@ -18,8 +18,17 @@ window.addEventListener("unhandledrejection", (e) => {
   if (isResizeObserverNoise(e.reason?.message ?? e.reason)) e.preventDefault();
 });
 
-createRoot(document.getElementById("root")!).render(
-  <HelmetProvider>
-    <App />
-  </HelmetProvider>
-);
+const raiz = document.getElementById("root")!;
+const montar = () =>
+  createRoot(raiz).render(
+    <HelmetProvider>
+      <App />
+    </HelmetProvider>
+  );
+
+// HTML pré-renderizado: carrega a página antes de montar, para o React trocar o
+// conteúdo pronto pela mesma página sem passar por uma tela vazia.
+const rotaPronta = raiz.dataset.prerender;
+const pagina = rotaPronta && rotaPronta === window.location.pathname.replace(/\/+$/, "") ? ROTAS_PRERENDER[rotaPronta] : undefined;
+if (pagina) pagina.preload().then(montar, montar);
+else montar();
