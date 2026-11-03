@@ -27,6 +27,34 @@ try {
   execSync("npx vite build --ssr src/entry-server.tsx --outDir dist-ssr --emptyOutDir --logLevel warn", { stdio: "inherit" });
   const template = fs.readFileSync(path.join(dist, "index.html"), "utf8");
   const { render, rotas } = await import(pathToFileURL(ssr).href);
+  // dist/index.html é também a reserva (fallback) de toda rota sem arquivo.
+  // Antes de colocar a home nele, cada rota SPA conhecida (rotas fixas do app +
+  // todas as URLs do sitemap, incluindo posts, pockets e materiais) ganha uma
+  // cópia do esqueleto original, para nunca receber o conteúdo da home.
+  const SPA_FIXAS = ["/auth", "/reset-password", "/unsubscribe", "/claudia", "/blog", "/admin",
+    "/cursos", "/cursos/entrar", "/cursos/obrigado", "/cursos/termos", "/cursos/privacidade",
+    "/cursos/ilha", "/cursos/painel"];
+  let doSitemap = [];
+  try {
+    const xml = fs.readFileSync(path.join(dist, "sitemap.xml"), "utf8");
+    doSitemap = [...xml.matchAll(/<loc>https?:\/\/[^/<]+(\/[^<]*)<\/loc>/g)].map((m) => m[1].replace(/\/+$/, ""));
+  } catch { /* sem sitemap: só as fixas */ }
+  let cascas = 0;
+  for (const r of new Set([...SPA_FIXAS, ...doSitemap])) {
+    if (!r || r === "/" || rotas.includes(r) || /\.[a-z0-9]+$/i.test(r)) continue;
+    const destino = path.join(dist, r, "index.html");
+    if (fs.existsSync(destino)) continue;
+    fs.mkdirSync(path.dirname(destino), { recursive: true });
+    fs.writeFileSync(destino, template);
+    cascas++;
+  }
+  console.log(`[prerender] ${cascas} rotas SPA com esqueleto próprio`);
+
+  // Guarda da reserva: se este HTML (com a home) for servido para outra rota,
+  // o conteúdo da home fica oculto antes da primeira pintura e o React monta a
+  // página certa. Robôs sem JS só recebem a home em URLs desconhecidas.
+  const GUARDA = `<style>html.rota-nao-home [data-prerender-home]{display:none!important}</style><script>if((location.pathname.replace(/\\/+$/,"")||"/")!=="/")document.documentElement.classList.add("rota-nao-home")</script>`;
+
   let ok = 0;
   for (const rota of rotas) {
     try {
@@ -37,9 +65,11 @@ try {
       const tags = [helmet.title, helmet.meta, helmet.link, helmet.script].map((t) => t.toString()).join("\n");
       const out = head
         .replace("</head>", `${tags}\n</head>`)
-        .replace('<div id="root"></div>', `<div id="root" data-prerender="${rota}">${html}</div>`);
+        .replace('<div id="root"></div>', rota === "/"
+          ? `${GUARDA}<div id="root" data-prerender="/"><div data-prerender-home>${html}</div></div>`
+          : `<div id="root" data-prerender="${rota}">${html}</div>`);
       if (out === head) throw new Error("template sem #root");
-      const destino = path.join(dist, rota, "index.html");
+      const destino = rota === "/" ? path.join(dist, "index.html") : path.join(dist, rota, "index.html");
       fs.mkdirSync(path.dirname(destino), { recursive: true });
       fs.writeFileSync(destino, out);
       ok++;

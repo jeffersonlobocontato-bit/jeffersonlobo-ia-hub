@@ -29,6 +29,6 @@ const montar = () =>
 // HTML pré-renderizado: carrega a página antes de montar, para o React trocar o
 // conteúdo pronto pela mesma página sem passar por uma tela vazia.
 const rotaPronta = raiz.dataset.prerender;
-const pagina = rotaPronta && rotaPronta === window.location.pathname.replace(/\/+$/, "") ? ROTAS_PRERENDER[rotaPronta] : undefined;
+const pagina = rotaPronta && rotaPronta === (window.location.pathname.replace(/\/+$/, "") || "/") ? ROTAS_PRERENDER[rotaPronta] : undefined;
 if (pagina) pagina.preload().then(montar, montar);
 else montar();
