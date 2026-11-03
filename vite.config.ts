@@ -10,7 +10,7 @@ export default defineConfig(({ mode, isSsrBuild }) => ({
     host: "::",
     port: 8080,
   },
-  plugins: [react(), mode === "development" && componentTagger(), paginasDeCompartilhamento()].filter(Boolean),
+  plugins: [react(), mode === "development" && componentTagger(), !isSsrBuild && paginasDeCompartilhamento()].filter(Boolean),
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
