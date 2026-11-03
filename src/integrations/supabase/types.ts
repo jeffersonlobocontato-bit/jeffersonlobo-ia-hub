@@ -797,6 +797,8 @@ export type Database = {
       curso_pedidos: {
         Row: {
           aprovado_em: string | null
+          capi_enviado_em: string | null
+          capi_resultado: string | null
           created_at: string
           curso_slug: string
           email: string
@@ -810,6 +812,7 @@ export type Database = {
           parcelas: number | null
           preferencia_id: string | null
           provedor: string
+          rastreio: Json
           status: string
           updated_at: string
           valor: number
@@ -817,6 +820,8 @@ export type Database = {
         }
         Insert: {
           aprovado_em?: string | null
+          capi_enviado_em?: string | null
+          capi_resultado?: string | null
           created_at?: string
           curso_slug: string
           email: string
@@ -830,6 +835,7 @@ export type Database = {
           parcelas?: number | null
           preferencia_id?: string | null
           provedor?: string
+          rastreio?: Json
           status?: string
           updated_at?: string
           valor: number
@@ -837,6 +843,8 @@ export type Database = {
         }
         Update: {
           aprovado_em?: string | null
+          capi_enviado_em?: string | null
+          capi_resultado?: string | null
           created_at?: string
           curso_slug?: string
           email?: string
@@ -850,6 +858,7 @@ export type Database = {
           parcelas?: number | null
           preferencia_id?: string | null
           provedor?: string
+          rastreio?: Json
           status?: string
           updated_at?: string
           valor?: number
@@ -2540,6 +2549,7 @@ export type Database = {
         Args: { p_id: string; p_respostas: Json; p_token: string }
         Returns: boolean
       }
+      valor_pedido_curso: { Args: { _id: string }; Returns: number }
     }
     Enums: {
       app_role: "admin" | "user"
