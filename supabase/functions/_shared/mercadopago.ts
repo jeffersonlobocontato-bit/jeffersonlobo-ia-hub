@@ -142,8 +142,7 @@ export function montarPreferencia(p: {
     statement_descriptor: 'JEFFERSONLOBO',
     payment_methods: { installments: 12 },
     binary_mode: false,
-    // O Mercado Pago envia o Purchase ao Meta Pixel quando o pagamento é aprovado.
-    // Não disparar Purchase pelo site, para não contar a venda duas vezes.
-    tracks: [{ type: 'facebook_ad', values: { pixel_id: '1629134600491040' } }],
+    // Sem o pixel nativo do Mercado Pago (tracks): o Purchase vem do nosso
+    // servidor (Conversions API) e do site, com o mesmo eventID (id do pedido).
   };
 }

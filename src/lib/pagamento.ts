@@ -1,10 +1,11 @@
 import { db } from '@/lib/cursos';
 import { origemParaConversao } from '@/lib/traffic-source';
+import { rastreioParaPedido } from '@/lib/metaPixel';
 
 // Compra direta pelo Mercado Pago (edge function mercadopago-checkout).
 // O preço é calculado no servidor; aqui só mandamos curso, e-mail e nome.
 
-export type RespostaCompra = { url: string } | { jaTemAcesso: true } | { erro: string };
+export type RespostaCompra = { url: string; pedido: string } | { jaTemAcesso: true } | { erro: string };
 
 const CHAVE_EMAIL = 'cursos-compra-email';
 
@@ -39,7 +40,7 @@ async function mensagemDoErro(error: unknown): Promise<string | null> {
 
 export async function criarCompra(curso: string, email: string, nome: string): Promise<RespostaCompra> {
   const { data, error } = await db.functions.invoke('mercadopago-checkout', {
-    body: { acao: 'criar', curso, email: email.trim().toLowerCase(), nome: nome.trim() || undefined, origem: origemParaConversao() },
+    body: { acao: 'criar', curso, email: email.trim().toLowerCase(), nome: nome.trim() || undefined, origem: origemParaConversao(), rastreio: rastreioParaPedido() },
   });
   if (error) {
     const msg = await mensagemDoErro(error);
@@ -47,7 +48,7 @@ export async function criarCompra(curso: string, email: string, nome: string): P
     return { erro: msg ?? 'Não consegui abrir o pagamento agora. Tente de novo em instantes.' };
   }
   if (data?.jaTemAcesso) return { jaTemAcesso: true };
-  if (data?.url) return { url: String(data.url) };
+  if (data?.url) return { url: String(data.url), pedido: String(data.pedido ?? '') };
   return { erro: 'Não consegui abrir o pagamento agora. Tente de novo em instantes.' };
 }
 
@@ -57,6 +58,13 @@ export async function confirmarCompra(pedido: string, pagamento?: string | null)
   });
   if (error) return null;
   return data?.status ?? null;
+}
+
+/** Valor real do pedido aprovado (o do lote em que foi comprado). */
+export async function valorDoPedido(pedido: string): Promise<number | null> {
+  const { data, error } = await db.rpc('valor_pedido_curso', { _id: pedido });
+  if (error || data == null) return null;
+  return Number(data);
 }
 
 export async function statusDoPedido(pedido: string): Promise<string | null> {

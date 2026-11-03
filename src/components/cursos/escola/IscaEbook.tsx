@@ -161,7 +161,7 @@ export default function IscaEbook() {
     void supabase.functions
       .invoke('isca-ebook-email', { body: { leadId: id } })
       .catch(() => null);
-    trackLead({ content_name: isca.nomeConversao });
+    trackLead({ content_name: isca.nomeConversao, content_category: 'ebook_gratis', eventID: `lead-${id}` });
     void trackCTA(`isca_${isca.material}_cadastro`, 'vitrine');
     guardarContato({ nome: n, email: em, whatsapp: zap });
     setEnviando(false);

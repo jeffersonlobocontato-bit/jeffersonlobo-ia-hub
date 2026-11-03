@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { SEO } from '@/components/SEO';
 import { produtoPorSlug } from '@/content/cursos/produtos';
+import { emailLembrado } from '@/lib/pagamento';
 import '@/styles/cursos-area.css';
 
 // Entrada da área do aluno. O padrão é o link mágico por e-mail (sem senha);
@@ -17,7 +18,13 @@ const Entrar = () => {
   const voltaParam = params.get('volta');
   const volta = voltaParam && voltaParam.startsWith('/cursos/') ? voltaParam : `/cursos/${curso.slug}/aulas`;
 
-  const [email, setEmail] = useState(params.get('email') ?? '');
+  const [email, setEmail] = useState(() => {
+    try {
+      return sessionStorage.getItem('cursos-entrar-email') || emailLembrado() || params.get('email') || '';
+    } catch {
+      return params.get('email') ?? '';
+    }
+  });
   const [senha, setSenha] = useState('');
   const [comSenha, setComSenha] = useState(false);
   const [enviando, setEnviando] = useState(false);

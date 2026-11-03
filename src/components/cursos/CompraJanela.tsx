@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, X } from 'lucide-react';
 import { criarCompra, lembrarEmail } from '@/lib/pagamento';
+import { trackAddPaymentInfo } from '@/lib/metaPixel';
 import { reais } from '@/content/cursos/pockets';
 import '@/styles/compra.css';
 
@@ -73,6 +74,7 @@ const CompraJanela = ({
     const r = await criarCompra(curso, email, nome);
     if ('url' in r) {
       lembrarEmail(email.trim().toLowerCase());
+      if (r.pedido) trackAddPaymentInfo({ value: preco, content_id: curso, content_name: nomeCurso, pedido: r.pedido });
       onAbrirPagamento?.();
       window.location.assign(r.url);
       return;
@@ -100,7 +102,7 @@ const CompraJanela = ({
             <p className="compra__texto">
               <b>{email.trim().toLowerCase()}</b> já está matriculado. É só entrar na área do aluno com ele.
             </p>
-            <Link className="compra__botao" to={`/cursos/entrar?curso=${curso}&email=${encodeURIComponent(email.trim().toLowerCase())}`}>
+            <Link className="compra__botao" to={`/cursos/entrar?curso=${curso}`} onClick={() => lembrarEmail(email.trim().toLowerCase())}>
               Entrar na área do aluno
             </Link>
             <button type="button" className="compra__link" onClick={() => setJaTem(false)}>
