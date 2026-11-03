@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { ilhaCourseLd } from '@/lib/seo';
 import {
   Check,
   ChevronDown,
@@ -341,16 +341,7 @@ const IlhaVendas = () => {
     { p: 'E se eu não gostar?', r: `Você tem ${CURSO_ILHA.garantiaDias} dias para pedir o reembolso, com devolução integral. É só me chamar no WhatsApp.` },
   ];
 
-  const ld = {
-    '@context': 'https://schema.org',
-    '@type': 'Course',
-    name: CURSO_ILHA.nome,
-    description: CURSO_ILHA.descricao,
-    url: `${SITE_URL}${CURSO_ILHA.vitrine.pagina}`,
-    image: `${SITE_URL}/cursos-ilha/og.jpg`,
-    provider: { '@type': 'Person', name: 'Jefferson Lobo', url: SITE_URL },
-    offers: { '@type': 'Offer', price: String(lote.preco), priceCurrency: 'BRL', category: 'Paid', availability: 'https://schema.org/InStock' },
-  };
+  const ld = ilhaCourseLd(agora);
   const faqLd = {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
@@ -371,15 +362,12 @@ const IlhaVendas = () => {
   return (
     <div className="escola e-ilha-pagina" ref={raiz}>
       <SEO
-        title="Ilha de Edição completa: agora você faz seu conteúdo sozinho no Claude | Jefferson Lobo"
-        description={CURSO_ILHA.descricao}
+        title="Ilha de Edição completa no Claude | Jefferson Lobo"
+        description="Curso Ilha de Edição completa: 5 aulas com as telas reais, instalador da Ilha, 5 manuais em PDF e Tutor IA para você fazer seu conteúdo sozinho no Claude."
         path={CURSO_ILHA.vitrine.pagina}
         ogImage={`${SITE_URL}/cursos-ilha/og.jpg`}
+        jsonLd={[ld, faqLd]}
       />
-      <Helmet>
-        <script type="application/ld+json">{JSON.stringify(ld)}</script>
-        <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
-      </Helmet>
 
       <EscolaTopo onCta={() => trackCTA('ilha_topo', 'ilha_vendas')} />
 

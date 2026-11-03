@@ -48,7 +48,7 @@ export default function JeffersonLobo() {
     <div className="min-h-screen bg-background">
       <SEO
         title="Quem é Jefferson Lobo | Palestrante de IA"
-        description="__JLDESC__"
+        description="Quem é Jefferson Lobo: palestrante de IA no Brasil, Head Executivo de Marketing do Sistema Fiep e criador do Método DEL. Biografia, credenciais e tese."
         path="/jefferson-lobo"
         ogType="profile"
         jsonLd={jsonLd}

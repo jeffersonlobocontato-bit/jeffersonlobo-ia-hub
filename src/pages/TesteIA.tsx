@@ -63,8 +63,8 @@ export default function TesteIA() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEO
-        title="Teste de Maturidade em IA — Jefferson Lobo"
-        description="Diagnóstico gratuito de 8 minutos: descubra seu nível de maturidade em Inteligência Artificial e receba um plano de ação 30/60/90 dias."
+        title="Teste de Maturidade em IA gratuito | Jefferson Lobo"
+        description="Diagnóstico gratuito de 8 minutos: descubra seu nível de maturidade em Inteligência Artificial e receba um plano de ação de 30, 60 e 90 dias com Jefferson Lobo."
         path="/teste-ia"
       />
       <Header />

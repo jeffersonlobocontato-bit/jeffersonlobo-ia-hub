@@ -375,18 +375,26 @@ const Vitrine = () => {
     },
   ].slice(0, 4);
 
+  const collectionLd = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    name: "Academia jeffersonlobo.tech",
+    url: `${SITE_URL}/cursos`,
+    inLanguage: "pt-BR",
+    description: "Cursos práticos de IA aplicada e o livro do Método DEL, de Jefferson Lobo.",
+    publisher: { "@type": "Organization", name: "Academia jeffersonlobo.tech", url: `${SITE_URL}/cursos` },
+    mainEntity: (({ ["@context"]: _c, ...rest }) => rest)(jsonLd as Record<string, unknown>),
+  };
+
   return (
     <div className="escola" ref={raiz}>
       <SEO
-        title="Academia jeffersonlobo.tech | Cursos e livro de Jefferson Lobo"
-        description="Cursos práticos de IA aplicada e o livro do Método DEL, de Jefferson Lobo. Aulas curtas, Tutor IA em cada aula e acesso pelo seu e-mail."
+        title="Academia jeffersonlobo.tech | Cursos de IA e livro DEL"
+        description="Cursos práticos de IA aplicada e o livro do Método DEL, de Jefferson Lobo. Aulas curtas, Tutor IA em cada aula, acesso pelo seu e-mail e garantia de 7 dias."
         path="/cursos"
         ogImage={`${SITE_URL}/academia/og-cursos.jpg`}
+        jsonLd={[collectionLd, faqLd]}
       />
-      <Helmet>
-        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-        <script type="application/ld+json">{JSON.stringify(faqLd)}</script>
-      </Helmet>
 
       <EscolaTopo onCta={() => trackCTA("vitrine_topo", "vitrine")} />
 

@@ -8,8 +8,8 @@ export default function WorkshopIA() {
       h1="Workshop de Inteligência Artificial para"
       h1Highlight="times de marketing e negócios"
       subtitle="Imersões práticas in-company para destravar o uso real de IA generativa: do prompt à orquestração de fluxos, com exercícios baseados nos casos reais da sua operação."
-      seoTitle="Workshop de IA in-company — Jefferson Lobo | Imersão prática de IA"
-      seoDescription="Workshop in-company de Inteligência Artificial para times de marketing, vendas e negócios. Imersão prática, hands-on, com casos reais da sua empresa. Presencial ou online."
+      seoTitle="Workshop de IA in-company | Jefferson Lobo"
+      seoDescription="Workshop in-company de Inteligência Artificial para times de marketing, vendas e negócios. Imersão prática com casos reais da sua empresa, presencial ou online."
       serviceType="Workshop de Inteligência Artificial"
       forWho={[
         "Times de marketing que precisam sair da fase de 'brincar com ChatGPT' para fluxos produtivos reais",

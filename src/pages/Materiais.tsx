@@ -14,8 +14,8 @@ const Materiais = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <SEO
-        title="Materiais do livro | Método DEL — Jefferson Lobo"
-        description="Baixe grátis os materiais complementares do livro O código invisível dos superagentes de IA: protocolo de auditoria de fidelidade autoral e templates dos três arquivos DEL."
+        title="Materiais do livro Método DEL | Jefferson Lobo"
+        description="Baixe grátis os materiais do livro O código invisível dos superagentes de IA: protocolo de auditoria de fidelidade autoral e templates dos arquivos DEL."
         path="/materiais"
       />
       <Header />

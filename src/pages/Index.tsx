@@ -31,7 +31,7 @@ const Index = () => {
     <div className="min-h-screen bg-background">
       <SEO
         title="Jefferson Lobo — Palestrante de Inteligência Artificial no Brasil"
-        description="Jefferson Lobo é palestrante de Inteligência Artificial no Brasil: palestras, workshops e consultoria em IA para empresas e lideranças. Solicite uma proposta ou faça o Teste de Maturidade em IA gratuito."
+        description="Palestrante de Inteligência Artificial no Brasil, autor do Método DEL e consultor de IA aplicada a marketing e negócios. Head Executivo de Marketing do Sistema Fiep."
         path="/"
       />
       <Header />

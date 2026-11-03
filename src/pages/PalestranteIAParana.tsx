@@ -8,8 +8,8 @@ export default function PalestranteIAParana() {
       h1="Palestrante de Inteligência Artificial no Paraná"
       h1Highlight="para empresas e eventos"
       subtitle="Referência nacional em IA aplicada a negócios, com atuação consolidada no Paraná — passagens por CNI, Gazeta do Povo, MIT, Sistema Fiep e Laguna Construtora. Keynotes, imersões e consultoria em IA generativa para empresas e eventos."
-      seoTitle="Palestrante de Inteligência Artificial no Paraná | Jefferson Lobo"
-      seoDescription="Jefferson Lobo é palestrante de Inteligência Artificial no Paraná: keynotes, imersões e consultoria em IA para empresas, indústrias e eventos em todo o estado, dentro de uma atuação nacional."
+      seoTitle="Palestrante de IA no Paraná | Jefferson Lobo"
+      seoDescription="Jefferson Lobo, palestrante de IA no Paraná e em todo o Brasil. Palestras e imersões sobre IA para empresas, indústrias e eventos corporativos do estado."
       serviceType="Palestrante de Inteligência Artificial no Paraná"
       ctaHref="https://wa.me/5545999864213?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20uma%20proposta%20de%20palestra%20de%20IA."
       areaServed={[
