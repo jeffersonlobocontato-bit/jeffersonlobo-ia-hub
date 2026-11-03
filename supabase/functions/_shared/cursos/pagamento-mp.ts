@@ -4,6 +4,7 @@
 import type { SupabaseClient } from 'npm:@supabase/supabase-js@2';
 import { API_MP, acaoDoStatus, statusDoPagamento, type StatusPedido } from '../mercadopago.ts';
 import { CATALOGO, linkDeEntrada } from './catalogo.ts';
+import { enviarPurchaseCapi } from './meta-capi.ts';
 import { sendTemplateEmailLogged } from '../transactional-email-templates/send-and-log.ts';
 
 export type Resultado = { pedidoId: string | null; status: StatusPedido | null; acao: string; erro: string | null };
@@ -130,7 +131,10 @@ export async function processarPagamento(
   if (erroUpd) throw new Error(`atualizar pedido: ${erroUpd.message}`);
 
   let resultado = `status ${status}`;
-  if (acao === 'liberar') resultado = await liberar(supabase, pedido as Pedido, String(pg.id));
+  if (acao === 'liberar') {
+    resultado = await liberar(supabase, pedido as Pedido, String(pg.id));
+    await enviarPurchaseCapi(supabase, pedidoId);
+  }
   if (acao === 'revogar') resultado = await revogar(supabase, pedido as Pedido, status);
   if (erro) await avisarTelegram(supabase, `⚠️ <b>Mercado Pago</b>\nPedido ${pedidoId}\n${erro}`);
 

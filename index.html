@@ -112,20 +112,42 @@
       Cada página que precisa de FAQPage já declara o seu próprio, com perguntas reais
       e visíveis (CommercialLanding.tsx, BlogPost.tsx) — é o jeito certo de fazer isso.
     -->
-    <!-- Meta Pixel (não carrega em rotas /admin) -->
+    <!-- Meta Pixel (não carrega em /admin nem em navegadores marcados como internos).
+         Antes de carregar: o e-mail que chega na URL (links de acesso) vai para a
+         sessão e sai do endereço; com token de login na URL, espera o app limpá-la. -->
     <script>
-      if (!/^\/admin(\/|$)/.test(location.pathname)) {
-      !function(f,b,e,v,n,t,s)
-      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-      n.queue=[];t=b.createElement(e);t.async=!0;
-      t.src=v;s=b.getElementsByTagName(e)[0];
-      s.parentNode.insertBefore(t,s)}(window, document,'script',
-      'https://connect.facebook.net/en_US/fbevents.js');
-      fbq('init', '1629134600491040');
-      fbq('track', 'PageView');
-      }
+      (function () {
+        try {
+          var u = new URL(location.href), mudou = false;
+          ['email', 'e-mail', 'nome', 'telefone', 'whatsapp', 'phone', 'cpf'].forEach(function (k) {
+            if (!u.searchParams.has(k)) return;
+            if (k === 'email') try { sessionStorage.setItem('cursos-entrar-email', u.searchParams.get(k) || ''); } catch (e) {}
+            u.searchParams.delete(k); mudou = true;
+          });
+          if (mudou) history.replaceState(history.state, '', u.pathname + u.search + u.hash);
+        } catch (e) {}
+        var interno = false;
+        try { interno = localStorage.getItem('analytics_ignorar') === '1'; } catch (e) {}
+        if (interno || /^\/admin(\/|$)/.test(location.pathname)) return;
+        var SENSIVEL = /(access_token|refresh_token|token_hash|[?&#]token=|[?&]code=)/;
+        function carregar() {
+          !function(f,b,e,v,n,t,s)
+          {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+          n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+          if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+          n.queue=[];t=b.createElement(e);t.async=!0;
+          t.src=v;s=b.getElementsByTagName(e)[0];
+          s.parentNode.insertBefore(t,s)}(window, document,'script',
+          'https://connect.facebook.net/en_US/fbevents.js');
+          fbq('init', '1629134600491040', {}, { agent: 'lovable' });
+          fbq('track', 'PageView');
+        }
+        if (!SENSIVEL.test(location.search + location.hash)) return carregar();
+        var n = 0, t = setInterval(function () {
+          if (!SENSIVEL.test(location.search + location.hash)) { clearInterval(t); carregar(); }
+          else if (++n > 50) clearInterval(t);
+        }, 200);
+      })();
     </script>
     <!-- End Meta Pixel -->
   </head>

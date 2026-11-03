@@ -91,9 +91,25 @@ Deno.serve(async (req) => {
     // pedido sem ela: a venda nunca depende do painel.
     const novo = { curso_slug: curso, email, nome, lote: preco.lote, valor: preco.preco };
     const origem = limparOrigem(corpo.origem);
+    // Dados para a Conversions API (cookies do pixel, IP e navegador de quem comprou).
+    // deno-lint-ignore no-explicit-any
+    const rb: any = corpo.rastreio && typeof corpo.rastreio === 'object' ? corpo.rastreio : {};
+    const txt = (v: unknown, n = 300) => (typeof v === 'string' && v.trim() ? v.trim().slice(0, n) : undefined);
+    const fonte = txt(rb.event_source_url);
+    const rastreio = {
+      fbclid: txt(rb.fbclid),
+      fbp: txt(rb.fbp),
+      fbc: txt(rb.fbc),
+      event_source_url: fonte && /^https:\/\/(www\.)?jeffersonlobo\.tech\//.test(fonte) ? fonte.split(/[?#]/)[0] : undefined,
+      client_ip: (req.headers.get('cf-connecting-ip') ?? req.headers.get('x-forwarded-for')?.split(',')[0] ?? '').trim() || undefined,
+      user_agent: txt(req.headers.get('user-agent'), 500),
+      ignorar: rb.ignorar === true || undefined,
+      utm_source: origem.utm_source, utm_medium: origem.utm_medium, utm_campaign: origem.utm_campaign,
+      utm_content: origem.utm_content, utm_term: origem.utm_term,
+    };
     let { data: pedido, error: erroPedido } = await supabase
       .from('curso_pedidos')
-      .insert({ ...novo, origem })
+      .insert({ ...novo, origem, rastreio })
       .select('id')
       .single();
     if (erroPedido && /origem/.test(erroPedido.message ?? '')) {

@@ -19,7 +19,7 @@ import {
 import { SEO, SITE_URL } from '@/components/SEO';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 import { CURSO_ILHA, LIVRO_DEL, loteAtual } from '@/content/cursos/ilha';
-import { trackInitiateCheckout, trackViewContent } from '@/lib/metaPixel';
+import { rastreioParaPedido, trackInitiateCheckout, trackViewContent } from '@/lib/metaPixel';
 import { POCKETS, VALOR_POCKETS, reais } from '@/content/cursos/pockets';
 import { ESCOLA } from '@/content/cursos/escola';
 import EscolaTopo from '@/components/cursos/escola/EscolaTopo';
@@ -263,7 +263,7 @@ const IlhaVendas = () => {
   const comprar = useCallback(
     (onde: string) => {
       trackCTA(`ilha_comprar_${onde}`, 'ilha_vendas');
-      trackInitiateCheckout({ value: lote.preco, content_name: 'Ilha de Edição' });
+      trackInitiateCheckout({ value: lote.preco, content_id: 'ilha', content_name: 'Ilha de Edição' });
       if (direto) setCompraAberta(true);
     },
     [direto, trackCTA, lote.preco],
@@ -271,7 +271,8 @@ const IlhaVendas = () => {
 
   // ViewContent do Meta Pixel, uma vez por visita à página.
   useEffect(() => {
-    trackViewContent('Ilha de Edição');
+    trackViewContent({ value: loteAtual(CURSO_ILHA).preco, content_id: 'ilha', content_name: 'Ilha de Edição' });
+    rastreioParaPedido(); // guarda o fbclid do anúncio para o pedido
   }, []);
 
   // Voltou de um pagamento recusado: reabre a janela com o recado.

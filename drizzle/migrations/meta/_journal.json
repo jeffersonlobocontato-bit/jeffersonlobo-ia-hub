@@ -64,6 +64,13 @@
       "when": 1792082545121,
       "tag": "0008_meta_ads_painel",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1793733060261,
+      "tag": "0009_pedidos_rastreio_capi",
+      "breakpoints": true
     }
   ]
 }
