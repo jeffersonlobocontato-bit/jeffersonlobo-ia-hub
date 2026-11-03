@@ -6,11 +6,13 @@ import { renderToPipeableStream } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
 import { HelmetProvider, type HelmetServerState } from "react-helmet-async";
 import type { ReactNode } from "react";
-import App, { ROTAS_PRERENDER } from "./App";
+import App, { ROTAS_PRERENDER, queryClient } from "./App";
 
 export const rotas = Object.keys(ROTAS_PRERENDER);
 
-export function render(url: string): Promise<{ html: string; helmet: HelmetServerState }> {
+export function render(url: string, dados: Record<string, unknown> = {}): Promise<{ html: string; helmet: HelmetServerState }> {
+  queryClient.clear();
+  for (const [chave, valor] of Object.entries(dados)) queryClient.setQueryData([chave], valor);
   const ctx: { helmet?: HelmetServerState } = {};
   const Roteador = ({ children }: { children: ReactNode }) => (
     <StaticRouter location={url}>{children}</StaticRouter>

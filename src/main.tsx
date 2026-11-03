@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import { HelmetProvider } from "react-helmet-async";
-import App, { ROTAS_PRERENDER } from "./App.tsx";
+import App, { ROTAS_PRERENDER, queryClient } from "./App.tsx";
 import "./index.css";
 
 // Aviso benigno do Chrome disparado por bibliotecas de UI (Radix/gráficos)
@@ -30,5 +30,16 @@ const montar = () =>
 // conteúdo pronto pela mesma página sem passar por uma tela vazia.
 const rotaPronta = raiz.dataset.prerender;
 const pagina = rotaPronta && rotaPronta === (window.location.pathname.replace(/\/+$/, "") || "/") ? ROTAS_PRERENDER[rotaPronta] : undefined;
+// Dados do banco usados no HTML pronto (ex.: texto do topo da home): entram no
+// cache antes de montar, para a primeira tela ser igual à pré-renderizada; em
+// seguida são buscados de novo, como sempre.
+const dadosProntos = document.getElementById("dados-prerender");
+if (pagina && dadosProntos) {
+  try {
+    const dados = JSON.parse(dadosProntos.textContent || "{}") as Record<string, unknown>;
+    for (const [chave, valor] of Object.entries(dados)) queryClient.setQueryData([chave], valor);
+    setTimeout(() => Object.keys(dados).forEach((chave) => queryClient.invalidateQueries({ queryKey: [chave] })), 0);
+  } catch { /* sem dados prontos: carrega normalmente */ }
+}
 if (pagina) pagina.preload().then(montar, montar);
 else montar();

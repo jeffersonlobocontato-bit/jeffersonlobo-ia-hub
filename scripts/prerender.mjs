@@ -55,10 +55,20 @@ try {
   // página certa. Robôs sem JS só recebem a home em URLs desconhecidas.
   const GUARDA = `<style>html.rota-nao-home [data-prerender-home]{display:none!important}</style><script>if((location.pathname.replace(/\\/+$/,"")||"/")!=="/")document.documentElement.classList.add("rota-nao-home")</script>`;
 
+  // Dados públicos que a home mostra no topo (mesma consulta do app).
+  const env = { ...Object.fromEntries((fs.existsSync(".env") ? fs.readFileSync(".env", "utf8") : "").split("\n").map((l) => l.match(/^\s*([A-Z_]+)\s*=\s*"?([^"]*)"?\s*$/)).filter(Boolean).map((m) => [m[1], m[2]])), ...process.env };
+  const dadosPorRota = { "/": {} };
+  try {
+    const r = await fetch(`${env.VITE_SUPABASE_URL}/rest/v1/hero_content?select=*&limit=1`, { headers: { apikey: env.VITE_SUPABASE_PUBLISHABLE_KEY } });
+    const linhas = await r.json();
+    if (Array.isArray(linhas) && linhas[0]) dadosPorRota["/"].hero_content = linhas[0];
+  } catch (e) { console.warn(`[prerender] topo da home sem dados do banco: ${e?.message || e}`); }
+
   let ok = 0;
   for (const rota of rotas) {
     try {
-      const { html, helmet } = await render(rota);
+      const dados = dadosPorRota[rota] || {};
+      const { html, helmet } = await render(rota, dados);
       if (!/<h1[\s>]/i.test(html)) throw new Error("sem H1");
       let head = template;
       for (const re of HEAD_ESTATICO) head = head.replace(re, "");
@@ -66,7 +76,7 @@ try {
       const out = head
         .replace("</head>", `${tags}\n</head>`)
         .replace('<div id="root"></div>', rota === "/"
-          ? `${GUARDA}<div id="root" data-prerender="/"><div data-prerender-home>${html}</div></div>`
+          ? `${GUARDA}<div id="root" data-prerender="/"><div data-prerender-home>${html}</div></div>${Object.keys(dados).length ? `<script type="application/json" id="dados-prerender">${JSON.stringify(dados).replace(/</g, "\\u003c")}</script>` : ""}`
           : `<div id="root" data-prerender="${rota}">${html}</div>`);
       if (out === head) throw new Error("template sem #root");
       const destino = rota === "/" ? path.join(dist, "index.html") : path.join(dist, rota, "index.html");

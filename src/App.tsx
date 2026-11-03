@@ -86,7 +86,7 @@ const RolagemParaAncora = () => {
   return null;
 };
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
 /** Rotas estáticas pré-renderizadas no build (scripts/prerender.mjs). */
 export const ROTAS_PRERENDER: Record<string, Precarregavel> = {
