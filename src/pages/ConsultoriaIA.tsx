@@ -8,8 +8,8 @@ export default function ConsultoriaIA() {
       h1="Consultoria de Inteligência Artificial para"
       h1Highlight="lideranças que vão decidir"
       subtitle="Acompanhamento estratégico para diretoria e C-level: diagnóstico de maturidade, definição de roadmap de IA, governança, escolha de stack e orquestração de fluxos com identidade de marca."
-      seoTitle="Consultoria de Inteligência Artificial — Jefferson Lobo | Estratégia de IA"
-      seoDescription="Consultoria estratégica de IA para diretoria e C-level: diagnóstico de maturidade, roadmap, governança e orquestração de fluxos de IA com Jefferson Lobo. Atende todo o Brasil."
+      seoTitle="Consultoria de Inteligência Artificial | Jefferson Lobo"
+      seoDescription="Consultoria estratégica de IA para diretoria e C-level: diagnóstico de maturidade, roadmap, governança e fluxos de IA com Jefferson Lobo. Atende todo o Brasil."
       serviceType="Consultoria de Inteligência Artificial"
       sober
       forWho={[

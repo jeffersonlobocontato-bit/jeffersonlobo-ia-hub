@@ -1,4 +1,5 @@
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
+import { PERSON_LD } from "@/lib/seo";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -115,7 +116,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
         "@id": `${url}#service`,
         name: props.serviceType,
         serviceType: props.serviceType,
-        provider: { "@id": `${SITE_URL}/#person` },
+        provider: PERSON_LD,
         areaServed: (props.areaServed || [{ type: "Country", name: "Brasil" }]).map(
           (a) => ({ "@type": a.type, name: a.name })
         ),
@@ -151,16 +152,12 @@ export default function CommercialLanding(props: CommercialLandingProps) {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>{props.seoTitle}</title>
-        <meta name="description" content={props.seoDescription} />
-        <link rel="canonical" href={url} />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={props.seoTitle} />
-        <meta property="og:description" content={props.seoDescription} />
-        <meta property="og:url" content={url} />
-        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-      </Helmet>
+      <SEO
+        title={props.seoTitle}
+        description={props.seoDescription}
+        path={`/${props.slug}`}
+        jsonLd={jsonLd}
+      />
 
       <Header />
 

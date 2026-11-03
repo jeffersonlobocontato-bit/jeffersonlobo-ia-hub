@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Helmet } from 'react-helmet-async';
+import { PERSON_LD } from '@/lib/seo';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { SEO, SITE_URL } from '@/components/SEO';
@@ -98,7 +98,7 @@ const bookJsonLd = {
   description:
     'Transforme IA genérica em agentes personalizados com DNA linguístico fiel à sua marca. O Método DEL, em livro — e-book ou impresso.',
   inLanguage: 'pt-BR',
-  author: { '@id': `${SITE_URL}/#person` },
+  author: PERSON_LD,
   offers: [
     {
       '@type': 'Offer',
@@ -138,14 +138,12 @@ const LivroDel = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
       <SEO
-        title="O código invisível dos superagentes de IA — Jefferson Lobo | Método DEL"
-        description="Transforme IA genérica em agentes personalizados com DNA linguístico fiel à sua marca. O Método DEL, em livro — e-book ou impresso."
+        title="O código invisível dos superagentes de IA | Método DEL"
+        description="Livro de Jefferson Lobo sobre o Método DEL: transforme IA genérica em agentes personalizados com DNA linguístico fiel à sua marca. E-book ou impresso."
         path="/livro-del"
         ogImage={`${SITE_URL}/og/livro-del.jpg`}
+        jsonLd={bookJsonLd}
       />
-      <Helmet>
-        <script type="application/ld+json">{JSON.stringify(bookJsonLd)}</script>
-      </Helmet>
       <Header />
 
       <main className="flex-1">

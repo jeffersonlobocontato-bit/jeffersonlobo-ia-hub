@@ -1,5 +1,7 @@
 import { useParams, Link, Navigate } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
+import { SEO } from '@/components/SEO';
+import { clip, DEFAULT_OG_IMAGE, PERSON_LD } from '@/lib/seo';
 import { Calendar, Clock, Tag, ArrowLeft, Share2, Link2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useEffect } from 'react';
@@ -50,7 +52,7 @@ const BlogPost = () => {
   }
 
   const url = `${SITE_URL}/blog/${post.slug}`;
-  const seoTitle = post.seo_title || `${post.title} — Jefferson Lobo`;
+  const seoTitle = post.seo_title || post.title;
   const seoDescription = post.seo_description || post.excerpt;
   const readingMin = post.reading_minutes || calcReadingMinutes(post.content_md);
   const published = new Date(post.published_at || post.date).toISOString();
@@ -82,13 +84,13 @@ const BlogPost = () => {
     '@context': 'https://schema.org',
     '@type': 'Article',
     headline: post.title,
-    description: post.excerpt,
-    image: post.cover_image ? [post.cover_image] : undefined,
+    description: seoDescription,
+    image: [post.cover_image || DEFAULT_OG_IMAGE],
     datePublished: published,
     dateModified: updated,
     author: isCuradoria
       ? { '@type': 'Organization', name: authorName }
-      : { '@id': `${SITE_URL}/#person` },
+      : PERSON_LD,
     publisher: {
       '@type': 'Organization',
       name: 'Jefferson Lobo',
@@ -142,18 +144,18 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <SEO
+        title={clip(seoTitle, 60)}
+        description={clip(seoDescription, 160)}
+        path={`/blog/${post.slug}`}
+        ogType="article"
+        ogImage={post.cover_image || DEFAULT_OG_IMAGE}
+        jsonLd={[articleJsonLd, breadcrumbJsonLd, faqJsonLd].filter(Boolean) as object[]}
+      />
       <Helmet>
-        <title>{seoTitle.slice(0, 60)}</title>
-        <meta name="description" content={seoDescription.slice(0, 160)} />
-        <link rel="canonical" href={url} />
         {post.tags && post.tags.length > 0 && (
           <meta name="keywords" content={post.tags.join(', ')} />
         )}
-        <meta property="og:type" content="article" />
-        <meta property="og:title" content={post.title} />
-        <meta property="og:description" content={post.excerpt} />
-        <meta property="og:url" content={url} />
-        {post.cover_image && <meta property="og:image" content={post.cover_image} />}
         <meta property="article:published_time" content={published} />
         <meta property="article:modified_time" content={updated} />
         <meta property="article:author" content={authorName} />
@@ -161,15 +163,6 @@ const BlogPost = () => {
         {(post.tags || []).map((t) => (
           <meta key={t} property="article:tag" content={t} />
         ))}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={post.title} />
-        <meta name="twitter:description" content={post.excerpt} />
-        {post.cover_image && <meta name="twitter:image" content={post.cover_image} />}
-        <script type="application/ld+json">{JSON.stringify(articleJsonLd)}</script>
-        <script type="application/ld+json">{JSON.stringify(breadcrumbJsonLd)}</script>
-        {faqJsonLd && (
-          <script type="application/ld+json">{JSON.stringify(faqJsonLd)}</script>
-        )}
       </Helmet>
 
       <ReadingProgress />

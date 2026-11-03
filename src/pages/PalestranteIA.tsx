@@ -8,8 +8,8 @@ export default function PalestranteIA() {
       h1="Palestrante de Inteligência Artificial"
       h1Highlight="no Brasil"
       subtitle="Referência nacional em IA aplicada a negócios — keynotes, imersões e consultoria em IA generativa aplicada a liderança, produtividade e governança para empresas e eventos corporativos em todo o Brasil."
-      seoTitle="Palestrante de Inteligência Artificial no Brasil | Jefferson Lobo"
-      seoDescription="Jefferson Lobo é palestrante de Inteligência Artificial no Brasil: keynotes, imersões e consultoria em IA aplicada a negócios, liderança e produtividade para empresas e eventos em todo o país."
+      seoTitle="Palestrante de Inteligência Artificial | Jefferson Lobo"
+      seoDescription="Jefferson Lobo, palestrante de IA e Head Executivo de Marketing do Sistema Fiep. Palestras e imersões sobre IA para empresas e eventos corporativos."
       serviceType="Palestrante de Inteligência Artificial"
       ctaHref="https://wa.me/5545999864213?text=Ol%C3%A1!%20Gostaria%20de%20solicitar%20uma%20proposta%20de%20palestra%20de%20IA."
       areaServed={[{ type: "Country", name: "Brasil" }]}

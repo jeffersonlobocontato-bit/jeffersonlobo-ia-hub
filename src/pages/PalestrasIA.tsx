@@ -8,8 +8,8 @@ export default function PalestrasIA() {
       h1="Palestras de Inteligência Artificial para"
       h1Highlight="empresas e lideranças"
       subtitle="Keynotes presenciais e online sobre IA generativa, agentes, marketing e estratégia — para convenções, kickoffs, lideranças C-level e eventos corporativos em todo o Brasil."
-      seoTitle="Palestras de Inteligência Artificial — Jefferson Lobo | Palestrante IA"
-      seoDescription="Contrate uma palestra de Inteligência Artificial com Jefferson Lobo: keynotes sobre IA generativa, marketing com IA, agentes e estratégia para empresas. Atende todo o Brasil."
+      seoTitle="Palestras de Inteligência Artificial | Jefferson Lobo"
+      seoDescription="Palestras de Inteligência Artificial com Jefferson Lobo: keynotes sobre IA generativa, marketing com IA, agentes e estratégia para empresas de todo o Brasil."
       serviceType="Palestras de Inteligência Artificial"
       forWho={[
         "Convenções de vendas, marketing e líderes que precisam de uma keynote provocadora sobre IA",
