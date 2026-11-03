@@ -4,6 +4,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { execSync } from "node:child_process";
 
 const dist = path.resolve("dist");
 const ssr = path.resolve("dist-ssr/entry-server.js");
@@ -23,6 +24,7 @@ const HEAD_ESTATICO = [
 ];
 
 try {
+  execSync("npx vite build --ssr src/entry-server.tsx --outDir dist-ssr --emptyOutDir --logLevel warn", { stdio: "inherit" });
   const template = fs.readFileSync(path.join(dist, "index.html"), "utf8");
   const { render, rotas } = await import(pathToFileURL(ssr).href);
   let ok = 0;
