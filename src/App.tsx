@@ -17,7 +17,7 @@ function lazyComPreload(factory: () => Promise<{ default: ComponentType }>): Pre
   let Pronto: ComponentType | null = null;
   const preload = () => factory().then((m) => { Pronto = m.default; return m; });
   const Lazy = lazy(preload);
-  const Comp = (() => (Pronto ? <Pronto /> : <Lazy />)) as Precarregavel;
+  const Comp = (() => (Pronto ? <Pronto /> : <Lazy />)) as unknown as Precarregavel;
   Comp.preload = preload;
   return Comp;
 }

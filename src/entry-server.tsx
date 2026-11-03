@@ -1,4 +1,7 @@
 // Usado só no build (scripts/prerender.mjs) para gerar o HTML das rotas estáticas.
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore -- módulo do Node, usado só no build de pré-renderização
+
 import { PassThrough } from "node:stream";
 import { renderToPipeableStream } from "react-dom/server";
 import { StaticRouter } from "react-router-dom/server";
