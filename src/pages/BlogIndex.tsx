@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Helmet } from 'react-helmet-async';
+import { SEO } from '@/components/SEO';
 import { Calendar, ExternalLink, ArrowRight } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -53,20 +53,12 @@ const BlogIndex = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Blog — Jefferson Lobo | IA, Tecnologia e Inovação</title>
-        <meta
-          name="description"
-          content="Artigos, análises e insights sobre Inteligência Artificial, tecnologia e o futuro do trabalho por Jefferson Lobo."
-        />
-        <link rel="canonical" href={`${SITE_URL}/blog`} />
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content="Blog — Jefferson Lobo" />
-        <meta property="og:description" content="Insights sobre IA, tecnologia e inovação." />
-        <meta property="og:url" content={`${SITE_URL}/blog`} />
-        <script type="application/ld+json">{JSON.stringify(blogListJsonLd)}</script>
-        <script type="application/ld+json">{JSON.stringify(collectionPageJsonLd)}</script>
-      </Helmet>
+      <SEO
+        title="Blog de Inteligência Artificial | Jefferson Lobo"
+        description="Artigos, análises e insights de Jefferson Lobo sobre Inteligência Artificial, tecnologia, marketing e o futuro do trabalho, com curadoria de notícias de IA."
+        path="/blog"
+        jsonLd={[blogListJsonLd, collectionPageJsonLd]}
+      />
 
 
       <Header />
