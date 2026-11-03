@@ -86,10 +86,11 @@ const RolagemParaAncora = () => {
   return null;
 };
 
-const queryClient = new QueryClient();
+export const queryClient = new QueryClient();
 
-/** Rotas estáticas pré-renderizadas no build (a home fica fora: ver AGENTS.md). */
+/** Rotas estáticas pré-renderizadas no build (scripts/prerender.mjs). */
 export const ROTAS_PRERENDER: Record<string, Precarregavel> = {
+  "/": Index,
   "/palestrante-inteligencia-artificial": PalestranteIA,
   "/palestrante-inteligencia-artificial-parana-brasil": PalestranteIAParana,
   "/palestras-ia": PalestrasIA,
