@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -46,20 +46,13 @@ export default function JeffersonLobo() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Helmet>
-        <title>Jefferson Lobo — Palestrante de Inteligência Artificial</title>
-        <meta
-          name="description"
-          content="Quem é Jefferson Lobo: palestrante de Inteligência Artificial no Brasil, Head Executivo de Marketing do Sistema Fiep e criador do Método DEL. Biografia, credenciais e tese."
-        />
-        <link rel="canonical" href={PAGE_URL} />
-        <meta property="og:type" content="profile" />
-        <meta property="og:title" content="Jefferson Lobo — Palestrante de Inteligência Artificial" />
-        <meta property="og:description" content="Palestrante de IA no Brasil, Head Executivo de Marketing do Sistema Fiep e criador do Método DEL." />
-        <meta property="og:url" content={PAGE_URL} />
-        <meta property="og:image" content={`${SITE_URL}/og-default.png`} />
-        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-      </Helmet>
+      <SEO
+        title="Quem é Jefferson Lobo | Palestrante de IA"
+        description="__JLDESC__"
+        path="/jefferson-lobo"
+        ogType="profile"
+        jsonLd={jsonLd}
+      />
 
       <Header />
 

@@ -1,4 +1,4 @@
-import { Helmet } from "react-helmet-async";
+import { SEO } from "@/components/SEO";
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -37,19 +37,13 @@ export default function Imprensa() {
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-      <Helmet>
-        <title>Imprensa & Press Kit — Jefferson Lobo</title>
-        <meta
-          name="description"
-          content="Press kit oficial de Jefferson Lobo: bio, fotos em alta, temas de especialidade e contato para jornalistas. Palestrante e consultor em Inteligência Artificial."
-        />
-        <link rel="canonical" href={`${SITE_URL}/imprensa`} />
-        <meta property="og:type" content="profile" />
-        <meta property="og:title" content="Imprensa & Press Kit — Jefferson Lobo" />
-        <meta property="og:description" content="Bio, fotos em alta, temas e contato para imprensa." />
-        <meta property="og:url" content={`${SITE_URL}/imprensa`} />
-        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
-      </Helmet>
+      <SEO
+        title="Imprensa e Press Kit | Jefferson Lobo"
+        description="Press kit oficial de Jefferson Lobo: bio, fotos em alta, temas de especialidade e contato para jornalistas. Palestrante e consultor em Inteligência Artificial."
+        path="/imprensa"
+        ogType="profile"
+        jsonLd={jsonLd}
+      />
 
       <Header />
 
