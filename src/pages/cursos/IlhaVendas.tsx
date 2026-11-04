@@ -179,7 +179,7 @@ function VSL({ aoTocar }: { aoTocar: () => void }) {
     <div className="e-vsl">
       <video
         ref={video}
-        src="/cursos-ilha/vsl/vsl.mp4"
+        src="/cursos-ilha/vsl/vsl.mp4?v=lote2"
         poster="/cursos-ilha/vsl/capa.jpg"
         playsInline
         preload="metadata"
