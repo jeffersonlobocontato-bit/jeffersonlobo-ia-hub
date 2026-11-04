@@ -62,7 +62,12 @@ export default function Claudia() {
     setActiveDomain(match.domain);
     window.setTimeout(() => setActiveDomain(null), 6000);
     if (match.openPath) {
-      window.open(match.openPath, "_blank", "noopener,noreferrer");
+      const path = match.openPath;
+      // Same-tab navigation, and delayed: window.open() here would be a
+      // background browser tab, not a user click, so Chrome's popup blocker
+      // silently swallows it — nothing visibly happens. Navigating this tab
+      // always works, and the delay lets the highlight + spoken reply land first.
+      window.setTimeout(() => window.location.assign(path), 900);
     }
     return match.response;
     // eslint-disable-next-line react-hooks/exhaustive-deps
