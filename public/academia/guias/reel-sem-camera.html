@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>O reel feito sem câmera</title>
+<meta name="description" content="Guia grátis: o passo a passo do reel em que você sai da sua foto de perfil e muda o seu número de seguidores, feito 100% com IA, sem câmera.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#050505; --surface:#0E0F0F; --surface-2:#151717; --line:#232626;
+    --text:#F2F2EF; --muted:#9BA3A1; --accent:#5EEAD4; --accent-ink:#04201C;
+    --warn:#F5C26B;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{background:var(--bg);color:var(--text);font-family:Inter,system-ui,sans-serif;line-height:1.6;font-size:17px}
+  .wrap{max-width:720px;margin:0 auto;padding:0 20px}
+  .mono{font-family:"IBM Plex Mono",monospace;text-transform:uppercase;letter-spacing:.14em;font-size:12px}
+  header{padding:56px 0 40px;border-bottom:1px solid var(--line)}
+  .kicker{color:var(--accent)}
+  h1{font-size:clamp(34px,8vw,54px);line-height:1.05;font-weight:800;letter-spacing:-.02em;margin:18px 0 18px}
+  h1 em{font-style:normal;color:var(--accent)}
+  .lead{color:var(--muted);font-size:19px;max-width:580px}
+  .needs{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:28px}
+  @media(min-width:600px){.needs{grid-template-columns:repeat(4,1fr)}}
+  .need{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+  .need b{display:block;font-size:15px}
+  .need span{color:var(--muted);font-size:13px}
+  section{padding:44px 0;border-bottom:1px solid var(--line)}
+  .step-n{color:var(--accent)}
+  h2{font-size:28px;line-height:1.15;font-weight:800;letter-spacing:-.01em;margin:10px 0 14px}
+  h3.sub{font-size:19px;font-weight:700;margin:26px 0 8px}
+  p+p{margin-top:12px}
+  ul.rules{list-style:none;margin-top:18px;display:grid;gap:10px}
+  ul.rules li{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+  ul.rules li b{color:var(--text)}
+  ul.rules li span{color:var(--muted)}
+  .prompt{background:var(--surface);border:1px solid var(--line);border-radius:14px;margin-top:22px;overflow:hidden}
+  .prompt-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px 16px;border-bottom:1px solid var(--line);background:var(--surface-2)}
+  .prompt-head h3{font-size:17px;font-weight:600}
+  .prompt-head .mono{color:var(--muted);font-size:11px}
+  .prompt-body{padding:16px;font-family:"IBM Plex Mono",monospace;font-size:14px;line-height:1.65;color:#DDE3E1;white-space:pre-wrap}
+  .prompt-body mark{background:rgba(94,234,212,.14);color:var(--accent);padding:0 4px;border-radius:4px}
+  .prompt-foot{padding:0 16px 16px}
+  .copy{appearance:none;border:0;background:var(--accent);color:var(--accent-ink);font:600 15px Inter,sans-serif;padding:12px 18px;border-radius:999px;cursor:pointer;width:100%}
+  .copy.ok{background:#fff}
+  .tip{color:var(--muted);font-size:14px;margin-top:10px}
+  .check{list-style:none;margin-top:16px;display:grid;gap:8px}
+  .check li{padding-left:30px;position:relative}
+  .check li::before{content:"";position:absolute;left:0;top:5px;width:18px;height:18px;border-radius:6px;border:2px solid var(--accent)}
+  .fix{background:var(--surface);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 16px;margin-top:18px;font-family:"IBM Plex Mono",monospace;font-size:14px}
+  .note{background:rgba(245,194,107,.07);border:1px solid rgba(245,194,107,.25);border-radius:12px;padding:14px 16px;margin-top:20px;font-size:15px;color:#E9DCC4}
+  .cta{text-align:center;padding:56px 0}
+  .cta h2{font-size:32px}
+  .cta p{color:var(--muted);max-width:520px;margin:0 auto}
+  .btn{display:inline-block;margin-top:24px;background:var(--accent);color:var(--accent-ink);text-decoration:none;font-weight:700;padding:16px 28px;border-radius:999px}
+  .next{margin-top:36px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px;text-align:left}
+  .next p{margin:6px 0 0;max-width:none}
+  .next a{color:var(--accent);font-weight:600}
+  footer{padding:28px 0 44px;color:var(--muted);font-size:14px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+  footer b{color:var(--text)}
+  .ba{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 16px}
+  .ba.solo{grid-template-columns:1fr 1fr;padding:0;margin-top:20px}
+  .ba.quatro{grid-template-columns:repeat(4,1fr);gap:8px}
+  .ba figure{margin:0}
+  .ba .frame{aspect-ratio:9/16;border-radius:10px;overflow:hidden;background:var(--surface-2);border:1px solid var(--line)}
+  .ba img{width:100%;height:100%;object-fit:cover;display:block}
+  .ba figcaption{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-top:6px}
+  .ba figcaption b{color:var(--accent);font-weight:500}
+  .ba-note{padding:0 16px 16px;color:var(--muted);font-size:14px;margin-top:-6px}
+  table.cost{width:100%;border-collapse:collapse;margin-top:18px;font-size:15px}
+  table.cost th,table.cost td{text-align:left;padding:12px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+  table.cost th{font-family:"IBM Plex Mono",monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:500}
+  table.cost td.n{font-family:"IBM Plex Mono",monospace;white-space:nowrap;color:var(--accent)}
+  table.cost tr.rec td{background:rgba(94,234,212,.05)}
+  table.cost small{display:block;color:var(--muted);font-size:13px}
+  .letter{margin-top:18px;background:#EDF4F5;color:#0A1A22;border-radius:18px;padding:18px 20px;text-align:center;font-weight:800;font-size:22px;line-height:1.2}
+  .letter span{color:#2196A6;display:block}
+  @media print{
+    body{background:#fff;color:#111;font-size:12pt}
+    :root{--bg:#fff;--surface:#F4F6F5;--surface-2:#EAEEED;--line:#D6DCDA;--text:#111;--muted:#555;--accent:#0F766E;--accent-ink:#fff}
+    .prompt-body{color:#111}
+    .copy{display:none}
+    .btn{background:none;color:var(--accent);padding:0}
+    .btn::after{content:' · ' attr(data-print)}
+    section{padding:22px 0}
+    .ba,table.cost,ul.rules li,.prompt-head,.letter,.note{break-inside:avoid}
+    .ba{max-width:330px;margin-left:auto;margin-right:auto}
+    .ba.quatro{max-width:none}
+    header{padding:10px 0 24px}
+    .note{color:#5b4a2a}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="mono kicker">Guia grátis · Academia jeffersonlobo.tech</div>
+  <h1>O reel feito <em>sem câmera</em></h1>
+  <p class="lead">Você sai da sua foto de perfil, apaga o número de seguidores e escreve o número que quer ter. Ninguém gravou nada: é um print, uma foto sua e IA.</p>
+  <div class="needs">
+    <div class="need"><b>Print do perfil</b><span>no modo escuro</span></div>
+    <div class="need"><b>Uma foto sua</b><span>de corpo inteiro</span></div>
+    <div class="need"><b>Magnific</b><span>plano pago</span></div>
+    <div class="need"><b>30 minutos</b><span>com as esperas</span></div>
+  </div>
+</header>
+
+<section>
+  <div class="mono step-n">Antes de começar</div>
+  <h2>Como o truque funciona</h2>
+  <p>A IA de vídeo recebe duas imagens: <b>como o vídeo começa</b> (o print do seu perfil) e <b>como ele termina</b> (você na frente da tela, já com o número novo). Ela inventa o movimento entre as duas.</p>
+  <p>Por isso o segredo não está no vídeo, está no quadro final. Se o quadro final ficar bom, o vídeo quase sempre fica bom.</p>
+  <div class="ba solo">
+    <figure><div class="frame"><img src="img/reel-sem-camera/01-print.jpg" alt="Print do perfil do Instagram em modo escuro, com 221 seguidores"></div><figcaption>Começo · <b>print</b></figcaption></figure>
+    <figure><div class="frame"><img src="img/reel-sem-camera/03-quadro-final.jpg" alt="O mesmo perfil com 10 MIL escrito à mão e o Jefferson em pé na frente da tela, sorrindo"></div><figcaption>Fim · <b>quadro final</b></figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <div class="mono step-n">Passo 1</div>
+  <h2>Tire o print do seu perfil</h2>
+  <p>Tudo o que aparecer no print aparece no vídeo. Arrume antes.</p>
+  <ul class="rules">
+    <li><b>Modo escuro ligado.</b> <span>O contraste com a sua roupa fica melhor e o vídeo parece mais "app de verdade".</span></li>
+    <li><b>Sem notificação na tela.</b> <span>Bolinha vermelha, aviso de bateria fraca: tudo isso vai para o vídeo.</span></li>
+    <li><b>Seus posts mais bonitos na grade.</b> <span>Se quiser, fixe no topo os três melhores antes de tirar o print.</span></li>
+    <li><b>Foto de perfil com você.</b> <span>Rosto visível, de frente. É dela que você vai "sair" no vídeo.</span></li>
+  </ul>
+</section>
+
+<section>
+  <div class="mono step-n">Passo 2</div>
+  <h2>Escolha uma foto sua de corpo inteiro</h2>
+  <p>É ela que ensina à IA como é o seu corpo e a sua roupa. Uma foto real funciona melhor do que qualquer foto gerada.</p>
+  <ul class="rules">
+    <li><b>Da cabeça aos pés.</b> <span>Sem cortar os sapatos.</span></li>
+    <li><b>Fundo liso e luz boa.</b> <span>Uma parede clara, de dia, perto da janela.</span></li>
+    <li><b>A roupa que vai aparecer no vídeo.</b> <span>Cores sólidas funcionam melhor do que listras e estampas.</span></li>
+  </ul>
+  <div class="ba solo" style="grid-template-columns:1fr 1fr">
+    <figure><div class="frame"><img src="img/reel-sem-camera/02-corpo-inteiro.jpg" alt="Foto de corpo inteiro do Jefferson com camisa azul-marinho aberta, camiseta branca, calça grafite e tênis branco"></div><figcaption>A foto de <b>referência</b> que eu usei</figcaption></figure>
+    <div style="align-self:center;color:var(--muted);font-size:15px">Se você usar a foto de perfil como referência do rosto, anexe as duas no passo 3. Quanto mais a IA conhece você, menos ela inventa.</div>
+  </div>
+</section>
+
+<section>
+  <div class="mono step-n">Passo 3</div>
+  <h2>Crie o quadro final</h2>
+  <p>No Magnific, abra a geração de <b>imagem</b>, escolha o modelo <b>Nano Banana Pro</b> e o formato <b>9:16</b>. Anexe nesta ordem: <b>1)</b> o print, <b>2)</b> a foto de corpo inteiro. Cole o prompt e troque os trechos <mark style="background:rgba(94,234,212,.14);color:var(--accent);padding:0 4px;border-radius:4px">destacados</mark>.</p>
+
+  <div class="prompt">
+    <div class="prompt-head"><h3>Prompt do quadro final</h3><span class="mono">imagem · 9:16</span></div>
+    <div class="prompt-body" id="p1">Edite a primeira imagem (a tela de um perfil do Instagram em modo escuro) mantendo EXATAMENTE iguais toda a interface, o layout, os textos, os ícones e as fotos da grade. Mude só estas três coisas:
+
+1. A foto de perfil redonda, no canto superior esquerdo, fica VAZIA: um círculo cinza liso (a pessoa saiu da foto). O "+" pequeno continua.
+2. O número <mark>221</mark> acima de "seguidores" é trocado pelo texto "<mark>10 MIL</mark>" escrito à mão com marcador branco grosso, um pouco irregular, como letra de verdade. Os outros números não mudam.
+3. A pessoa da segunda imagem (o mesmo rosto, o mesmo cabelo, a mesma roupa) aparece EM PÉ NA FRENTE da tela, de corpo inteiro e hiper-realista, como se fosse uma pessoa pequena andando sobre o celular: um pouco à direita do centro, pés perto da borda de baixo, cabeça na altura da bio, corpo virado três quartos para a câmera, olhando para a câmera com um sorriso orgulhoso, segurando um marcador preto na mão direita e um pano branco amassado na esquerda. Ela não cobre o "<mark>10 MIL</mark>" nem o nome do perfil. Sombra suave dela sobre a tela. Foto realista.</div>
+    <div class="prompt-foot"><button class="copy" data-target="p1">Copiar prompt</button></div>
+    <div class="ba">
+      <figure><div class="frame"><img src="img/reel-sem-camera/01-print.jpg" alt="Print do perfil antes"></div><figcaption>Anexo 1 · print</figcaption></figure>
+      <figure><div class="frame"><img src="img/reel-sem-camera/03-quadro-final.jpg" alt="Quadro final gerado pela IA"></div><figcaption><b>Resultado</b> · Nano Banana Pro</figcaption></figure>
+    </div>
+    <p class="ba-note">Peça 2 variações de uma vez e fique com a melhor. Eu gerei duas e usei a que deixou o corpo maior na tela.</p>
+  </div>
+
+  <h3 class="sub">Confira antes de seguir</h3>
+  <ul class="check">
+    <li>O nome do perfil, a bio e o link continuam escritos certinho?</li>
+    <li>Só o número de seguidores mudou?</li>
+    <li>O rosto é o seu, e não "alguém parecido"?</li>
+    <li>As mãos têm cinco dedos e seguram o marcador e o pano?</li>
+  </ul>
+  <p style="margin-top:18px">Se algo saiu errado, responda na mesma geração:</p>
+  <div class="fix">Você alterou <mark style="background:none;color:var(--accent)">o texto da bio</mark>. Refaça mantendo a interface idêntica à primeira imagem.</div>
+</section>
+
+<section>
+  <div class="mono step-n">Passo 4</div>
+  <h2>Gere o vídeo</h2>
+  <p>No Magnific, abra a geração de <b>vídeo</b>, formato <b>9:16</b>. Em <b>quadro inicial</b>, coloque o print. Em <b>quadro final</b>, coloque a imagem do passo 3. Cole o prompt abaixo, que conta a cena segundo a segundo.</p>
+
+  <div class="prompt">
+    <div class="prompt-head"><h3>Prompt do vídeo</h3><span class="mono">vídeo · 9:16 · 10 a 12 s</span></div>
+    <div class="prompt-body" id="p2">Câmera totalmente parada e travada. O quadro inteiro é a tela de um perfil do Instagram em modo escuro, como uma parede gigante. A interface NUNCA se mexe, deforma ou muda: todos os textos, ícones, números e fotos da grade continuam nítidos e iguais o tempo todo, exceto o que está descrito abaixo.
+
+0–2s: a pessoa da foto de perfil redonda ganha vida. Ela se inclina para a frente, a cabeça e os ombros saem do círculo em 3D, ela se apoia na borda do círculo com as duas mãos, sai da foto e pula na tela como uma pessoa de verdade, de corpo inteiro. Quando ela sai, o círculo fica cinza e vazio.
+2–4s: ela cai de leve, anda para a direita de costas para a câmera e para logo abaixo do número de seguidores, tirando um pano branco do bolso de trás.
+4–7s: de costas, ela estica o braço e esfrega o número "<mark>221</mark>" com o pano, em círculos rápidos, até ele sumir. A palavra "seguidores" fica.
+7–10s: ela passa o pano para a mão esquerda, destampa um marcador preto e, ainda de costas, escreve "<mark>10 MIL</mark>" à mão, em traço branco grosso, letra por letra.
+10–12s: ela dá um passo para trás, se vira três quartos para a câmera com um sorriso orgulhoso e para na pose do quadro final.
+
+Mesmo rosto da foto de perfil do começo ao fim, física natural do corpo, sombra realista sobre a tela, luz suave. Sons: pulo leve, passos, pano rangendo, marcador riscando. Sem música e sem voz. Evite: texto da interface mudando ou derretendo, outras pessoas, câmera se mexendo, piscadas de luz, mãos deformadas, rosto mudando.</div>
+    <div class="prompt-foot"><button class="copy" data-target="p2">Copiar prompt</button></div>
+    <div class="ba quatro">
+      <figure><div class="frame"><img src="img/reel-sem-camera/04-saindo.jpg" alt="Jefferson saindo da foto de perfil"></div><figcaption>0,7 s</figcaption></figure>
+      <figure><div class="frame"><img src="img/reel-sem-camera/05-apagando.jpg" alt="Jefferson de costas apagando o número com um pano"></div><figcaption>5 s</figcaption></figure>
+      <figure><div class="frame"><img src="img/reel-sem-camera/06-escrevendo.jpg" alt="Jefferson escrevendo 10 MIL com marcador"></div><figcaption>9,3 s</figcaption></figure>
+      <figure><div class="frame"><img src="img/reel-sem-camera/03-quadro-final.jpg" alt="Jefferson virado para a câmera sorrindo"></div><figcaption><b>12 s</b></figcaption></figure>
+    </div>
+    <p class="ba-note">Quadros do vídeo que eu publiquei, gerado com este prompt na primeira tentativa.</p>
+  </div>
+
+  <h3 class="sub">Qual modelo escolher (e quanto custa)</h3>
+  <p>O custo é em créditos do Magnific, e cada tentativa cobra de novo. Os valores abaixo são os que o próprio Magnific calculou para este vídeo, com início e fim definidos:</p>
+  <table class="cost">
+    <thead><tr><th>Modelo</th><th>Configuração</th><th>Créditos</th></tr></thead>
+    <tbody>
+      <tr class="rec"><td><b>Kling 2.5</b><small>Mais barato. Sem som: você coloca o áudio depois.</small></td><td>10 s · 1080p</td><td class="n">650</td></tr>
+      <tr><td><b>Seedance 2.0 Mini</b><small>Bom equilíbrio, já vem com som.</small></td><td>12 s · 720p</td><td class="n">1.680</td></tr>
+      <tr><td><b>Seedance 2.0 Fast</b><small>Rápido, com som.</small></td><td>12 s · 720p</td><td class="n">2.820</td></tr>
+      <tr><td><b>Seedance 2.5</b><small>O que eu usei. O mais realista, com som.</small></td><td>12 s · 1080p</td><td class="n">9.480</td></tr>
+    </tbody>
+  </table>
+  <p class="tip">Cada imagem do passo 3 custa 75 créditos. Comece pelo Kling 2.5: se o movimento ficar bom, você já tem o seu reel. Só suba de modelo se precisar de mais realismo.</p>
+  <div class="fix" style="font-family:Inter,sans-serif;font-size:15px"><b>Eu testei os dois com os mesmos quadros.</b> No Kling 2.5 (650 créditos), eu saio da foto, pulo, ando até o número e escrevo "10 MIL", mas o "221" some sozinho antes de o pano chegar e o movimento é mais simples. Dá para publicar. No Seedance 2.5 (9.480 créditos), cada ação acontece na hora certa e o vídeo já vem com som. A diferença de preço é de quase 15 vezes.</div>
+  <div class="note"><b>Seja realista:</b> a IA não acerta sempre. Às vezes a interface treme, a mão erra ou o número sai torto. Conte com uma ou duas tentativas no orçamento. E não use o rosto de outra pessoa: faça com você.</div>
+</section>
+
+<section>
+  <div class="mono step-n">Passo 5</div>
+  <h2>Coloque o texto e publique</h2>
+  <p>Não peça para a IA escrever o texto por cima do vídeo: ela ainda erra letras. Coloque depois, no CapCut ou no próprio editor do Instagram, fixo do começo ao fim, na parte de baixo da tela (para não cobrir o número novo).</p>
+  <div class="letter">Tem um número errado no meu perfil.<span>Só você pode corrigir.</span></div>
+  <ul class="rules" style="margin-top:22px">
+    <li><b>Na legenda, conte o truque.</b> <span>"Esse vídeo não teve câmera." A curiosidade sobre como foi feito gera mais comentário do que o pedido para seguir.</span></li>
+    <li><b>Termine com um convite.</b> <span>"Segue e compartilha com quem precisa ver isso."</span></li>
+    <li><b>Marque como feito com IA.</b> <span>Ao publicar, ative o rótulo de IA do Instagram. Transparência protege a sua reputação.</span></li>
+  </ul>
+</section>
+
+<section class="cta">
+  <div class="mono kicker">Sua vez</div>
+  <h2>Fez o seu? Me mostra.</h2>
+  <p>Me marca no seu reel ou manda no meu direct. Eu respondo pessoalmente e te digo o que dá para melhorar.</p>
+  <a class="btn" data-print="instagram.com/jeffersonlobo.tech" href="https://ig.me/m/jeffersonlobo.tech?ref=reel-sem-camera-resultado">Mandar o meu reel</a>
+
+  <div class="next">
+    <div class="mono kicker">Quer ir além de um reel?</div>
+    <p>Esse é um vídeo. Na <b>Ilha de Edição</b> eu mostro como montar no seu Claude um estúdio de conteúdo inteiro: reels editados, carrosséis, stories e direct automático, sem equipe.</p>
+    <p style="margin-top:12px"><a href="https://jeffersonlobo.tech/cursos/ilha">Conhecer a Ilha de Edição →</a></p>
+  </div>
+</section>
+
+<footer>
+  <span><b>Jefferson Lobo</b> · Head Executivo de Marketing · Consultor em IA</span>
+  <span>jeffersonlobo.tech</span>
+</footer>
+
+</div>
+<script>
+  document.querySelectorAll('.copy').forEach(function(b){
+    b.addEventListener('click',function(){
+      var t=document.getElementById(b.dataset.target).innerText;
+      var done=function(){b.textContent='Copiado ✓';b.classList.add('ok');setTimeout(function(){b.textContent='Copiar prompt';b.classList.remove('ok')},1800)};
+      if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(done).catch(fallback)}else{fallback()}
+      function fallback(){var a=document.createElement('textarea');a.value=t;document.body.appendChild(a);a.select();try{document.execCommand('copy');done()}catch(e){}a.remove()}
+    });
+  });
+</script>
+</body>
+</html>
