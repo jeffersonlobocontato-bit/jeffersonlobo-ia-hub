@@ -29,6 +29,12 @@ const ISCAS: Record<string, { modelo: string; arquivo: string; pagina?: string; 
     pagina: '/academia/guias/atendimento-whatsapp.html',
     titulo: 'Atendimento que fecha no WhatsApp',
   },
+  'guia-reel-sem-camera': {
+    modelo: 'guia-entrega',
+    arquivo: '/academia/guias/reel-sem-camera.pdf',
+    pagina: '/academia/guias/reel-sem-camera.html',
+    titulo: 'O reel feito sem câmera',
+  },
 }
 
 Deno.serve(async (req) => {

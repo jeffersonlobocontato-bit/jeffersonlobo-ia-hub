@@ -129,7 +129,31 @@ export const ISCA_ATENDIMENTO: Isca = {
   nomeConversao: 'Guia Atendimento WhatsApp',
 };
 
+export const ISCA_REEL: Isca = {
+  material: 'guia-reel-sem-camera',
+  rotulo: 'Reel sem câmera',
+  tema: 'Vídeo com IA',
+  titulo: 'O reel feito sem câmera',
+  chamada: { antes: 'O reel feito', destaque: 'sem câmera' },
+  olho: 'Guia grátis · leitura online + PDF',
+  descricao:
+    'O passo a passo do reel em que eu saio da minha foto de perfil, apago o número de seguidores e escrevo o número que quero ter. Só um print, uma foto e IA, com os dois prompts prontos e o custo real de cada modelo.',
+  resumo: 'Você sai da sua foto de perfil e muda o seu número: um print, uma foto e IA.',
+  lista: [
+    'Os 2 prompts prontos: o quadro final e o vídeo segundo a segundo',
+    'Quanto custa em cada modelo, testado: de 650 a 9.480 créditos',
+    'O que conferir antes de gastar créditos no vídeo',
+  ],
+  arquivo: '/academia/guias/reel-sem-camera.pdf',
+  pagina: '/academia/guias/reel-sem-camera.html',
+  capa: '/academia/guias/capa-reel-sem-camera.jpg',
+  botao: 'Quero o guia grátis',
+  motivoWhatsapp: 'Para receber novidades e materiais da Academia.',
+  emailModelo: 'guia-entrega',
+  nomeConversao: 'Guia Reel sem camera',
+};
+
 /** evento para abrir um material no formulário da vitrine (detail = material) */
 export const EVENTO_ISCA = 'academia:isca';
 
-export const ISCAS: Isca[] = [ISCA_SKILLS, ISCA_FOTO, ISCA_CONTEUDO, ISCA_ATENDIMENTO];
+export const ISCAS: Isca[] = [ISCA_SKILLS, ISCA_FOTO, ISCA_CONTEUDO, ISCA_ATENDIMENTO, ISCA_REEL];
