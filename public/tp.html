@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#000000">
+<title>TP Câmera · Jefferson Lobo</title>
+<style>
+:root{--ink:#F4F2EC;--line:#5EEAD4;--rec:#E5484D;--bar:rgba(10,12,11,.82);--edge:rgba(255,255,255,.14);color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0;height:100%;background:#000;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
+video#cam{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);background:#000}
+/* texto do TP: perto do topo, onde fica a lente */
+#tpBox{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);height:var(--h,38vh);overflow:hidden;pointer-events:none;
+  -webkit-mask-image:linear-gradient(transparent,#000 14%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 14%,#000 80%,transparent)}
+#tpBg{position:absolute;inset:0;background:rgba(0,0,0,var(--op,.45))}
+#scroller{position:absolute;left:0;right:0;top:0;will-change:transform;padding:0 max(18px,env(safe-area-inset-left,0px)) 0 max(18px,env(safe-area-inset-right,0px))}
+#texto{font-weight:700;line-height:1.35;text-align:center;padding-block:calc(var(--h,38vh) * .35) calc(var(--h,38vh) * .9);text-shadow:0 2px 8px rgba(0,0,0,.6)}
+#texto p{margin:0 0 1em}
+#guia{position:fixed;left:10px;right:10px;top:calc(env(safe-area-inset-top,0px) + var(--h,38vh) * .35);border-top:2px solid var(--line);opacity:.5;pointer-events:none}
+#conta{position:fixed;inset:0;display:grid;place-items:center;font:800 30vmin/1 Inter,system-ui,sans-serif;color:var(--line);text-shadow:0 4px 30px rgba(0,0,0,.6);pointer-events:none}
+#recDot{position:fixed;top:calc(env(safe-area-inset-top,0px) + 10px);right:max(14px,env(safe-area-inset-right,0px));display:flex;align-items:center;gap:6px;font:700 13px ui-monospace,Menlo,monospace;background:rgba(0,0,0,.55);padding:5px 10px;border-radius:999px}
+#recDot i{width:10px;height:10px;border-radius:50%;background:var(--rec);animation:pisca 1s infinite}
+@keyframes pisca{50%{opacity:.25}}
+#nivel{position:fixed;left:max(14px,env(safe-area-inset-left,0px));top:calc(env(safe-area-inset-top,0px) + 14px);width:6px;height:60px;border-radius:3px;background:rgba(255,255,255,.15);overflow:hidden}
+#nivel b{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--line);transition:height .08s}
+#nivel.fala b{background:#4CC38A}
+#texto .w.dita{opacity:.45}
+#barra{position:fixed;left:0;right:0;bottom:0;background:var(--bar);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--edge);
+  padding:10px max(14px,env(safe-area-inset-right,0px)) calc(12px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px));display:grid;gap:10px}
+.lin{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+label{display:flex;align-items:center;gap:6px;font:600 11px ui-monospace,Menlo,monospace;letter-spacing:.06em;text-transform:uppercase;color:#B9B6AE;flex:1 1 140px}
+input[type=range]{flex:1;min-width:70px;accent-color:var(--line)}
+button{font:700 14px Inter,system-ui,sans-serif;color:var(--ink);background:rgba(255,255,255,.08);border:1px solid var(--edge);border-radius:999px;padding:10px 14px}
+#gravar{flex:1;background:var(--rec);border-color:var(--rec);font-size:16px;padding:14px}
+#gravar.on{background:#fff;color:#000;border-color:#fff}
+body.gravando #barra .opc{display:none}
+#aviso{position:fixed;inset:0;display:grid;place-items:center;padding:24px;text-align:center;background:#000}
+#aviso div{max-width:420px;display:grid;gap:14px}
+#aviso b{font-size:20px}
+#aviso p{margin:0;color:#B9B6AE;line-height:1.5}
+#aviso button{background:var(--line);color:#04201C;border-color:var(--line);font-size:16px;padding:14px}
+#pronto{position:fixed;inset:0;background:rgba(0,0,0,.92);display:grid;place-items:center;padding:20px}
+#pronto div{display:grid;gap:12px;width:min(420px,100%)}
+#pronto video{width:100%;max-height:55vh;border-radius:12px;background:#111}
+#pronto a{display:block;text-align:center;text-decoration:none;font:700 16px Inter,system-ui,sans-serif;background:var(--line);color:#04201C;padding:14px;border-radius:999px}
+#editor{position:fixed;inset:0;background:#000;display:flex;flex-direction:column;gap:10px;padding:calc(14px + env(safe-area-inset-top,0px)) 14px calc(14px + env(safe-area-inset-bottom,0px))}
+#editor textarea{flex:1;background:#111;color:var(--ink);border:1px solid var(--edge);border-radius:12px;padding:14px;font:500 16px/1.5 Inter,system-ui,sans-serif;-webkit-user-select:text;user-select:text}
+</style>
+</head>
+<body>
+<video id="cam" playsinline autoplay muted></video>
+<div id="tpBox"><div id="tpBg"></div><div id="scroller"><div id="texto"></div></div></div>
+<div id="guia"></div>
+<div id="conta" hidden></div>
+<div id="recDot" hidden><i></i><span id="tempo">00:00</span><span id="vozSt" style="margin-left:6px;color:#5EEAD4">●</span></div>
+<div id="nivel" hidden><b></b></div>
+
+<div id="barra">
+  <div class="lin opc">
+    <label>Velocidade <input id="vel" type="range" min="1" max="10" step="0.5" value="4"></label>
+    <label>Letra <input id="tam" type="range" min="18" max="48" step="1" value="28"></label>
+  </div>
+  <div class="lin opc">
+    <label>Rolagem
+      <select id="modo" style="flex:1;background:rgba(255,255,255,.08);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:6px;font:600 13px Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0">
+        <option value="voz">Segue a minha voz</option>
+        <option value="palavras">Segue as palavras (beta)</option>
+        <option value="fixa">Velocidade fixa</option>
+      </select>
+    </label>
+    <label>Sensibilidade <input id="sens" type="range" min="1" max="10" step="1" value="5"></label>
+  </div>
+  <div class="lin opc">
+    <label>Fundo do texto <input id="op" type="range" min="0" max="0.85" step="0.05" value="0.45"></label>
+    <label>Altura <input id="alt" type="range" min="22" max="60" step="2" value="38"></label>
+  </div>
+  <div class="lin">
+    <button id="inicio" class="opc" type="button">↺</button>
+    <button id="editar" class="opc" type="button">Texto</button>
+    <button id="virar" class="opc" type="button">Câmera</button>
+    <button id="gravar" type="button">● Gravar</button>
+  </div>
+</div>
+
+<div id="aviso">
+  <div>
+    <b>Teleprompter com câmera</b>
+    <p>O texto sobe por cima da câmera, perto da lente, e segue a sua voz: anda quando você fala, para quando você para e acompanha o seu ritmo. Só a câmera é gravada: o texto não aparece no vídeo.</p>
+    <button id="liberar" type="button">Ligar câmera e microfone</button>
+    <p id="erro" style="color:#F2C94C" hidden></p>
+  </div>
+</div>
+<div id="pronto" hidden>
+  <div>
+    <video id="previa" playsinline controls></video>
+    <a id="baixar" download="video.mp4">Salvar vídeo</a>
+    <button id="descartar" type="button">Gravar de novo</button>
+  </div>
+</div>
+<div id="editor" hidden>
+  <textarea id="campo" aria-label="Roteiro"></textarea>
+  <div class="lin"><button id="cancelar" type="button" style="flex:1">Cancelar</button><button id="salvar" type="button" style="flex:1;background:var(--line);color:#04201C;border-color:var(--line)">Usar este texto</button></div>
+</div>
+
+<script>
+const ROTEIRO = `Se a IA vai te dar o mesmo resultado que você já tem sem ela… então continua sem IA.
+
+Não importa o que falam por aí: a IA tem que vir pra somar alguma coisa no seu negócio. Se ela não te poupa tempo, não te ajuda a vender e não deixa o seu dia mais leve, nem que seja tirando o trabalho chato da sua frente… é melhor ficar sem.
+
+Não adianta ser a IA bonitona, a da moda, a que todo mundo posta no LinkedIn, se ela não melhora a sua empresa de forma prática.
+
+Seja adulto. Quando um empresário adulto coloca IA na empresa, ele não tá buscando brinquedo. Ele busca processo, ganho de tempo, dinheiro no caixa.
+
+Imagina você construir a sua empresa com anos de suor… pra depois virar refém de prompt milagroso de guru, em troca de nada. Não dá, né, meu amigo?!
+
+E mesmo que você nunca tenha usado IA na vida, escuta quem tá há 34 anos nisso: jamais pague por uma IA que não deixa a sua empresa melhor do que ela era sem ela.
+
+Eu não tô falando dos erros e ajustes do começo. Eu tô falando de assinar IA de nada.
+
+Imagina você com uma IA que te deixa fechando relatório sozinho de madrugada, que não responde o cliente que te chamou às dez da noite, que não te traz um real a mais no fim do mês…
+
+Às vezes é melhor continuar sem IA.`;
+
+const $ = (s) => document.querySelector(s);
+const ler = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } };
+const gravarLS = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+let roteiro = ler('tpc_texto', ROTEIRO), stream = null, facing = 'user', rec = null, partes = [], y = 0, rolando = false, ultimo = 0, t0 = 0, relogio = null, lock = null, urlAtual = null;
+
+const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
+let palavras = [], spans = [];
+function render() {
+  const t = $('#texto'); t.innerHTML = ''; palavras = []; spans = [];
+  roteiro.split(/\n\s*\n/).forEach((par) => {
+    const e = document.createElement('p');
+    par.trim().split(/\s+/).forEach((w, i) => {
+      if (i) e.appendChild(document.createTextNode(' '));
+      const s = document.createElement('span'); s.className = 'w'; s.textContent = w; e.appendChild(s);
+      const n = norm(w); if (n) { palavras.push(n); spans.push(s); }
+    });
+    t.appendChild(e);
+  });
+}
+function aplicar() {
+  document.documentElement.style.setProperty('--op', $('#op').value);
+  document.documentElement.style.setProperty('--h', $('#alt').value + 'vh');
+  $('#texto').style.fontSize = $('#tam').value + 'px';
+  ['vel', 'tam', 'op', 'alt', 'sens', 'modo'].forEach((k) => gravarLS('tpc_' + k, $('#' + k).value));
+}
+const pos = () => { $('#scroller').style.transform = `translateY(${-y}px)`; };
+const maxY = () => Math.max(0, $('#texto').offsetHeight - $('#tpBox').offsetHeight * 0.5);
+
+async function ligarCamera() {
+  if (stream) stream.getTracks().forEach((t) => t.stop());
+  try {
+    stream = await navigator.mediaDevices.getUserMedia({
+      video: { facingMode: facing, width: { ideal: 1080 }, height: { ideal: 1920 }, frameRate: { ideal: 30 } },
+      audio: { echoCancellation: true, noiseSuppression: true },
+    });
+    const v = $('#cam'); v.srcObject = stream; v.style.transform = facing === 'user' ? 'scaleX(-1)' : 'none';
+    $('#aviso').hidden = true;
+  } catch (e) {
+    $('#erro').hidden = false;
+    $('#erro').textContent = 'Não consegui ligar a câmera. Confira se o navegador tem permissão de câmera e microfone e se a página abriu em https.';
+  }
+}
+
+function tipo() {
+  const op = ['video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'];
+  return op.find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
+}
+// ---------- motor de voz: fala anda, silêncio para, ritmo da fala muda a velocidade
+let actx = null, analyser = null, buf = null, piso = 0.004, env = 0, acima = false, picos = [], ultimaVoz = 0, fatorRitmo = 1, velAtual = 0;
+let reco = null, cursor = 0, alvoY = null, alvoEm = 0;
+function iniciarAudio() {
+  try {
+    actx = new (window.AudioContext || window.webkitAudioContext)();
+    const src = actx.createMediaStreamSource(new MediaStream(stream.getAudioTracks()));
+    analyser = actx.createAnalyser(); analyser.fftSize = 1024; src.connect(analyser);
+    buf = new Float32Array(analyser.fftSize); actx.resume?.();
+  } catch { analyser = null; }
+}
+function ouvir(agora) {
+  if (!analyser) return false;
+  analyser.getFloatTimeDomainData(buf);
+  let s = 0; for (let i = 0; i < buf.length; i++) s += buf[i] * buf[i];
+  const rms = Math.sqrt(s / buf.length);
+  const sens = +$('#sens').value; // 1 = pouco sensível, 10 = muito
+  const limiar = piso * (4.2 - sens * 0.3) + 0.002;
+  if (rms < limiar) piso = piso * 0.995 + rms * 0.005; // acompanha o ruído do ambiente
+  env = env * 0.6 + rms * 0.4;
+  if (!acima && env > limiar * 1.35) { acima = true; if (!picos.length || agora - picos[picos.length - 1] > 110) picos.push(agora); }
+  if (acima && env < limiar * 1.05) acima = false;
+  if (rms > limiar) ultimaVoz = agora;
+  picos = picos.filter((p) => agora - p < 2500);
+  const ritmo = picos.length / 2.5; // sílabas por segundo, aproximado
+  const alvo = Math.min(1.8, Math.max(0.55, ritmo / 4));
+  fatorRitmo += (alvo - fatorRitmo) * 0.03;
+  const falando = agora - ultimaVoz < 550;
+  $('#nivel b').style.height = Math.min(100, (rms / (limiar * 3)) * 100) + '%';
+  $('#nivel').classList.toggle('fala', falando);
+  $('#vozSt').style.opacity = falando ? 1 : 0.25;
+  return falando;
+}
+function iniciarReco() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) return;
+  try {
+    reco = new SR(); reco.lang = 'pt-BR'; reco.continuous = true; reco.interimResults = true;
+    reco.onresult = (e) => {
+      const txt = e.results[e.results.length - 1][0].transcript;
+      const ditas = txt.split(/\s+/).map(norm).filter(Boolean).slice(-4);
+      if (!ditas.length) return;
+      let melhor = -1, nota = 0;
+      for (let i = Math.max(0, cursor - 3); i < Math.min(palavras.length, cursor + 40); i++) {
+        let n = 0; for (let k = 0; k < ditas.length; k++) { const j = i - (ditas.length - 1 - k); if (j >= 0 && palavras[j] === ditas[k]) n++; }
+        if (n > nota || (n === nota && n && Math.abs(i - cursor) < Math.abs(melhor - cursor))) { nota = n; melhor = i; }
+      }
+      if (melhor >= 0 && nota >= Math.min(2, ditas.length)) {
+        for (let i = cursor; i <= melhor; i++) spans[i]?.classList.add('dita');
+        cursor = Math.max(cursor, melhor);
+        const h = $('#tpBox').offsetHeight;
+        alvoY = Math.max(0, spans[cursor].offsetTop - h * 0.35 - spans[cursor].offsetHeight * 0.2); alvoEm = performance.now();
+      }
+    };
+    reco.onend = () => { if (rolando && $('#modo').value === 'palavras') { try { reco.start(); } catch {} } };
+    reco.start();
+  } catch { reco = null; }
+}
+function passo(t) {
+  if (!rolando) return;
+  const dt = ultimo ? Math.min(0.1, (t - ultimo) / 1000) : 0; ultimo = t;
+  const base = (+$('#vel').value) * 9 * (+$('#tam').value / 28);
+  const modo = $('#modo').value;
+  const falando = ouvir(t);
+  let alvoVel = base;
+  if (modo !== 'fixa') alvoVel = falando ? base * fatorRitmo : 0;
+  velAtual += (alvoVel - velAtual) * Math.min(1, dt * (alvoVel > velAtual ? 4 : 8));
+  if (modo === 'palavras' && alvoY !== null && t - alvoEm < 2500) {
+    const dif = alvoY - y; y += dif * Math.min(1, dt * 2.5) + (falando ? velAtual * 0.35 * dt : 0);
+  } else {
+    y += velAtual * dt;
+  }
+  y = Math.min(maxY(), Math.max(0, y)); pos();
+  requestAnimationFrame(passo);
+}
+async function comecar() {
+  if (!stream) return;
+  y = 0; pos(); cursor = 0; alvoY = null; velAtual = 0; spans.forEach((s) => s.classList.remove('dita')); document.body.classList.add('gravando');
+  iniciarAudio(); $('#nivel').hidden = $('#modo').value === 'fixa';
+  try { lock = await navigator.wakeLock?.request('screen'); } catch {}
+  const c = $('#conta'); let n = 3; c.hidden = false; c.textContent = n;
+  await new Promise((r) => { const iv = setInterval(() => { n--; if (n > 0) c.textContent = n; else { clearInterval(iv); c.hidden = true; r(); } }, 800); });
+  partes = []; const mt = tipo();
+  rec = new MediaRecorder(stream, mt ? { mimeType: mt, videoBitsPerSecond: 8000000 } : undefined);
+  rec.ondataavailable = (e) => { if (e.data.size) partes.push(e.data); };
+  rec.onstop = mostrar;
+  rec.start(1000);
+  $('#gravar').textContent = '■ Parar'; $('#gravar').classList.add('on');
+  t0 = Date.now(); $('#recDot').hidden = false;
+  relogio = setInterval(() => { const s = Math.floor((Date.now() - t0) / 1000); $('#tempo').textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`; }, 250);
+  rolando = true; ultimo = 0; ultimaVoz = 0; if ($('#modo').value === 'palavras') iniciarReco(); requestAnimationFrame(passo);
+}
+function parar() {
+  rolando = false; clearInterval(relogio); $('#recDot').hidden = true; $('#nivel').hidden = true;
+  try { reco?.stop(); } catch {} reco = null; try { actx?.close(); } catch {} actx = null; analyser = null;
+  $('#gravar').textContent = '● Gravar'; $('#gravar').classList.remove('on');
+  document.body.classList.remove('gravando');
+  try { lock?.release(); } catch {} lock = null;
+  if (rec && rec.state !== 'inactive') rec.stop();
+}
+function mostrar() {
+  const mt = rec.mimeType || 'video/mp4';
+  const blob = new Blob(partes, { type: mt });
+  if (urlAtual) URL.revokeObjectURL(urlAtual);
+  urlAtual = URL.createObjectURL(blob);
+  const ext = mt.includes('mp4') ? 'mp4' : 'webm';
+  const d = new Date(); const nome = `tp-${d.getFullYear()}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}.${ext}`;
+  $('#previa').src = urlAtual; $('#baixar').href = urlAtual; $('#baixar').download = nome;
+  $('#pronto').hidden = false;
+}
+
+$('#liberar').onclick = ligarCamera;
+$('#gravar').onclick = () => (rec && rec.state === 'recording') ? parar() : comecar();
+$('#descartar').onclick = () => { $('#pronto').hidden = true; y = 0; pos(); };
+$('#inicio').onclick = () => { y = 0; pos(); };
+$('#virar').onclick = () => { facing = facing === 'user' ? 'environment' : 'user'; ligarCamera(); };
+$('#editar').onclick = () => { $('#campo').value = roteiro; $('#editor').hidden = false; };
+$('#cancelar').onclick = () => { $('#editor').hidden = true; };
+$('#salvar').onclick = () => { roteiro = $('#campo').value.trim() || ROTEIRO; gravarLS('tpc_texto', roteiro); render(); y = 0; pos(); $('#editor').hidden = true; };
+['vel', 'tam', 'op', 'alt', 'sens', 'modo'].forEach((k) => { $('#' + k).value = ler('tpc_' + k, $('#' + k).value); $('#' + k).oninput = aplicar; $('#' + k).onchange = aplicar; });
+let toqueY = null;
+$('#tpBox').style.pointerEvents = 'auto';
+$('#tpBox').addEventListener('touchstart', (e) => { toqueY = e.touches[0].clientY; }, { passive: true });
+$('#tpBox').addEventListener('touchmove', (e) => { if (toqueY === null) return; y = Math.max(0, Math.min(maxY(), y + (toqueY - e.touches[0].clientY))); toqueY = e.touches[0].clientY; pos(); }, { passive: true });
+render(); aplicar(); pos();
+</script>
+</body>
+</html>
