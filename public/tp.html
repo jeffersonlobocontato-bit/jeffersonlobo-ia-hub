@@ -11,7 +11,8 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;background:#000;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
-video#cam{position:fixed;inset:0;width:100%;height:100%;object-fit:cover;transform:scaleX(-1);background:#000}
+video#cam{position:fixed;left:50%;top:50%;width:var(--vw,100vw);height:var(--vh,100vh);object-fit:cover;transform:translate(-50%,-50%) scaleX(var(--mx,-1));background:#000}
+#cv{display:none}
 /* texto do TP: perto do topo, onde fica a lente */
 #tpBox{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);height:var(--h,38vh);overflow:hidden;pointer-events:none;
   -webkit-mask-image:linear-gradient(transparent,#000 14%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 14%,#000 80%,transparent)}
@@ -52,6 +53,7 @@ body.gravando #barra .opc{display:none}
 </head>
 <body>
 <video id="cam" playsinline autoplay muted></video>
+<canvas id="cv"></canvas>
 <div id="tpBox"><div id="tpBg"></div><div id="scroller"><div id="texto"></div></div></div>
 <div id="guia"></div>
 <div id="conta" hidden></div>
@@ -69,6 +71,12 @@ body.gravando #barra .opc{display:none}
         <option value="voz">Segue a minha voz</option>
         <option value="palavras">Segue as palavras (beta)</option>
         <option value="fixa">Velocidade fixa</option>
+      </select>
+    </label>
+    <label>Formato
+      <select id="fmt" style="flex:1;background:rgba(255,255,255,.08);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:6px;font:600 13px Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0">
+        <option value="v">9:16 vertical (reels, stories)</option>
+        <option value="h">16:9 horizontal (YouTube)</option>
       </select>
     </label>
     <label>Sensibilidade <input id="sens" type="range" min="1" max="10" step="1" value="5"></label>
@@ -147,19 +155,41 @@ function aplicar() {
   document.documentElement.style.setProperty('--op', $('#op').value);
   document.documentElement.style.setProperty('--h', $('#alt').value + 'vh');
   $('#texto').style.fontSize = $('#tam').value + 'px';
-  ['vel', 'tam', 'op', 'alt', 'sens', 'modo'].forEach((k) => gravarLS('tpc_' + k, $('#' + k).value));
+  ['vel', 'tam', 'op', 'alt', 'sens', 'modo', 'fmt'].forEach((k) => gravarLS('tpc_' + k, $('#' + k).value));
 }
 const pos = () => { $('#scroller').style.transform = `translateY(${-y}px)`; };
 const maxY = () => Math.max(0, $('#texto').offsetHeight - $('#tpBox').offsetHeight * 0.5);
 
+const fmtV = () => $('#fmt').value === 'v';
+const saida = () => fmtV() ? [1080, 1920] : [1920, 1080];
+function enquadrar() {
+  const [W, H] = saida(); const r = W / H;
+  let w = innerWidth, hh = innerWidth / r;
+  if (hh > innerHeight) { hh = innerHeight; w = innerHeight * r; }
+  document.documentElement.style.setProperty('--vw', w + 'px');
+  document.documentElement.style.setProperty('--vh', hh + 'px');
+}
+addEventListener('resize', enquadrar);
+let desenhando = false;
+function desenhar() {
+  if (!desenhando) return;
+  const v = $('#cam'), cv = $('#cv'), ctx = cv.getContext('2d');
+  const vw = v.videoWidth, vh = v.videoHeight;
+  if (vw && vh) {
+    const W = cv.width, H = cv.height, esc = Math.max(W / vw, H / vh);
+    const sw = W / esc, sh = H / esc, sx = (vw - sw) / 2, sy = (vh - sh) / 2;
+    ctx.drawImage(v, sx, sy, sw, sh, 0, 0, W, H);
+  }
+  requestAnimationFrame(desenhar);
+}
 async function ligarCamera() {
   if (stream) stream.getTracks().forEach((t) => t.stop());
   try {
     stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: facing, width: { ideal: 1080 }, height: { ideal: 1920 }, frameRate: { ideal: 30 } },
+      video: { facingMode: facing, width: { ideal: fmtV() ? 1080 : 1920 }, height: { ideal: fmtV() ? 1920 : 1080 }, frameRate: { ideal: 30 } },
       audio: { echoCancellation: true, noiseSuppression: true },
     });
-    const v = $('#cam'); v.srcObject = stream; v.style.transform = facing === 'user' ? 'scaleX(-1)' : 'none';
+    const v = $('#cam'); v.srcObject = stream; document.documentElement.style.setProperty('--mx', facing === 'user' ? -1 : 1); enquadrar();
     $('#aviso').hidden = true;
   } catch (e) {
     $('#erro').hidden = false;
@@ -254,7 +284,9 @@ async function comecar() {
   const c = $('#conta'); let n = 3; c.hidden = false; c.textContent = n;
   await new Promise((r) => { const iv = setInterval(() => { n--; if (n > 0) c.textContent = n; else { clearInterval(iv); c.hidden = true; r(); } }, 800); });
   partes = []; const mt = tipo();
-  rec = new MediaRecorder(stream, mt ? { mimeType: mt, videoBitsPerSecond: 8000000 } : undefined);
+  const [W, H] = saida(); const cv = $('#cv'); cv.width = W; cv.height = H; desenhando = true; desenhar();
+  const gravavel = new MediaStream([...cv.captureStream(30).getVideoTracks(), ...stream.getAudioTracks()]);
+  rec = new MediaRecorder(gravavel, mt ? { mimeType: mt, videoBitsPerSecond: 8000000 } : undefined);
   rec.ondataavailable = (e) => { if (e.data.size) partes.push(e.data); };
   rec.onstop = mostrar;
   rec.start(1000);
@@ -270,6 +302,7 @@ function parar() {
   document.body.classList.remove('gravando');
   try { lock?.release(); } catch {} lock = null;
   if (rec && rec.state !== 'inactive') rec.stop();
+  setTimeout(() => { desenhando = false; }, 400);
 }
 function mostrar() {
   const mt = rec.mimeType || 'video/mp4';
@@ -290,12 +323,13 @@ $('#virar').onclick = () => { facing = facing === 'user' ? 'environment' : 'user
 $('#editar').onclick = () => { $('#campo').value = roteiro; $('#editor').hidden = false; };
 $('#cancelar').onclick = () => { $('#editor').hidden = true; };
 $('#salvar').onclick = () => { roteiro = $('#campo').value.trim() || ROTEIRO; gravarLS('tpc_texto', roteiro); render(); y = 0; pos(); $('#editor').hidden = true; };
-['vel', 'tam', 'op', 'alt', 'sens', 'modo'].forEach((k) => { $('#' + k).value = ler('tpc_' + k, $('#' + k).value); $('#' + k).oninput = aplicar; $('#' + k).onchange = aplicar; });
+['vel', 'tam', 'op', 'alt', 'sens', 'modo', 'fmt'].forEach((k) => { $('#' + k).value = ler('tpc_' + k, $('#' + k).value); $('#' + k).oninput = aplicar; $('#' + k).onchange = aplicar; });
 let toqueY = null;
 $('#tpBox').style.pointerEvents = 'auto';
 $('#tpBox').addEventListener('touchstart', (e) => { toqueY = e.touches[0].clientY; }, { passive: true });
 $('#tpBox').addEventListener('touchmove', (e) => { if (toqueY === null) return; y = Math.max(0, Math.min(maxY(), y + (toqueY - e.touches[0].clientY))); toqueY = e.touches[0].clientY; pos(); }, { passive: true });
-render(); aplicar(); pos();
+render(); aplicar(); pos(); enquadrar();
+$('#fmt').addEventListener('change', () => { enquadrar(); if (stream) ligarCamera(); });
 </script>
 </body>
 </html>
