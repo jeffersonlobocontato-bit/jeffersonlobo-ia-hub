@@ -35,6 +35,12 @@ const ISCAS: Record<string, { modelo: string; arquivo: string; pagina?: string; 
     pagina: '/academia/guias/reel-sem-camera.html',
     titulo: 'O reel feito sem câmera',
   },
+  'guia-checklist-escala': {
+    modelo: 'guia-entrega',
+    arquivo: '/academia/guias/checklist-escala.pdf',
+    pagina: '/academia/guias/checklist-escala.html',
+    titulo: 'Seu projeto de IA vale escalar?',
+  },
 }
 
 Deno.serve(async (req) => {

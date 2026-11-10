@@ -153,7 +153,31 @@ export const ISCA_REEL: Isca = {
   nomeConversao: 'Guia Reel sem camera',
 };
 
+export const ISCA_ESCALA: Isca = {
+  material: 'guia-checklist-escala',
+  rotulo: 'Vale escalar?',
+  tema: 'Gestão de IA',
+  titulo: 'Seu projeto de IA vale escalar?',
+  chamada: { antes: 'Seu projeto de IA vale', destaque: 'escalar?' },
+  olho: 'Checklist grátis · leitura online + PDF',
+  descricao:
+    'As 24 perguntas que eu faço antes de tirar um projeto de IA do piloto: linha de base, custo real, prova de ganho e governança, com uma régua para decidir entre escalar, ajustar ou encerrar.',
+  resumo: '24 perguntas e uma régua para decidir se o seu projeto de IA sai do piloto.',
+  lista: [
+    '6 etapas, do problema à escala, para marcar na própria página',
+    'Exemplo de ROI com conta pronta',
+    'Régua final: escalar, ajustar ou encerrar',
+  ],
+  arquivo: '/academia/guias/checklist-escala.pdf',
+  pagina: '/academia/guias/checklist-escala.html',
+  capa: '/academia/guias/capa-checklist-escala.jpg',
+  botao: 'Quero o checklist grátis',
+  motivoWhatsapp: 'Para receber novidades e materiais da Academia.',
+  emailModelo: 'guia-entrega',
+  nomeConversao: 'Checklist escala IA',
+};
+
 /** evento para abrir um material no formulário da vitrine (detail = material) */
 export const EVENTO_ISCA = 'academia:isca';
 
-export const ISCAS: Isca[] = [ISCA_SKILLS, ISCA_FOTO, ISCA_CONTEUDO, ISCA_ATENDIMENTO, ISCA_REEL];
+export const ISCAS: Isca[] = [ISCA_SKILLS, ISCA_FOTO, ISCA_CONTEUDO, ISCA_ATENDIMENTO, ISCA_REEL, ISCA_ESCALA];
