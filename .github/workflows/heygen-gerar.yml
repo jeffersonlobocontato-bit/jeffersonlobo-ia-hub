@@ -1,0 +1,52 @@
+name: HeyGen · gerar vídeo pela API
+# Usa o crédito da API do HeyGen (secret HEYGEN_API_KEY). A chave nunca aparece no log.
+on:
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "Arquivo do pedido em scripts/heygen/ (ex.: bom-demais.json)"
+        required: true
+        default: bom-demais.json
+      so_conferir:
+        description: "true = só confere a chave e o saldo, sem gerar"
+        required: false
+        default: "false"
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - name: Conferir chave e saldo
+        env:
+          K: ${{ secrets.HEYGEN_API_KEY }}
+        run: |
+          test -n "$K" || { echo "::error::Falta o secret HEYGEN_API_KEY"; exit 1; }
+          curl -sS -H "X-Api-Key: $K" https://api.heygen.com/v2/user/remaining_quota | tee quota.json
+          echo
+      - name: Gerar e baixar
+        if: ${{ inputs.so_conferir != 'true' }}
+        env:
+          K: ${{ secrets.HEYGEN_API_KEY }}
+        run: |
+          set -e
+          R=$(curl -sS -X POST https://api.heygen.com/v2/video/generate -H "X-Api-Key: $K" -H "Content-Type: application/json" --data @scripts/heygen/${{ inputs.job }})
+          echo "$R"
+          ID=$(echo "$R" | jq -r '.data.video_id // empty')
+          test -n "$ID" || { echo "::error::HeyGen recusou o pedido"; exit 1; }
+          for i in $(seq 1 120); do
+            S=$(curl -sS -H "X-Api-Key: $K" "https://api.heygen.com/v1/video_status.get?video_id=$ID")
+            ST=$(echo "$S" | jq -r '.data.status')
+            echo "$i $ST"
+            if [ "$ST" = "completed" ]; then
+              curl -sSL -o video.mp4 "$(echo "$S" | jq -r '.data.video_url')"; break
+            fi
+            if [ "$ST" = "failed" ]; then echo "$S"; exit 1; fi
+            sleep 20
+          done
+          test -s video.mp4
+      - uses: actions/upload-artifact@v4
+        if: ${{ inputs.so_conferir != 'true' }}
+        with:
+          name: heygen-${{ github.run_id }}
+          path: video.mp4

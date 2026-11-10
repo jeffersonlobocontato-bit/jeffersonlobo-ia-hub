@@ -1,0 +1,19 @@
+{
+  "title": "BOM DEMAIS · IA 1001 utilidades (apresentador)",
+  "caption": false,
+  "dimension": { "width": 720, "height": 1280 },
+  "video_inputs": [
+    {
+      "character": {
+        "type": "avatar",
+        "avatar_id": "5681f6735e4546c68c763000a110acca",
+        "avatar_style": "normal"
+      },
+      "voice": {
+        "type": "text",
+        "voice_id": "6788d7fd4c3949d4a405979bca686531",
+        "input_text": "Pra provar que a inteligência artificial resolve de tudo, vamos ligar pra uma dona de casa e ouvir a opinião dela. <break time=\"2.5s\"/> Alô! A senhora usa inteligência artificial? <break time=\"5s\"/> E a senhora sabia que dá pra usar no trabalho também? <break time=\"4.5s\"/> Mãe? <break time=\"1s\"/> Pra provar que IA tem mil e uma utilidades, basta comentar GUIAS que eu te mando agora dicas grátis sobre IA."
+      }
+    }
+  ]
+}
