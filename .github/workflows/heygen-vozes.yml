@@ -13,7 +13,13 @@ jobs:
           K: ${{ secrets.HEYGEN_API_KEY }}
           N: ${{ inputs.nome }}
         run: |
-          for u in https://api.heygen.com/v2/voices "https://api.heygen.com/v3/voices?type=public&limit=100"; do
-            curl -sS -H "x-api-key: $K" "$u" > v.json
-            jq -c --arg n "$N" '[(.data.voices // .data // .data.items // [])[] | select((.name // "") | ascii_downcase | contains($n | ascii_downcase)) | {voice_id, name, language, gender}]' v.json || head -c 300 v.json
+          curl -sS -H "x-api-key: $K" https://api.heygen.com/v2/voices > v2.json
+          jq -c --arg n "$N" '[(.data.voices // [])[] | select((.name // "") | ascii_downcase | contains($n | ascii_downcase)) | {voice_id, name, language, gender}]' v2.json
+          T=""
+          for p in $(seq 1 40); do
+            curl -sS -H "x-api-key: $K" "https://api.heygen.com/v3/voices?type=public&limit=100${T:+&token=$T}" > v3.json
+            jq -c --arg n "$N" '[(.data // [])[] | select((.name // "") | ascii_downcase | contains($n | ascii_downcase)) | {voice_id, name, language, gender, available_engines}] | select(length>0)' v3.json
+            T=$(jq -r '.next_token // empty' v3.json)
+            [ -z "$T" ] && break
           done
+          echo fim
