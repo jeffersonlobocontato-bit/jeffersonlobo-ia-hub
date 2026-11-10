@@ -1,18 +1,17 @@
 {
   "type": "avatar",
   "avatar_id": "536c04d09c5f4b9388cd28426ecdb426",
-  "title": "BOM DEMAIS · IA 1001 utilidades (Jefferson Lobo Oficial)",
+  "title": "BOM DEMAIS · IA 1001 utilidades (Avatar III, natural)",
   "voice_id": "6788d7fd4c3949d4a405979bca686531",
   "voice_settings": {
     "engine_settings": {
       "engine_type": "orca"
     }
   },
-  "script": "Pra provar que a inteligência artificial resolve de tudo, vamos ligar pra uma dona de casa e ouvir a opinião dela. <break time=\"2.5s\"/> Alô! A senhora usa inteligência artificial? <break time=\"5s\"/> E a senhora sabia que dá pra usar no trabalho também? <break time=\"4.5s\"/> Mãe? <break time=\"1s\"/> Pra provar que IA tem mil e uma utilidades, basta comentar GUIAS que eu te mando agora dicas grátis sobre IA.",
+  "script": "Pra provar que a inteligência artificial resolve de tudo, vamos ligar pra uma dona de casa e ouvir a opinião dela. <break time=\"2.5s\"/> Alô! A senhora usa inteligência artificial? <break time=\"5s\"/> E a senhora sabia que dá pra usar no trabalho também? <break time=\"5s\"/> Mãe?! É você? <break time=\"0.8s\"/> Viu só? Até a minha mãe sabe! <break time=\"0.6s\"/> Pra provar que IA tem mil e uma utilidades, basta comentar GUIAS que eu te mando agora dicas grátis sobre IA.",
   "engine": {
-    "type": "avatar_v"
+    "type": "avatar_iii"
   },
-  "motion_prompt": "Apresentador animado de comercial de TV antigo, gestos amplos e simpáticos. Nas pausas, fica em silêncio escutando com atenção, como quem ouve alguém ao telefone, balançando levemente a cabeça. Ao dizer \"Mãe?\", expressão de surpresa e sem graça. No final, aponta para baixo ao falar \"comentar\".",
   "aspect_ratio": "9:16",
   "fit": "cover",
   "resolution": "1080p",
