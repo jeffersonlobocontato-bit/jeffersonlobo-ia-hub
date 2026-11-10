@@ -1,0 +1,18 @@
+name: Baixar arquivo (HeyGen)
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "URL do arquivo (resource2.heygen.ai)"
+        required: true
+jobs:
+  baixar:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          case "${{ inputs.url }}" in https://resource2.heygen.ai/*|https://files2.heygen.ai/*) ;; *) echo "::error::só HeyGen"; exit 1;; esac
+          curl -sSL -o arquivo "${{ inputs.url }}" && ls -la arquivo
+      - uses: actions/upload-artifact@v4
+        with:
+          name: arquivo-${{ github.run_id }}
+          path: arquivo
