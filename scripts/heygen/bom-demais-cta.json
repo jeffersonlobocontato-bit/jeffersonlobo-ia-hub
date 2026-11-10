@@ -1,0 +1,19 @@
+{
+  "type": "avatar",
+  "avatar_id": "536c04d09c5f4b9388cd28426ecdb426",
+  "title": "BOM DEMAIS · CTA guias",
+  "voice_id": "6788d7fd4c3949d4a405979bca686531",
+  "voice_settings": {
+    "engine_settings": {
+      "engine_type": "orca"
+    }
+  },
+  "script": "Pra provar que IA tem mil e uma utilidades, basta comentar guias, que eu te mando agora dicas grátis sobre IA.",
+  "engine": {
+    "type": "avatar_iii"
+  },
+  "aspect_ratio": "9:16",
+  "fit": "cover",
+  "resolution": "1080p",
+  "output_format": "webm"
+}
