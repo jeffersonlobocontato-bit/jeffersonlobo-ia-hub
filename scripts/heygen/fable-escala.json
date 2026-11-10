@@ -1,0 +1,19 @@
+{
+  "type": "avatar",
+  "avatar_id": "536c04d09c5f4b9388cd28426ecdb426",
+  "title": "FABLE 5.2 · 1.000 agentes, e daí? (CTA escala)",
+  "voice_id": "6788d7fd4c3949d4a405979bca686531",
+  "voice_settings": {
+    "engine_settings": {
+      "engine_type": "orca"
+    }
+  },
+  "script": "A IA coordenou mil agentes e construiu um sistema operacional do zero. É verdade. Mas não é essa a notícia. <break time=\"0.7s\"/> A Ântropic lançou o Clôd Fêibol cinco ponto dois. Num teste interno, um engenheiro deu uma pasta vazia pro modelo. Ele coordenou mais de mil agentes e, em oito dias, entregou um sistema operacional que liga num notebook, com tela de login, drivers e instalador. <break time=\"0.7s\"/> Agora, o que o post viral não te contou: é um teste da própria empresa. Não divulgaram o código, nem o custo, nem quanto humano entrou no meio. Mil agentes rodando oito dias não sai de graça. E ninguém de fora verificou ainda. <break time=\"0.7s\"/> Então a pergunta não é se a IA faz um sistema operacional. É se ela faz o seu processo render mais do que custa. Ensaio tem valor. Mas só prova de ganho é que vale escalar. <break time=\"0.7s\"/> Quer o checklist que eu uso pra saber se um projeto de IA vale escalar? Comenta escala, que eu te mando.",
+  "engine": {
+    "type": "avatar_iii"
+  },
+  "aspect_ratio": "9:16",
+  "fit": "cover",
+  "resolution": "1080p",
+  "output_format": "webm"
+}
