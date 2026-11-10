@@ -1,0 +1,21 @@
+{
+  "type": "avatar",
+  "avatar_id": "536c04d09c5f4b9388cd28426ecdb426",
+  "title": "FABLE 5.2 · capa (sorriso)",
+  "voice_id": "6788d7fd4c3949d4a405979bca686531",
+  "voice_settings": {
+    "engine_settings": {
+      "engine_type": "orca"
+    }
+  },
+  "script": "Pois é! <break time=\"1.5s\"/> Bora medir?",
+  "engine": {
+    "type": "avatar_v",
+    "more_blinking": true
+  },
+  "aspect_ratio": "9:16",
+  "fit": "cover",
+  "resolution": "1080p",
+  "output_format": "webm",
+  "motion_prompt": "Big warm genuine smile showing teeth, head perfectly straight and level, looking directly into the camera, relaxed confident posture, hands calm"
+}
