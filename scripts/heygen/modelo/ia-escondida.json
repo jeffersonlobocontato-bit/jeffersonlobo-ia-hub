@@ -1,0 +1,9 @@
+{
+  "mode": "image_to_video",
+  "model": "heygen-video-1",
+  "prompt": "Keep the exact framing, lighting and office from the first frame. The man's hands hold the smartphone below the desk and type naturally and continuously with both thumbs; new chat bubbles appear on the phone screen as he types. Fingers move realistically, small natural wrist movement. Very subtle handheld camera breathing, no zoom, no cuts. In the blurred background, colleagues move slightly. Hyper-realistic, real skin texture, no text, no logos, no faces in focus.",
+  "image": { "type": "url", "url": "https://raw.githubusercontent.com/jeffersonlobocontato-bit/jeffersonlobo-ia-hub/main/scripts/heygen/img/ia-escondida-base.jpg" },
+  "resolution": "1080p",
+  "duration": 8,
+  "prompt_enhancement": "quality"
+}

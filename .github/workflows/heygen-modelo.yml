@@ -1,0 +1,69 @@
+name: HeyGen · vídeo por modelo (imagem → vídeo)
+# Usa o crédito da API do HeyGen (secret HEYGEN_API_KEY) com o HeyGen Video 1.
+# Dispara quando um pedido novo entra em scripts/heygen/modelo/*.json (ou manualmente)
+# e grava o resultado em scripts/heygen/saida/<nome>.mp4 no próprio repositório.
+on:
+  push:
+    branches: [main]
+    paths: ["scripts/heygen/modelo/*.json"]
+  workflow_dispatch:
+    inputs:
+      job:
+        description: "Arquivo em scripts/heygen/modelo/ (ex.: ia-escondida.json)"
+        required: true
+permissions:
+  contents: write
+concurrency: heygen-modelo
+jobs:
+  gerar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Escolher pedidos
+        id: pedidos
+        run: |
+          if [ -n "${{ inputs.job }}" ]; then
+            echo "lista=scripts/heygen/modelo/${{ inputs.job }}" >> "$GITHUB_OUTPUT"
+          else
+            L=$(git diff --name-only --diff-filter=AM HEAD~1 HEAD -- 'scripts/heygen/modelo/*.json' | tr '\n' ' ')
+            echo "lista=$L" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Gerar e baixar
+        env:
+          K: ${{ secrets.HEYGEN_API_KEY }}
+        run: |
+          set -e
+          test -n "$K" || { echo "::error::Falta o secret HEYGEN_API_KEY"; exit 1; }
+          mkdir -p scripts/heygen/saida
+          for F in ${{ steps.pedidos.outputs.lista }}; do
+            N=$(basename "$F" .json)
+            echo "== $N"
+            R=$(curl -sS -X POST https://api.heygen.com/v3/models/videos -H "x-api-key: $K" -H "Content-Type: application/json" -H "Idempotency-Key: run-${{ github.run_id }}-$N" --data @"$F")
+            echo "$R"
+            ID=$(echo "$R" | jq -r '.data.video_id // .data.id // empty')
+            test -n "$ID" || { echo "::error::HeyGen recusou o pedido $N"; exit 1; }
+            for i in $(seq 1 90); do
+              S=$(curl -sS -H "x-api-key: $K" "https://api.heygen.com/v3/models/videos/$ID")
+              ST=$(echo "$S" | jq -r '.data.status')
+              echo "$i $ST"
+              if [ "$ST" = "completed" ]; then
+                U=$(echo "$S" | jq -r '.data.video_url // .data.url // .data.output.video_url // empty')
+                echo "$S" | jq 'del(.data.video_url, .data.url, .data.thumbnail_url)'
+                curl -sSL -o "scripts/heygen/saida/$N.mp4" "$U"; break
+              fi
+              if [ "$ST" = "failed" ] || [ "$ST" = "cancelled" ]; then echo "$S"; exit 1; fi
+              sleep 20
+            done
+            ls -la "scripts/heygen/saida/$N.mp4"
+          done
+      - name: Salvar no repositório
+        run: |
+          git config user.name "heygen-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add scripts/heygen/saida
+          git commit -m "HeyGen: vídeo gerado (${{ github.run_id }})" || exit 0
+          git pull --rebase origin main
+          git push
