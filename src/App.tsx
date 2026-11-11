@@ -22,6 +22,12 @@ function lazyComPreload(factory: () => Promise<{ default: ComponentType }>): Pre
   return Comp;
 }
 
+// /teleprompter é um atalho para a página estática public/tp.html.
+const IrParaTeleprompter = () => {
+  window.location.replace("/tp.html");
+  return null;
+};
+
 // Todas as páginas carregam sob demanda: nenhuma rota pesa no bundle inicial das outras.
 const Index = lazyComPreload(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -167,6 +173,7 @@ const App = ({ Roteador = RoteadorPadrao }: { Roteador?: ComponentType<{ childre
                 }
               />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="/teleprompter" element={<IrParaTeleprompter />} />
               <Route path="*" element={comSuspense(<NotFound />)} />
             </Routes>
           </AnalyticsTracker>

@@ -114,27 +114,29 @@ body.gravando #barra .opc{display:none}
 </div>
 
 <script>
-const ROTEIRO = `Se a IA vai te dar o mesmo resultado que você já tem sem ela… então continua sem IA.
+const ROTEIRO = `Prompt não salvou nenhuma empresa. Nenhuma. E quem te vendeu o contrário sabia disso.
 
-Não importa o que falam por aí: a IA tem que vir pra somar alguma coisa no seu negócio. Se ela não te poupa tempo, não te ajuda a vender e não deixa o seu dia mais leve, nem que seja tirando o trabalho chato da sua frente… é melhor ficar sem.
+De um ano pra cá, todo mundo virou especialista em IA. Quem vendia curso de Instagram agora vende pacote de prompt. Quem vendia mentoria de vendas agora vende "agente milagroso".
 
-Não adianta ser a IA bonitona, a da moda, a que todo mundo posta no LinkedIn, se ela não melhora a sua empresa de forma prática.
+Eu lidero inteligência artificial numa empresa com mais de 4 mil pessoas. E neste vídeo eu vou te mostrar os 3 sinais de que você está comprando de um falso especialista. No final, eu te dou uma pergunta. Uma só. Que desmascara qualquer guru de IA em 10 segundos. Guarda essa promessa.
 
-Seja adulto. Quando um empresário adulto coloca IA na empresa, ele não tá buscando brinquedo. Ele busca processo, ganho de tempo, dinheiro no caixa.
+Sinal número 3: ele vende prompt como se fosse produto. Pacote com 500, mil, dez mil prompts. Só que prompt é instrução. É como comprar uma receita sem ter cozinha, ingrediente nem cozinheiro. Sem o seu contexto, os seus dados e o seu processo, prompt é texto bonito. Copiar o prompt de outro é copiar a resposta de uma prova que não é a sua. E se você acha que isso já é grave, o sinal 2 é o que mais custa dinheiro.
 
-Imagina você construir a sua empresa com anos de suor… pra depois virar refém de prompt milagroso de guru, em troca de nada. Não dá, né, meu amigo?!
+Sinal 2: ele promete resultado antes de perguntar qualquer coisa sobre a sua empresa. Não pergunta qual é o processo, onde estão os dados, quem vai usar, qual é a meta. Quem promete resultado sem diagnóstico não está te ajudando. Está te vendendo. Se a sua operação é desorganizada, a IA só deixa a bagunça mais rápida. Agora, o sinal 1. Esse é o mais fácil de ver e quase ninguém repara.
 
-E mesmo que você nunca tenha usado IA na vida, escuta quem tá há 34 anos nisso: jamais pague por uma IA que não deixa a sua empresa melhor do que ela era sem ela.
+Sinal 1: ele nunca mostra um número. Mostra print de texto bonito, mostra "antes e depois" de um post. Mas não mostra quanto tempo economizou, quanto custo cortou, quanto vendeu a mais. Na empresa onde eu trabalho, a regra é simples: ensaio tem valor, mas só prova de ganho é que escala. Se não tem número, não tem resultado. Tem marketing. Só que agora eu vou falar uma coisa que vai incomodar o outro lado também.
 
-Eu não tô falando dos erros e ajustes do começo. Eu tô falando de assinar IA de nada.
+Nem todo especialista é lacrador de viral. Quem está implementando IA de verdade quase não aparece. Está dentro da empresa, testando, medindo, corrigindo. E esse é o problema: quando quem sabe fica calado, quem lacra ocupa o espaço. E você acaba aprendendo IA com quem nunca implementou nada. Foi por isso que eu resolvi falar. E agora sim: a pergunta que eu te prometi.
 
-Imagina você com uma IA que te deixa fechando relatório sozinho de madrugada, que não responde o cliente que te chamou às dez da noite, que não te traz um real a mais no fim do mês…
+A pergunta é esta: "Me conta um projeto de IA que você implementou e deu errado. Quanto custou e o que você mudou?" Quem implementou de verdade tem essa resposta na ponta da língua, com número. Porque todo mundo que faz, erra. Quem só vende prompt vai te responder com mais um prompt.
 
-Às vezes é melhor continuar sem IA.`;
+IA dá resultado, sim. Mas não por atalho. Se você quer IA com resultado e não com hype, comenta ROI aqui embaixo que eu te mando como eu começo um projeto do zero. E faz essa pergunta pro próximo guru que aparecer no seu feed.`;
+const ROTEIRO_VER = 'golpe-especialista-ia-1';
 
 const $ = (s) => document.querySelector(s);
 const ler = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } };
 const gravarLS = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+if (ler('tpc_ver', '') !== ROTEIRO_VER) { try { localStorage.removeItem('tpc_texto'); } catch {} gravarLS('tpc_ver', ROTEIRO_VER); }
 let roteiro = ler('tpc_texto', ROTEIRO), stream = null, facing = 'user', rec = null, partes = [], y = 0, rolando = false, ultimo = 0, t0 = 0, relogio = null, lock = null, urlAtual = null;
 
 const norm = (s) => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '');
