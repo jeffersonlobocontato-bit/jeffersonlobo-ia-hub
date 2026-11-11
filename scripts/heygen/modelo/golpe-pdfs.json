@@ -1,0 +1,9 @@
+{
+  "mode": "text_to_video",
+  "model": "heygen-video-1",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "prompt_enhancement": "quality",
+  "prompt": "Hyper-realistic slow-motion shot: hundreds of printed paper sheets and thick stapled booklets rain down from above onto a dark wooden office desk, piling up into a messy tall stack, papers sliding and fluttering. Moody low-key lighting with a soft green-tinted rim light, dark background, shallow depth of field, cinematic. No readable text, no logos, no people.",
+  "duration": 5
+}

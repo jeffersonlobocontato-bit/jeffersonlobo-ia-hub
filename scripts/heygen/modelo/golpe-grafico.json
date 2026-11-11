@@ -1,0 +1,9 @@
+{
+  "mode": "text_to_video",
+  "model": "heygen-video-1",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "prompt_enhancement": "quality",
+  "prompt": "Hyper-realistic close-up of a laptop on a dark office desk at night. The screen shows a bright green line chart climbing steeply upward. Then the glowing chart line on the screen breaks apart and dissolves into wisps of thin grey smoke that drift up out of the screen and vanish, leaving the screen empty and dark. Cinematic, low-key lighting, shallow depth of field, slow push-in. No readable text, no logos, no people.",
+  "duration": 5
+}

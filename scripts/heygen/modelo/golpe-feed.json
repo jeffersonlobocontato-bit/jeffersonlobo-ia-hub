@@ -1,0 +1,9 @@
+{
+  "mode": "text_to_video",
+  "model": "heygen-video-1",
+  "aspect_ratio": "9:16",
+  "resolution": "1080p",
+  "prompt_enhancement": "quality",
+  "prompt": "Hyper-realistic close-up, shot over the shoulder in a dark room at night: a man's thumb scrolls very fast through a vertical social media feed on a smartphone. The feed is an endless stream of flashy sponsored posts from self-proclaimed AI gurus: bright thumbnails of people pointing at the camera, luxury cars, stacks of cash, big arrows and glowing robot icons. The phone screen light reflects on his hand. Scrolling gets faster and faster. Shallow depth of field, cinematic, natural motion, no readable text, no logos, no real faces in focus. Subtle cold green ambient tint.",
+  "duration": 13
+}
