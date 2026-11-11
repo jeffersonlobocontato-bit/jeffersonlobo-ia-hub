@@ -11,8 +11,9 @@
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html,body{margin:0;height:100%;background:#000;color:var(--ink);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden;-webkit-user-select:none;user-select:none}
-video#cam{position:fixed;left:50%;top:50%;width:var(--vw,100vw);height:var(--vh,100vh);object-fit:cover;transform:translate(-50%,-50%) scaleX(var(--mx,-1));background:#000}
-#cv{display:none}
+video#cam{position:fixed;left:0;top:0;width:2px;height:2px;opacity:0;pointer-events:none}
+#cv{position:fixed;left:50%;top:50%;width:var(--vw,100vw);height:var(--vh,100vh);transform:translate(-50%,-50%) scaleX(var(--mx,-1));background:#000}
+#camInfo{font:600 11px ui-monospace,Menlo,monospace;color:#B9B6AE;letter-spacing:.04em;flex:1 1 100%}
 /* texto do TP: perto do topo, onde fica a lente */
 #tpBox{position:fixed;left:0;right:0;top:env(safe-area-inset-top,0px);height:var(--h,38vh);overflow:hidden;pointer-events:none;
   -webkit-mask-image:linear-gradient(transparent,#000 14%,#000 80%,transparent);mask-image:linear-gradient(transparent,#000 14%,#000 80%,transparent)}
@@ -85,6 +86,22 @@ body.gravando #barra .opc{display:none}
     <label>Fundo do texto <input id="op" type="range" min="0" max="0.85" step="0.05" value="0.45"></label>
     <label>Altura <input id="alt" type="range" min="22" max="60" step="2" value="38"></label>
   </div>
+  <div class="lin opc">
+    <label title="Esquerda: câmera inteira, enquadramento aberto. Direita: preenche a tela, mais fechado.">Aproximar <input id="enq" type="range" min="0" max="100" step="1" value="0"></label>
+    <label id="zoomL" hidden>Zoom da lente <input id="zoom" type="range" min="1" max="1" step="0.1" value="1"></label>
+  </div>
+  <div class="lin opc">
+    <label>Qualidade
+      <select id="qual" style="flex:1;background:rgba(255,255,255,.08);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:6px;font:600 13px Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0">
+        <option value="1080">Alta · 1080p 30 fps</option>
+        <option value="720">Leve · 720p 30 fps</option>
+      </select>
+    </label>
+    <label id="lenteL" hidden>Lente
+      <select id="lente" style="flex:1;min-width:0;background:rgba(255,255,255,.08);color:var(--ink);border:1px solid var(--edge);border-radius:8px;padding:6px;font:600 13px Inter,system-ui,sans-serif;text-transform:none;letter-spacing:0"></select>
+    </label>
+    <span id="camInfo"></span>
+  </div>
   <div class="lin">
     <button id="inicio" class="opc" type="button">↺</button>
     <button id="editar" class="opc" type="button">Texto</button>
@@ -131,11 +148,12 @@ Nem todo especialista é lacrador de viral. Quem está implementando IA de verda
 A pergunta é esta: "Me conta um projeto de IA que você implementou e deu errado. Quanto custou e o que você mudou?" Quem implementou de verdade tem essa resposta na ponta da língua, com número. Porque todo mundo que faz, erra. Quem só vende prompt vai te responder com mais um prompt.
 
 IA dá resultado, sim. Mas não por atalho. Se você quer IA com resultado e não com hype, comenta ROI aqui embaixo que eu te mando como eu começo um projeto do zero. E faz essa pergunta pro próximo guru que aparecer no seu feed.`;
-const ROTEIRO_VER = 'golpe-especialista-ia-1';
 
 const $ = (s) => document.querySelector(s);
 const ler = (k, d) => { try { const v = localStorage.getItem(k); return v === null ? d : v; } catch { return d; } };
 const gravarLS = (k, v) => { try { localStorage.setItem(k, v); } catch {} };
+let deviceId = '', trilha = null, peq = null;
+const ROTEIRO_VER = 'golpe-especialista-ia-1';
 if (ler('tpc_ver', '') !== ROTEIRO_VER) { try { localStorage.removeItem('tpc_texto'); } catch {} gravarLS('tpc_ver', ROTEIRO_VER); }
 let roteiro = ler('tpc_texto', ROTEIRO), stream = null, facing = 'user', rec = null, partes = [], y = 0, rolando = false, ultimo = 0, t0 = 0, relogio = null, lock = null, urlAtual = null;
 
@@ -157,13 +175,13 @@ function aplicar() {
   document.documentElement.style.setProperty('--op', $('#op').value);
   document.documentElement.style.setProperty('--h', $('#alt').value + 'vh');
   $('#texto').style.fontSize = $('#tam').value + 'px';
-  ['vel', 'tam', 'op', 'alt', 'sens', 'modo', 'fmt'].forEach((k) => gravarLS('tpc_' + k, $('#' + k).value));
+  ['vel', 'tam', 'op', 'alt', 'sens', 'modo', 'fmt', 'enq', 'qual'].forEach((k) => gravarLS('tpc_' + k, $('#' + k).value));
 }
 const pos = () => { $('#scroller').style.transform = `translateY(${-y}px)`; };
 const maxY = () => Math.max(0, $('#texto').offsetHeight - $('#tpBox').offsetHeight * 0.5);
 
 const fmtV = () => $('#fmt').value === 'v';
-const saida = () => fmtV() ? [1080, 1920] : [1920, 1080];
+const saida = () => { const c = $('#qual').value === '720' ? [720, 1280] : [1080, 1920]; return fmtV() ? c : [c[1], c[0]]; };
 function enquadrar() {
   const [W, H] = saida(); const r = W / H;
   let w = innerWidth, hh = innerWidth / r;
@@ -178,20 +196,43 @@ function desenhar() {
   const v = $('#cam'), cv = $('#cv'), ctx = cv.getContext('2d');
   const vw = v.videoWidth, vh = v.videoHeight;
   if (vw && vh) {
-    const W = cv.width, H = cv.height, esc = Math.max(W / vw, H / vh);
-    const sw = W / esc, sh = H / esc, sx = (vw - sw) / 2, sy = (vh - sh) / 2;
-    ctx.drawImage(v, sx, sy, sw, sh, 0, 0, W, H);
+    const W = cv.width, H = cv.height;
+    const cobre = Math.max(W / vw, H / vh), cabe = Math.min(W / vw, H / vh);
+    const k = +$('#enq').value / 100, esc = cabe + (cobre - cabe) * k;
+    const dw = vw * esc, dh = vh * esc, dx = (W - dw) / 2, dy = (H - dh) / 2;
+    if (dw < W - 1 || dh < H - 1) {
+      // fundo: a própria câmera, ampliada e desfocada (funciona também no Safari)
+      if (!peq) peq = document.createElement('canvas');
+      peq.width = Math.max(8, Math.round(W / 40)); peq.height = Math.max(8, Math.round(H / 40));
+      const pc = peq.getContext('2d'), sw = W / cobre, sh = H / cobre;
+      pc.drawImage(v, (vw - sw) / 2, (vh - sh) / 2, sw, sh, 0, 0, peq.width, peq.height);
+      ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(peq, 0, 0, W, H);
+      ctx.fillStyle = 'rgba(0,0,0,.35)'; ctx.fillRect(0, 0, W, H);
+    }
+    ctx.drawImage(v, dx, dy, dw, dh);
   }
   requestAnimationFrame(desenhar);
 }
 async function ligarCamera() {
   if (stream) stream.getTracks().forEach((t) => t.stop());
   try {
-    stream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: facing, width: { ideal: fmtV() ? 1080 : 1920 }, height: { ideal: fmtV() ? 1920 : 1080 }, frameRate: { ideal: 30 } },
-      audio: { echoCancellation: true, noiseSuppression: true },
-    });
-    const v = $('#cam'); v.srcObject = stream; document.documentElement.style.setProperty('--mx', facing === 'user' ? -1 : 1); enquadrar();
+    // pede o maior lado em 1920 (ou 1280) e deixa a câmera entregar o quadro inteiro, sem recorte do navegador
+    const L = $('#qual').value === '720' ? 1280 : 1920;
+    const video = { width: { ideal: L }, height: { ideal: L }, frameRate: { ideal: 30, max: 30 }, resizeMode: 'none' };
+    if (deviceId) video.deviceId = { exact: deviceId }; else video.facingMode = facing;
+    const audio = { echoCancellation: true, noiseSuppression: true };
+    try { stream = await navigator.mediaDevices.getUserMedia({ video, audio }); }
+    catch (e1) { if (!deviceId) throw e1; deviceId = ''; delete video.deviceId; video.facingMode = facing; stream = await navigator.mediaDevices.getUserMedia({ video, audio }); }
+    const v = $('#cam'); v.srcObject = stream; try { await v.play(); } catch {}
+    trilha = stream.getVideoTracks()[0];
+    const st = trilha.getSettings ? trilha.getSettings() : {};
+    if (st.facingMode) facing = st.facingMode;
+    document.documentElement.style.setProperty('--mx', facing === 'user' ? -1 : 1);
+    const [W, H] = saida(); const cv = $('#cv'); cv.width = W; cv.height = H; enquadrar();
+    if (!desenhando) { desenhando = true; desenhar(); }
+    $('#camInfo').textContent = `Câmera ${st.width || '?'}×${st.height || '?'} · ${Math.round(st.frameRate || 30)} fps → grava ${W}×${H}`;
+    configurarZoom(); listarLentes();
     $('#aviso').hidden = true;
   } catch (e) {
     $('#erro').hidden = false;
@@ -199,6 +240,30 @@ async function ligarCamera() {
   }
 }
 
+function configurarZoom() {
+  const cap = trilha && trilha.getCapabilities ? trilha.getCapabilities() : {};
+  const z = cap.zoom, el = $('#zoom');
+  if (!z || z.max <= z.min) { $('#zoomL').hidden = true; return; }
+  el.min = z.min; el.max = z.max; el.step = z.step || 0.1;
+  const salvo = parseFloat(ler('tpc_zoom_' + (deviceId || facing), ''));
+  el.value = isNaN(salvo) ? Math.max(z.min, Math.min(z.max, 1)) : Math.max(z.min, Math.min(z.max, salvo));
+  $('#zoomL').hidden = false; aplicarZoom();
+}
+function aplicarZoom() {
+  if (!trilha) return;
+  trilha.applyConstraints({ advanced: [{ zoom: +$('#zoom').value }] }).catch(() => {});
+  gravarLS('tpc_zoom_' + (deviceId || facing), $('#zoom').value);
+}
+async function listarLentes() {
+  try {
+    const cams = (await navigator.mediaDevices.enumerateDevices()).filter((d) => d.kind === 'videoinput');
+    const sel = $('#lente'), atual = trilha && trilha.getSettings ? trilha.getSettings().deviceId : '';
+    if (cams.length < 2) { $('#lenteL').hidden = true; return; }
+    sel.innerHTML = cams.map((c, i) => `<option value="${c.deviceId}">${(c.label || 'Câmera ' + (i + 1)).replace(/[<&]/g, '')}</option>`).join('');
+    if (atual) sel.value = atual;
+    $('#lenteL').hidden = false;
+  } catch { $('#lenteL').hidden = true; }
+}
 function tipo() {
   const op = ['video/mp4;codecs=avc1,mp4a', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'];
   return op.find((t) => window.MediaRecorder && MediaRecorder.isTypeSupported(t)) || '';
@@ -286,9 +351,10 @@ async function comecar() {
   const c = $('#conta'); let n = 3; c.hidden = false; c.textContent = n;
   await new Promise((r) => { const iv = setInterval(() => { n--; if (n > 0) c.textContent = n; else { clearInterval(iv); c.hidden = true; r(); } }, 800); });
   partes = []; const mt = tipo();
-  const [W, H] = saida(); const cv = $('#cv'); cv.width = W; cv.height = H; desenhando = true; desenhar();
+  const cv = $('#cv'); if (!desenhando) { desenhando = true; desenhar(); }
+  const bps = $('#qual').value === '720' ? 6000000 : 12000000;
   const gravavel = new MediaStream([...cv.captureStream(30).getVideoTracks(), ...stream.getAudioTracks()]);
-  rec = new MediaRecorder(gravavel, mt ? { mimeType: mt, videoBitsPerSecond: 8000000 } : undefined);
+  rec = new MediaRecorder(gravavel, mt ? { mimeType: mt, videoBitsPerSecond: bps, audioBitsPerSecond: 160000 } : undefined);
   rec.ondataavailable = (e) => { if (e.data.size) partes.push(e.data); };
   rec.onstop = mostrar;
   rec.start(1000);
@@ -304,7 +370,6 @@ function parar() {
   document.body.classList.remove('gravando');
   try { lock?.release(); } catch {} lock = null;
   if (rec && rec.state !== 'inactive') rec.stop();
-  setTimeout(() => { desenhando = false; }, 400);
 }
 function mostrar() {
   const mt = rec.mimeType || 'video/mp4';
@@ -321,17 +386,20 @@ $('#liberar').onclick = ligarCamera;
 $('#gravar').onclick = () => (rec && rec.state === 'recording') ? parar() : comecar();
 $('#descartar').onclick = () => { $('#pronto').hidden = true; y = 0; pos(); };
 $('#inicio').onclick = () => { y = 0; pos(); };
-$('#virar').onclick = () => { facing = facing === 'user' ? 'environment' : 'user'; ligarCamera(); };
+$('#virar').onclick = () => { deviceId = ''; facing = facing === 'user' ? 'environment' : 'user'; ligarCamera(); };
+$('#lente').onchange = (e) => { deviceId = e.target.value; ligarCamera(); };
+$('#zoom').oninput = aplicarZoom;
 $('#editar').onclick = () => { $('#campo').value = roteiro; $('#editor').hidden = false; };
 $('#cancelar').onclick = () => { $('#editor').hidden = true; };
 $('#salvar').onclick = () => { roteiro = $('#campo').value.trim() || ROTEIRO; gravarLS('tpc_texto', roteiro); render(); y = 0; pos(); $('#editor').hidden = true; };
-['vel', 'tam', 'op', 'alt', 'sens', 'modo', 'fmt'].forEach((k) => { $('#' + k).value = ler('tpc_' + k, $('#' + k).value); $('#' + k).oninput = aplicar; $('#' + k).onchange = aplicar; });
+['vel', 'tam', 'op', 'alt', 'sens', 'modo', 'fmt', 'enq', 'qual'].forEach((k) => { $('#' + k).value = ler('tpc_' + k, $('#' + k).value); $('#' + k).oninput = aplicar; $('#' + k).onchange = aplicar; });
 let toqueY = null;
 $('#tpBox').style.pointerEvents = 'auto';
 $('#tpBox').addEventListener('touchstart', (e) => { toqueY = e.touches[0].clientY; }, { passive: true });
 $('#tpBox').addEventListener('touchmove', (e) => { if (toqueY === null) return; y = Math.max(0, Math.min(maxY(), y + (toqueY - e.touches[0].clientY))); toqueY = e.touches[0].clientY; pos(); }, { passive: true });
 render(); aplicar(); pos(); enquadrar();
 $('#fmt').addEventListener('change', () => { enquadrar(); if (stream) ligarCamera(); });
+$('#qual').addEventListener('change', () => { if (stream && !(rec && rec.state === 'recording')) ligarCamera(); });
 </script>
 </body>
 </html>
