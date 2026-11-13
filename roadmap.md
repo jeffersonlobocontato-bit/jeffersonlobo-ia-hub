@@ -1,5 +1,4 @@
-# Fases 2 e 3
-- [ ] Substituir tokens e tipografia global; eliminar alternância de tema.
-- [ ] Atualizar controles compartilhados, Header e Footer.
-- [ ] Verificar preservação da Academia, navegação, tracking e contraste.
-- [ ] Entregar alterações por arquivo e pendências; aguardar Fase 4.
+# Redesenho visual da Ilha
+- [x] Redesenhar exclusivamente a página de vendas da Ilha com as oito peças solicitadas.
+- [x] Adicionar animações leves, leitura no topo e alternativa sem movimento.
+- [x] Verificar telas pequenas, textos, preços, compra e preservação das outras páginas; não publicar.

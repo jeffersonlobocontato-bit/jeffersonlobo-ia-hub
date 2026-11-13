@@ -2,9 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ilhaCourseLd } from '@/lib/seo';
 import {
+  BookOpen,
+  Bot,
   Check,
   ChevronDown,
   Clapperboard,
+  FileText,
+  Headphones,
   Images,
   MessageCircleReply,
   MonitorPlay,
@@ -26,7 +30,10 @@ import EscolaTopo from '@/components/cursos/escola/EscolaTopo';
 import EscolaRodape from '@/components/cursos/escola/EscolaRodape';
 import CompraJanela from '@/components/cursos/CompraJanela';
 import { useEscola } from '@/components/cursos/escola/useEscola';
+import { Button } from '@/components/ui/button';
+import { IlhaLessons, IlhaWords, useIlhaMotion } from '@/components/cursos/ilha/IlhaVisuals';
 import '@/styles/escola.css';
+import '@/styles/ilha-vendas.css';
 
 // Página de vendas do curso (jeffersonlobo.tech/cursos/ilha), no mesmo tema da
 // vitrine (/cursos). Preços, lote e bônus vêm de content/cursos/ilha.ts: na
@@ -176,25 +183,31 @@ function VSL({ aoTocar }: { aoTocar: () => void }) {
     v.play().catch(() => setTocando(false));
   };
   return (
-    <div className="e-vsl">
-      <video
-        ref={video}
-        src="/cursos-ilha/vsl/vsl.mp4?v=lote2"
-        poster="/cursos-ilha/vsl/capa.jpg"
-        playsInline
-        preload="metadata"
-        controls={tocando}
-        aria-label="Vídeo de apresentação do curso Ilha de Edição completa"
-      />
+    <div className={`ilha-portrait${tocando ? ' is-playing' : ''}`}>
+      <div className="ilha-portrait__frame">
+        <img src="/cursos-ilha/img/historia.jpg" alt="Jefferson Lobo no estúdio, de moletom azul" width={864} height={1080} loading="lazy" decoding="async" />
+        <video
+          ref={video}
+          src="/cursos-ilha/vsl/vsl.mp4?v=lote2"
+          width={720}
+          height={1280}
+          playsInline
+          preload="none"
+          controls={tocando}
+          aria-hidden={!tocando}
+          tabIndex={tocando ? 0 : -1}
+          aria-label="Vídeo de apresentação do curso Ilha de Edição completa"
+        />
+      </div>
       {!tocando && (
-        <button type="button" className="e-podcast__som e-vsl__play" onClick={tocar}>
+        <Button type="button" className="e-podcast__som e-vsl__play" onClick={tocar}>
           <span className="e-podcast__icone" aria-hidden>
             <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor">
               <path d="M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z" />
             </svg>
           </span>
           Assistir ao vídeo
-        </button>
+        </Button>
       )}
     </div>
   );
@@ -210,23 +223,30 @@ function Reel({ n, legenda, i }: { n: string; legenda: string; i: number }) {
     v.muted = true;
     if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) return;
     if (!('IntersectionObserver' in window)) {
+      v.src = `/cursos-ilha/reels/${n}.mp4`;
       v.play().catch(() => undefined);
       return;
     }
-    const obs = new IntersectionObserver(([e]) => (e.isIntersecting ? v.play().catch(() => undefined) : v.pause()), { threshold: 0.25 });
+    const obs = new IntersectionObserver(([e]) => {
+      if (e.isIntersecting) {
+        if (!v.getAttribute('src')) v.src = `/cursos-ilha/reels/${n}.mp4`;
+        v.play().catch(() => undefined);
+      } else v.pause();
+    }, { threshold: 0.25 });
     obs.observe(v);
     return () => obs.disconnect();
-  }, []);
+  }, [n]);
   return (
     <figure className="e-reel e-revela" style={atraso(`${i * 0.08}s`)}>
       <video
         ref={video}
-        src={`/cursos-ilha/reels/${n}.mp4`}
         poster={`/cursos-ilha/reels/${n}.jpg`}
+        width={720}
+        height={1280}
         muted
         loop
         playsInline
-        preload="metadata"
+        preload="none"
         aria-label={`Reel editado na Ilha: ${legenda}`}
       />
       <figcaption>{legenda}</figcaption>
@@ -243,6 +263,7 @@ const Check12 = () => (
 const IlhaVendas = () => {
   const raiz = useRef<HTMLDivElement>(null);
   useEscola(raiz);
+  const { lesson, selectLesson } = useIlhaMotion(raiz);
   const { trackCTA } = useTrackCTA();
   const [compraAberta, setCompraAberta] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -359,9 +380,10 @@ const IlhaVendas = () => {
     <><b>Bônus: o e-book O código invisível</b>, o livro do Método DEL <span className="e-ilha-vale">vale {reais(CURSO_ILHA.bonus.valor)}</span></>,
     <><b>Bônus: 3 pockets em PDF</b> para tirar o Claude do genérico <span className="e-ilha-vale">vale {reais(VALOR_POCKETS)}</span></>,
   ];
+  const recebeIcones = [MonitorPlay, Paperclip, FileText, Bot, Clapperboard, Headphones, BookOpen, FileText];
 
   return (
-    <div className="escola e-ilha-pagina" ref={raiz}>
+    <div className="escola e-ilha-pagina ilha-vendas" ref={raiz}>
       <SEO
         title="Ilha de Edição completa no Claude | Jefferson Lobo"
         description="Curso Ilha de Edição completa: 5 aulas com as telas reais, instalador da Ilha, 5 manuais em PDF e Tutor IA para você fazer seu conteúdo sozinho no Claude."
@@ -371,21 +393,19 @@ const IlhaVendas = () => {
       />
 
       <EscolaTopo onCta={() => trackCTA('ilha_topo', 'ilha_vendas')} />
+      <div className="ilha-reading" aria-hidden><span className="ilha-reading__fill" /></div>
 
       <main>
         {/* topo: promessa, vídeo e compra */}
         <section className="e-ilha-hero">
-          <div className="e-aura" aria-hidden>
-            <div className="e-aura__grade" />
-          </div>
           <div className="e-ilha-hero__miolo">
             <div className="e-ilha-hero__texto">
               <span className="e-selo e-entra" style={atraso('0s')}>
                 <span className="e-selo__ponto" aria-hidden />
                 {lote1 ? `Lote 1 aberto até ${fimCurto}` : 'Inscrições abertas'}
               </span>
-              <h1 className="e-pocket-hero__titulo e-entra" style={atraso('0.15s')}>
-                Pela primeira vez, você faz seus <span className="e-ilha-destaque">reels, carrosséis, stories e direct</span> sozinho.
+              <h1 className="e-pocket-hero__titulo">
+                <IlhaWords>Pela primeira vez, você faz seus <span className="e-ilha-destaque">reels, carrosséis, stories e direct</span> <span className="ilha-alone">sozinho<svg viewBox="0 0 180 12" fill="none" aria-hidden><path pathLength="1" d="M2 8C40 1 112 1 177 6M15 11C57 6 127 6 164 9" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" /></svg></span>.</IlhaWords>
               </h1>
               <p className="e-pocket-hero__sub e-entra" style={atraso('0.3s')}>
                 Um estúdio de conteúdo que roda no seu Claude, instalado por você em 5 aulas. Para quem cria conteúdo e não tem equipe.
@@ -417,6 +437,11 @@ const IlhaVendas = () => {
                   <Contador restante={restante} />
                 </div>
               )}
+              <ul className="ilha-proofs">
+                <li><Wallet size={16} aria-hidden /><span><b>{preco}</b>pagamento único</span></li>
+                <li><MonitorPlay size={16} aria-hidden /><span><b>5 aulas</b>com as telas reais</span></li>
+                <li><ShieldCheck size={16} aria-hidden /><span><b>{CURSO_ILHA.garantiaDias} dias</b>de garantia</span></li>
+              </ul>
             </div>
           </div>
         </section>
@@ -425,24 +450,36 @@ const IlhaVendas = () => {
         <section className="e-secao">
           <div className="e-cab e-cab--centro e-revela">
             <span className="e-olho">Você conhece esse lugar</span>
-            <h2 className="e-h2">Você grava, mas o vídeo fica na galeria. Tem ideia, mas depende de alguém para postar.</h2>
+            <h2 className="e-h2"><IlhaWords>Você grava, mas o vídeo fica na galeria. Tem ideia, mas depende de alguém para postar.</IlhaWords></h2>
           </div>
-          <ul className="e-recursos">
-            {DORES.map((d, i) => (
-              <li key={d.n} className="e-recurso e-revela" style={atraso(`${i * 0.08}s`)}>
-                <span className="e-recurso__icone e-ilha-num" aria-hidden>
-                  {d.n}
-                </span>
-                <span className="e-olho">{d.olho}</span>
-                <h3>{d.titulo}</h3>
-                <p>{d.texto}</p>
-              </li>
-            ))}
-          </ul>
+          <div className="ilha-comparison">
+            <article className="ilha-comparison__card ilha-comparison__card--before">
+              <h3><IlhaWords>Sem a Ilha</IlhaWords></h3>
+              <ul>
+                {DORES.map((d) => (
+                  <li key={d.n} data-ilha-reveal>
+                    <X size={20} aria-hidden />
+                    <div><span className="e-olho">{d.n} · {d.olho}</span><h4><IlhaWords>{d.titulo}</IlhaWords></h4><p>{d.texto}</p></div>
+                  </li>
+                ))}
+              </ul>
+            </article>
+            <article className="ilha-comparison__card ilha-comparison__card--after">
+              <h3><IlhaWords>Com a Ilha</IlhaWords></h3>
+              <ul>
+                {[FRENTES[0], FRENTES[1], FRENTES[3]].map((f) => (
+                  <li key={f.titulo} data-ilha-reveal>
+                    <Check size={20} aria-hidden />
+                    <div><span className="e-olho">{f.olho}</span><h4><IlhaWords>{f.titulo === 'Ilha de Edição' ? 'Reels' : f.titulo}</IlhaWords></h4><p>{f.texto}</p></div>
+                  </li>
+                ))}
+              </ul>
+            </article>
+          </div>
         </section>
 
         {/* a história */}
-        <section className="e-secao">
+        <section className="e-secao ilha-story">
           <div className="e-ilha-duo">
             <figure className="e-ilha-foto e-revela">
               <img src="/cursos-ilha/img/historia.jpg" alt="Jefferson Lobo no estúdio" width={864} height={1080} loading="lazy" />
@@ -450,7 +487,7 @@ const IlhaVendas = () => {
             <div className="e-cab e-revela" style={atraso('0.1s')}>
               <span className="e-olho">A história</span>
               <h2 className="e-h2">
-                Eu não acreditei em prompt milagroso. <span className="e-ilha-destaque">Fui testar.</span>
+                <IlhaWords>Eu não acreditei em prompt milagroso. <span className="e-ilha-destaque">Fui testar.</span></IlhaWords>
               </h2>
               <p>
                 Quando a IA chegou, eu vi muita promessa fácil. A minha regra sempre foi uma: ensaio tem valor, mas só prova de ganho vale
@@ -460,7 +497,6 @@ const IlhaVendas = () => {
                 Então montei, dentro do Claude, um estúdio de conteúdo. Não é um site nem um aplicativo que você assina. É uma plataforma
                 que roda na sua própria conta, com banco de dados e tarefas que trabalham sozinhas.
               </p>
-              <blockquote className="e-ilha-citacao">Gravei no celular, escolhi o modelo, e uns vinte minutos depois o reel estava pronto.</blockquote>
             </div>
           </div>
         </section>
@@ -469,49 +505,47 @@ const IlhaVendas = () => {
         <section className="e-secao" id="frentes">
           <div className="e-cab e-revela">
             <span className="e-olho">O que você vai montar</span>
-            <h2 className="e-h2">Cinco frentes. Uma aula para cada.</h2>
+            <h2 className="e-h2"><IlhaWords>Cinco frentes. Uma aula para cada.</IlhaWords></h2>
             <p>As telas abaixo são da plataforma funcionando, com dados e criações reais.</p>
           </div>
-          <div className="e-catalogo">
-            {FRENTES.map((f, i) => (
-              <article key={f.titulo} className="e-card e-revela" style={atraso(`${(i % 3) * 0.08}s`)}>
-                <span className="e-card__feixe" aria-hidden />
-                <span className="e-card__brilho" aria-hidden />
-                <div className="e-card__thumb e-ilha-frente__thumb">
-                  <img src={f.img} alt={f.alt} width={820} height={968} loading="lazy" />
-                </div>
-                <span className="e-olho">{f.olho}</span>
-                <h3 className="e-card__titulo">{f.titulo}</h3>
-                <p className="e-card__texto">{f.texto}</p>
-              </article>
-            ))}
-          </div>
+          <IlhaLessons lessons={FRENTES.slice(0, 5)} active={lesson} onSelect={selectLesson} />
+        </section>
+
+        <section className="e-secao ilha-quote">
+          <span className="ilha-quote__mark" aria-hidden>“</span>
+          <blockquote><IlhaWords progressive>Gravei no celular, escolhi o modelo, e uns vinte minutos depois o reel estava pronto.</IlhaWords></blockquote>
         </section>
 
         {/* como funciona */}
         <section className="e-secao">
-          <div className="e-cab e-cab--centro e-revela">
-            <span className="e-olho">Como funciona</span>
-            <h2 className="e-h2">Você não programa nada.</h2>
+          <div className="ilha-how">
+            <div className="ilha-how__intro">
+              <div className="e-cab e-revela">
+                <span className="e-olho">Como funciona</span>
+                <h2 className="e-h2"><IlhaWords>Você não programa nada.</IlhaWords></h2>
+              </div>
+              <figure className="ilha-how__editor" data-ilha-reveal>
+                <img src={FRENTES[5].img} alt={FRENTES[5].alt} width={820} height={968} loading="lazy" decoding="async" />
+                <figcaption><span className="e-olho">{FRENTES[5].olho}</span><h3><IlhaWords>{FRENTES[5].titulo}</IlhaWords></h3><p>{FRENTES[5].texto}</p></figcaption>
+              </figure>
+            </div>
+            <ol className="ilha-timeline" data-ilha-timeline>
+              {PASSOS.map((s) => (
+                <li key={s.titulo} className="ilha-step">
+                  <span aria-hidden><s.icone size={19} /></span>
+                  <h3><IlhaWords>{s.titulo}</IlhaWords></h3>
+                  <p>{s.texto}</p>
+                </li>
+              ))}
+            </ol>
           </div>
-          <ul className="e-recursos">
-            {PASSOS.map((s, i) => (
-              <li key={s.titulo} className="e-recurso e-revela" style={atraso(`${i * 0.08}s`)}>
-                <span className="e-recurso__icone" aria-hidden>
-                  <s.icone size={22} />
-                </span>
-                <h3>{s.titulo}</h3>
-                <p>{s.texto}</p>
-              </li>
-            ))}
-          </ul>
         </section>
 
         {/* provas */}
         <section className="e-secao">
           <div className="e-cab e-cab--centro e-revela">
             <span className="e-olho">Provas</span>
-            <h2 className="e-h2">Estes reels foram editados na Ilha.</h2>
+            <h2 className="e-h2"><IlhaWords>Estes reels foram editados na Ilha.</IlhaWords></h2>
             <p>Sem editor, sem designer, sem agência. Gravados no celular e editados na fila automática.</p>
           </div>
           <div className="e-reels">
@@ -525,12 +559,12 @@ const IlhaVendas = () => {
         <section className="e-secao">
           <div className="e-cab e-cab--centro e-revela">
             <span className="e-olho">Para quem é</span>
-            <h2 className="e-h2">Feito para quem precisa postar e não tem equipe.</h2>
+            <h2 className="e-h2"><IlhaWords>Feito para quem precisa postar e não tem equipe.</IlhaWords></h2>
           </div>
           <div className="e-planos">
             <div className="e-plano e-plano--destaque e-revela">
               <div className="e-plano__topo">
-                <h3>É para você se</h3>
+                <h3><IlhaWords>É para você se</IlhaWords></h3>
                 <span className="e-plano__icone" aria-hidden>
                   <Check size={18} />
                 </span>
@@ -546,7 +580,7 @@ const IlhaVendas = () => {
             </div>
             <div className="e-plano e-revela" style={atraso('0.1s')}>
               <div className="e-plano__topo">
-                <h3>Não é para você se</h3>
+                <h3><IlhaWords>Não é para você se</IlhaWords></h3>
                 <span className="e-plano__icone" aria-hidden>
                   <X size={18} />
                 </span>
@@ -570,10 +604,16 @@ const IlhaVendas = () => {
           <div className="e-cab e-cab--centro e-revela">
             <span className="e-olho">A conta</span>
             <h2 className="e-h2">
-              Se você fosse contratar, pagaria no mínimo <span className="e-ilha-destaque">R$ 6.900</span> no primeiro mês.
+              <IlhaWords>Se você fosse contratar, pagaria no mínimo <span className="e-ilha-destaque">R$ 6.900</span> no primeiro mês.</IlhaWords>
             </h2>
           </div>
-          <div className="e-ilha-conta e-revela">
+          <div className="ilha-cost">
+            <div className="ilha-cost__orbit" data-ilha-reveal>
+              <svg viewBox="0 0 320 320" aria-hidden><circle className="ilha-cost__ring-track" cx="160" cy="160" r="154" /><circle className="ilha-cost__ring" cx="160" cy="160" r="154" pathLength="1" /></svg>
+              <div className="ilha-cost__number"><small>R$</small><b>6.900</b></div>
+              {['Reels', 'Roteiros', 'Carrosséis', 'Direct', 'Formatos'].map((tag) => <span className="ilha-cost__tag" key={tag}>{tag}</span>)}
+            </div>
+            <div className="e-ilha-conta e-revela">
             <table>
               <thead>
                 <tr>
@@ -597,6 +637,7 @@ const IlhaVendas = () => {
                 </tr>
               </tbody>
             </table>
+            </div>
           </div>
           <p className="e-conta e-revela">
             Nos meses seguintes, sem o chatbot, seriam <b>R$ 5.400 por mês</b>. Na Ilha, você paga <b>{preco}</b> uma vez.
@@ -608,22 +649,16 @@ const IlhaVendas = () => {
           <div className="e-cab e-cab--centro e-revela">
             <span className="e-olho">A oferta</span>
             <h2 className="e-h2">
-              Tudo isso por <span className="e-ilha-destaque">{preco}</span>. Uma vez.
+              <IlhaWords>Tudo isso por <span className="e-ilha-destaque">{preco}</span>. Uma vez.</IlhaWords>
             </h2>
           </div>
-          <div className="e-ilha-oferta e-revela">
-            <div className="e-ilha-oferta__itens">
-              <h3>O que você recebe</h3>
-              <ul className="e-lista">
-                {recebe.map((item, i) => (
-                  <li key={i}>
-                    <Check12 />
-                    <span>{item}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="e-ilha-oferta__preco">
+          <h3 className="ilha-offer-label"><IlhaWords>O que você recebe</IlhaWords></h3>
+          <ul className="ilha-offer-grid">
+            {recebe.map((item, i) => {
+              const Icon = recebeIcones[i] ?? Check;
+              return <li key={i} className="ilha-offer-item" data-ilha-reveal><Icon aria-hidden /><div>{item}</div></li>;
+            })}
+            <li className="ilha-offer-checkout">
               <span className="e-plano__selo">{lote1 ? 'Lote 1' : 'Lote 2'}</span>
               <div className="e-preco">
                 <small>{lote1 ? `até ${fimCurto}, 23h59` : 'preço atual'}</small>
@@ -643,15 +678,15 @@ const IlhaVendas = () => {
               <p className="e-plano__garantia e-ilha-oferta__garantia">
                 <ShieldCheck size={14} aria-hidden /> {CURSO_ILHA.garantiaDias} dias de garantia, com reembolso integral
               </p>
-            </div>
-          </div>
+            </li>
+          </ul>
         </section>
 
         {/* bônus */}
         <section className="e-secao">
           <div className="e-cab e-revela">
             <span className="e-olho">Bônus</span>
-            <h2 className="e-h2">Vem junto, sem pagar a mais</h2>
+            <h2 className="e-h2"><IlhaWords>Vem junto, sem pagar a mais</IlhaWords></h2>
           </div>
           <div className="e-ilha-bonus">
             <div className="e-livro e-revela">
@@ -660,7 +695,7 @@ const IlhaVendas = () => {
               </div>
               <div className="e-livro__texto">
                 <span className="e-olho e-olho--laranja">Bônus · e-book de {reais(CURSO_ILHA.bonus.valor)}</span>
-                <h3 className="e-h2">O código invisível dos superagentes de inteligência artificial</h3>
+                <h3 className="e-h2"><IlhaWords>O código invisível dos superagentes de inteligência artificial</IlhaWords></h3>
                 <p>
                   O livro do Método DEL: como transformar o jeito como você escreve, argumenta e escolhe palavras em orientações para
                   agentes de IA, como o Claude. Na Aula 5 você usa o DEL para adaptar formatos; no livro está o método inteiro.
@@ -700,7 +735,7 @@ const IlhaVendas = () => {
               </div>
               <div className="e-pacote__texto">
                 <span className="e-olho">Bônus · 3 pockets de {reais(POCKETS[0].preco)}</span>
-                <h3 className="e-h2">3 pockets para tirar o Claude do genérico</h3>
+                <h3 className="e-h2"><IlhaWords>3 pockets para tirar o Claude do genérico</IlhaWords></h3>
                 <p>
                   Tutoriais curtos em PDF, com as telas do Claude em português e modelos para copiar. Cada um resolve uma coisa só, e cada
                   um tem o próprio Tutor IA.
@@ -736,21 +771,21 @@ const IlhaVendas = () => {
         <section className="e-secao">
           <div className="e-cab e-cab--centro e-revela">
             <span className="e-olho">Por que tão barato</span>
-            <h2 className="e-h2">Menos do que um único reel editado por freelancer.</h2>
+            <h2 className="e-h2"><IlhaWords>Menos do que um único reel editado por freelancer.</IlhaWords></h2>
           </div>
           <ul className="e-recursos e-recursos--duplo e-ilha-estreito">
             <li className="e-recurso e-revela">
               <span className="e-recurso__icone" aria-hidden>
                 <Wallet size={22} />
               </span>
-              <h3>Roda no seu Claude</h3>
+              <h3><IlhaWords>Roda no seu Claude</IlhaWords></h3>
               <p>Eu não tenho servidor, banco de dados nem custo por aluno. O preço paga as aulas, não a infraestrutura.</p>
             </li>
             <li className="e-recurso e-revela" style={atraso('0.08s')}>
               <span className="e-recurso__icone" aria-hidden>
                 <Sparkles size={22} />
               </span>
-              <h3>{lote1 ? 'É o primeiro lote' : 'Preço de lançamento'}</h3>
+              <h3><IlhaWords>{lote1 ? 'É o primeiro lote' : 'Preço de lançamento'}</IlhaWords></h3>
               <p>Eu quero muita gente usando, mostrando resultado e ajudando a melhorar os instaladores.</p>
             </li>
           </ul>
@@ -778,7 +813,7 @@ const IlhaVendas = () => {
             </div>
             <div>
               <span className="e-olho">Risco zero</span>
-              <h2>{CURSO_ILHA.garantiaDias} dias. Entrou, instalou, não gostou: devolvo cada centavo.</h2>
+              <h2><IlhaWords>{CURSO_ILHA.garantiaDias} dias. Entrou, instalou, não gostou: devolvo cada centavo.</IlhaWords></h2>
               <p>
                 É só pedir o reembolso <b>dentro de {CURSO_ILHA.garantiaDias} dias</b>, pelo WhatsApp. Sem perguntas.
               </p>
@@ -786,7 +821,7 @@ const IlhaVendas = () => {
           </div>
           <div className="e-cab e-revela e-ilha-req-cab">
             <span className="e-olho">O que você precisa</span>
-            <h2 className="e-h2">Antes de comprar</h2>
+            <h2 className="e-h2"><IlhaWords>Antes de comprar</IlhaWords></h2>
           </div>
           <ul className="e-recursos">
             {REQUISITOS.map((r, i) => (
@@ -795,7 +830,7 @@ const IlhaVendas = () => {
                   <r.icone size={22} />
                 </span>
                 <span className="e-ilha-tag">{r.tag}</span>
-                <h3>{r.titulo}</h3>
+                <h3><IlhaWords>{r.titulo}</IlhaWords></h3>
                 <p>{r.texto}</p>
               </li>
             ))}
@@ -810,7 +845,7 @@ const IlhaVendas = () => {
             </figure>
             <div className="e-cab e-revela" style={atraso('0.1s')}>
               <span className="e-olho">Quem ensina</span>
-              <h2 className="e-h2">Jefferson Lobo</h2>
+              <h2 className="e-h2"><IlhaWords>Jefferson Lobo</IlhaWords></h2>
               <p>
                 Head Executivo de Marketing e IA. São 34 anos de comunicação estratégica e tecnologia. Criador do Método DEL, que desmonta a
                 estrutura de linguagem dos conteúdos que funcionam e reescreve com a sua voz.
@@ -829,7 +864,7 @@ const IlhaVendas = () => {
           <div className="e-faq">
             <div className="e-cab e-revela">
               <span className="e-olho">Dúvidas</span>
-              <h2 className="e-h2">Antes de entrar</h2>
+              <h2 className="e-h2"><IlhaWords>Antes de entrar</IlhaWords></h2>
               <p>
                 Ficou alguma dúvida?{' '}
                 <a href={ESCOLA.whatsapp} target="_blank" rel="noopener" className="e-link">
@@ -859,14 +894,14 @@ const IlhaVendas = () => {
         </section>
 
         {/* chamada final */}
-        <section className="e-secao">
+        <section className="e-secao ilha-closing">
           <div className="e-cab e-cab--centro e-revela">
             <span className="e-olho">Daqui a um mês</span>
             <h2 className="e-h2">
-              As mesmas ideias no caderno, <span className="e-ilha-destaque">ou no ar?</span>
+              <IlhaWords>As mesmas ideias no caderno, <span className="e-ilha-destaque">ou no ar?</span></IlhaWords>
             </h2>
-            <p>
-              A diferença custa <b>{preco}</b>.
+            <p className="ilha-closing__price">
+              <IlhaWords>A diferença custa <b>{preco}</b>.</IlhaWords>
             </p>
           </div>
           <div className="e-ilha-final e-revela">
