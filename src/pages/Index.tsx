@@ -17,6 +17,12 @@ import Footer from '@/components/Footer';
 import ChatBot from '@/components/ChatBot';
 import StickyHeaderCTA from '@/components/StickyHeaderCTA';
 import { Separator } from '@/components/ui/separator';
+import ScrollFX from '@/components/ScrollFX';
+
+// Cada seção sobe e aparece ao entrar na tela (ver [data-reveal] em index.css)
+const Reveal = ({ children }: { children: React.ReactNode }) => (
+  <div data-reveal>{children}</div>
+);
 
 const Divider = ({ accent = 'primary' }: { accent?: 'primary' | 'secondary' }) => (
   <div className="py-10 md:py-14">
@@ -28,36 +34,37 @@ const Divider = ({ accent = 'primary' }: { accent?: 'primary' | 'secondary' }) =
 
 const Index = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
+      <ScrollFX />
       <SEO
         title="Jefferson Lobo — Palestrante de Inteligência Artificial no Brasil"
         description="Palestrante de Inteligência Artificial no Brasil, autor do Método DEL e consultor de IA aplicada a marketing e negócios. Head Executivo de Marketing do Sistema Fiep."
         path="/"
       />
       <Header />
-      <main>
+      <main className="relative z-[1]">
         <HeroSection />
         <Divider />
-        <TesteIASection />
-        <AcademiaSection />
-        <LogosBarSection />
+        <Reveal><TesteIASection /></Reveal>
+        <Reveal><AcademiaSection /></Reveal>
+        <Reveal><LogosBarSection /></Reveal>
         <Divider accent="secondary" />
-        <PalestrasSection />
+        <Reveal><PalestrasSection /></Reveal>
         <Divider />
-        <AboutSection />
+        <Reveal><AboutSection /></Reveal>
         <Divider accent="secondary" />
-        <ProductsSection />
+        <Reveal><ProductsSection /></Reveal>
         <Divider />
-        <TrustBarSection />
-        <StagePhotosSection />
+        <Reveal><TrustBarSection /></Reveal>
+        <Reveal><StagePhotosSection /></Reveal>
         <Divider />
-        <ContactSection />
+        <Reveal><ContactSection /></Reveal>
         <Divider accent="secondary" />
-        <BookSection />
+        <Reveal><BookSection /></Reveal>
         <Divider />
-        <PodcastSection />
+        <Reveal><PodcastSection /></Reveal>
         <Divider accent="secondary" />
-        <BlogSection />
+        <Reveal><BlogSection /></Reveal>
       </main>
       <Footer />
       <ChatBot />
