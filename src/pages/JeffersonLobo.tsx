@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Linkedin, Instagram, Mail, ArrowRight } from "lucide-react";
-import profileImg from "@/assets/profile.jpg";
+import profileImg from "@/assets/jefferson-lobo-real.webp";
 
 const SITE_URL = "https://jeffersonlobo.tech";
 const PAGE_URL = `${SITE_URL}/jefferson-lobo`;
