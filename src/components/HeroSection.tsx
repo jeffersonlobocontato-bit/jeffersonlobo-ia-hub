@@ -11,7 +11,7 @@ import { useTrackCTA } from '@/hooks/useTrackCTA';
  */
 const provas = [
   { n: '34', l: 'anos de comunicação estratégica' },
-  { n: '4 mil+', l: 'pessoas na operação de IA que lidero' },
+  { n: '4 mil+', l: 'colaboradores na empresa onde lidero marketing e IA' },
   { n: 'DEL', l: 'método próprio e livro publicado' },
 ];
 
@@ -82,7 +82,7 @@ const HeroSection = () => {
             {provas.map((p, i) => (
               <div key={p.n} className="hero-in flex items-baseline gap-3" style={{ animationDelay: `${300 + i * 90}ms` }}>
                 <span className="display-title text-3xl md:text-4xl text-primary whitespace-nowrap">{p.n}</span>
-                <span className="text-sm text-muted-foreground leading-tight max-w-[16ch]">{p.l}</span>
+                <span className="text-sm text-muted-foreground leading-tight max-w-[20ch]">{p.l}</span>
               </div>
             ))}
             <a
