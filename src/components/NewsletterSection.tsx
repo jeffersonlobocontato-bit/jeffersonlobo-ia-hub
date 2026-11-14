@@ -21,7 +21,6 @@ const NewsletterSection = () => {
 
   return (
     <section className="relative overflow-hidden bg-background py-24">
-      <div className="absolute inset-0 z-0 bg-brand-grid opacity-30" />
       <div className="absolute inset-x-0 top-0 h-px bg-primary/40" />
       <div className="absolute inset-x-0 bottom-0 h-px bg-secondary/40" />
 

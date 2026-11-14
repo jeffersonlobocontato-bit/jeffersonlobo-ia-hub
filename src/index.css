@@ -100,13 +100,6 @@ All colors MUST be HSL.
 }
 
 @layer utilities {
-  .bg-brand-grid {
-    background-image:
-      linear-gradient(to right, hsl(var(--primary) / 0.12) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(var(--primary) / 0.12) 1px, transparent 1px);
-    background-size: 32px 32px;
-  }
-
   .bg-noise-stripe {
     background: linear-gradient(180deg, hsl(var(--background)), hsl(var(--surface-strong)));
   }

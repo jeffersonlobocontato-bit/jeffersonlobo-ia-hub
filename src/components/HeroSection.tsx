@@ -22,7 +22,6 @@ const HeroSection = () => {
       id="home"
       className="relative min-h-screen flex items-center overflow-hidden bg-background pt-24 pb-16"
     >
-      <div className="absolute inset-0 z-0 bg-brand-grid opacity-40" aria-hidden="true" />
 
       <div className="container mx-auto px-4 z-10 relative">
         <div className="mx-auto max-w-6xl grid gap-10 md:gap-14 md:grid-cols-[1.35fr_1fr] items-center animate-fade-in">

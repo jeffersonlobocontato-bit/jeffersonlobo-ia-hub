@@ -164,7 +164,6 @@ export default function CommercialLanding(props: CommercialLandingProps) {
       <main className="flex-1 pt-24">
         {/* HERO */}
         <section className="relative overflow-hidden bg-background py-20 md:py-28 border-b border-border">
-          <div className="absolute inset-0 z-0 bg-brand-grid opacity-20" />
           <div className="container mx-auto px-4 relative z-10 max-w-4xl text-center space-y-6 flex flex-col items-center">
             <Kicker>{props.kicker}</Kicker>
             <h1 className="display-title text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-foreground">
@@ -206,7 +205,7 @@ export default function CommercialLanding(props: CommercialLandingProps) {
 
         {/* MÉTODO DEL — metodologia proprietária, termo de marca sem concorrência direta */}
         {props.methodBlock && (
-          <section className="relative overflow-hidden py-16 sm:py-20 bg-brand-grid border-b border-border">
+          <section className="relative overflow-hidden py-16 sm:py-20 border-b border-border">
             <div className="container mx-auto px-4 max-w-2xl text-center space-y-4">
               <Kicker>{props.methodBlock.kicker}</Kicker>
               <h2 className="display-title text-3xl sm:text-4xl text-foreground">
@@ -314,7 +313,6 @@ export default function CommercialLanding(props: CommercialLandingProps) {
 
         {/* O QUE ENTREGA */}
         <section className="bg-background py-24 relative overflow-hidden border-b border-border">
-          <div className="absolute inset-0 bg-brand-grid opacity-15" />
           <div className="container mx-auto px-4 max-w-5xl relative z-10">
             <SectionHead
               kicker="O que você leva"
@@ -427,7 +425,6 @@ export default function CommercialLanding(props: CommercialLandingProps) {
               : "bg-primary py-24 relative overflow-hidden"
           }
         >
-          {!sober && <div className="absolute inset-0 bg-brand-grid opacity-15" />}
           <div className="container mx-auto px-4 max-w-3xl text-center space-y-6 relative z-10 flex flex-col items-center">
             <Kicker>Próximo passo</Kicker>
             <h2

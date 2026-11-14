@@ -405,7 +405,7 @@ const BlogPost = () => {
           </section>
         )}
 
-        <section className="relative overflow-hidden py-20 sm:py-24 mt-20 bg-brand-grid border-y border-border">
+        <section className="relative overflow-hidden py-20 sm:py-24 mt-20 border-y border-border">
           <div className="container mx-auto px-5 relative z-10">
             <div className="mx-auto max-w-3xl text-center space-y-6">
               <span className="section-kicker">Palestras e consultoria</span>

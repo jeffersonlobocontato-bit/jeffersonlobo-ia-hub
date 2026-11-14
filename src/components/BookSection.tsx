@@ -29,7 +29,6 @@ const BookSection = () => {
 
   return (
     <section id="livro" className="relative overflow-hidden bg-background py-24">
-      <div className="absolute inset-0 z-0 bg-brand-grid opacity-20" />
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="text-center mb-12">

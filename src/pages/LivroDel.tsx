@@ -148,7 +148,7 @@ const LivroDel = () => {
 
       <main className="flex-1">
         {/* HERO */}
-        <section className="relative overflow-hidden pt-32 pb-16 bg-brand-grid">
+        <section className="relative overflow-hidden pt-32 pb-16">
           <div className="absolute inset-0 z-0">
             <img
               src={jeffersonPortrait}
@@ -353,7 +353,7 @@ const LivroDel = () => {
         </section>
 
         {/* PALESTRANTE */}
-        <section className="relative overflow-hidden py-20 sm:py-24 bg-brand-grid border-y border-border">
+        <section className="relative overflow-hidden py-20 sm:py-24 border-y border-border">
           <div className="container mx-auto px-4 relative z-10">
             <div className="mx-auto max-w-3xl text-center space-y-6">
               <span className="section-kicker">Palestras e consultoria</span>

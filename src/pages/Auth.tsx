@@ -87,7 +87,6 @@ const Auth = () => {
         path="/auth"
         noindex
       />
-      <div className="absolute inset-0 bg-grid-pattern opacity-5" />
       
       <Card className="w-full max-w-md relative z-10 border-primary/20 bg-background/95 backdrop-blur">
         <CardHeader className="text-center">

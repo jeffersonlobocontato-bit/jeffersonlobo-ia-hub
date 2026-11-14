@@ -68,7 +68,7 @@ export default function TesteIA() {
         path="/teste-ia"
       />
       <Header />
-      <main className="flex-1 pt-20 bg-brand-grid">
+      <main className="flex-1 pt-20">
         {etapa === "gate" && (
           <TesteIAGate
             onComplete={(id, tipo, token) => {
