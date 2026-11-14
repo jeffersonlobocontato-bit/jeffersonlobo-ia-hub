@@ -8,7 +8,6 @@ import PalestrasSection from '@/components/PalestrasSection';
 import TrustBarSection from '@/components/TrustBarSection';
 import StagePhotosSection from '@/components/StagePhotosSection';
 import AboutSection from '@/components/AboutSection';
-import ProductsSection from '@/components/ProductsSection';
 import BookSection from '@/components/BookSection';
 import PodcastSection from '@/components/PodcastSection';
 import BlogSection from '@/components/BlogSection';
@@ -53,8 +52,6 @@ const Index = () => {
         <Divider />
         <Reveal><AboutSection /></Reveal>
         <Divider accent="secondary" />
-        <Reveal><ProductsSection /></Reveal>
-        <Divider />
         <Reveal><TrustBarSection /></Reveal>
         <Reveal><StagePhotosSection /></Reveal>
         <Divider />

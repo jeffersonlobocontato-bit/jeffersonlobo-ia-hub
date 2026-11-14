@@ -31,7 +31,7 @@ const Footer = () => {
           <div className="md:col-span-2">
             <h4 className="text-xs font-semibold uppercase tracking-wider mb-4 text-foreground/70" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>Navegação</h4>
             <ul className="space-y-2">
-              {['home', 'palestras', 'sobre', 'produtos', 'contato', 'livro', 'blog'].map((item) => (
+              {['home', 'academia', 'palestras', 'sobre', 'contato', 'livro', 'blog'].map((item) => (
                 <li key={item}>
                   <Button
                     variant="ghost"
