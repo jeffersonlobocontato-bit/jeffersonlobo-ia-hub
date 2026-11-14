@@ -78,6 +78,13 @@
       "when": 1794688693727,
       "tag": "0010_tighten_open_policies",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1794688729868,
+      "tag": "0011_fix_scroll_event_check",
+      "breakpoints": true
     }
   ]
 }
