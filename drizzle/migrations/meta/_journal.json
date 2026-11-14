@@ -71,6 +71,13 @@
       "when": 1793733060261,
       "tag": "0009_pedidos_rastreio_capi",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1794688693727,
+      "tag": "0010_tighten_open_policies",
+      "breakpoints": true
     }
   ]
 }
