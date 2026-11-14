@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { ArrowRight, Briefcase, Store } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import portrait from '@/assets/jefferson-lobo-real.webp';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 
 /*
@@ -24,22 +23,7 @@ const HeroSection = () => {
     >
 
       <div className="container mx-auto px-4 z-10 relative">
-        <div className="mx-auto max-w-6xl grid gap-10 md:gap-14 md:grid-cols-[1.35fr_1fr] items-center animate-fade-in">
-
-          {/* Foto — no mobile vem primeiro e menor */}
-          <div className="order-first md:order-last mx-auto w-48 sm:w-64 md:w-full max-w-md">
-            <div className="relative aspect-square rounded-2xl overflow-hidden border border-border shadow-xl">
-              <img
-                src={portrait}
-                alt="Jefferson Lobo"
-                width={1000}
-                height={1000}
-                ref={(el) => el?.setAttribute('fetchpriority', 'high')}
-                decoding="async"
-                className="w-full h-full object-cover"
-              />
-            </div>
-          </div>
+        <div className="mx-auto max-w-4xl animate-fade-in">
 
           {/* Texto */}
           <div className="text-center md:text-left space-y-7">
