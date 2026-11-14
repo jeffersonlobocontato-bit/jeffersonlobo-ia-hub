@@ -49,7 +49,7 @@ const HeroSection = () => {
 
           <div className="hero-in grid gap-8 md:grid-cols-[1fr_auto] md:items-end" style={{ animationDelay: '180ms' }}>
             <p className="max-w-xl text-lg sm:text-xl md:text-2xl text-foreground/85 font-medium leading-snug">
-              Eu começo pela prova — e só depois escalo. IA aplicada a negócios, com governança, ROI medido e a voz da sua marca.
+              Eu começo pela prova e só depois escalo. IA aplicada a negócios, com governança, ROI medido e a voz da sua marca.
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
