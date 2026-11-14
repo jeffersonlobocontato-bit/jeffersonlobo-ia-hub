@@ -6,6 +6,9 @@ import { useBlogPosts } from '@/hooks/useBlogPosts';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 import { isInternalPost, extractFirstParagraph } from '@/lib/blog-utils';
 
+// Na home mostra só os mais recentes; a lista completa fica em /blog
+const POSTS_NA_HOME = 4;
+
 const BlogSection = () => {
   const { data: blogPosts = [] } = useBlogPosts();
   const { trackCTA } = useTrackCTA();
@@ -23,7 +26,7 @@ const BlogSection = () => {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 md:gap-8 max-w-6xl mx-auto">
-          {blogPosts.map((post: any, index: number) => {
+          {blogPosts.slice(0, POSTS_NA_HOME).map((post: any, index: number) => {
             const internal = isInternalPost(post);
             const formattedDate = new Date(post.date).toLocaleDateString('pt-BR', {
               day: 'numeric',

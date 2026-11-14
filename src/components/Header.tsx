@@ -54,7 +54,7 @@ const Header = () => {
 
           {/* Desktop Navigation — ordem alinhada com a ordem real das seções na página */}
           <nav className="site-header__nav hidden xl:flex items-center">
-            {['home', 'palestras', 'sobre', 'produtos', 'contato'].map((item) => (
+            {['home', 'academia', 'palestras', 'sobre', 'contato'].map((item) => (
               <Button
                 variant="ghost"
                 key={item}
@@ -131,7 +131,7 @@ const Header = () => {
         {/* Mobile Menu */}
         {isMobileMenuOpen && (
           <div id="mobile-menu" className="site-mobile-menu xl:hidden p-6 space-y-2 animate-fade-in bg-popover border border-border">
-            {['home', 'palestras', 'sobre', 'produtos', 'contato'].map((item) => (
+            {['home', 'academia', 'palestras', 'sobre', 'contato'].map((item) => (
               <Button
                 variant="ghost"
                 key={item}

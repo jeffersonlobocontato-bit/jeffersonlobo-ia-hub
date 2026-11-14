@@ -78,17 +78,17 @@ const HeroSection = () => {
       {/* Faixa de prova — fecha a dobra */}
       <div className="relative z-10 border-t border-white/10 mt-12">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-3 md:grid-cols-[1fr_1fr_1fr_auto] gap-6 sm:gap-8 py-7 items-center">
+          <div className="max-w-6xl mx-auto flex flex-col lg:flex-row lg:flex-wrap gap-x-12 gap-y-5 py-7 lg:items-center">
             {provas.map((p, i) => (
-              <div key={p.n} className="hero-in flex items-baseline gap-3" style={{ animationDelay: `${300 + i * 90}ms` }}>
+              <div key={p.n} className="hero-in flex items-center gap-3 shrink-0" style={{ animationDelay: `${300 + i * 90}ms` }}>
                 <span className="display-title text-3xl md:text-4xl text-primary whitespace-nowrap">{p.n}</span>
-                <span className="text-sm text-muted-foreground leading-tight max-w-[20ch]">{p.l}</span>
+                <span className="text-sm text-muted-foreground leading-tight max-w-[26ch]">{p.l}</span>
               </div>
             ))}
             <a
               href="/teste-ia"
               onClick={() => trackCTA('hero_cta_diagnostico', 'hero_section')}
-              className="hero-in sm:col-span-3 md:col-span-1 inline-flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
+              className="hero-in lg:ml-auto inline-flex items-center gap-2 text-sm font-medium text-foreground/80 hover:text-primary transition-colors"
               style={{ animationDelay: '600ms' }}
             >
               Comece pela prova: Teste de Maturidade em IA
