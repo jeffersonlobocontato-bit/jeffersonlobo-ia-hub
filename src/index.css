@@ -307,3 +307,78 @@ h1:not(.escola *):not(.compra *) { font-size: 42px; font-weight: 500; letter-spa
 h2:not(.escola *):not(.compra *) { font-size: 32px; font-weight: 500; letter-spacing: 0; }
 h3:not(.escola *):not(.compra *):not(.site-footer__signature) { font-size: 20px; font-weight: 500; letter-spacing: 0; }
 @media (max-width: 639px) { h1:not(.escola *):not(.compra *) { font-size: 40px; } }
+
+/* ===================================================================
+   Parallax + reveal da home (motor em src/components/ScrollFX.tsx)
+   =================================================================== */
+
+/* Hero */
+.hero-fx .hero-orb {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(80px);
+  will-change: transform;
+}
+.hero-fx .hero-orb--a {
+  width: 52vw; height: 52vw; max-width: 760px; max-height: 760px;
+  right: -14vw; top: -10vh;
+  background: radial-gradient(circle, hsl(var(--primary) / 0.32), transparent 65%);
+}
+.hero-fx .hero-orb--b {
+  width: 34vw; height: 34vw; max-width: 520px; max-height: 520px;
+  left: -10vw; bottom: -12vh;
+  background: radial-gradient(circle, hsl(38 92% 55% / 0.22), transparent 65%);
+}
+.hero-fx .hero-ghost {
+  position: absolute;
+  right: -2vw;
+  bottom: 6vh;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(7rem, 24vw, 26rem);
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: transparent;
+  -webkit-text-stroke: 1px hsl(var(--foreground) / 0.07);
+  user-select: none;
+  will-change: transform;
+}
+.hero-fx .hero-content {
+  opacity: calc(1 - var(--hero-p, 0) * 1.3);
+  transform: translate3d(0, calc(var(--hero-p, 0) * 80px), 0) scale(calc(1 - var(--hero-p, 0) * 0.05));
+  transform-origin: 50% 0;
+  will-change: transform, opacity;
+}
+
+/* Headline do hero: vence a regra global de h1 (42px) */
+#home h1.hero-title {
+  font-size: clamp(2.6rem, 6.2vw, 7rem);
+  line-height: 1.02;
+}
+
+/* Entrada do hero */
+@keyframes hero-rise {
+  from { opacity: 0; transform: translate3d(0, 28px, 0); filter: blur(6px); }
+  to   { opacity: 1; transform: none; filter: none; }
+}
+.hero-in {
+  opacity: 0;
+  animation: hero-rise 0.9s cubic-bezier(0.2, 0.7, 0.1, 1) forwards;
+}
+
+/* Reveal das seções */
+[data-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 56px, 0) scale(0.985);
+  transition: opacity 0.9s cubic-bezier(0.2, 0.7, 0.1, 1), transform 1.1s cubic-bezier(0.2, 0.7, 0.1, 1);
+}
+[data-reveal].is-in {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-in { animation: none; opacity: 1; }
+  [data-reveal] { opacity: 1; transform: none; transition: none; }
+  .hero-fx .hero-content { opacity: 1; transform: none; }
+}
