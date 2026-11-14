@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 import { Copy, Check } from 'lucide-react';
-import jeffersonPortrait from '@/assets/jefferson-portrait.png';
+import jeffersonPortrait from '@/assets/jefferson-lobo-real.webp';
 import capaAsset from '@/assets/livro-del-capa-flutuante.png.asset.json';
 
 const capaFlutuante = capaAsset.url;
@@ -153,7 +153,7 @@ const LivroDel = () => {
             <img
               src={jeffersonPortrait}
               alt=""
-              className="w-full h-full object-cover object-[70%_15%] opacity-20"
+              className="w-full h-full object-cover object-[50%_30%] opacity-20"
             />
             <div className="absolute inset-0 bg-gradient-to-b from-background via-background/85 to-background" />
           </div>

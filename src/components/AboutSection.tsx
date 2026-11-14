@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import * as LucideIcons from 'lucide-react';
-import profileImg from '@/assets/profile.jpg';
+import profileImg from '@/assets/jefferson-lobo-real.webp';
 import { useAboutContent, useServices } from '@/hooks/useAboutContent';
 
 const AboutSection = () => {

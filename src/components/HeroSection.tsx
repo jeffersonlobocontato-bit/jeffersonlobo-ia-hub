@@ -1,184 +1,91 @@
 import { Button } from '@/components/ui/button';
-import { ArrowRight, BrainCircuit, BookOpen } from 'lucide-react';
+import { ArrowRight, Briefcase, Store } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import heroBg from '@/assets/jefferson-portrait.png';
-import { useHeroContent } from '@/hooks/useHeroContent';
+import portrait from '@/assets/jefferson-lobo-real.webp';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 
+/*
+ * Hero da home — Círculo Dourado (nov/2026).
+ * WHY (manifesto) abre a página; HOW no subtítulo; WHAT nos dois caminhos.
+ * A headline é fixa no código de propósito: é o posicionamento central da marca
+ * e não deve ser sobrescrita pela tabela hero_content.
+ */
 const HeroSection = () => {
-  const { data: heroData, isLoading } = useHeroContent();
   const { trackCTA } = useTrackCTA();
 
   const scrollToSection = (id: string) => {
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  const defaultData = {
-    headline: "Palestrante de Inteligência Artificial para empresas, líderes e eventos corporativos em todo o Brasil.",
-    subtitle: "Referência em IA aplicada a negócios, liderança, produtividade, governança e transformação organizacional.",
-    cta_primary: "AVALIE GRÁTIS SEU DOMÍNIO EM IA",
-    cta_secondary: "Veja o Blog",
-    cta_tertiary: "LEIA MEU LIVRO",
-    cta_tertiary_target: "/livro-del",
-    stat1_number: "127",
-    stat1_label: "Palestras realizadas",
-    stat2_number: "45+",
-    stat2_label: "Empresas transformadas",
-    stat3_number: "97%",
-    stat3_label: "Taxa de satisfação"
-  };
-
-  const displayData = heroData || defaultData;
-
-
-  // Quebra a headline e aplica destaque amarelo "highlighter" na palavra-chave
-  // Estratégia: pega as 2 últimas palavras antes de "sem perder dinheiro" ou destaca "IA"
-  const renderHeadline = (text: string) => {
-    const keywords = ['IA', 'inteligência artificial', 'Inteligência Artificial'];
-    let result: React.ReactNode = text;
-    for (const kw of keywords) {
-      const idx = text.indexOf(kw);
-      if (idx !== -1) {
-        result = (
-          <>
-            {text.slice(0, idx)}
-            <span className="highlight-yellow">{kw}</span>
-            {text.slice(idx + kw.length)}
-          </>
-        );
-        return result;
-      }
-    }
-    return text;
-  };
-
   return (
     <section
       id="home"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden bg-background pt-24"
+      className="relative min-h-screen flex items-center overflow-hidden bg-background pt-24 pb-16"
     >
-      {/* Background Image cinematográfico */}
-      <div className="absolute inset-0 z-0">
-        <img
-          src={heroBg}
-          alt="Jefferson Lobo - Especialista em IA"
-          width={1920}
-          height={1080}
-          ref={(el) => el?.setAttribute("fetchpriority", "high")}
-          decoding="async"
-          className="w-full h-full object-cover object-[50%_18%] md:object-[70%_22%]"
-        />
+      <div className="absolute inset-0 z-0 bg-brand-grid opacity-40" aria-hidden="true" />
 
-        <div className="absolute inset-0 bg-gradient-to-b from-background/85 via-background/75 to-background" />
-        <div className="absolute inset-0 bg-brand-grid opacity-40" />
-      </div>
-
-      {/* Conteúdo centralizado estilo Rundown */}
       <div className="container mx-auto px-4 z-10 relative">
-        <div className="mx-auto max-w-5xl text-center space-y-8 animate-fade-in">
+        <div className="mx-auto max-w-6xl grid gap-10 md:gap-14 md:grid-cols-[1.35fr_1fr] items-center animate-fade-in">
 
-          {/* Roles slash line (Matt Wolfe style) */}
-          <div className="roles-slash">
-            <span className="role">Palestrante de Inteligência Artificial</span>
-            <span className="sep">/</span>
-            <span className="role">Consultor em IA</span>
-            <span className="sep">/</span>
-            <span className="role">Head Executivo de Marketing</span>
+          {/* Foto — no mobile vem primeiro e menor */}
+          <div className="order-first md:order-last mx-auto w-48 sm:w-64 md:w-full max-w-md">
+            <div className="relative aspect-square rounded-2xl overflow-hidden border border-border shadow-xl">
+              <img
+                src={portrait}
+                alt="Jefferson Lobo"
+                width={1000}
+                height={1000}
+                ref={(el) => el?.setAttribute('fetchpriority', 'high')}
+                decoding="async"
+                className="w-full h-full object-cover"
+              />
+            </div>
           </div>
 
-          {isLoading ? (
-            <div className="space-y-6" aria-hidden="true">
-              <div className="mx-auto h-[2.5rem] sm:h-12 md:h-14 lg:h-16 xl:h-24 w-11/12 rounded bg-foreground/10 animate-pulse" />
-              <div className="mx-auto h-[2.5rem] sm:h-12 md:h-14 lg:h-16 xl:h-24 w-3/4 rounded bg-foreground/10 animate-pulse" />
-              <div className="mx-auto max-w-2xl h-6 md:h-8 w-full rounded bg-foreground/10 animate-pulse" />
-              <div className="mx-auto max-w-xl h-6 md:h-8 w-4/5 rounded bg-foreground/10 animate-pulse" />
+          {/* Texto */}
+          <div className="text-center md:text-left space-y-7">
+            <div className="roles-slash md:justify-start">
+              <span className="sep">IA com prova de ganho</span>
             </div>
-          ) : (
-            <>
-              {/* Headline massivo com palavra em highlighter amarelo */}
-              <h1 className="display-title text-[2.5rem] sm:text-5xl md:text-6xl lg:text-7xl xl:text-[6rem] tracking-tight break-words hyphens-none">
-                {renderHeadline(displayData.headline)}
-              </h1>
 
-              {/* Subtitle */}
-              <p className="mx-auto max-w-2xl text-lg sm:text-xl md:text-2xl text-foreground/90 font-medium">
-                {displayData.subtitle}
-              </p>
-            </>
-          )}
+            <h1 className="display-title text-[2.25rem] sm:text-5xl md:text-[3.25rem] lg:text-6xl xl:text-[4.25rem] leading-[1.08] tracking-tight break-words hyphens-none">
+              IA sem prova de ganho é <span className="highlight-yellow"><i>hora paga sem retorno</i></span> e aumento de custo.
+            </h1>
 
+            <p className="max-w-xl mx-auto md:mx-0 text-lg sm:text-xl text-foreground/90 font-medium">
+              São 34 anos de comunicação estratégica e uma operação real de IA no dia a dia.
+              Eu começo pela prova — e só depois escalo.
+            </p>
 
-          {/* CTAs — palestra é a prioridade de negócio, por isso vem primeiro e com estilo sólido */}
-          <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center items-center pt-2">
-            <Button
-              size="lg"
-              onClick={() => {
-                trackCTA('hero_cta_palestra', 'hero_section');
-                scrollToSection('palestras');
-              }}
-              className="text-base sm:text-lg px-8 py-6"
-            >
-              {displayData.cta_secondary}
-              <ArrowRight className="ml-2 w-5 h-5" />
-            </Button>
-            <Button size="lg" variant="outline" asChild className="text-base sm:text-lg px-8 py-6">
-              <a href="/teste-ia" onClick={() => trackCTA('hero_cta_diagnostico', 'hero_section')}>
-                <BrainCircuit className="mr-2 w-5 h-5" />
-                {displayData.cta_primary}
-              </a>
-            </Button>
-            {displayData.cta_tertiary && (
+            <div className="flex flex-col sm:flex-row flex-wrap gap-4 justify-center md:justify-start items-center pt-1">
               <Button
                 size="lg"
-                variant="outline"
-                asChild
-                className="text-base sm:text-lg px-8 py-6 border-primary/30 hover:bg-primary/10"
+                onClick={() => {
+                  trackCTA('hero_cta_empresas', 'hero_section');
+                  scrollToSection('palestras');
+                }}
+                className="text-base sm:text-lg px-8 py-6"
               >
-                {(() => {
-                  const target = displayData.cta_tertiary_target || '#livro';
-                  const label = displayData.cta_tertiary;
-                  const handleClick = () => trackCTA('hero_cta_livro', 'hero_section');
-                  if (target.startsWith('#')) {
-                    return (
-                      <a
-                        href={target}
-                        onClick={(e) => {
-                          e.preventDefault();
-                          handleClick();
-                          scrollToSection(target.replace('#', ''));
-                        }}
-                      >
-                        <BookOpen className="mr-2 w-5 h-5" />
-                        {label}
-                      </a>
-                    );
-                  }
-                  if (target.startsWith('/')) {
-                    return (
-                      <Link to={target} onClick={handleClick}>
-                        <BookOpen className="mr-2 w-5 h-5" />
-                        {label}
-                      </Link>
-                    );
-                  }
-                  return (
-                    <a href={target} target="_blank" rel="noopener noreferrer" onClick={handleClick}>
-                      <BookOpen className="mr-2 w-5 h-5" />
-                      {label}
-                    </a>
-                  );
-                })()}
+                <Briefcase className="mr-2 w-5 h-5" />
+                Para empresas
               </Button>
-            )}
+              <Button size="lg" variant="outline" asChild className="text-base sm:text-lg px-8 py-6">
+                <Link to="/cursos" onClick={() => trackCTA('hero_cta_negocio', 'hero_section')}>
+                  <Store className="mr-2 w-5 h-5" />
+                  Para o seu negócio
+                </Link>
+              </Button>
+            </div>
+
+            <a
+              href="/teste-ia"
+              onClick={() => trackCTA('hero_cta_diagnostico', 'hero_section')}
+              className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors"
+            >
+              Comece pela prova: faça o Teste de Maturidade em IA
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </div>
-
-        </div>
-      </div>
-
-      {/* Scroll Indicator */}
-      <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-10 animate-bounce hidden md:block">
-        <div className="w-6 h-10 border-2 border-primary/50 rounded-full p-1">
-          <div className="w-1 h-3 bg-primary rounded-full mx-auto animate-pulse" />
         </div>
       </div>
     </section>
