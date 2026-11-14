@@ -11,7 +11,11 @@ export interface KnowledgeDoc {
   conteudo: string;
 }
 
+import { PORTFOLIO_DOCS } from './uivo-portfolio.ts';
+
 export const KNOWLEDGE_DOCUMENTS: KnowledgeDoc[] = [
+  // Portfólio atual (Academia, livro, serviços, posicionamento) — fonte em uivo-portfolio.ts
+  ...PORTFOLIO_DOCS,
   {
     titulo: 'Método DEL - Visão Geral',
     fonte: 'Livro Método DEL',

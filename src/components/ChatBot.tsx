@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { MessageCircle, Send, X, Loader2, Sparkles } from 'lucide-react';
+import { MessageCircle, Send, X, Loader2, Sparkles, ArrowRight } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 
 interface Message {
@@ -11,12 +11,74 @@ interface Message {
 }
 
 const WHATSAPP_NUMBER = '5545999864213'; // (45) 99986-4213
+const LEAD_STORAGE_KEY = 'uivo-lobo-lead';
 
-const processMessageContent = (content: string, onGoToTest: () => void) => {
-  // Substituir [LINK_WHATSAPP]/[LINK_TESTE]texto[/...] por botões clicáveis
-  const parts = content.split(/(\[LINK_WHATSAPP\].*?\[\/LINK_WHATSAPP\]|\[LINK_TESTE\].*?\[\/LINK_TESTE\])/g);
+// Rotas que o Uivo pode transformar em botão ([LINK:/rota]texto[/LINK]).
+// Espelho de ROTAS_PERMITIDAS em supabase/functions/_shared/uivo-portfolio.ts.
+const ROTAS_PERMITIDAS = new Set([
+  '/cursos',
+  '/cursos/ilha',
+  '/cursos/pocket/configurei-o-claude-errado',
+  '/cursos/pocket/claude-com-a-sua-voz',
+  '/cursos/pocket/do-roteiro-a-postagem',
+  '/cursos/entrar',
+  '/livro-del',
+  '/palestras-ia',
+  '/consultoria-ia',
+  '/workshop-ia',
+  '/teste-ia',
+  '/materiais',
+  '/blog',
+  '/imprensa',
+  '/jefferson-lobo',
+]);
+
+type LeadSalvo = { nome?: string; apelido?: string; whatsapp?: string };
+
+const lerLeadSalvo = (): LeadSalvo => {
+  try {
+    const raw = localStorage.getItem(LEAD_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as LeadSalvo) : {};
+  } catch {
+    return {};
+  }
+};
+
+const salvarLead = (lead: LeadSalvo) => {
+  try {
+    localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(lead));
+  } catch {
+    /* navegador sem storage: segue sem lembrar */
+  }
+};
+
+const processMessageContent = (
+  content: string,
+  onGoToTest: () => void,
+  onGoTo: (rota: string) => void,
+) => {
+  // Substituir [LINK_WHATSAPP]/[LINK_TESTE]/[LINK:/rota]texto[/...] por botões clicáveis
+  const parts = content.split(/(\[LINK_WHATSAPP\].*?\[\/LINK_WHATSAPP\]|\[LINK_TESTE\].*?\[\/LINK_TESTE\]|\[LINK:[^\]]+\].*?\[\/LINK\])/g);
 
   return parts.map((part, index) => {
+    const rotaMatch = part.match(/\[LINK:([^\]]+)\](.*?)\[\/LINK\]/);
+    if (rotaMatch) {
+      const rota = rotaMatch[1].trim().split('#')[0];
+      const texto = rotaMatch[2];
+      // Rota fora da lista: mostra só o texto, sem link (o modelo inventou)
+      if (!ROTAS_PERMITIDAS.has(rota)) return <ReactMarkdown key={index}>{texto}</ReactMarkdown>;
+      return (
+        <button
+          key={index}
+          type="button"
+          className="my-2 inline-flex w-full max-w-full items-start gap-2 rounded-md border border-primary/60 bg-primary/10 px-3 py-2 text-left text-xs font-medium text-foreground hover:bg-primary/20 whitespace-normal break-words"
+          onClick={() => onGoTo(rota)}
+        >
+          <ArrowRight className="w-3 h-3 mt-0.5 shrink-0 text-primary" />
+          <span className="flex-1 break-words">{texto}</span>
+        </button>
+      );
+    }
     const waMatch = part.match(/\[LINK_WHATSAPP\](.*?)\[\/LINK_WHATSAPP\]/);
     if (waMatch) {
       return (
@@ -55,12 +117,12 @@ const ChatBot = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [leadCaptured, setLeadCaptured] = useState(false);
-  const [leadData, setLeadData] = useState<{
-    nome?: string;
-    apelido?: string;
-    whatsapp?: string;
-  }>({});
+  // Visitante que já se identificou antes é lembrado neste navegador
+  const [leadData, setLeadData] = useState<LeadSalvo>(() => lerLeadSalvo());
+  const [leadCaptured, setLeadCaptured] = useState(() => {
+    const l = lerLeadSalvo();
+    return Boolean(l.nome && l.whatsapp);
+  });
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
@@ -112,6 +174,7 @@ const ChatBot = () => {
       if (currentLeadData.nome && currentLeadData.whatsapp) {
         setLeadCaptured(true);
         setLeadData(currentLeadData);
+        salvarLead(currentLeadData);
         shouldSaveLead = true;
         console.log("✅ Lead completo capturado:", currentLeadData);
       }
@@ -120,9 +183,15 @@ const ChatBot = () => {
     // Extrair possíveis interesses da conversa
     const interesses: string[] = [];
     const keywords = [
-      'método del', 'del', 'consultoria', 'treinamento', 'curso', 'ia', 
-      'inteligência artificial', 'agente', 'automação', 'livro', 'teste',
-      'maturidade', 'implementação', 'empresa', 'estratégia', 'governança'
+      // empresas
+      'palestra', 'evento', 'workshop', 'treinamento', 'consultoria', 'governança',
+      'estratégia', 'empresa', 'equipe', 'roi', 'implementação', 'maturidade', 'teste',
+      // academia / pequeno negócio
+      'curso', 'ilha', 'reels', 'reel', 'carrossel', 'stories', 'conteúdo', 'instagram',
+      'pocket', 'claude', 'e-book', 'ebook', 'skills', 'guia', 'foto', 'whatsapp',
+      'atendimento', 'direct', 'meu negócio', 'loja',
+      // método e livro
+      'método del', 'sua voz', 'minha voz', 'livro', 'agente', 'automação',
     ];
     
     const textLower = input.toLowerCase();
@@ -153,7 +222,8 @@ const ChatBot = () => {
           mensagens: updatedMessages.map(m => ({ role: m.role, content: m.content })),
           interesses,
         };
-      } else if (leadCaptured && interesses.length > 0) {
+      } else if (leadCaptured && leadData.nome && leadData.whatsapp) {
+        // Sempre manda a identificação: o servidor usa para lembrar o visitante
         console.log("🔵 ChatBot - Atualizando lead existente");
         requestBody.leadData = {
           ...leadData,
@@ -309,8 +379,17 @@ const ChatBot = () => {
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {messages.length === 0 && (
           <div className="text-center text-muted-foreground text-sm py-8">
-            Olá! Sou o Uivo do Lobo 🐺<br />
-            Como posso te ajudar hoje?
+            {leadCaptured && (leadData.apelido || leadData.nome) ? (
+              <>
+                Que bom te ver de novo, {leadData.apelido || leadData.nome}! 🐺<br />
+                Em que posso te ajudar hoje?
+              </>
+            ) : (
+              <>
+                Olá! Sou o Uivo do Lobo 🐺<br />
+                Te ajudo a achar o caminho certo: IA para a sua empresa ou para o seu negócio.
+              </>
+            )}
           </div>
         )}
         {messages.map((message, index) => (
@@ -329,10 +408,17 @@ const ChatBot = () => {
                 <p className="text-sm whitespace-pre-wrap">{message.content}</p>
               ) : (
                 <div className="text-sm prose prose-sm max-w-none dark:prose-invert">
-                  {processMessageContent(message.content, () => {
-                    setIsOpen(false);
-                    navigate('/teste-ia');
-                  })}
+                  {processMessageContent(
+                    message.content,
+                    () => {
+                      setIsOpen(false);
+                      navigate('/teste-ia');
+                    },
+                    (rota) => {
+                      setIsOpen(false);
+                      navigate(rota);
+                    },
+                  )}
                 </div>
               )}
             </div>
