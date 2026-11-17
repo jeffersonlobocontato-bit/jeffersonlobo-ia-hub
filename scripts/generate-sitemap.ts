@@ -290,6 +290,7 @@ function writeLlmsTxt(blogPosts: BlogPostRow[]) {
   lines.push(`- [Palestrante de Inteligência Artificial no Paraná](${BASE_URL}/palestrante-inteligencia-artificial-parana-brasil): atuação regional consolidada no Paraná (ADJORI-PR, CNI, MIT, Sistema Fiep), dentro de uma atuação nacional.`);
   lines.push(`- [Palestras de Inteligência Artificial](${BASE_URL}/palestras-ia): keynotes presenciais e online sobre IA generativa, agentes, marketing e estratégia — para convenções, kickoffs, lideranças C-level e eventos corporativos em todo o Brasil.`);
   lines.push(`- [Workshop de IA in-company](${BASE_URL}/workshop-ia): imersões práticas (mão na massa) para times aplicarem IA generativa em fluxos reais da própria empresa, com ou sem conhecimento prévio.`);
+  lines.push(`- [Método Prova de Ganho](${BASE_URL}/provadeganho): método de gestão de projetos de IA em cinco fases (Panorama, Rota, Ensaio, Escala e Rotina) e quatro portões de decisão, conduzido pela Agência de Inteligência Vozes com projetos liderados por Jefferson Lobo. Só escala o que provou ganho; o que está em produção é medido todo mês em quatro ganhos: previsto, realizado, capacidade liberada e custo evitado. Começa por um diagnóstico de 3 a 4 semanas.`);
   lines.push(`- [Consultoria de Inteligência Artificial](${BASE_URL}/consultoria-ia): acompanhamento estratégico para diretoria e C-level — diagnóstico de maturidade, roadmap de 12 meses, governança e orquestração de fluxos com identidade de marca.`);
   lines.push('');
   lines.push('## Livro e Método DEL');
@@ -377,6 +378,7 @@ async function main() {
     { path: "/palestrante-inteligencia-artificial-parana-brasil", lastmod: today, changefreq: "monthly", priority: "0.85" },
     { path: "/workshop-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
     { path: "/consultoria-ia", lastmod: today, changefreq: "monthly", priority: "0.9" },
+    { path: "/provadeganho", lastmod: today, changefreq: "monthly", priority: "0.95" },
     { path: "/teste-ia", lastmod: today, changefreq: "monthly", priority: "0.8" },
     { path: "/imprensa", lastmod: today, changefreq: "monthly", priority: "0.6" },
     { path: "/jefferson-lobo", lastmod: today, changefreq: "monthly", priority: "0.8" },
