@@ -43,6 +43,7 @@ const PalestranteIA = lazyComPreload(() => import("./pages/PalestranteIA"));
 const PalestranteIAParana = lazyComPreload(() => import("./pages/PalestranteIAParana"));
 const WorkshopIA = lazyComPreload(() => import("./pages/WorkshopIA"));
 const ConsultoriaIA = lazyComPreload(() => import("./pages/ConsultoriaIA"));
+const ProvaDeGanho = lazyComPreload(() => import("./pages/ProvaDeGanho"));
 const BlogIndex = lazy(() => import("./pages/BlogIndex"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
 const PressReleaseOG = lazy(() => import("./pages/PressReleaseOG"));
@@ -102,6 +103,7 @@ export const ROTAS_PRERENDER: Record<string, Precarregavel> = {
   "/palestras-ia": PalestrasIA,
   "/workshop-ia": WorkshopIA,
   "/consultoria-ia": ConsultoriaIA,
+  "/provadeganho": ProvaDeGanho,
   "/livro-del": LivroDel,
   "/jefferson-lobo": JeffersonLobo,
   "/imprensa": Imprensa,
@@ -140,6 +142,9 @@ const App = ({ Roteador = RoteadorPadrao }: { Roteador?: ComponentType<{ childre
               <Route path="/palestrante-inteligencia-artificial-parana" element={<Navigate to="/palestrante-inteligencia-artificial-parana-brasil" replace />} />
               <Route path="/workshop-ia" element={comSuspense(<WorkshopIA />)} />
               <Route path="/consultoria-ia" element={comSuspense(<ConsultoriaIA />)} />
+              <Route path="/provadeganho" element={comSuspense(<ProvaDeGanho />)} />
+              <Route path="/prova-de-ganho" element={<Navigate to="/provadeganho" replace />} />
+              <Route path="/metodo" element={<Navigate to="/provadeganho" replace />} />
               <Route path="/blog" element={comSuspense(<BlogIndex />)} />
               <Route path="/blog/:slug" element={comSuspense(<BlogPost />)} />
               <Route path="/materiais" element={comSuspense(<Materiais />)} />
