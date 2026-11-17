@@ -2,6 +2,7 @@ import { SEO } from '@/components/SEO';
 import Header from '@/components/Header';
 import HeroSection from '@/components/HeroSection';
 import TesteIASection from '@/components/TesteIASection';
+import MetodoSection from '@/components/MetodoSection';
 import AcademiaSection from '@/components/AcademiaSection';
 import LogosBarSection from '@/components/LogosBarSection';
 import PalestrasSection from '@/components/PalestrasSection';
@@ -43,6 +44,7 @@ const Index = () => {
       <Header />
       <main className="relative z-[1]">
         <HeroSection />
+        <Reveal><MetodoSection /></Reveal>
         <Divider />
         <Reveal><TesteIASection /></Reveal>
         <Reveal><AcademiaSection /></Reveal>
