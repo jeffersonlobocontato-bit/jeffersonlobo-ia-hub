@@ -65,6 +65,13 @@ const Header = () => {
               </Button>
             ))}
             <Link
+              to="/provadeganho"
+              className="text-xs font-medium uppercase tracking-wider text-primary transition-colors hover:text-primary/80"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Método
+            </Link>
+            <Link
               to="/livro-del"
               className="text-xs font-medium uppercase tracking-wider text-foreground/85 transition-colors hover:text-primary"
               style={{ fontFamily: "'IBM Plex Mono', monospace" }}
@@ -141,6 +148,14 @@ const Header = () => {
                 {item}
               </Button>
             ))}
+            <Link
+              to="/provadeganho"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="block w-full text-left py-3 text-sm font-medium uppercase tracking-wider text-primary hover:text-primary/80 transition-colors"
+              style={{ fontFamily: "'IBM Plex Mono', monospace" }}
+            >
+              Método
+            </Link>
             <Link
               to="/livro-del"
               onClick={() => setIsMobileMenuOpen(false)}

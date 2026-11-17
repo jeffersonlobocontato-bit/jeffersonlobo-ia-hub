@@ -25,6 +25,7 @@ const ROTAS_PERMITIDAS = new Set([
   '/livro-del',
   '/palestras-ia',
   '/consultoria-ia',
+  '/provadeganho',
   '/workshop-ia',
   '/teste-ia',
   '/materiais',

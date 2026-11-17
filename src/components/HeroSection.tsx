@@ -18,10 +18,6 @@ const provas = [
 const HeroSection = () => {
   const { trackCTA } = useTrackCTA();
 
-  const scrollToSection = (id: string) => {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   return (
     <section id="home" className="hero-fx relative min-h-[100svh] flex flex-col overflow-hidden bg-background pt-28 md:pt-32">
       {/* Camadas de fundo (parallax) */}
@@ -53,16 +49,11 @@ const HeroSection = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4">
-              <Button
-                size="lg"
-                onClick={() => {
-                  trackCTA('hero_cta_empresas', 'hero_section');
-                  scrollToSection('palestras');
-                }}
-                className="text-base sm:text-lg px-8 py-6"
-              >
-                <Briefcase className="mr-2 w-5 h-5" />
-                Para empresas
+              <Button size="lg" asChild className="text-base sm:text-lg px-8 py-6">
+                <Link to="/provadeganho" onClick={() => trackCTA('hero_cta_empresas', 'hero_section')}>
+                  <Briefcase className="mr-2 w-5 h-5" />
+                  Para empresas
+                </Link>
               </Button>
               <Button size="lg" variant="outline" asChild className="text-base sm:text-lg px-8 py-6">
                 <Link to="/cursos" onClick={() => trackCTA('hero_cta_negocio', 'hero_section')}>
