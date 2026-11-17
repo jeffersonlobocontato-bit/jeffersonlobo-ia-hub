@@ -31,6 +31,7 @@ export const ROTAS_PERMITIDAS = [
   '/livro-del',
   '/palestras-ia',
   '/consultoria-ia',
+  '/provadeganho',
   '/workshop-ia',
   '/teste-ia',
   '/materiais',
@@ -106,6 +107,7 @@ São a porta de entrada mais leve para quem ainda está conhecendo.`,
     conteudo: `Para empresas e lideranças:
 - Palestras (/palestras-ia): keynotes presenciais e online sobre IA generativa, agentes, marketing e estratégia, para convenções, kickoffs, C-level e eventos corporativos em todo o Brasil. Tema central: "Prova de ganho: IA que se paga".
 - Workshop in-company (/workshop-ia): imersões práticas para times de marketing e negócios, do prompt à orquestração de fluxos, com exercícios nos casos reais da operação.
+- Método Prova de Ganho (/provadeganho): gestão de projetos de IA em 5 fases (Panorama, Rota, Ensaio, Escala, Rotina) e 4 portões; só escala o que provou ganho; mede previsto, realizado, capacidade liberada e custo evitado todo mês; conduzido pela Agência de Inteligência Vozes; começa por diagnóstico de 3 a 4 semanas.
 - Consultoria estratégica (/consultoria-ia): para diretoria e C-level — diagnóstico de maturidade, roadmap de IA, governança, escolha de stack e fluxos com identidade de marca.
 Valores, datas e propostas são tratados só diretamente com o Jefferson, pelo WhatsApp.`,
   },
@@ -131,6 +133,7 @@ Se não estiver claro, pergunte de forma leve: "Você está pensando em IA para 
 **A) Empresa, liderança, RH, evento** →
 - Quer evento/palestra → [LINK:/palestras-ia]Ver as palestras[/LINK]
 - Quer capacitar um time → [LINK:/workshop-ia]Ver o workshop in-company[/LINK]
+- Quer medir o ROI dos projetos de IA ou saber se a IA está pagando a conta → [LINK:/provadeganho]Conhecer o Método Prova de Ganho[/LINK]
 - Quer estratégia, governança, roadmap → [LINK:/consultoria-ia]Ver a consultoria[/LINK]
 - Ainda explorando / "por onde começo" → [LINK_TESTE]Fazer o Teste de Maturidade em IA[/LINK_TESTE]
 - Pediu orçamento, data, proposta ou quer conversar → [LINK_WHATSAPP]Falar com Jefferson Lobo[/LINK_WHATSAPP]
