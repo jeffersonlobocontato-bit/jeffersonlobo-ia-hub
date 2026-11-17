@@ -1,0 +1,461 @@
+import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { MessageCircle, Send, X, Loader2, Sparkles, ArrowRight } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+
+interface Message {
+  role: 'user' | 'assistant';
+  content: string;
+}
+
+const WHATSAPP_NUMBER = '5545999864213'; // (45) 99986-4213
+const LEAD_STORAGE_KEY = 'uivo-lobo-lead';
+
+// Rotas que o Uivo pode transformar em botão ([LINK:/rota]texto[/LINK]).
+// Espelho de ROTAS_PERMITIDAS em supabase/functions/_shared/uivo-portfolio.ts.
+const ROTAS_PERMITIDAS = new Set([
+  '/cursos',
+  '/cursos/ilha',
+  '/cursos/pocket/configurei-o-claude-errado',
+  '/cursos/pocket/claude-com-a-sua-voz',
+  '/cursos/pocket/do-roteiro-a-postagem',
+  '/cursos/entrar',
+  '/livro-del',
+  '/palestras-ia',
+  '/consultoria-ia',
+  '/provadeganho',
+  '/workshop-ia',
+  '/teste-ia',
+  '/materiais',
+  '/blog',
+  '/imprensa',
+  '/jefferson-lobo',
+]);
+
+type LeadSalvo = { nome?: string; apelido?: string; whatsapp?: string };
+
+const lerLeadSalvo = (): LeadSalvo => {
+  try {
+    const raw = localStorage.getItem(LEAD_STORAGE_KEY);
+    return raw ? (JSON.parse(raw) as LeadSalvo) : {};
+  } catch {
+    return {};
+  }
+};
+
+const salvarLead = (lead: LeadSalvo) => {
+  try {
+    localStorage.setItem(LEAD_STORAGE_KEY, JSON.stringify(lead));
+  } catch {
+    /* navegador sem storage: segue sem lembrar */
+  }
+};
+
+const processMessageContent = (
+  content: string,
+  onGoToTest: () => void,
+  onGoTo: (rota: string) => void,
+) => {
+  // Substituir [LINK_WHATSAPP]/[LINK_TESTE]/[LINK:/rota]texto[/...] por botões clicáveis
+  const parts = content.split(/(\[LINK_WHATSAPP\].*?\[\/LINK_WHATSAPP\]|\[LINK_TESTE\].*?\[\/LINK_TESTE\]|\[LINK:[^\]]+\].*?\[\/LINK\])/g);
+
+  return parts.map((part, index) => {
+    const rotaMatch = part.match(/\[LINK:([^\]]+)\](.*?)\[\/LINK\]/);
+    if (rotaMatch) {
+      const rota = rotaMatch[1].trim().split('#')[0];
+      const texto = rotaMatch[2];
+      // Rota fora da lista: mostra só o texto, sem link (o modelo inventou)
+      if (!ROTAS_PERMITIDAS.has(rota)) return <ReactMarkdown key={index}>{texto}</ReactMarkdown>;
+      return (
+        <button
+          key={index}
+          type="button"
+          className="my-2 inline-flex w-full max-w-full items-start gap-2 rounded-md border border-primary/60 bg-primary/10 px-3 py-2 text-left text-xs font-medium text-foreground hover:bg-primary/20 whitespace-normal break-words"
+          onClick={() => onGoTo(rota)}
+        >
+          <ArrowRight className="w-3 h-3 mt-0.5 shrink-0 text-primary" />
+          <span className="flex-1 break-words">{texto}</span>
+        </button>
+      );
+    }
+    const waMatch = part.match(/\[LINK_WHATSAPP\](.*?)\[\/LINK_WHATSAPP\]/);
+    if (waMatch) {
+      return (
+        <button
+          key={index}
+          type="button"
+          className="my-2 inline-flex w-full max-w-full items-start gap-2 rounded-md bg-green-600 px-3 py-2 text-left text-xs font-medium text-white hover:bg-green-700 whitespace-normal break-words"
+          onClick={() => window.open(`https://wa.me/${WHATSAPP_NUMBER}`, '_blank')}
+        >
+          <MessageCircle className="w-3 h-3 mt-0.5 shrink-0" />
+          <span className="flex-1 break-words">{waMatch[1]}</span>
+        </button>
+      );
+    }
+    const testeMatch = part.match(/\[LINK_TESTE\](.*?)\[\/LINK_TESTE\]/);
+    if (testeMatch) {
+      return (
+        <button
+          key={index}
+          type="button"
+          className="my-2 inline-flex w-full max-w-full items-start gap-2 rounded-md bg-primary px-3 py-2 text-left text-xs font-medium text-primary-foreground hover:bg-primary/90 whitespace-normal break-words"
+          onClick={onGoToTest}
+        >
+          <Sparkles className="w-3 h-3 mt-0.5 shrink-0" />
+          <span className="flex-1 break-words">{testeMatch[1]}</span>
+        </button>
+      );
+    }
+    return <ReactMarkdown key={index}>{part}</ReactMarkdown>;
+  });
+};
+
+const ChatBot = () => {
+  const navigate = useNavigate();
+  const [isOpen, setIsOpen] = useState(false);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  // Visitante que já se identificou antes é lembrado neste navegador
+  const [leadData, setLeadData] = useState<LeadSalvo>(() => lerLeadSalvo());
+  const [leadCaptured, setLeadCaptured] = useState(() => {
+    const l = lerLeadSalvo();
+    return Boolean(l.nome && l.whatsapp);
+  });
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
+
+  const sendMessage = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage: Message = { role: 'user', content: input };
+    const updatedMessages = [...messages, userMessage];
+    setMessages(updatedMessages);
+    setInput('');
+    setIsLoading(true);
+
+    // Detectar nome, apelido e WhatsApp de forma clara e separada
+    let currentLeadData = { ...leadData };
+    let shouldSaveLead = false;
+
+    if (!leadCaptured && updatedMessages.filter(m => m.role === 'user').length <= 3) {
+      const trimmedInput = input.trim();
+      
+      // Tentar extrair WhatsApp (padrões: (11) 98765-4321, 11987654321, 11 98765-4321, etc.)
+      const phoneMatch = trimmedInput.match(/(?:\(?\d{2}\)?\s*)?9?\d{4}[-\s]?\d{4}/);
+      const isPhoneMessage = phoneMatch && phoneMatch[0].replace(/\D/g, '').length >= 10;
+      
+      if (isPhoneMessage && !currentLeadData.whatsapp) {
+        // É um telefone - salvar apenas como WhatsApp
+        currentLeadData.whatsapp = phoneMatch[0].replace(/\D/g, '');
+        console.log("📱 Telefone capturado:", currentLeadData.whatsapp);
+      } else if (!isPhoneMessage && trimmedInput.length > 0) {
+        // Não é telefone - é nome ou apelido
+        if (!currentLeadData.nome) {
+          // Primeira informação de texto é o nome
+          currentLeadData.nome = trimmedInput;
+          console.log("👤 Nome capturado:", currentLeadData.nome);
+        } else if (!currentLeadData.apelido && trimmedInput !== currentLeadData.nome) {
+          // Segunda informação de texto diferente do nome é o apelido
+          currentLeadData.apelido = trimmedInput;
+          console.log("✏️ Apelido capturado:", currentLeadData.apelido);
+        }
+      }
+
+      // Se tem todos os dados obrigatórios, marcar como capturado
+      if (currentLeadData.nome && currentLeadData.whatsapp) {
+        setLeadCaptured(true);
+        setLeadData(currentLeadData);
+        salvarLead(currentLeadData);
+        shouldSaveLead = true;
+        console.log("✅ Lead completo capturado:", currentLeadData);
+      }
+    }
+
+    // Extrair possíveis interesses da conversa
+    const interesses: string[] = [];
+    const keywords = [
+      // empresas
+      'palestra', 'evento', 'workshop', 'treinamento', 'consultoria', 'governança',
+      'estratégia', 'empresa', 'equipe', 'roi', 'implementação', 'maturidade', 'teste',
+      // academia / pequeno negócio
+      'curso', 'ilha', 'reels', 'reel', 'carrossel', 'stories', 'conteúdo', 'instagram',
+      'pocket', 'claude', 'e-book', 'ebook', 'skills', 'guia', 'foto', 'whatsapp',
+      'atendimento', 'direct', 'meu negócio', 'loja',
+      // método e livro
+      'método del', 'sua voz', 'minha voz', 'livro', 'agente', 'automação',
+    ];
+    
+    const textLower = input.toLowerCase();
+    keywords.forEach(keyword => {
+      if (textLower.includes(keyword)) {
+        interesses.push(keyword);
+      }
+    });
+
+    try {
+      const CHAT_URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/chat-uivo-lobo`;
+      
+      console.log("🔵 ChatBot - Preparando requisição:", {
+        chatUrl: CHAT_URL,
+        shouldSaveLead,
+        leadCaptured,
+        currentLeadData,
+        interessesLength: interesses.length
+      });
+
+      const requestBody: any = { messages: updatedMessages };
+      
+      // Se deve salvar o lead, incluir leadData
+      if (shouldSaveLead) {
+        console.log("🔵 ChatBot - Salvando novo lead");
+        requestBody.leadData = {
+          ...currentLeadData,
+          mensagens: updatedMessages.map(m => ({ role: m.role, content: m.content })),
+          interesses,
+        };
+      } else if (leadCaptured && leadData.nome && leadData.whatsapp) {
+        // Sempre manda a identificação: o servidor usa para lembrar o visitante
+        console.log("🔵 ChatBot - Atualizando lead existente");
+        requestBody.leadData = {
+          ...leadData,
+          mensagens: [{ role: userMessage.role, content: userMessage.content }],
+          interesses,
+        };
+      }
+
+      console.log("🔵 ChatBot - Request body:", JSON.stringify(requestBody, null, 2));
+      
+      const response = await fetch(CHAT_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      console.log("🔵 ChatBot - Resposta:", {
+        ok: response.ok,
+        status: response.status,
+        statusText: response.statusText
+      });
+
+      if (!response.ok || !response.body) {
+        throw new Error('Erro ao processar resposta');
+      }
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let assistantContent = '';
+      let textBuffer = '';
+      let streamDone = false;
+
+      // Adiciona mensagem do assistente vazia
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }]);
+
+      while (!streamDone) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        
+        textBuffer += decoder.decode(value, { stream: true });
+
+        let newlineIndex: number;
+        while ((newlineIndex = textBuffer.indexOf('\n')) !== -1) {
+          let line = textBuffer.slice(0, newlineIndex);
+          textBuffer = textBuffer.slice(newlineIndex + 1);
+
+          if (line.endsWith('\r')) line = line.slice(0, -1);
+          if (line.startsWith(':') || line.trim() === '') continue;
+          if (!line.startsWith('data: ')) continue;
+
+          const jsonStr = line.slice(6).trim();
+          if (jsonStr === '[DONE]') {
+            streamDone = true;
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1].content = assistantContent;
+                return newMessages;
+              });
+            }
+          } catch {
+            textBuffer = line + '\n' + textBuffer;
+            break;
+          }
+        }
+      }
+
+      // Flush final
+      if (textBuffer.trim()) {
+        for (let raw of textBuffer.split('\n')) {
+          if (!raw || raw.startsWith(':') || !raw.startsWith('data: ')) continue;
+          const jsonStr = raw.slice(6).trim();
+          if (jsonStr === '[DONE]') continue;
+          try {
+            const parsed = JSON.parse(jsonStr);
+            const content = parsed.choices?.[0]?.delta?.content;
+            if (content) {
+              assistantContent += content;
+              setMessages(prev => {
+                const newMessages = [...prev];
+                newMessages[newMessages.length - 1].content = assistantContent;
+                return newMessages;
+              });
+            }
+          } catch {}
+        }
+      }
+
+    } catch (error) {
+      console.error('❌ ChatBot - Erro completo:', error);
+      console.error('❌ ChatBot - Error stack:', (error as any)?.stack);
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'Desculpe, ocorreu um erro. Tente novamente.'
+      }]);
+    } finally {
+      setIsLoading(false);
+      console.log("🔵 ChatBot - Loading desativado");
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  };
+
+  if (!isOpen) {
+    return (
+      <Button
+        onClick={() => setIsOpen(true)}
+        className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 h-14 w-14 rounded-full shadow-lg bg-gradient-to-r from-primary via-secondary to-primary animate-pulse-glow hover:scale-110 transition-transform z-50"
+        size="icon"
+      >
+        <MessageCircle className="h-6 w-6" />
+      </Button>
+    );
+  }
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 sm:bottom-6 sm:right-6 sm:left-auto w-full sm:w-96 h-[100dvh] sm:h-[600px] bg-card border-t sm:border border-border sm:rounded-lg shadow-2xl flex flex-col z-50">
+      <div className="flex items-center justify-between p-4 border-b border-border bg-gradient-to-r from-primary/10 to-secondary/10">
+        <div className="flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-gradient-to-r from-primary to-secondary flex items-center justify-center">
+            <MessageCircle className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <div>
+            <h3 className="font-semibold text-sm">Uivo do Lobo</h3>
+            <p className="text-xs text-muted-foreground">Assistente IA</p>
+          </div>
+        </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          onClick={() => setIsOpen(false)}
+          className="h-8 w-8"
+        >
+          <X className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 && (
+          <div className="text-center text-muted-foreground text-sm py-8">
+            {leadCaptured && (leadData.apelido || leadData.nome) ? (
+              <>
+                Que bom te ver de novo, {leadData.apelido || leadData.nome}! 🐺<br />
+                Em que posso te ajudar hoje?
+              </>
+            ) : (
+              <>
+                Olá! Sou o Uivo do Lobo 🐺<br />
+                Te ajudo a achar o caminho certo: IA para a sua empresa ou para o seu negócio.
+              </>
+            )}
+          </div>
+        )}
+        {messages.map((message, index) => (
+          <div
+            key={index}
+            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+          >
+            <div
+              className={`max-w-[80%] rounded-lg p-3 ${
+                message.role === 'user'
+                  ? 'bg-primary text-primary-foreground'
+                  : 'bg-muted text-foreground'
+              }`}
+            >
+              {message.role === 'user' ? (
+                <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+              ) : (
+                <div className="text-sm prose prose-sm max-w-none dark:prose-invert">
+                  {processMessageContent(
+                    message.content,
+                    () => {
+                      setIsOpen(false);
+                      navigate('/teste-ia');
+                    },
+                    (rota) => {
+                      setIsOpen(false);
+                      navigate(rota);
+                    },
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        ))}
+        {isLoading && (
+          <div className="flex justify-start">
+            <div className="bg-muted rounded-lg p-3">
+              <Loader2 className="h-4 w-4 animate-spin" />
+            </div>
+          </div>
+        )}
+        <div ref={messagesEndRef} />
+      </div>
+
+      <div className="p-4 border-t border-border">
+        <div className="flex gap-2">
+          <Input
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Digite sua mensagem..."
+            disabled={isLoading}
+            className="flex-1"
+          />
+          <Button
+            onClick={sendMessage}
+            disabled={isLoading || !input.trim()}
+            size="icon"
+          >
+            <Send className="h-4 w-4" />
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default ChatBot;
