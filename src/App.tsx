@@ -28,6 +28,11 @@ const IrParaTeleprompter = () => {
   return null;
 };
 
+const IrParaClaude = () => {
+  window.location.replace("/claude.html");
+  return null;
+};
+
 // Todas as páginas carregam sob demanda: nenhuma rota pesa no bundle inicial das outras.
 const Index = lazyComPreload(() => import("./pages/Index"));
 const Auth = lazy(() => import("./pages/Auth"));
@@ -179,6 +184,7 @@ const App = ({ Roteador = RoteadorPadrao }: { Roteador?: ComponentType<{ childre
               />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="/teleprompter" element={<IrParaTeleprompter />} />
+              <Route path="/claude" element={<IrParaClaude />} />
               <Route path="*" element={comSuspense(<NotFound />)} />
             </Routes>
           </AnalyticsTracker>
