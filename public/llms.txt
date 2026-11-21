@@ -16,6 +16,7 @@ Referência nacional em IA aplicada a negócios. Atende todo o Brasil, presencia
 - [Palestrante de Inteligência Artificial no Paraná](https://jeffersonlobo.tech/palestrante-inteligencia-artificial-parana-brasil): atuação regional consolidada no Paraná (ADJORI-PR, CNI, MIT, Sistema Fiep), dentro de uma atuação nacional.
 - [Palestras de Inteligência Artificial](https://jeffersonlobo.tech/palestras-ia): keynotes presenciais e online sobre IA generativa, agentes, marketing e estratégia — para convenções, kickoffs, lideranças C-level e eventos corporativos em todo o Brasil.
 - [Workshop de IA in-company](https://jeffersonlobo.tech/workshop-ia): imersões práticas (mão na massa) para times aplicarem IA generativa em fluxos reais da própria empresa, com ou sem conhecimento prévio.
+- [Método Prova de Ganho](https://jeffersonlobo.tech/provadeganho): método de gestão de projetos de IA em cinco fases (Panorama, Rota, Ensaio, Escala e Rotina) e quatro portões de decisão, conduzido pela Agência de Inteligência Vozes com projetos liderados por Jefferson Lobo. Só escala o que provou ganho; o que está em produção é medido todo mês em quatro ganhos: previsto, realizado, capacidade liberada e custo evitado. Começa por um diagnóstico de 3 a 4 semanas.
 - [Consultoria de Inteligência Artificial](https://jeffersonlobo.tech/consultoria-ia): acompanhamento estratégico para diretoria e C-level — diagnóstico de maturidade, roadmap de 12 meses, governança e orquestração de fluxos com identidade de marca.
 
 ## Livro e Método DEL
