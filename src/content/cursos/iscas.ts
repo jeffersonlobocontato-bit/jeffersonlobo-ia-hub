@@ -1,6 +1,8 @@
 // Materiais gratuitos da Academia (iscas para captar leads na vitrine).
 // Os arquivos ficam em public/academia; o cadastro grava em academia_leads pela
 // função registrar_lead_academia, com a versão da política de privacidade.
+import { ISCAS_DICAS } from './iscas-dicas';
+
 // A ordem de ISCAS é a ordem em que aparecem no seletor da vitrine.
 
 export type Isca = {
@@ -181,3 +183,6 @@ export const ISCA_ESCALA: Isca = {
 export const EVENTO_ISCA = 'academia:isca';
 
 export const ISCAS: Isca[] = [ISCA_SKILLS, ISCA_FOTO, ISCA_CONTEUDO, ISCA_ATENDIMENTO, ISCA_REEL, ISCA_ESCALA];
+
+/** todos os materiais com cadastro: os do seletor da vitrine mais os kits e ebooks dos microcursos */
+export const ISCAS_TODAS: Isca[] = [...ISCAS, ...ISCAS_DICAS];

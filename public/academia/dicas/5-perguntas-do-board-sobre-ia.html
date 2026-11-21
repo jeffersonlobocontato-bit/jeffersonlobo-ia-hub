@@ -1,0 +1,130 @@
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>As 5 perguntas que o board faz antes de aprovar um projeto de IA | Academia Jefferson Lobo</title><meta name="description" content="Uma ideia de IA só chega ao conselho com cinco respostas em número. Se faltar uma, ela volta para a Rota."><link rel="canonical" href="https://jeffersonlobo.tech/academia/dicas/5-perguntas-do-board-sobre-ia.html"><meta property="og:type" content="article"><meta property="og:title" content="As 5 perguntas que o board faz antes de aprovar um projeto de IA | Academia Jefferson Lobo"><meta property="og:description" content="Uma ideia de IA só chega ao conselho com cinco respostas em número. Se faltar uma, ela volta para a Rota."><meta property="og:url" content="https://jeffersonlobo.tech/academia/dicas/5-perguntas-do-board-sobre-ia.html"><meta property="og:image" content="https://jeffersonlobo.tech/academia/dicas/capa-5-perguntas-do-board-sobre-ia.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: kicker + tese, card do podcast logo abaixo, depois passo a passo e cadastro lateral. Padrão visual da página /provadeganho: fundo quase preto, verde-água, cartões translúcidos, raio 12, títulos em peso 500. */
+:root{--bg:#050505;--fg:#ffffff;--muted:#b5b5b5;--card:rgba(255,255,255,.03);--line:rgba(255,255,255,.08);--accent:#5eead4;--accent-fg:#050505;--accent-soft:rgba(94,234,212,.1);--warn:#f3c969;--warn-bg:rgba(243,201,105,.1);--r:12px;--sans:Inter,ui-sans-serif,system-ui,sans-serif;--mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.6 var(--sans);padding-block:0 56px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.w{max-width:1040px;margin:0 auto}
+.k{font:500 12px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}
+.prev{background:var(--warn-bg);color:var(--warn);font:500 12px/1.5 var(--mono);letter-spacing:.04em;padding:8px 12px;border-radius:8px;margin:16px 0 0}
+header{padding:40px 0 8px}
+h1{font-size:clamp(2rem,6vw,3.1rem);line-height:1.08;letter-spacing:-.02em;font-weight:500;margin:14px 0;text-wrap:balance;max-width:22ch}
+.lead{font-size:1.15rem;color:var(--muted);max-width:60ch;margin:0}
+.phases{display:flex;flex-wrap:wrap;gap:6px;margin-top:20px}
+.ph{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;border:1px solid var(--line);color:var(--muted);padding:7px 10px;border-radius:999px}
+.ph.on{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+.pod{display:grid;grid-template-columns:132px minmax(0,1fr) auto;gap:20px;align-items:center;margin-top:28px;padding:18px;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+@media (max-width:640px){.pod{grid-template-columns:88px minmax(0,1fr)}.pod .go{grid-column:1/-1}}
+.cover{aspect-ratio:1;width:100%;border-radius:10px;background:radial-gradient(120% 120% at 20% 10%,rgba(94,234,212,.35),transparent 55%),#0b1211;border:1px solid var(--line);display:flex;flex-direction:column;justify-content:flex-end;padding:10px;overflow:hidden}
+.cover b{font:500 10px/1.2 var(--mono);letter-spacing:.14em;color:var(--accent);text-transform:uppercase}
+.cover span{font-weight:500;font-size:clamp(.95rem,3.4vw,1.25rem);line-height:1.05;letter-spacing:-.01em}
+.pod h2{font-size:1.3rem;font-weight:500;margin:6px 0 6px;text-wrap:balance}
+.pod p{margin:0;color:var(--muted);font-size:.95rem}
+.go{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+.play{display:inline-flex;align-items:center;gap:10px;margin:0;padding:12px 18px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font:600 .95rem var(--sans);cursor:not-allowed;width:auto}
+.st{font:500 11px/1.4 var(--mono);letter-spacing:.04em;color:var(--muted);max-width:30ch}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:40px;margin-top:32px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+section{margin:0 0 36px}
+h2{font-size:1.5rem;font-weight:500;letter-spacing:-.01em;margin:0 0 12px;text-wrap:balance}
+.steps{counter-reset:s;list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:34px minmax(0,1fr);gap:12px;padding:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+.steps li:before{content:counter(s);font:500 13px/34px var(--mono);text-align:center;width:34px;height:34px;border-radius:50%;background:var(--accent-soft);color:var(--accent)}
+.steps b{display:block;font-weight:500}
+.steps span{color:var(--muted);font-size:.95rem}
+.portao{margin-top:12px;padding:14px;border:1px solid var(--accent);border-radius:var(--r);background:var(--accent-soft)}
+.portao .k{display:block;margin-bottom:6px}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.fact{padding:14px;border:1px solid var(--line);border-radius:var(--r);background:var(--card)}
+.fact b{font:500 1.7rem/1.1 var(--sans);color:var(--accent);display:block}
+.fact span{font-size:.88rem;color:var(--muted)}
+.note{font-size:.9rem;color:var(--muted);margin-top:10px}
+details{border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:4px 16px}
+summary{cursor:pointer;font-weight:500;padding:12px 0}
+summary:focus-visible,a:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.t{padding:10px 0;border-top:1px solid var(--line)}
+.t p{margin:4px 0 0}
+.who{font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.t.l .who{color:var(--accent)}
+.form{position:sticky;top:max(16px,env(safe-area-inset-top,0px));border:1px solid var(--line);border-radius:var(--r);background:var(--card);padding:18px}
+@media (max-width:860px){.form{position:static}}
+.form h2{font-size:1.2rem}
+label{display:block;font-size:.85rem;font-weight:500;margin:12px 0 4px}
+input[type=text],input[type=email],input[type=tel],select{width:100%;font:inherit;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:#0b0b0b;color:var(--fg)}
+.cons{display:flex;gap:10px;align-items:flex-start;margin-top:14px;font-size:.82rem;color:var(--muted)}
+.cons input{margin-top:3px;flex:none}
+button.cta{margin-top:16px;width:100%;font:600 1rem var(--sans);padding:12px 16px;border:0;border-radius:999px;background:var(--accent);color:var(--accent-fg);cursor:pointer}
+.msg{margin-top:12px;font-size:.88rem;color:var(--muted)}
+.next{border:1px solid var(--line);border-radius:var(--r);padding:18px;background:var(--card)}
+.next a{color:var(--accent);font-weight:500}
+.src{font-size:.85rem;color:var(--muted)}
+.src a{color:var(--accent)}
+footer{margin-top:24px;color:var(--muted);font-size:.8rem}
+.form{background:#e29f65;color:#1b1208;border-color:#e29f65;box-shadow:0 12px 40px rgba(226,159,101,.18)}
+.form .k,.form h2,.form label{color:#1b1208}
+.form .cons,.form .cons label{color:#2b1c0b}
+.form input[type=text],.form input[type=email],.form input[type=tel],.form select{background:#fff7ec;color:#1b1208;border:1px solid #b9783a}
+.form .msg{color:#1b1208}
+.form button.cta{background:#050505;color:#ffffff}
+.form :focus-visible{outline-color:#050505}
+
+.back{margin:18px 0 0}.back a{color:var(--accent);font:500 12px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;text-decoration:none}
+.code{white-space:pre-wrap;font:400 .9rem/1.55 var(--mono);padding:14px;border:1px solid var(--line);border-radius:var(--r);background:#0b0b0b;color:var(--muted)}
+.form a{color:#0f2b2a;font-weight:600}.form a.cta{background:#0f2b2a;color:#fff;padding:13px 16px;border-radius:10px}.form p{color:#1d1a12}audio{width:100%;max-width:420px}.go{display:flex;flex-direction:column;gap:6px}a.cta:hover{filter:brightness(1.08)}</style></head><body>
+<div class="w">
+<nav class="back"><a href="/cursos">&larr; Academia</a></nav>
+<header>
+<div class="k">Academia · Dica L1 · Método Prova de Ganho</div>
+<h1>As 5 perguntas que o board faz antes de aprovar um projeto de IA</h1>
+<p class="lead">Uma ideia de IA só chega ao conselho com cinco respostas em número. Se faltar uma, ela volta para a Rota.</p>
+<div class="phases" aria-label="Fase do método"><span class="ph">Panorama</span><span class="ph on">Rota</span><span class="ph">Ensaio</span><span class="ph">Escala</span><span class="ph">Rotina</span></div>
+<div class="pod">
+<div class="cover" aria-hidden="true"><b>Ep. 02</b><span>O Código Lobo</span></div>
+<div><div class="k">Podcast · 2:14</div><h2>5 perguntas do board</h2><p>As cinco perguntas que separam uma ideia boa de um gasto sem retorno, incluindo a que quase ninguém faz: quanto custaria resolver sem IA?</p></div>
+<div class="go"><audio controls preload="none" src="/podcast/codigo-lobo/codigo-lobo-ep02-L1.mp3" aria-label="Ouvir o episódio 2: 5 perguntas do board"></audio><span class="st">Vozes geradas por IA, com autorização</span></div>
+</div>
+</header>
+<div class="grid">
+<main>
+<section><h2>O passo a passo em 5 movimentos</h2>
+<ol class="steps"><li><div><b>Qual é o processo e quanto ele custa hoje?</b><span>Linha de base com número e fonte: horas, custo e erros por mês.</span></div></li><li><div><b>Quanto custaria resolver sem IA?</b><span>A alternativa sem IA entra na mesa. Se ela resolve por menos, a decisão muda.</span></div></li><li><div><b>Qual é o ganho previsto e de onde vem cada número?</b><span>Em reais por mês, com a fonte de cada número da ficha.</span></div></li><li><div><b>Que dado entra e quem responde por ele?</b><span>Categoria do dado, onde fica, qual fornecedor e quem é o responsável.</span></div></li><li><div><b>Como saberemos que deu certo, ou que devemos parar?</b><span>Meta, prazo e a decisão prevista no Portão C, escritas antes de começar.</span></div></li></ol>
+<div class="portao"><span class="k">Portão B do método</span>O conselho escolhe o que vale a pena, com a alternativa sem IA na mesa.</div></section>
+<section><h2>O que a evidência mostra</h2>
+<div class="facts"><div class="fact"><b>37%</b><span>das empresas atribuem algum impacto no resultado à IA (McKinsey, 2026, 1.719 participantes)</span></div><div class="fact"><b>6%</b><span>são as que mais ganham: redesenham o fluxo e definem como medir o impacto (McKinsey, 2026)</span></div></div>
+<p class="note">A pesquisa da McKinsey é de empresas grandes e de 2026. Serve de pista, não de promessa: o que o conselho precisa ver é o número da sua empresa.</p></section>
+<section><h2>Segurança de dados em 3 regras</h2>
+<ol class="steps"><li><div><b>Dado pessoal ou financeiro precisa de responsável nomeado</b><span>Sem nome na ficha, a ideia não avança.</span></div></li><li><div><b>Fornecedor: onde o dado fica e se treina com ele</b><span>Pergunte antes de contratar e registre a resposta.</span></div></li><li><div><b>A ficha nunca contém os dados, só a categoria</b><span>Evita que o próprio documento vire risco.</span></div></li></ol></section>
+
+<section><details><summary>Prefere ler? A conversa completa do episódio</summary>
+<div class="t h"><span class="who">Apresentadora</span><p>Você está ouvindo O Código Lobo, episódio dois. As vozes são geradas por inteligência artificial: a apresentadora e a voz oficial do Géferson Lobo, criada a partir da voz dele, com autorização. Hoje: as cinco perguntas que a diretoria faz antes de aprovar um projeto de IA. Géferson, por que o conselho precisa dessas perguntas?</p></div>
+<div class="t l"><span class="who">Lobo oficial</span><p>Porque a maioria das empresas já gasta com IA e não sabe dizer quanto devolve. A McKinsey, em 2026, mostrou que só 37% das empresas atribuem algum impacto no resultado à IA. No Método Prova de Ganho, essa conversa acontece na fase de Rota, no Portão B: o conselho escolhe o que vale a pena, com a alternativa sem IA na mesa.</p></div>
+<div class="t h"><span class="who">Apresentadora</span><p>Qual é a primeira pergunta?</p></div>
+<div class="t l"><span class="who">Lobo oficial</span><p>Qual é o processo e quanto ele custa hoje. Com número e com fonte. Se ninguém sabe dizer, a ideia ainda não está pronta para o conselho. Ela volta para o Panorama.</p></div>
+<div class="t h"><span class="who">Apresentadora</span><p>E a segunda?</p></div>
+<div class="t l"><span class="who">Lobo oficial</span><p>Quanto custaria resolver sem IA. É a pergunta que quase ninguém faz. Às vezes uma planilha, uma regra de processo ou uma contratação resolvem por menos. Se a IA não ganha dessa alternativa, a decisão muda, e tudo bem.</p></div>
+<div class="t h"><span class="who">Apresentadora</span><p>Terceira e quarta?</p></div>
+<div class="t l"><span class="who">Lobo oficial</span><p>Terceira: qual é o ganho previsto, em reais por mês, e de onde vem cada número. Quarta: que dado entra e quem responde por ele. Aqui entra a LGPD e a pergunta ao fornecedor: onde o dado fica e se treina com ele.</p></div>
+<div class="t h"><span class="who">Apresentadora</span><p>E a quinta?</p></div>
+<div class="t l"><span class="who">Lobo oficial</span><p>Como saberemos que deu certo, ou que devemos parar. A meta e o prazo escritos antes. No Portão C a pergunta é: provou ganho? Escala. Não provou? Ajusta ou encerra.</p></div>
+<div class="t h"><span class="who">Apresentadora</span><p>O que o diretor leva para casa?</p></div>
+<div class="t l"><span class="who">Lobo oficial</span><p>Uma regra simples: ideia com menos de cinco respostas em número não vai para votação. Na página do episódio tem a Ficha de ROI para preencher e levar à reunião. IA sem prova de ganho é hora paga sem retorno e aumento de custo.</p></div>
+<div class="t h"><span class="who">Apresentadora</span><p>Obrigada, Géferson. A Ficha de ROI e o guia estão na página deste episódio, em jeffersonlobo ponto tech.</p></div>
+</details></section>
+<section class="next"><h2>Já mediu e quer ir além?</h2>
+<p>Com os números na mão, o próximo passo é mapear onde a IA tem retorno no seu negócio e conduzir o ensaio com acompanhamento. É o diagnóstico do Método Prova de Ganho, em consultoria. Para levar o tema à sua equipe ou diretoria, a palestra apresenta o método ao vivo.</p>
+<p><a href="https://wa.me/5545999864213" target="_blank" rel="noopener">Agendar o diagnóstico ou falar sobre palestra</a></p></section>
+<section class="src"><h2 style="font-size:1rem">Fontes</h2>
+<a href="https://www.mckinsey.com/capabilities/quantumblack/our-insights/the-state-of-ai">McKinsey, The state of AI</a> · <a href="https://www.nber.org/papers/w31161">NBER w31161</a> · <a href="https://news.mit.edu/2023/study-finds-chatgpt-boosts-worker-productivity-writing-0714">MIT News, Noy e Zhang</a> · Lei 13.709/2018 (LGPD)</section>
+</main>
+<aside><div class="form"><div class="k">Kit gratuito</div><h2>Baixe a planilha, a ficha e o checklist</h2>
+<p>Ficha de implementação com os 6 blocos, planilha com fórmulas prontas e checklist de segurança de dados. Cadastro rápido, sem custo.</p>
+<a class="cta" href="/cursos?isca=dica-l1#ebook-gratis" style="display:block;text-align:center;text-decoration:none">Receber o kit</a>
+<p class="note" style="margin-top:14px">Quer ir além? O ebook <b>Guia do Board</b> reúne esta dica com as da mesma trilha.</p>
+<p><a href="/cursos?isca=ebook-guia-do-board#ebook-gratis">Baixar o ebook grátis</a></p></div></aside>
+</div>
+<footer>Agência de Inteligência Vozes · projetos liderados por Jefferson Lobo</footer>
+</div>
+</body></html>
