@@ -28,6 +28,7 @@ import { useEscola } from "@/components/cursos/escola/useEscola";
 import PodcastTopo from "@/components/cursos/escola/PodcastTopo";
 import IscaEbook from "@/components/cursos/escola/IscaEbook";
 import { EVENTO_ISCA, ISCAS, type Isca } from "@/content/cursos/iscas";
+import { DICAS, VITRINE_OCULTOS, dicaPagina, type Dica } from "@/content/cursos/dicas";
 import "@/styles/escola.css";
 
 // Vitrine da escola (/cursos). É um catálogo: o topo, o "como funciona", a
@@ -227,6 +228,35 @@ function CardIsca({ isca, i, onClick }: { isca: Isca; i: number; onClick: () => 
   );
 }
 
+function CardDica({ d, i, onClick }: { d: Dica; i: number; onClick: () => void }) {
+  // página estática da dica (podcast, passo a passo e kit com cadastro)
+  return (
+    <article className="e-card e-card--pocket e-card--isca e-revela" style={atraso(i + 1)}>
+      <span className="e-card__feixe" aria-hidden />
+      <span className="e-card__brilho" aria-hidden />
+      <a href={dicaPagina(d)} className="e-card__thumb e-card__thumb--pocket" tabIndex={-1} aria-hidden onClick={onClick}>
+        <img src={`/academia/dicas/capa-${d.slug}.jpg`} alt="" width={640} height={906} loading="lazy" />
+      </a>
+      <span className="e-olho">Grátis · {d.tipo} · Fase {d.fase}</span>
+      <h3 className="e-card__titulo">
+        <a href={dicaPagina(d)} onClick={onClick}>
+          {d.titulo}
+        </a>
+      </h3>
+      <p className="e-card__texto">{d.resumo}</p>
+      <div className="e-card__rodape">
+        <div className="e-preco">
+          <b>Grátis</b>
+          <span>podcast de {d.duracao} · kit para baixar</span>
+        </div>
+        <a href={dicaPagina(d)} className="e-btn e-btn--fantasma" onClick={onClick}>
+          Abrir <ArrowRight size={16} aria-hidden />
+        </a>
+      </div>
+    </article>
+  );
+}
+
 function CardPocket({ p, i, onClick }: { p: Pocket; i: number; onClick: () => void }) {
   return (
     <article className="e-card e-card--pocket e-revela" style={atraso(i + 1)}>
@@ -261,7 +291,8 @@ const Vitrine = () => {
   const raiz = useRef<HTMLDivElement>(null);
   useEscola(raiz);
   const { trackCTA } = useTrackCTA();
-  const abertos = CURSOS;
+  // a Ilha sai da vitrine, mas a página, o acesso e o conteúdo dos alunos seguem ativos
+  const abertos = CURSOS.filter((c) => !VITRINE_OCULTOS.includes(c.slug));
   const comLivro = abertos.filter((c) => c.vitrine.bonusLivro);
 
   const faq = [
@@ -481,6 +512,62 @@ const Vitrine = () => {
             </div>
           </div>
           <div className="e-hero__base" />
+        </section>
+
+        {/* Microcursos grátis do Método Prova de Ganho */}
+        <section className="e-secao" id="microcursos">
+          <div className="e-cab e-revela">
+            <span className="e-olho">Grátis · Método Prova de Ganho</span>
+            <h2 className="e-h2">Microcursos de IA com prova de ganho</h2>
+            <p>
+              Nove dicas curtas, cada uma com um episódio de podcast, o passo a
+              passo, a ficha, a planilha e o checklist de segurança de dados.
+              Método, não truque de prompt.
+            </p>
+          </div>
+          <div className="e-catalogo">
+            {DICAS.map((d, i) => (
+              <CardDica key={d.id} d={d} i={i} onClick={() => trackCTA(`vitrine_dica_${d.id.toLowerCase()}`, "vitrine")} />
+            ))}
+            <article className="e-card e-card--pocket e-revela" style={atraso(DICAS.length + 1)}>
+              <span className="e-olho">Consultoria</span>
+              <h3 className="e-card__titulo">Diagnóstico do Método Prova de Ganho</h3>
+              <p className="e-card__texto">
+                Mapa dos processos, linha de base e lista priorizada de onde a IA
+                dá retorno na sua empresa, com decisão no conselho.
+              </p>
+              <div className="e-card__rodape">
+                <a
+                  href="https://wa.me/5545999864213?text=Oi%2C%20Jefferson!%20Quero%20saber%20do%20diagn%C3%B3stico%20do%20M%C3%A9todo%20Prova%20de%20Ganho."
+                  target="_blank"
+                  rel="noopener"
+                  className="e-btn e-btn--fantasma"
+                  onClick={() => trackCTA("vitrine_consultoria", "vitrine")}
+                >
+                  Conversar <ArrowRight size={16} aria-hidden />
+                </a>
+              </div>
+            </article>
+            <article className="e-card e-card--pocket e-revela" style={atraso(DICAS.length + 2)}>
+              <span className="e-olho">Palestra</span>
+              <h3 className="e-card__titulo">IA sem prova de ganho</h3>
+              <p className="e-card__texto">
+                Para diretoria, gestores e equipes. O método ao vivo, em 45 a 50
+                minutos, com casos reais.
+              </p>
+              <div className="e-card__rodape">
+                <a
+                  href="https://wa.me/5545999864213?text=Oi%2C%20Jefferson!%20Quero%20levar%20a%20palestra%20para%20a%20minha%20empresa."
+                  target="_blank"
+                  rel="noopener"
+                  className="e-btn e-btn--fantasma"
+                  onClick={() => trackCTA("vitrine_palestra", "vitrine")}
+                >
+                  Levar para a empresa <ArrowRight size={16} aria-hidden />
+                </a>
+              </div>
+            </article>
+          </div>
         </section>
 
         {/* Catálogo */}

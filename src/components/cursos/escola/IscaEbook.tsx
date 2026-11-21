@@ -4,7 +4,7 @@ import { ArrowRight, BookOpen, Check, Download, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { db } from '@/lib/cursos';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
-import { EVENTO_ISCA, ISCAS, ISCA_SKILLS, type Isca } from '@/content/cursos/iscas';
+import { EVENTO_ISCA, ISCAS, ISCAS_TODAS, ISCA_SKILLS, type Isca } from '@/content/cursos/iscas';
 import { VERSAO_PRIVACIDADE } from '@/content/cursos/privacidade';
 import { origemParaConversao } from '@/lib/traffic-source';
 import { trackLead } from '@/lib/metaPixel';
@@ -49,7 +49,7 @@ function iscaDaUrl(): Isca | null {
   if (typeof window === 'undefined') return null;
   const pedida = new URLSearchParams(window.location.search).get('isca')?.toLowerCase();
   if (!pedida) return null;
-  return ISCAS.find((i) => i.material === pedida || i.material === `guia-${pedida}`) ?? null;
+  return ISCAS_TODAS.find((i) => i.material === pedida || i.material === `guia-${pedida}`) ?? null;
 }
 
 /** WhatsApp brasileiro com DDD: devolve só os dígitos (sem o 55) ou null se
@@ -111,7 +111,7 @@ export default function IscaEbook() {
   useEffect(() => {
     const abrir = (ev: Event) => {
       const material = (ev as CustomEvent<string>).detail;
-      const i = ISCAS.find((x) => x.material === material);
+      const i = ISCAS_TODAS.find((x) => x.material === material);
       if (!i) return;
       setAtiva(i);
       setErro('');

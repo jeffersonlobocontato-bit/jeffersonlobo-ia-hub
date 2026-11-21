@@ -41,6 +41,78 @@ const ISCAS: Record<string, { modelo: string; arquivo: string; pagina?: string; 
     pagina: '/academia/guias/checklist-escala.html',
     titulo: 'Seu projeto de IA vale escalar?',
   },
+  "dica-p00": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/antes-de-usar-ia-meca-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/antes-de-usar-ia-meca-kit.html",
+    titulo: "Antes de usar IA, meça",
+  },
+  "dica-l1": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/5-perguntas-do-board-sobre-ia-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/5-perguntas-do-board-sobre-ia-kit.html",
+    titulo: "As 5 perguntas que o board faz antes de aprovar um projeto de IA",
+  },
+  "dica-l2": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/politica-de-uso-de-ia-em-uma-pagina-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/politica-de-uso-de-ia-em-uma-pagina-kit.html",
+    titulo: "Política de uso de IA em uma página",
+  },
+  "dica-l4": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/go-no-go-do-piloto-de-ia-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/go-no-go-do-piloto-de-ia-kit.html",
+    titulo: "Piloto de 2 semanas: como o board lê o resultado",
+  },
+  "dica-p01": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/resposta-ao-cliente-com-ia-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/resposta-ao-cliente-com-ia-kit.html",
+    titulo: "Rascunho de resposta ao cliente com revisão humana",
+  },
+  "dica-p05": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/proposta-comercial-com-ia-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/proposta-comercial-com-ia-kit.html",
+    titulo: "Proposta comercial padronizada em minutos",
+  },
+  "dica-n4": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/seguranca-de-dados-em-10-minutos-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/seguranca-de-dados-em-10-minutos-kit.html",
+    titulo: "Segurança de dados em 10 minutos: o que nunca colar",
+  },
+  "dica-l5": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/riscos-de-dados-e-lgpd-para-diretoria-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/riscos-de-dados-e-lgpd-para-diretoria-kit.html",
+    titulo: "Riscos de dados e LGPD em linguagem de diretoria",
+  },
+  "dica-l7": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/decisoes-que-nunca-ficam-so-com-a-ia-ficha-e-checklist.pdf",
+    pagina: "/academia/dicas/decisoes-que-nunca-ficam-so-com-a-ia-kit.html",
+    titulo: "Decisões que nunca ficam só com a IA",
+  },
+  "ebook-guia-do-board": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/ebook-guia-do-board.pdf",
+    pagina: "/academia/dicas/ebook-guia-do-board.html",
+    titulo: "Guia do Board para IA com prova de ganho",
+  },
+  "ebook-ia-com-dados-seguros": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/ebook-ia-com-dados-seguros.pdf",
+    pagina: "/academia/dicas/ebook-ia-com-dados-seguros.html",
+    titulo: "IA com dados seguros",
+  },
+  "ebook-prova-de-ganho-na-pratica": {
+    modelo: 'guia-entrega',
+    arquivo: "/academia/dicas/ebook-prova-de-ganho-na-pratica.pdf",
+    pagina: "/academia/dicas/ebook-prova-de-ganho-na-pratica.html",
+    titulo: "Prova de ganho na prática",
+  },
 }
 
 Deno.serve(async (req) => {
