@@ -18,6 +18,26 @@ window.addEventListener("unhandledrejection", (e) => {
   if (isResizeObserverNoise(e.reason?.message ?? e.reason)) e.preventDefault();
 });
 
+// Depois de uma nova versão, arquivos antigos da página deixam de existir e o
+// carregamento falha ("Failed to fetch dynamically imported module"). Recarrega
+// uma vez para buscar a versão nova, sem entrar em ciclo.
+const CHAVE_RECARGA = "recarga_versao_nova";
+const ehFalhaDeVersao = (msg: unknown) =>
+  typeof msg === "string" && /dynamically imported module|Importing a module script failed|error loading dynamically/i.test(msg);
+const recarregarUmaVez = () => {
+  const ultima = Number(sessionStorage.getItem(CHAVE_RECARGA) || 0);
+  if (Date.now() - ultima < 10000) return false;
+  sessionStorage.setItem(CHAVE_RECARGA, String(Date.now()));
+  window.location.reload();
+  return true;
+};
+window.addEventListener("vite:preloadError", (e) => {
+  if (recarregarUmaVez()) e.preventDefault();
+});
+window.addEventListener("unhandledrejection", (e) => {
+  if (ehFalhaDeVersao(e.reason?.message ?? e.reason) && recarregarUmaVez()) e.preventDefault();
+});
+
 const raiz = document.getElementById("root")!;
 const montar = () =>
   createRoot(raiz).render(
