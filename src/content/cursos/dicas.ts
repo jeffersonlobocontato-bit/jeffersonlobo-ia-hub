@@ -102,3 +102,6 @@ export const DICAS: Dica[] = [
   }
 ];
 export const dicaPagina = (d: Dica) => `/academia/dicas/${d.slug}.html`;
+
+/** slugs de cursos que não aparecem na vitrine /cursos */
+export const VITRINE_OCULTOS: string[] = [];
