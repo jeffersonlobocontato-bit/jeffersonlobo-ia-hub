@@ -104,8 +104,11 @@ const AdminCursosTab = ({ dentroDoPainel = false }: { dentroDoPainel?: boolean }
   }, [slug]);
 
   const liberar = async () => {
-    const email = novoEmail.trim().toLowerCase();
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return toast({ title: 'Confira o e-mail', variant: 'destructive' });
+    // Tira espaços e caracteres invisíveis que vêm junto ao colar do WhatsApp/celular
+    // (espaço comum, não-separável, zero-width etc.) — e-mail nunca tem espaço.
+    const email = novoEmail.replace(/[\s​-‍⁠﻿]/g, '').toLowerCase();
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+      return toast({ title: 'Confira o e-mail', description: `Li assim: "${email}"`, variant: 'destructive' });
     const { error } = await db
       .from('curso_acessos')
       .upsert(
