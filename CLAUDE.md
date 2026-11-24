@@ -34,6 +34,8 @@ Site pessoal, blog e hub de conteúdo de Jefferson Lobo (palestrante e consultor
 - Nunca commitar segredos — `.env` está no `.gitignore`, chaves do Supabase vêm de variáveis de ambiente
 - `predev`/`prebuild` rodam `scripts/generate-sitemap.ts` — não editar `public/sitemap.xml`/`llms.txt` manualmente, eles são gerados
 - Ao adicionar rota nova em `App.tsx`, sempre acima do catch-all `*` (comentário já existe no arquivo marcando o lugar)
+- **Sem grade de fundo** (linhas/pontos em grade, inclusive em perspectiva) em nenhuma página nem capa — decisão do Jefferson (nov/2026): a grade entrega o padrão visual genérico de site feito por IA.
+- **Capas do blog**: padrão do site — fundo petróleo liso, kicker IBM Plex Mono verde-água, título em Inter branco com o trecho-chave em verde-água (`--primary`), régua verde-água e assinatura cinza. Gerador único: `supabase/functions/_shared/branded-cover.ts` (o âmbar/Instrument Serif antigo saiu).
 - Tema visual: paleta "editorial autoral" (papel/creme, tinta petróleo, âmbar como assinatura) definida em `src/index.css` — não é o preto/azul/roxo neon do briefing original do README, o design evoluiu
 
 ## Segundo cérebro — registro dos projetos pessoais

@@ -187,7 +187,6 @@ html:has(.escola) body { background: #050505; }
 /* ---------- hero ---------- */
 .e-hero { position: relative; isolation: isolate; overflow: hidden; padding: calc(64px + clamp(48px, 9vw, 96px)) 20px 0; text-align: center; }
 .e-aura { position: absolute; inset: 0; z-index: -1; pointer-events: none; background: radial-gradient(60% 42% at 50% 0%, rgb(20 184 166 / 0.18), transparent 70%), radial-gradient(30% 22% at 50% 4%, rgb(94 234 212 / 0.12), transparent 70%); }
-.e-aura__grade { position: absolute; inset: 0; background-image: linear-gradient(to right, rgb(255 255 255 / 0.045) 1px, transparent 1px); background-size: calc(100% / 6) 100%; background-position: calc(100% / 12) 0; -webkit-mask-image: radial-gradient(75% 60% at 50% 28%, #000, transparent); mask-image: radial-gradient(75% 60% at 50% 28%, #000, transparent); }
 .e-aura__arco {
   position: absolute;
   left: 50%;
@@ -296,8 +295,7 @@ html:has(.escola) body { background: #050505; }
 .e-card--laranja { --acc: #f97316; --acc-claro: #fb923c; --acc-brilho: #fdba74; }
 .e-card__feixe { position: absolute; top: 0; left: 50%; z-index: 3; width: 70%; height: 1px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--acc-brilho) 65%, transparent), transparent); pointer-events: none; }
 .e-card__brilho { position: absolute; top: 0; left: 0; width: 100%; height: 260px; background: radial-gradient(ellipse at top, color-mix(in srgb, var(--acc) 26%, transparent), transparent 70%); pointer-events: none; }
-.e-card__pontos { position: absolute; inset: 0; background-image: radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px); background-size: 24px 24px; -webkit-mask-image: radial-gradient(60% 60% at 50% 15%, #000, transparent); mask-image: radial-gradient(60% 60% at 50% 15%, #000, transparent); pointer-events: none; }
-.e-card > :not(.e-card__feixe):not(.e-card__brilho):not(.e-card__pontos) { position: relative; z-index: 2; }
+.e-card > :not(.e-card__feixe):not(.e-card__brilho) { position: relative; z-index: 2; }
 .e-card__thumb { display: block; width: calc(100% + 64px); margin: -32px -32px 24px; aspect-ratio: 16 / 9; overflow: hidden; border-bottom: 1px solid color-mix(in srgb, var(--acc) 22%, transparent); background: rgb(255 255 255 / 0.04); }
 .e-card__thumb img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s var(--e-padrao); }
 .e-card:hover .e-card__thumb img { transform: scale(1.04); }

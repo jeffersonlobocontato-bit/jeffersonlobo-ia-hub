@@ -154,7 +154,6 @@ function CardCurso({
     >
       <span className="e-card__feixe" aria-hidden />
       <span className="e-card__brilho" aria-hidden />
-      <span className="e-card__pontos" aria-hidden />
       <Link
         to={v.pagina}
         className="e-card__thumb e-card__thumb--larga"
@@ -432,7 +431,6 @@ const Vitrine = () => {
         {/* Hero da escola */}
         <section className="e-hero">
           <div className="e-aura" aria-hidden>
-            <div className="e-aura__grade" />
             {PULSOS.map((p) => (
               <span
                 key={p.left}

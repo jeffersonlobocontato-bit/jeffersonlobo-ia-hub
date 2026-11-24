@@ -16,7 +16,7 @@ a{color:var(--acl)}
 /* hero com aura, grade, pulsos e motivo do tema */
 .hero{position:relative;padding:34px 0 8px;isolation:isolate}
 .aura{position:absolute;inset:-120px -100vw 0;z-index:-1;pointer-events:none;background:radial-gradient(60% 55% at 50% 0%,rgba(20,184,166,.20),transparent 70%),radial-gradient(30% 28% at 50% 6%,rgba(94,234,212,.12),transparent 70%)}
-.aura .grade{position:absolute;inset:0;background-image:linear-gradient(to right,rgba(255,255,255,.045) 1px,transparent 1px);background-size:calc(100% / 12) 100%;-webkit-mask-image:radial-gradient(70% 70% at 50% 25%,#000,transparent);mask-image:radial-gradient(70% 70% at 50% 25%,#000,transparent)}
+.aura .grade{display:none}
 .aura .arco{position:absolute;left:50%;top:70%;width:max(1400px,150vw);aspect-ratio:1;transform:translateX(-50%);border-radius:50%;border-top:1px solid rgba(94,234,212,.35);background:radial-gradient(closest-side,#050505 97%,rgba(20,184,166,.22) 99.4%,transparent 100%);box-shadow:0 -40px 140px -30px rgba(20,184,166,.4)}
 .pv{position:absolute;top:0;width:1px;height:110px;background:linear-gradient(to bottom,transparent,var(--ac),var(--acb),transparent);box-shadow:0 0 12px 1px rgba(94,234,212,.6);animation:cv 4s cubic-bezier(.4,0,.2,1) infinite}
 @keyframes cv{0%{opacity:0;transform:translateY(-100%)}10%,80%{opacity:1}100%{opacity:0;transform:translateY(60vh)}}
