@@ -75,7 +75,6 @@ const Obrigado = () => {
       <EscolaTopo />
       <main className="e-obrigado">
         <div className="e-aura" aria-hidden>
-          <div className="e-aura__grade" />
           <div className="e-aura__arco" style={{ top: '70%' }} />
         </div>
         <section className="e-obrigado__caixa e-entra" aria-live="polite">

@@ -182,7 +182,7 @@ const faq = [
 
 
 /* ------------------------------------------------------------------------------------------------
- * Efeitos da página (nov/2026): fundo vivo em camadas (partículas em rede, grade em perspectiva e
+ * Efeitos da página (nov/2026): fundo vivo em camadas (partículas em rede e
  * orbes com parallax), cards flutuantes que inclinam com o mouse e ganham brilho neon, profundidade
  * entre conteúdo e fundo, e a linha das fases que acende conforme a rolagem.
  * Parallax e reveal usam o motor do site (ScrollFX: [data-speed] e [data-reveal]).
@@ -194,13 +194,6 @@ const FX_CSS = `
 .pg-fx section { background: transparent !important; }
 .pg-bg { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
 .pg-bg canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
-.pg-grade { position: absolute; left: -50%; right: -50%; bottom: -20vh; height: 70vh;
-  background-image: linear-gradient(hsl(var(--primary) / .16) 1px, transparent 1px),
-                    linear-gradient(90deg, hsl(var(--primary) / .16) 1px, transparent 1px);
-  background-size: 64px 64px; transform: perspective(600px) rotateX(64deg); transform-origin: bottom;
-  mask-image: linear-gradient(to top, #000 10%, transparent 85%); -webkit-mask-image: linear-gradient(to top, #000 10%, transparent 85%);
-  animation: pg-grade 9s linear infinite; }
-@keyframes pg-grade { to { background-position: 0 64px, 0 0; } }
 .pg-orbe { position: absolute; border-radius: 50%; filter: blur(90px); opacity: .5; will-change: transform; }
 .pg-orbe--a { width: 520px; height: 520px; left: -140px; top: 8vh; background: hsl(var(--primary) / .32); }
 .pg-orbe--b { width: 420px; height: 420px; right: -120px; top: 55vh; background: hsl(172 80% 40% / .26); }
@@ -252,7 +245,7 @@ const FX_CSS = `
 @keyframes pg-respira { 0%,100% { box-shadow: 0 0 80px -30px hsl(var(--primary) / .9); } 50% { box-shadow: 0 0 110px -24px hsl(var(--primary)); } }
 
 @media (prefers-reduced-motion: reduce) {
-  .pg-grade, .pg-flutua, .pg-neon, .pg-hud i, .pg-video { animation: none !important; }
+  .pg-flutua, .pg-neon, .pg-hud i, .pg-video { animation: none !important; }
   .pg-card { transform: none !important; }
 }
 `;
@@ -306,7 +299,6 @@ function FundoVivo() {
       <div data-speed="0.25" className="pg-orbe pg-orbe--a" />
       <div data-speed="-0.15" className="pg-orbe pg-orbe--b" />
       <div data-speed="0.4" className="pg-orbe pg-orbe--c" />
-      <div className="pg-grade" />
       <canvas ref={ref} />
     </div>
   );

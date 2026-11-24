@@ -132,7 +132,6 @@ function Pagina({ pocket }: { pocket: Pocket }) {
         {/* topo */}
         <section className="e-pocket-hero">
           <div className="e-aura" aria-hidden>
-            <div className="e-aura__grade" />
           </div>
           <div className="e-pocket-hero__miolo">
             <div className="e-pocket-hero__texto">

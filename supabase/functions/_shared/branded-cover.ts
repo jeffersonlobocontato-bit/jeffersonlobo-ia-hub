@@ -1,19 +1,20 @@
-// Gera a capa de post do blog no padrão visual do site (petróleo + grid sutil +
-// kicker em IBM Plex Mono âmbar + título em Instrument Serif com a "palavra-chave"
-// em itálico âmbar + régua fina + assinatura), em vez da foto genérica gerada
-// por IA que o pipeline usava antes.
+// Gera a capa de post do blog no padrão visual do site (nov/2026): fundo
+// petróleo liso (sem grade) + kicker em IBM Plex Mono verde-água + título em Inter branco com
+// as palavras-chave em verde-água (cor --primary do site, hsl 171 77% 64%) +
+// régua fina verde-água + assinatura cinza. Âmbar e Instrument Serif saíram:
+// eram do design anterior e destoavam dos cards do blog.
 //
 // Usa satori (React-like tree -> SVG) + resvg-wasm (SVG -> PNG), ambos puro
 // JS/WASM, compatíveis com o runtime de Edge Functions do Supabase (sem FFI,
 // sem canvas nativo). As fontes são buscadas do Google Fonts em tempo de
-// execução (Instrument Serif e IBM Plex Mono, as mesmas do design system do
-// site) — ver fetchGoogleFontTTF().
+// execução (Inter e IBM Plex Mono, as mesmas do design system do site) — ver fetchGoogleFontTTF().
 import satori from 'npm:satori@0.10.13';
 import { Resvg, initWasm } from 'npm:@resvg/resvg-wasm@2.6.2';
 
 const PETROLEO = '#12201E';
-const PAPEL = '#F2EEE4';
-const AMBAR = '#E29F65';
+const BRANCO = '#F5F7F6';
+const VERDE = '#5DEAD5'; // --primary do site: hsl(171 77% 64%)
+const CINZA = '#9AA5A2';
 
 let wasmReady: Promise<void> | null = null;
 function ensureResvgWasm(): Promise<void> {
@@ -46,25 +47,25 @@ async function fetchGoogleFontTTF(cssFamilyQuery: string): Promise<ArrayBuffer> 
   return fontRes.arrayBuffer();
 }
 
-let fontsCache: Promise<{
-  serifRegular: ArrayBuffer;
-  serifItalic: ArrayBuffer;
-  monoBold: ArrayBuffer;
-}> | null = null;
+export interface CoverFonts {
+  sansRegular: ArrayBuffer;
+  monoRegular: ArrayBuffer;
+}
 
-function loadFonts() {
+let fontsCache: Promise<CoverFonts> | null = null;
+
+function loadFonts(): Promise<CoverFonts> {
   if (!fontsCache) {
     fontsCache = Promise.all([
-      fetchGoogleFontTTF('Instrument+Serif'),
-      fetchGoogleFontTTF('Instrument+Serif:ital@1'),
-      fetchGoogleFontTTF('IBM+Plex+Mono:wght@700'),
-    ]).then(([serifRegular, serifItalic, monoBold]) => ({ serifRegular, serifItalic, monoBold }));
+      fetchGoogleFontTTF('Inter:wght@400'),
+      fetchGoogleFontTTF('IBM+Plex+Mono:wght@400'),
+    ]).then(([sansRegular, monoRegular]) => ({ sansRegular, monoRegular }));
   }
   return fontsCache;
 }
 
 // Heurística simples e determinística pra escolher qual trecho do título vira
-// itálico âmbar (o "conceito-chave" visual), sem precisar de curadoria manual
+// destaque verde-água (o "conceito-chave" visual), sem precisar de curadoria manual
 // a cada post: as duas últimas palavras "de conteúdo" do título (ignorando
 // pontuação e preposições curtas soltas no fim).
 const STOPWORDS = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'a', 'o', 'as', 'os', 'em', 'no', 'na']);
@@ -85,25 +86,26 @@ interface BrandedCoverOptions {
   kicker: string;
   title: string;
   author?: string;
-  /** Sobrescreve a escolha automática de qual(is) palavra(s) destacar em itálico âmbar. */
+  /** Sobrescreve a escolha automática de qual(is) palavra(s) destacar em verde-água. */
   highlightWords?: string[];
 }
 
-export async function renderBrandedCover({
-  kicker,
-  title,
-  author = 'JEFFERSON LOBO',
-  highlightWords,
-}: BrandedCoverOptions): Promise<Uint8Array> {
-  const [{ serifRegular, serifItalic, monoBold }] = await Promise.all([loadFonts(), ensureResvgWasm()]);
-  const highlight = new Set((highlightWords ?? pickHighlightWords(title)).map((w) => w.toLowerCase()));
-
-  const words = title.split(' ').map((word, i) => {
-    const bare = word.toLowerCase().replace(/[.,:;!?]+$/, '');
-    return { word, isHighlight: highlight.has(bare), key: i };
-  });
-
-  const tree = {
+/** Monta a árvore satori da capa. Separado do render para poder ser usado fora do Deno (ex.: gerar capa manual). */
+export function buildCoverTree({ kicker, title, author = 'JEFFERSON LOBO', highlightWords }: BrandedCoverOptions) {
+  // Destaca o TRECHO (sequência de palavras), na última vez que aparece — e não
+  // toda palavra igual do título (ex.: "Ganho ... ganho no caixa" pintava as duas).
+  const norm = (w: string) => w.toLowerCase().replace(/[.,:;!?]+$/, '');
+  const raw = title.split(' ');
+  const alvo = (highlightWords ?? pickHighlightWords(title)).map(norm);
+  const marcados = new Set<number>();
+  for (let i = raw.length - alvo.length; i >= 0; i--) {
+    if (alvo.every((w, j) => norm(raw[i + j]) === w)) {
+      alvo.forEach((_, j) => marcados.add(i + j));
+      break;
+    }
+  }
+  const words = raw.map((word, i) => ({ word, isHighlight: marcados.has(i), key: i }));
+  return {
     type: 'div',
     props: {
       style: {
@@ -113,87 +115,51 @@ export async function renderBrandedCover({
         flexDirection: 'column',
         justifyContent: 'center',
         backgroundColor: PETROLEO,
-        backgroundImage:
-          'linear-gradient(90deg, rgba(226,159,101,0.08) 1px, transparent 1px), linear-gradient(180deg, rgba(226,159,101,0.08) 1px, transparent 1px)',
-        backgroundSize: '40px 40px',
-        padding: '0 90px',
+        padding: '0 96px',
       },
       children: [
         {
           type: 'div',
           props: {
-            style: {
-              display: 'flex',
-              fontFamily: 'IBM Plex Mono',
-              fontWeight: 700,
-              fontSize: 17,
-              letterSpacing: 3,
-              textTransform: 'uppercase',
-              color: AMBAR,
-              marginBottom: 22,
-            },
+            style: { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 18, letterSpacing: 2, textTransform: 'uppercase', color: VERDE, marginBottom: 28 },
             children: kicker,
           },
         },
         {
           type: 'div',
           props: {
-            style: {
-              display: 'flex',
-              flexWrap: 'wrap',
-              fontFamily: 'Instrument Serif',
-              fontSize: 50,
-              lineHeight: 1.25,
-              color: PAPEL,
-              maxWidth: 1020,
-            },
+            style: { display: 'flex', flexWrap: 'wrap', fontFamily: 'Inter', fontSize: 60, lineHeight: 1.22, letterSpacing: -0.5, color: BRANCO, maxWidth: 1000 },
             children: words.map(({ word, isHighlight, key }) => ({
               type: 'span',
-              props: {
-                style: {
-                  marginRight: 14,
-                  fontStyle: isHighlight ? 'italic' : 'normal',
-                  color: isHighlight ? AMBAR : PAPEL,
-                },
-                children: word,
-              },
+              props: { style: { marginRight: 15, color: isHighlight ? VERDE : BRANCO }, children: word },
               key,
             })),
           },
         },
-        {
-          type: 'div',
-          props: { style: { width: 96, height: 2, backgroundColor: AMBAR, margin: '26px 0 22px 0' } },
-        },
+        { type: 'div', props: { style: { width: 96, height: 3, backgroundColor: VERDE, margin: '38px 0 24px 0' } } },
         {
           type: 'div',
           props: {
-            style: {
-              display: 'flex',
-              fontFamily: 'IBM Plex Mono',
-              fontWeight: 700,
-              fontSize: 15,
-              letterSpacing: 3,
-              textTransform: 'uppercase',
-              color: AMBAR,
-            },
+            style: { display: 'flex', fontFamily: 'IBM Plex Mono', fontSize: 16, letterSpacing: 2, textTransform: 'uppercase', color: CINZA },
             children: author,
           },
         },
       ],
     },
   };
+}
 
-  const svg = await satori(tree as any, {
-    width: 1200,
-    height: 630,
-    fonts: [
-      { name: 'Instrument Serif', data: serifRegular, weight: 400, style: 'normal' },
-      { name: 'Instrument Serif', data: serifItalic, weight: 400, style: 'italic' },
-      { name: 'IBM Plex Mono', data: monoBold, weight: 700, style: 'normal' },
-    ],
-  });
+export function coverFontsForSatori(f: CoverFonts) {
+  return [
+    { name: 'Inter', data: f.sansRegular, weight: 400 as const, style: 'normal' as const },
+    { name: 'IBM Plex Mono', data: f.monoRegular, weight: 400 as const, style: 'normal' as const },
+  ];
+}
 
+export async function renderBrandedCover(opts: BrandedCoverOptions): Promise<Uint8Array> {
+  const [fonts] = await Promise.all([loadFonts(), ensureResvgWasm()]);
+  // deno-lint-ignore no-explicit-any
+  const svg = await satori(buildCoverTree(opts) as any, { width: 1200, height: 630, fonts: coverFontsForSatori(fonts) });
   const resvg = new Resvg(svg, { fitTo: { mode: 'width', value: 1200 } });
   return resvg.render().asPng();
 }
