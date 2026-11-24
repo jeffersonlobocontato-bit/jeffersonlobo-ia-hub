@@ -2,11 +2,15 @@
 // fontes oficiais ativas em content_sources (RSS de blog/imprensa e feeds
 // públicos de vídeo do YouTube, nunca scraping de LinkedIn/X), gera dois
 // rascunhos com a OpenAI (coluna de curadoria + artigo autoral) e deixa os
-// dois como blog_posts com status='pending_review' esperando aprovação no
-// admin. Notifica por Telegram quando a pauta do dia está pronta.
+// dois como blog_posts com status='pending_review'. O revisor editorial
+// (_shared/revisor-editorial.ts) aprova sozinho o que seguir a matéria-modelo;
+// o resto espera aprovação no admin. Notifica por Telegram quando a pauta do dia está pronta.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { signApprovalToken } from '../_shared/approval-token.ts';
 import { renderBrandedCover } from '../_shared/branded-cover.ts';
+import { LINHA_EDITORIAL, eixoDoDia } from '../_shared/linha-editorial.ts';
+import { MATERIA_MODELO, POR_QUE_O_MODELO_FOI_APROVADO } from '../_shared/materia-modelo.ts';
+import { revisarRascunho, type ResultadoRevisao } from '../_shared/revisor-editorial.ts';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
 
@@ -190,35 +194,54 @@ async function draftWithAI(apiKey: string, systemPrompt: string, userPrompt: str
   };
 }
 
-const CURATION_SYSTEM_PROMPT = `Você escreve, em nome de Jefferson Lobo (palestrante, autor e consultor brasileiro de Inteligência Artificial aplicada a marketing, negócios e lideranças), a coluna diária "Vozes que Importam" do blog dele.
+// O "treinamento" do redator (tese, público, estilo, calibragem e dados
+// permitidos) fica em _shared/linha-editorial.ts — mude lá, não aqui.
+const FORMATO_JSON_E_SEO = `Regras obrigatórias (SEO/AEO/GEO — o mesmo padrão já usado no blog):
+- "title": capitalização de frase normal — só a primeira letra maiúscula e nomes próprios. Nunca "Capitalize Cada Palavra Assim". Título informativo, como manchete de jornal de negócios, sem clickbait.
+- "subtitle": uma linha de apoio que diga ao decisor por que o tema importa para ele.
+- "excerpt" tem que funcionar sozinho como resposta direta e completa (é o TL;DR que aparece no topo do artigo e alimenta buscadores de IA) — resuma a tese, não um gancho vazio. Até 160 caracteres.
+- Estrutura em markdown com subtítulos (##), sem repetir o título como H1. Inclua pelo menos uma frase-tese curta e citável.
+- "faq": 3 a 4 perguntas objetivas que um conselheiro ou executivo (ou uma IA respondendo por ele) faria sobre o tema, com respostas curtas e diretas — vira dado estruturado FAQPage na página.`;
 
-Linha editorial: "quando eles falam, o mundo presta atenção". A coluna comenta, com a voz e o ponto de vista autoral de Jefferson (tese de "orquestração de fluxos de IA" e "agentes com DNA autoral"), o que as maiores vozes e empresas de tecnologia do mundo disseram ou lançaram nas últimas 24-48h — nunca copia o texto original, só cita trechos curtos entre aspas com atribuição clara e link para a fonte.
+const CURATION_SYSTEM_PROMPT = `${LINHA_EDITORIAL}
 
-Regras obrigatórias (SEO/AEO/GEO — o mesmo padrão já usado no blog):
-- "title": capitalização de frase normal — só a primeira letra maiúscula e nomes próprios. Nunca "Capitalize Cada Palavra Assim".
-- Português do Brasil, tom analítico e direto, sem hype vazio.
-- "excerpt" tem que funcionar sozinho como resposta direta e completa (é o TL;DR que aparece no topo do artigo e alimenta buscadores de IA) — responda a pergunta antes de justificar, sem gancho vazio tipo "descubra...".
-- Estrutura do content_md: um parágrafo de abertura conectando os temas do dia, depois 3 a 5 seções (## Nome da pessoa/empresa) cada uma comentando um item, citação curta (no máximo 1-2 frases entre aspas) com link markdown para a fonte original, fechando com um parágrafo de síntese ligando tudo à visão de Jefferson sobre IA aplicada a marketing e negócios. Use subtítulos claros (##) — favorece leitura escaneável e citação por mecanismos de busca por IA.
-- "faq": 3 a 4 perguntas objetivas que um leitor (ou uma IA respondendo por ele) faria sobre o tema do dia, com respostas curtas e diretas — vira dado estruturado FAQPage na página.
-- Nunca invente citações, dados ou fatos que não estejam nos itens fornecidos. Se não houver itens suficientes e relevantes, produza uma coluna mais curta em vez de inventar.
+# TAREFA: COLUNA "VOZES QUE IMPORTAM"
+Você escreve, em nome de Jefferson Lobo, a coluna diária "Vozes que Importam". Linha: "quando eles falam, o mundo presta atenção". A coluna comenta o que as maiores vozes e empresas de tecnologia do mundo disseram ou lançaram nas últimas 24-48h, e traduz cada item para a pergunta que interessa ao board brasileiro: isso muda o que a minha empresa deveria medir, decidir ou exigir? Nunca copie o texto original: cite só trechos curtos entre aspas, com atribuição clara e link para a fonte.
+
+Estrutura do content_md: um parágrafo de abertura conectando os temas do dia ao momento global da IA; depois 3 a 5 seções (## Nome da pessoa/empresa), cada uma com o fato, uma citação curta (no máximo 1-2 frases entre aspas) com link markdown para a fonte original e a leitura para quem decide no Brasil; fechando com um parágrafo de síntese sob a ótica do Prova de Ganho (o que o conselho deveria fazer com isso). Não force o método em todas as seções.
+
+Nunca invente citações, dados ou fatos que não estejam nos itens fornecidos ou nos FATOS DE REFERÊNCIA. Se não houver itens suficientes e relevantes, produza uma coluna mais curta em vez de inventar.
+
+${FORMATO_JSON_E_SEO}
 - Retorne APENAS um JSON válido no formato exato:
-{"title": "...", "subtitle": "...", "excerpt": "resposta direta e completa em 1-2 frases, até 160 caracteres", "content_md": "corpo em markdown, sem repetir o título", "sources": [{"name": "...", "title": "cargo/empresa", "url": "...", "quote": "trecho citado"}], "faq": [{"q": "...", "a": "..."}]}`;
+{"title": "...", "subtitle": "...", "excerpt": "...", "content_md": "corpo em markdown, sem repetir o título", "sources": [{"name": "...", "title": "cargo/empresa", "url": "...", "quote": "trecho citado"}], "faq": [{"q": "...", "a": "..."}]}`;
 
-const AUTHORED_SYSTEM_PROMPT = `Você escreve, em nome de Jefferson Lobo (palestrante, autor e consultor brasileiro de Inteligência Artificial aplicada a marketing, negócios e lideranças, Gerente Executivo de Marketing do Sistema Fiep), o artigo autoral diário do blog dele.
+const AUTHORED_SYSTEM_PROMPT = `${LINHA_EDITORIAL}
 
-Este NÃO é um resumo de notícias — é uma opinião/análise original de Jefferson, com sua tese proprietária: o marketing entrou na fase da "orquestração de fluxos de IA" (sistemas de agentes conectados ao processo real da marca, não prompt avulso) e marcas precisam de "agentes de IA com DNA autoral" em vez de dependerem de ferramentas genéricas ou da "indústria de prompts".
+# TAREFA: ARTIGO AUTORAL DO DIA
+Você escreve, em nome de Jefferson Lobo, o artigo autoral diário do blog. NÃO é resumo de notícias: é análise e opinião, no formato de coluna de negócios. Use 1-2 itens do noticiário do dia (fornecidos) como gancho factual na abertura, mas o centro é o raciocínio de Jefferson para o board brasileiro, dentro do eixo do dia informado na mensagem.
 
-Pode usar 1-2 itens do noticiário do dia (fornecidos) como gancho/contexto para a reflexão, mas o centro do texto é o raciocínio próprio de Jefferson, aplicável a lideranças de marketing e negócios no Brasil.
+- Português do Brasil, 700 a 1.000 palavras.
+- 3 a 4 subtítulos (##). Pelo menos um parágrafo com dado de FATOS DE REFERÊNCIA citado com a fonte.
+- Ilustre o argumento com pelo menos um caso medido (de CASOS GLOBAIS MEDIDOS ou das notícias do dia).
+- Pelo menos um trecho que valorize explicitamente o papel humano e um trecho crítico sobre a fase de letramento ou sobre a forma como o tema é tratado nos conselhos, quando couber no eixo.
+- Não repita a tese ou o título de artigos recentes (a lista vem na mensagem). Ache um ângulo novo.
 
-Regras obrigatórias (SEO/AEO/GEO — o mesmo padrão já usado no blog):
-- "title": capitalização de frase normal — só a primeira letra maiúscula e nomes próprios. Nunca "Capitalize Cada Palavra Assim".
-- Português do Brasil, 600 a 900 palavras, tom de estrategista prático, não genérico.
-- "excerpt" tem que funcionar sozinho como resposta direta e completa (é o TL;DR que aparece no topo do artigo e alimenta buscadores de IA) — resuma a tese do artigo, não um gancho vazio.
-- Estrutura em markdown com 2-4 subtítulos (##), sem repetir o título como H1. Inclua pelo menos uma frase-tese curta e citável (o tipo de frase que um buscador de IA reproduziria como resposta).
-- "faq": 3 a 4 perguntas objetivas que um leitor (ou uma IA respondendo por ele) faria sobre o tema do artigo, com respostas curtas e diretas — vira dado estruturado FAQPage na página.
-- Nunca invente fatos ou estatísticas específicas — se citar um dado externo, baseie-se só no que foi fornecido.
+# MATÉRIA-MODELO APROVADA POR JEFFERSON (a régua de qualidade)
+Siga o mesmo padrão de estrutura, tom, densidade de evidência e cuidado. NÃO copie o tema, as frases nem os casos: escreva um texto novo, com ângulo próprio e casos adequados ao eixo do dia. Um revisor automático compara seu texto com este modelo antes da publicação.
+
+Por que o modelo foi aprovado:
+${POR_QUE_O_MODELO_FOI_APROVADO}
+
+Título: ${MATERIA_MODELO.title}
+Subtítulo: ${MATERIA_MODELO.subtitle}
+Resumo: ${MATERIA_MODELO.excerpt}
+
+${MATERIA_MODELO.content_md}
+
+${FORMATO_JSON_E_SEO}
 - Retorne APENAS um JSON válido no formato exato:
-{"title": "...", "subtitle": "...", "excerpt": "resposta direta e completa em 1-2 frases, até 160 caracteres", "content_md": "corpo em markdown, sem repetir o título", "sources": [], "faq": [{"q": "...", "a": "..."}]}`;
+{"title": "...", "subtitle": "...", "excerpt": "...", "content_md": "corpo em markdown, sem repetir o título", "sources": [], "faq": [{"q": "...", "a": "..."}]}`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
@@ -306,9 +329,30 @@ Deno.serve(async (req) => {
       .map((i, idx) => `${idx + 1}. [${i.source}${i.personName ? ` — ${i.personName}` : ''}] ${i.title}\n${i.description}\nLink: ${i.link}\nData: ${i.pubDate}`)
       .join('\n\n');
 
+    // Títulos recentes: o redator precisa saber o que já foi dito para não
+    // repetir a mesma tese todo dia (problema real com o ciclo do Método DEL).
+    const { data: recentPosts } = await supabase
+      .from('blog_posts')
+      .select('title, author_kind, content_md')
+      .order('date', { ascending: false })
+      .limit(14);
+    // Caso próprio (Vozes Paranaenses) no máximo 1x a cada ~2 semanas: se já
+    // apareceu em algum dos últimos 14 posts, fica bloqueado. Repetir o mesmo
+    // caso todo dia passa a impressão de que só existe um.
+    const casoProprioLiberado = !(recentPosts || []).some((p: { content_md: string | null }) =>
+      (p.content_md || '').includes('Vozes Paranaenses'),
+    );
+    const recentTitles = (recentPosts || [])
+      .map((p: { title: string; author_kind: string | null }) => `- ${p.title}${p.author_kind ? ` (${p.author_kind})` : ''}`)
+      .join('\n') || '- (nenhum)';
+
     const [curationDraft, authoredDraft] = await Promise.all([
-      draftWithAI(aiApiKey, CURATION_SYSTEM_PROMPT, `Itens coletados hoje:\n\n${poolText}`),
-      draftWithAI(aiApiKey, AUTHORED_SYSTEM_PROMPT, `Contexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`),
+      draftWithAI(aiApiKey, CURATION_SYSTEM_PROMPT, `Caso próprio liberado: não\n\nItens coletados hoje:\n\n${poolText}`),
+      draftWithAI(
+        aiApiKey,
+        AUTHORED_SYSTEM_PROMPT,
+        `Eixo do dia: ${eixoDoDia()}\nCaso próprio liberado: ${casoProprioLiberado ? 'sim' : 'não'}\n\nArtigos publicados recentemente (não repita tese nem título):\n${recentTitles}\n\nContexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`,
+      ),
     ]);
 
 
@@ -363,7 +407,7 @@ Deno.serve(async (req) => {
         try {
           const bytes = await generateImage(
             openAIApiKey,
-            `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
+            `Fotografia realista, editorial, para capa de artigo de opinião sobre gestão, conselhos de administração e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
           );
           const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
           authoredCover = { url, alt: 'Imagem gerada por IA' };
@@ -414,13 +458,35 @@ Deno.serve(async (req) => {
         status: 'pending_review',
         author_kind: 'jefferson',
         faq: authoredDraft.faq,
-        tags: ['inteligencia-artificial', 'marketing', 'estrategia'],
+        tags: ['inteligencia-artificial', 'estrategia', 'governanca', 'prova-de-ganho'],
         seo_title: authoredDraft.title,
         seo_description: authoredDraft.excerpt || authoredDraft.title,
       })
       .select()
       .single();
     if (e2) throw e2;
+
+    // Revisor editorial: o que seguir a linha editorial e o padrão da
+    // matéria-modelo é aprovado sozinho e vai ao ar às 10h (content-pipeline-publish).
+    // O resto espera aprovação humana, como antes. Desligar: secret
+    // BLOG_AUTOPUBLICACAO=off (aí o revisor só dá o parecer).
+    const autoPublicacao = (Deno.env.get('BLOG_AUTOPUBLICACAO') || 'on').toLowerCase() !== 'off';
+    const revisar = async (draft: typeof authoredDraft, tipo: 'autoral' | 'curadoria', postId: string, liberado: boolean) => {
+      const revisao = await revisarRascunho(aiApiKey, draft, tipo, { noticias: poolText, casoProprioLiberado: liberado });
+      const update: Record<string, unknown> = { editorial_review: revisao };
+      if (revisao.aprovado && autoPublicacao) update.status = 'approved';
+      const { error } = await supabase.from('blog_posts').update(update).eq('id', postId);
+      if (error) {
+        // Sem a coluna editorial_review (migration não aplicada), ainda vale aprovar.
+        console.warn('não consegui gravar o parecer do revisor', error.message);
+        if (update.status) await supabase.from('blog_posts').update({ status: 'approved' }).eq('id', postId);
+      }
+      return revisao;
+    };
+    const [curationReview, authoredReview] = await Promise.all([
+      revisar(curationDraft, 'curadoria', curationPost.id, false),
+      revisar(authoredDraft, 'autoral', authoredPost.id, casoProprioLiberado),
+    ]);
 
     await supabase
       .from('content_pipeline_runs')
@@ -437,24 +503,30 @@ Deno.serve(async (req) => {
       return `${supabaseUrl}/functions/v1/content-approve?post=${postId}&action=${action}&token=${token}`;
     };
 
-    const postBlock = async (post: { id: string }, title: string, excerpt: string, label: string) => {
+    const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const postBlock = async (post: { id: string }, title: string, excerpt: string, label: string, rev: ResultadoRevisao) => {
       const approve = await approveLink(post.id, 'approve');
       const reject = await approveLink(post.id, 'reject');
-      return (
-        `<b>${title}</b>\n<i>${label}</i>\n${excerpt}\n\n` +
-        `<a href="${approve}">✅ Aprovar</a> · <a href="${reject}">❌ Rejeitar</a> · <a href="${SITE_URL}/admin">Ver/editar no painel</a>`
-      );
+      const autoAprovado = rev.aprovado && autoPublicacao;
+      const parecer = autoAprovado
+        ? `🤖 <b>Aprovado pelo revisor</b> (nota ${rev.nota}/10). Vai ao ar às 10h. Para barrar, rejeite.`
+        : `🔎 <b>Precisa da sua revisão</b>${rev.nota !== null ? ` (nota ${rev.nota}/10)` : ''}:\n` +
+          [...rev.falhasObjetivas, ...rev.problemasEditoriais].slice(0, 5).map((p) => `• ${esc(p)}`).join('\n');
+      const acoes = autoAprovado
+        ? `<a href="${reject}">❌ Rejeitar</a> · <a href="${SITE_URL}/admin">Ver/editar no painel</a>`
+        : `<a href="${approve}">✅ Aprovar</a> · <a href="${reject}">❌ Rejeitar</a> · <a href="${SITE_URL}/admin">Ver/editar no painel</a>`;
+      return `<b>${esc(title)}</b>\n<i>${label}</i>\n${esc(excerpt)}\n\n${parecer}\n${acoes}`;
     };
 
     const telegramText =
-      `📰 <b>Pauta de hoje pronta para revisão</b>\n\n` +
-      `${await postBlock(curationPost, curationDraft.title, curationDraft.excerpt, 'Vozes que Importam')}\n\n` +
-      `${await postBlock(authoredPost, authoredDraft.title, authoredDraft.excerpt, 'Artigo autoral')}\n\n` +
-      `Aprovando (por aqui ou pelo painel) até 10h, os dois vão ao ar automaticamente nesse horário.`;
+      `📰 <b>Pauta de hoje</b>\n\n` +
+      `${await postBlock(curationPost, curationDraft.title, curationDraft.excerpt, 'Vozes que Importam', curationReview)}\n\n` +
+      `${await postBlock(authoredPost, authoredDraft.title, authoredDraft.excerpt, 'Artigo autoral', authoredReview)}\n\n` +
+      `O que estiver aprovado (pelo revisor, por aqui ou pelo painel) vai ao ar às 10h.`;
     await supabase.functions.invoke('notify-telegram', { body: { text: telegramText } }).catch((e) => console.warn('telegram falhou', e));
 
     return new Response(
-      JSON.stringify({ ok: true, curationPostId: curationPost.id, authoredPostId: authoredPost.id, itemsCollected: pool.length }),
+      JSON.stringify({ ok: true, curationPostId: curationPost.id, authoredPostId: authoredPost.id, itemsCollected: pool.length, autoAprovados: { curadoria: curationReview.aprovado && autoPublicacao, autoral: authoredReview.aprovado && autoPublicacao } }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error) {
