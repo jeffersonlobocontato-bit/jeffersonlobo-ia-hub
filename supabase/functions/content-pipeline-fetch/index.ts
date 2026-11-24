@@ -2,12 +2,15 @@
 // fontes oficiais ativas em content_sources (RSS de blog/imprensa e feeds
 // públicos de vídeo do YouTube, nunca scraping de LinkedIn/X), gera dois
 // rascunhos com a OpenAI (coluna de curadoria + artigo autoral) e deixa os
-// dois como blog_posts com status='pending_review' esperando aprovação no
-// admin. Notifica por Telegram quando a pauta do dia está pronta.
+// dois como blog_posts com status='pending_review'. O revisor editorial
+// (_shared/revisor-editorial.ts) aprova sozinho o que seguir a matéria-modelo;
+// o resto espera aprovação no admin. Notifica por Telegram quando a pauta do dia está pronta.
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { signApprovalToken } from '../_shared/approval-token.ts';
 import { renderBrandedCover } from '../_shared/branded-cover.ts';
 import { LINHA_EDITORIAL, eixoDoDia } from '../_shared/linha-editorial.ts';
+import { MATERIA_MODELO, POR_QUE_O_MODELO_FOI_APROVADO } from '../_shared/materia-modelo.ts';
+import { revisarRascunho, type ResultadoRevisao } from '../_shared/revisor-editorial.ts';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
 
@@ -223,6 +226,18 @@ Você escreve, em nome de Jefferson Lobo, o artigo autoral diário do blog. NÃO
 - Ilustre o argumento com pelo menos um caso medido (de CASOS GLOBAIS MEDIDOS ou das notícias do dia).
 - Pelo menos um trecho que valorize explicitamente o papel humano e um trecho crítico sobre a fase de letramento ou sobre a forma como o tema é tratado nos conselhos, quando couber no eixo.
 - Não repita a tese ou o título de artigos recentes (a lista vem na mensagem). Ache um ângulo novo.
+
+# MATÉRIA-MODELO APROVADA POR JEFFERSON (a régua de qualidade)
+Siga o mesmo padrão de estrutura, tom, densidade de evidência e cuidado. NÃO copie o tema, as frases nem os casos: escreva um texto novo, com ângulo próprio e casos adequados ao eixo do dia. Um revisor automático compara seu texto com este modelo antes da publicação.
+
+Por que o modelo foi aprovado:
+${POR_QUE_O_MODELO_FOI_APROVADO}
+
+Título: ${MATERIA_MODELO.title}
+Subtítulo: ${MATERIA_MODELO.subtitle}
+Resumo: ${MATERIA_MODELO.excerpt}
+
+${MATERIA_MODELO.content_md}
 
 ${FORMATO_JSON_E_SEO}
 - Retorne APENAS um JSON válido no formato exato:
@@ -451,6 +466,28 @@ Deno.serve(async (req) => {
       .single();
     if (e2) throw e2;
 
+    // Revisor editorial: o que seguir a linha editorial e o padrão da
+    // matéria-modelo é aprovado sozinho e vai ao ar às 10h (content-pipeline-publish).
+    // O resto espera aprovação humana, como antes. Desligar: secret
+    // BLOG_AUTOPUBLICACAO=off (aí o revisor só dá o parecer).
+    const autoPublicacao = (Deno.env.get('BLOG_AUTOPUBLICACAO') || 'on').toLowerCase() !== 'off';
+    const revisar = async (draft: typeof authoredDraft, tipo: 'autoral' | 'curadoria', postId: string, liberado: boolean) => {
+      const revisao = await revisarRascunho(aiApiKey, draft, tipo, { noticias: poolText, casoProprioLiberado: liberado });
+      const update: Record<string, unknown> = { editorial_review: revisao };
+      if (revisao.aprovado && autoPublicacao) update.status = 'approved';
+      const { error } = await supabase.from('blog_posts').update(update).eq('id', postId);
+      if (error) {
+        // Sem a coluna editorial_review (migration não aplicada), ainda vale aprovar.
+        console.warn('não consegui gravar o parecer do revisor', error.message);
+        if (update.status) await supabase.from('blog_posts').update({ status: 'approved' }).eq('id', postId);
+      }
+      return revisao;
+    };
+    const [curationReview, authoredReview] = await Promise.all([
+      revisar(curationDraft, 'curadoria', curationPost.id, false),
+      revisar(authoredDraft, 'autoral', authoredPost.id, casoProprioLiberado),
+    ]);
+
     await supabase
       .from('content_pipeline_runs')
       .update({
@@ -466,24 +503,30 @@ Deno.serve(async (req) => {
       return `${supabaseUrl}/functions/v1/content-approve?post=${postId}&action=${action}&token=${token}`;
     };
 
-    const postBlock = async (post: { id: string }, title: string, excerpt: string, label: string) => {
+    const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    const postBlock = async (post: { id: string }, title: string, excerpt: string, label: string, rev: ResultadoRevisao) => {
       const approve = await approveLink(post.id, 'approve');
       const reject = await approveLink(post.id, 'reject');
-      return (
-        `<b>${title}</b>\n<i>${label}</i>\n${excerpt}\n\n` +
-        `<a href="${approve}">✅ Aprovar</a> · <a href="${reject}">❌ Rejeitar</a> · <a href="${SITE_URL}/admin">Ver/editar no painel</a>`
-      );
+      const autoAprovado = rev.aprovado && autoPublicacao;
+      const parecer = autoAprovado
+        ? `🤖 <b>Aprovado pelo revisor</b> (nota ${rev.nota}/10). Vai ao ar às 10h. Para barrar, rejeite.`
+        : `🔎 <b>Precisa da sua revisão</b>${rev.nota !== null ? ` (nota ${rev.nota}/10)` : ''}:\n` +
+          [...rev.falhasObjetivas, ...rev.problemasEditoriais].slice(0, 5).map((p) => `• ${esc(p)}`).join('\n');
+      const acoes = autoAprovado
+        ? `<a href="${reject}">❌ Rejeitar</a> · <a href="${SITE_URL}/admin">Ver/editar no painel</a>`
+        : `<a href="${approve}">✅ Aprovar</a> · <a href="${reject}">❌ Rejeitar</a> · <a href="${SITE_URL}/admin">Ver/editar no painel</a>`;
+      return `<b>${esc(title)}</b>\n<i>${label}</i>\n${esc(excerpt)}\n\n${parecer}\n${acoes}`;
     };
 
     const telegramText =
-      `📰 <b>Pauta de hoje pronta para revisão</b>\n\n` +
-      `${await postBlock(curationPost, curationDraft.title, curationDraft.excerpt, 'Vozes que Importam')}\n\n` +
-      `${await postBlock(authoredPost, authoredDraft.title, authoredDraft.excerpt, 'Artigo autoral')}\n\n` +
-      `Aprovando (por aqui ou pelo painel) até 10h, os dois vão ao ar automaticamente nesse horário.`;
+      `📰 <b>Pauta de hoje</b>\n\n` +
+      `${await postBlock(curationPost, curationDraft.title, curationDraft.excerpt, 'Vozes que Importam', curationReview)}\n\n` +
+      `${await postBlock(authoredPost, authoredDraft.title, authoredDraft.excerpt, 'Artigo autoral', authoredReview)}\n\n` +
+      `O que estiver aprovado (pelo revisor, por aqui ou pelo painel) vai ao ar às 10h.`;
     await supabase.functions.invoke('notify-telegram', { body: { text: telegramText } }).catch((e) => console.warn('telegram falhou', e));
 
     return new Response(
-      JSON.stringify({ ok: true, curationPostId: curationPost.id, authoredPostId: authoredPost.id, itemsCollected: pool.length }),
+      JSON.stringify({ ok: true, curationPostId: curationPost.id, authoredPostId: authoredPost.id, itemsCollected: pool.length, autoAprovados: { curadoria: curationReview.aprovado && autoPublicacao, autoral: authoredReview.aprovado && autoPublicacao } }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } },
     );
   } catch (error) {
