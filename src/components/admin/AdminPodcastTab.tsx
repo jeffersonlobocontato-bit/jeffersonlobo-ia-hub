@@ -10,6 +10,8 @@ import { ptBR } from 'date-fns/locale';
 import { RefreshCw, Trash2 } from 'lucide-react';
 import { usePodcastEpisodes } from '@/hooks/usePodcastEpisodes';
 import { usePodcastConfig } from '@/hooks/usePodcastConfig';
+import { usePodcastSeries } from '@/hooks/usePodcastSeries';
+import { AdminPodcastSeriesCard, EpisodeSeriesCells } from '@/components/admin/AdminPodcastSeries';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import {
@@ -25,6 +27,11 @@ const AdminPodcastTab = () => {
   const { toast } = useToast();
   const { data: episodes, refetch: refetchEpisodes } = usePodcastEpisodes({ includeInactive: true });
   const { data: config, refetch: refetchConfig } = usePodcastConfig();
+  const { data: series = [], refetch: refetchSeries } = usePodcastSeries();
+  const atualizarSeries = () => {
+    refetchSeries();
+    refetchEpisodes();
+  };
   const [syncing, setSyncing] = useState(false);
   const [configData, setConfigData] = useState({
     podcast_title: config?.podcast_title || '',
@@ -216,6 +223,8 @@ const AdminPodcastTab = () => {
         </CardContent>
       </Card>
 
+      <AdminPodcastSeriesCard series={series} episodes={episodes || []} onChange={atualizarSeries} />
+
       <Card>
         <CardHeader>
           <CardTitle>Episódios</CardTitle>
@@ -228,6 +237,8 @@ const AdminPodcastTab = () => {
             <TableHeader>
               <TableRow>
                 <TableHead>Título</TableHead>
+                <TableHead>Série</TableHead>
+                <TableHead>Nº</TableHead>
                 <TableHead>Data</TableHead>
                 <TableHead>Duração</TableHead>
                 <TableHead>Ativo</TableHead>
@@ -240,6 +251,7 @@ const AdminPodcastTab = () => {
                   <TableCell className="font-medium max-w-md truncate">
                     {episode.title}
                   </TableCell>
+                  <EpisodeSeriesCells episode={episode} series={series} onChange={atualizarSeries} />
                   <TableCell>
                     {format(new Date(episode.published_date), 'dd/MM/yyyy', {
                       locale: ptBR,

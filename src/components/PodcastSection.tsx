@@ -5,11 +5,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { usePodcastEpisodes } from '@/hooks/usePodcastEpisodes';
 import { usePodcastConfig } from '@/hooks/usePodcastConfig';
+import { usePodcastSeries } from '@/hooks/usePodcastSeries';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
-import { PODCAST_NOME, linkDeCompartilhamento, slugsDosEpisodios, versaoDeCompartilhamento } from '@/lib/podcast';
+import { PODCAST_NOME, agruparPorSerie, linkDeCompartilhamento, slugsDosEpisodios, versaoDeCompartilhamento } from '@/lib/podcast';
 
 // Compartilha o link estático do episódio (a prévia mostra o card com o título e o nome do canal).
 function compartilharEpisodio(titulo: string, url: string) {
@@ -24,9 +25,10 @@ function compartilharEpisodio(titulo: string, url: string) {
 const PodcastSection = () => {
   const { data: episodes, isLoading: episodesLoading } = usePodcastEpisodes();
   const { data: config, isLoading: configLoading } = usePodcastConfig();
+  const { data: series = [], isLoading: seriesLoading } = usePodcastSeries();
   const { trackCTA } = useTrackCTA();
 
-  if (episodesLoading || configLoading) {
+  if (episodesLoading || configLoading || seriesLoading) {
     return (
       <section id="podcast" className="py-20 px-4 sm:px-6 lg:px-8">
         <div className="container mx-auto max-w-7xl">
@@ -58,6 +60,8 @@ const PodcastSection = () => {
 
   const slugDe = new Map<string, string>();
   slugsDosEpisodios(episodes).forEach((ep, slug) => slugDe.set(ep.id, slug));
+  // Séries primeiro (episódios em ordem de número), depois os episódios avulsos.
+  const grupos = agruparPorSerie(episodes, series);
 
   return (
     <section id="podcast" className="bg-muted/20 py-20 px-4 sm:px-6 lg:px-8">
@@ -74,72 +78,88 @@ const PodcastSection = () => {
           )}
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {episodes.map((episode) => (
-            <Card key={episode.id} className="group transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card">
-              <CardHeader>
-                <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
-                  <Link to={`/podcast/${slugDe.get(episode.id)}`}>{episode.title}</Link>
-                </CardTitle>
-                <CardDescription className="flex items-center gap-4 text-sm">
-                  <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {format(new Date(episode.published_date), 'dd MMM yyyy', { locale: ptBR })}
-                  </span>
-                  {episode.duration && (
-                    <span className="flex items-center gap-1">
-                      <Clock className="h-3 w-3" />
-                      {episode.duration}
-                    </span>
-                  )}
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {episode.description && (
-                  <p className="text-sm text-muted-foreground line-clamp-3">
-                    {episode.description.replace(/<[^>]*>/g, '')}
-                  </p>
-                )}
-                <audio
-                  controls
-                  className="w-full"
-                  preload="metadata"
-                  src={episode.audio_url}
-                  onPlay={() => trackCTA('podcast_play', 'podcast_section')}
-                >
-                  Seu navegador não suporta o elemento de áudio.
-                </audio>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex-1 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                    asChild
-                  >
-                    <Link
-                      to={`/podcast/${slugDe.get(episode.id)}`}
-                      onClick={() => trackCTA('podcast_listen', 'podcast_section')}
-                    >
-                      <Play className="h-4 w-4 mr-2" />
-                      Abrir episódio
-                    </Link>
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    aria-label={`Compartilhar o episódio ${episode.title}`}
-                    onClick={() => {
-                      const slug = slugDe.get(episode.id)!;
-                      const v = versaoDeCompartilhamento(episode.updated_at || episode.published_date);
-                      trackCTA('podcast_share', 'podcast_section');
-                      compartilharEpisodio(episode.title, `${linkDeCompartilhamento(slug)}${v ? `?v=${v}` : ''}`);
-                    }}
-                  >
-                    <Share2 className="h-4 w-4" />
-                  </Button>
+        <div className="space-y-14">
+          {grupos.map((g) => (
+            <div key={g.serie?.id || 'avulsos'}>
+              {(g.serie || grupos.length > 1) && (
+                <div className="mb-6">
+                  <div className="text-xs uppercase tracking-[0.2em] text-primary mb-1" style={{ fontFamily: "'IBM Plex Mono', monospace" }}>
+                    {g.serie ? 'Série' : 'Episódios avulsos'}
+                  </div>
+                  {g.serie && <div className="text-2xl font-medium text-foreground">{g.serie.title}</div>}
+                  {g.serie?.description && <p className="mt-1 text-muted-foreground max-w-3xl">{g.serie.description}</p>}
                 </div>
-              </CardContent>
-            </Card>
+              )}
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {g.episodios.map((episode) => (
+                <Card key={episode.id} className="group transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card">
+                  <CardHeader>
+                    <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
+                      <Link to={`/podcast/${slugDe.get(episode.id)}`}>{episode.title}</Link>
+                    </CardTitle>
+                    <CardDescription className="flex items-center gap-4 text-sm">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="h-3 w-3" />
+                        {episode.episode_number && g.serie ? `EP ${episode.episode_number} · ` : ''}
+                    {format(new Date(episode.published_date), 'dd MMM yyyy', { locale: ptBR })}
+                      </span>
+                      {episode.duration && (
+                        <span className="flex items-center gap-1">
+                          <Clock className="h-3 w-3" />
+                          {episode.duration}
+                        </span>
+                      )}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    {episode.description && (
+                      <p className="text-sm text-muted-foreground line-clamp-3">
+                        {episode.description.replace(/<[^>]*>/g, '')}
+                      </p>
+                    )}
+                    <audio
+                      controls
+                      className="w-full"
+                      preload="metadata"
+                      src={episode.audio_url}
+                      onPlay={() => trackCTA('podcast_play', 'podcast_section')}
+                    >
+                      Seu navegador não suporta o elemento de áudio.
+                    </audio>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="flex-1 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                        asChild
+                      >
+                        <Link
+                          to={`/podcast/${slugDe.get(episode.id)}`}
+                          onClick={() => trackCTA('podcast_listen', 'podcast_section')}
+                        >
+                          <Play className="h-4 w-4 mr-2" />
+                          Abrir episódio
+                        </Link>
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        aria-label={`Compartilhar o episódio ${episode.title}`}
+                        onClick={() => {
+                          const slug = slugDe.get(episode.id)!;
+                          const v = versaoDeCompartilhamento(episode.updated_at || episode.published_date);
+                          trackCTA('podcast_share', 'podcast_section');
+                          compartilharEpisodio(episode.title, `${linkDeCompartilhamento(slug)}${v ? `?v=${v}` : ''}`);
+                        }}
+                      >
+                        <Share2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+                ))}
+              </div>
+            </div>
           ))}
         </div>
       </div>

@@ -1,6 +1,6 @@
 // Card de compartilhamento de um episódio do podcast (1200x630 PNG), no mesmo
 // padrão das capas do blog (_shared/branded-cover.ts): nome do canal no topo,
-// título do episódio no centro, "EPISÓDIO N · JEFFERSON LOBO" embaixo.
+// título do episódio no centro, "SÉRIE X · EPISÓDIO N" embaixo.
 //
 // GET /functions/v1/podcast-card?id=<uuid do episódio>
 //
@@ -22,19 +22,36 @@ Deno.serve(async (req) => {
     return new Response('parâmetro id (uuid do episódio) obrigatório', { status: 400 });
   }
 
-  const { data: ep, error } = await supabase
+  // Com a série (podcast_series). Se a tabela de séries ainda não existir no banco,
+  // cai para a consulta simples e o card sai sem a série.
+  let ep: { title: string; episode_number: number | null; podcast_series?: { title: string } | null } | null = null;
+  const comSerie = await supabase
     .from('podcast_episodes')
-    .select('title, episode_number')
+    .select('title, episode_number, podcast_series(title)')
     .eq('id', id)
     .maybeSingle();
-  if (error) return new Response(error.message, { status: 500 });
+  if (comSerie.error) {
+    const simples = await supabase.from('podcast_episodes').select('title, episode_number').eq('id', id).maybeSingle();
+    if (simples.error) return new Response(simples.error.message, { status: 500 });
+    ep = simples.data;
+  } else {
+    // deno-lint-ignore no-explicit-any
+    ep = comSerie.data as any;
+  }
   if (!ep) return new Response('episódio não encontrado', { status: 404 });
+
+  const serie = ep.podcast_series?.title;
+  const partes = [
+    serie ? `SÉRIE ${serie}` : null,
+    ep.episode_number ? `EPISÓDIO ${ep.episode_number}` : null,
+  ].filter(Boolean);
+  const rodape = partes.length ? partes.join(' · ') : 'JEFFERSON LOBO';
 
   try {
     const png = await renderBrandedCover({
       kicker: PODCAST_NOME,
       title: ep.title,
-      author: ep.episode_number ? `EPISÓDIO ${ep.episode_number} · JEFFERSON LOBO` : 'JEFFERSON LOBO',
+      author: rodape,
     });
     return new Response(png, {
       headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=3600' },

@@ -7,12 +7,15 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { SEO } from '@/components/SEO';
 import { ShareBar } from '@/components/share/ShareBar';
-import { usePodcastEpisodes, type PodcastEpisode } from '@/hooks/usePodcastEpisodes';
+import { usePodcastEpisodes } from '@/hooks/usePodcastEpisodes';
+import { usePodcastSeries } from '@/hooks/usePodcastSeries';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
 import {
   PODCAST_NOME,
   SITE_URL,
+  agruparPorSerie,
   linkDeCompartilhamento,
+  proximoEpisodio,
   slugsDosEpisodios,
   versaoDeCompartilhamento,
 } from '@/lib/podcast';
@@ -30,6 +33,7 @@ const PodcastEpisodio = () => {
   const { slug } = useParams<{ slug: string }>();
   const location = useLocation();
   const { data: episodios = [], isLoading } = usePodcastEpisodes();
+  const { data: series = [], isLoading: carregandoSeries } = usePodcastSeries();
   const { trackCTA } = useTrackCTA();
   const audioRef = useRef<HTMLAudioElement>(null);
   const [terminou, setTerminou] = useState(false);
@@ -41,11 +45,17 @@ const PodcastEpisodio = () => {
     return m;
   }, [porSlug]);
   const episodio = slug ? porSlug.get(slug) : undefined;
-  const outros = episodios.filter((e) => e.id !== episodio?.id);
-  const indice = episodio ? episodios.findIndex((e) => e.id === episodio.id) : -1;
-  // "Próximo" segue a ordem da lista (do mais novo para o mais antigo) e volta ao começo no fim.
-  const proximo: PodcastEpisode | undefined =
-    episodios.length > 1 ? episodios[(indice + 1) % episodios.length] : undefined;
+  const serie = series.find((s) => s.id === episodio?.series_id) || null;
+  // Lista "escolha o próximo": a série deste episódio primeiro (em ordem de número),
+  // depois as outras séries e os avulsos; o episódio atual fica de fora.
+  const grupos = useMemo(() => {
+    const gs = agruparPorSerie(episodios, series)
+      .map((g) => ({ ...g, episodios: g.episodios.filter((e) => e.id !== episodio?.id) }))
+      .filter((g) => g.episodios.length > 0);
+    return gs.sort((a, b) => Number(b.serie?.id === serie?.id && !!serie) - Number(a.serie?.id === serie?.id && !!serie));
+  }, [episodios, series, episodio?.id, serie]);
+  // "Próximo" segue a ordem de escuta: dentro da série, 1 → 2 → 3...
+  const proximo = episodio ? proximoEpisodio(episodio, episodios, series) : undefined;
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -59,7 +69,7 @@ const PodcastEpisodio = () => {
     }
   }, [episodio, location.state]);
 
-  if (isLoading) {
+  if (isLoading || carregandoSeries) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-muted-foreground uppercase font-bold">Carregando...</div>
@@ -98,6 +108,7 @@ const PodcastEpisodio = () => {
     ...(episodio.episode_number ? { episodeNumber: episodio.episode_number } : {}),
     associatedMedia: { '@type': 'MediaObject', contentUrl: episodio.audio_url },
     partOfSeries: { '@type': 'PodcastSeries', name: PODCAST_NOME, url: `${SITE_URL}/#podcast` },
+    ...(serie ? { partOfSeason: { '@type': 'PodcastSeason', name: serie.title } } : {}),
   };
 
   return (
@@ -122,6 +133,7 @@ const PodcastEpisodio = () => {
           <header className="mb-6">
             <div className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary" style={mono}>
               {PODCAST_NOME}
+              {serie ? ` · Série ${serie.title}` : ''}
               {episodio.episode_number ? ` · Episódio ${episodio.episode_number}` : ''}
             </div>
             <h1 className="display-title text-3xl md:text-5xl mb-5 leading-[1.08] tracking-tight">{episodio.title}</h1>
@@ -172,7 +184,7 @@ const PodcastEpisodio = () => {
             <p className="text-lg text-foreground/85 leading-relaxed mb-12 whitespace-pre-line">{descricao}</p>
           )}
 
-          {outros.length > 0 && (
+          {grupos.length > 0 && (
             <section aria-labelledby="outros-episodios">
               <h2
                 id="outros-episodios"
@@ -182,33 +194,44 @@ const PodcastEpisodio = () => {
               >
                 <Headphones className="h-4 w-4 text-primary" /> Escolha o próximo episódio
               </h2>
-              <ol className="divide-y divide-border rounded-2xl border border-border bg-card overflow-hidden">
-                {outros.map((ep) => (
-                  <li key={ep.id}>
-                    <Link
-                      to={`/podcast/${slugDe.get(ep.id)}`}
-                      state={{ tocar: true }}
-                      onClick={() => trackCTA('podcast_proximo', 'podcast_episodio')}
-                      className={`group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-primary/5 ${proximo?.id === ep.id ? 'bg-primary/[0.04]' : ''}`}
-                    >
-                      <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-primary/40 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                        <Play className="h-4 w-4" fill="currentColor" />
-                      </span>
-                      <span className="min-w-0 flex-1">
-                        <span className="block font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">{ep.title}</span>
-                        <span className="mt-1 block text-xs text-muted-foreground" style={mono}>
-                          {ep.episode_number ? `EP ${ep.episode_number} · ` : ''}
-                          {dataCurta(ep.published_date)}
-                          {ep.duration ? ` · ${ep.duration}` : ''}
-                        </span>
-                      </span>
-                      {proximo?.id === ep.id && (
-                        <span className="hidden sm:inline text-[10px] uppercase tracking-[0.15em] text-primary" style={mono}>Próximo</span>
-                      )}
-                    </Link>
-                  </li>
+              <div className="space-y-6">
+                {grupos.map((g) => (
+                  <div key={g.serie?.id || 'avulsos'}>
+                    {(g.serie || grupos.length > 1) && (
+                      <div className="mb-2 text-[11px] uppercase tracking-[0.18em] text-primary" style={mono}>
+                        {g.serie ? `Série ${g.serie.title}` : 'Outros episódios'}
+                      </div>
+                    )}
+                    <ol className="divide-y divide-border rounded-2xl border border-border bg-card overflow-hidden">
+                      {g.episodios.map((ep) => (
+                        <li key={ep.id}>
+                          <Link
+                            to={`/podcast/${slugDe.get(ep.id)}`}
+                            state={{ tocar: true }}
+                            onClick={() => trackCTA('podcast_proximo', 'podcast_episodio')}
+                            className={`group flex items-center gap-4 px-5 py-4 transition-colors hover:bg-primary/5 ${proximo?.id === ep.id ? 'bg-primary/[0.04]' : ''}`}
+                          >
+                            <span className="flex h-10 w-10 flex-none items-center justify-center rounded-full border border-primary/40 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                              <Play className="h-4 w-4" fill="currentColor" />
+                            </span>
+                            <span className="min-w-0 flex-1">
+                              <span className="block font-medium text-foreground group-hover:text-primary transition-colors line-clamp-2">{ep.title}</span>
+                              <span className="mt-1 block text-xs text-muted-foreground" style={mono}>
+                                {ep.episode_number ? `EP ${ep.episode_number} · ` : ''}
+                                {dataCurta(ep.published_date)}
+                                {ep.duration ? ` · ${ep.duration}` : ''}
+                              </span>
+                            </span>
+                            {proximo?.id === ep.id && (
+                              <span className="hidden sm:inline text-[10px] uppercase tracking-[0.15em] text-primary" style={mono}>Próximo</span>
+                            )}
+                          </Link>
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
                 ))}
-              </ol>
+              </div>
             </section>
           )}
         </div>

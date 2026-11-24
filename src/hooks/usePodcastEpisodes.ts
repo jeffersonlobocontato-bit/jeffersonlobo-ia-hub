@@ -13,6 +13,7 @@ export interface PodcastEpisode {
   image_url?: string;
   active: boolean;
   updated_at?: string;
+  series_id?: string | null;
 }
 
 /**
