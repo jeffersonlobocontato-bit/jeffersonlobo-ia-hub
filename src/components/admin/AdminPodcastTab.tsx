@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Switch } from '@/components/ui/switch';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { RefreshCw, Trash2 } from 'lucide-react';
@@ -23,7 +23,7 @@ import {
 
 const AdminPodcastTab = () => {
   const { toast } = useToast();
-  const { data: episodes, refetch: refetchEpisodes } = usePodcastEpisodes();
+  const { data: episodes, refetch: refetchEpisodes } = usePodcastEpisodes({ includeInactive: true });
   const { data: config, refetch: refetchConfig } = usePodcastConfig();
   const [syncing, setSyncing] = useState(false);
   const [configData, setConfigData] = useState({
@@ -31,6 +31,17 @@ const AdminPodcastTab = () => {
     podcast_description: config?.podcast_description || '',
     rss_url: config?.rss_url || '',
   });
+
+  // A config chega depois do primeiro render: sem isto os campos ficavam vazios
+  // e "Salvar Configurações" sobrescrevia título, descrição e RSS com texto vazio.
+  useEffect(() => {
+    if (!config) return;
+    setConfigData({
+      podcast_title: config.podcast_title || '',
+      podcast_description: config.podcast_description || '',
+      rss_url: config.rss_url || '',
+    });
+  }, [config]);
 
   const handleSyncRSS = async () => {
     setSyncing(true);
@@ -59,6 +70,7 @@ const AdminPodcastTab = () => {
   };
 
   const handleUpdateConfig = async () => {
+    if (!config?.id) return;
     try {
       const { error } = await supabase
         .from('podcast_config')
@@ -180,7 +192,7 @@ const AdminPodcastTab = () => {
           </div>
 
           <div className="flex gap-2">
-            <Button onClick={handleUpdateConfig}>
+            <Button onClick={handleUpdateConfig} disabled={!config?.id}>
               Salvar Configurações
             </Button>
             <Button
