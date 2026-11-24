@@ -1488,6 +1488,7 @@ export type Database = {
           image_url: string | null
           published_date: string
           season_number: number | null
+          series_id: string | null
           title: string
           updated_at: string | null
         }
@@ -1503,6 +1504,7 @@ export type Database = {
           image_url?: string | null
           published_date: string
           season_number?: number | null
+          series_id?: string | null
           title: string
           updated_at?: string | null
         }
@@ -1518,6 +1520,45 @@ export type Database = {
           image_url?: string | null
           published_date?: string
           season_number?: number | null
+          series_id?: string | null
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "podcast_episodes_series_id_fkey"
+            columns: ["series_id"]
+            isOneToOne: false
+            referencedRelation: "podcast_series"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      podcast_series: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          id: string
+          position: number
+          slug: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          position?: number
+          slug: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          id?: string
+          position?: number
+          slug?: string
           title?: string
           updated_at?: string | null
         }

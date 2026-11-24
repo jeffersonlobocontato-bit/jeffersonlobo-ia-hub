@@ -12,6 +12,8 @@ export interface PodcastEpisode {
   season_number?: number;
   image_url?: string;
   active: boolean;
+  updated_at?: string;
+  series_id?: string | null;
 }
 
 /**
