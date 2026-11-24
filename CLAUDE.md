@@ -27,6 +27,7 @@ Site pessoal, blog e hub de conteúdo de Jefferson Lobo (palestrante e consultor
 
 ## Supabase
 - 80+ migrations em `supabase/migrations/` — schema já é grande, sempre olhar migrations recentes antes de assumir estrutura de tabela
+- **Linha editorial do blog**: o redator automático (`content-pipeline-fetch`, que gera o artigo autoral e a coluna Vozes que Importam) é "treinado" por `supabase/functions/_shared/linha-editorial.ts` — tese do Método Prova de Ganho (o DEL é peça dele, não tema central), público board/decisores, estilo de coluna de negócios, calibragem sobre o board brasileiro e a lista fechada de dados que podem ser citados. Mudanças de tese/dados vão lá, não nos prompts.
 - Edge functions relevantes: `content-pipeline-fetch`/`content-pipeline-publish` (pipeline de conteúdo), `chat-uivo-lobo` (chatbot do site), `sync-podcast-rss`, `publish-linkedin`, `video-ai-instrucoes`, sistema de e-mail transacional (`send-transactional-email`, `process-email-queue`, `handle-email-unsubscribe`/`handle-email-suppression`)
 
 ## Convenções

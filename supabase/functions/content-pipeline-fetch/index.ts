@@ -7,6 +7,7 @@
 import { createClient } from 'npm:@supabase/supabase-js@2';
 import { signApprovalToken } from '../_shared/approval-token.ts';
 import { renderBrandedCover } from '../_shared/branded-cover.ts';
+import { LINHA_EDITORIAL, eixoDoDia } from '../_shared/linha-editorial.ts';
 
 const SITE_URL = 'https://jeffersonlobo.tech';
 
@@ -190,35 +191,41 @@ async function draftWithAI(apiKey: string, systemPrompt: string, userPrompt: str
   };
 }
 
-const CURATION_SYSTEM_PROMPT = `Você escreve, em nome de Jefferson Lobo (palestrante, autor e consultor brasileiro de Inteligência Artificial aplicada a marketing, negócios e lideranças), a coluna diária "Vozes que Importam" do blog dele.
+// O "treinamento" do redator (tese, público, estilo, calibragem e dados
+// permitidos) fica em _shared/linha-editorial.ts — mude lá, não aqui.
+const FORMATO_JSON_E_SEO = `Regras obrigatórias (SEO/AEO/GEO — o mesmo padrão já usado no blog):
+- "title": capitalização de frase normal — só a primeira letra maiúscula e nomes próprios. Nunca "Capitalize Cada Palavra Assim". Título informativo, como manchete de jornal de negócios, sem clickbait.
+- "subtitle": uma linha de apoio que diga ao decisor por que o tema importa para ele.
+- "excerpt" tem que funcionar sozinho como resposta direta e completa (é o TL;DR que aparece no topo do artigo e alimenta buscadores de IA) — resuma a tese, não um gancho vazio. Até 160 caracteres.
+- Estrutura em markdown com subtítulos (##), sem repetir o título como H1. Inclua pelo menos uma frase-tese curta e citável.
+- "faq": 3 a 4 perguntas objetivas que um conselheiro ou executivo (ou uma IA respondendo por ele) faria sobre o tema, com respostas curtas e diretas — vira dado estruturado FAQPage na página.`;
 
-Linha editorial: "quando eles falam, o mundo presta atenção". A coluna comenta, com a voz e o ponto de vista autoral de Jefferson (tese de "orquestração de fluxos de IA" e "agentes com DNA autoral"), o que as maiores vozes e empresas de tecnologia do mundo disseram ou lançaram nas últimas 24-48h — nunca copia o texto original, só cita trechos curtos entre aspas com atribuição clara e link para a fonte.
+const CURATION_SYSTEM_PROMPT = `${LINHA_EDITORIAL}
 
-Regras obrigatórias (SEO/AEO/GEO — o mesmo padrão já usado no blog):
-- "title": capitalização de frase normal — só a primeira letra maiúscula e nomes próprios. Nunca "Capitalize Cada Palavra Assim".
-- Português do Brasil, tom analítico e direto, sem hype vazio.
-- "excerpt" tem que funcionar sozinho como resposta direta e completa (é o TL;DR que aparece no topo do artigo e alimenta buscadores de IA) — responda a pergunta antes de justificar, sem gancho vazio tipo "descubra...".
-- Estrutura do content_md: um parágrafo de abertura conectando os temas do dia, depois 3 a 5 seções (## Nome da pessoa/empresa) cada uma comentando um item, citação curta (no máximo 1-2 frases entre aspas) com link markdown para a fonte original, fechando com um parágrafo de síntese ligando tudo à visão de Jefferson sobre IA aplicada a marketing e negócios. Use subtítulos claros (##) — favorece leitura escaneável e citação por mecanismos de busca por IA.
-- "faq": 3 a 4 perguntas objetivas que um leitor (ou uma IA respondendo por ele) faria sobre o tema do dia, com respostas curtas e diretas — vira dado estruturado FAQPage na página.
-- Nunca invente citações, dados ou fatos que não estejam nos itens fornecidos. Se não houver itens suficientes e relevantes, produza uma coluna mais curta em vez de inventar.
+# TAREFA: COLUNA "VOZES QUE IMPORTAM"
+Você escreve, em nome de Jefferson Lobo, a coluna diária "Vozes que Importam". Linha: "quando eles falam, o mundo presta atenção". A coluna comenta o que as maiores vozes e empresas de tecnologia do mundo disseram ou lançaram nas últimas 24-48h, e traduz cada item para a pergunta que interessa ao board brasileiro: isso muda o que a minha empresa deveria medir, decidir ou exigir? Nunca copie o texto original: cite só trechos curtos entre aspas, com atribuição clara e link para a fonte.
+
+Estrutura do content_md: um parágrafo de abertura conectando os temas do dia ao momento global da IA; depois 3 a 5 seções (## Nome da pessoa/empresa), cada uma com o fato, uma citação curta (no máximo 1-2 frases entre aspas) com link markdown para a fonte original e a leitura para quem decide no Brasil; fechando com um parágrafo de síntese sob a ótica do Prova de Ganho (o que o conselho deveria fazer com isso). Não force o método em todas as seções.
+
+Nunca invente citações, dados ou fatos que não estejam nos itens fornecidos ou nos FATOS DE REFERÊNCIA. Se não houver itens suficientes e relevantes, produza uma coluna mais curta em vez de inventar.
+
+${FORMATO_JSON_E_SEO}
 - Retorne APENAS um JSON válido no formato exato:
-{"title": "...", "subtitle": "...", "excerpt": "resposta direta e completa em 1-2 frases, até 160 caracteres", "content_md": "corpo em markdown, sem repetir o título", "sources": [{"name": "...", "title": "cargo/empresa", "url": "...", "quote": "trecho citado"}], "faq": [{"q": "...", "a": "..."}]}`;
+{"title": "...", "subtitle": "...", "excerpt": "...", "content_md": "corpo em markdown, sem repetir o título", "sources": [{"name": "...", "title": "cargo/empresa", "url": "...", "quote": "trecho citado"}], "faq": [{"q": "...", "a": "..."}]}`;
 
-const AUTHORED_SYSTEM_PROMPT = `Você escreve, em nome de Jefferson Lobo (palestrante, autor e consultor brasileiro de Inteligência Artificial aplicada a marketing, negócios e lideranças, Gerente Executivo de Marketing do Sistema Fiep), o artigo autoral diário do blog dele.
+const AUTHORED_SYSTEM_PROMPT = `${LINHA_EDITORIAL}
 
-Este NÃO é um resumo de notícias — é uma opinião/análise original de Jefferson, com sua tese proprietária: o marketing entrou na fase da "orquestração de fluxos de IA" (sistemas de agentes conectados ao processo real da marca, não prompt avulso) e marcas precisam de "agentes de IA com DNA autoral" em vez de dependerem de ferramentas genéricas ou da "indústria de prompts".
+# TAREFA: ARTIGO AUTORAL DO DIA
+Você escreve, em nome de Jefferson Lobo, o artigo autoral diário do blog. NÃO é resumo de notícias: é análise e opinião, no formato de coluna de negócios. Use 1-2 itens do noticiário do dia (fornecidos) como gancho factual na abertura, mas o centro é o raciocínio de Jefferson para o board brasileiro, dentro do eixo do dia informado na mensagem.
 
-Pode usar 1-2 itens do noticiário do dia (fornecidos) como gancho/contexto para a reflexão, mas o centro do texto é o raciocínio próprio de Jefferson, aplicável a lideranças de marketing e negócios no Brasil.
+- Português do Brasil, 700 a 1.000 palavras.
+- 3 a 4 subtítulos (##). Pelo menos um parágrafo com dado de FATOS DE REFERÊNCIA citado com a fonte.
+- Pelo menos um trecho que valorize explicitamente o papel humano e um trecho crítico sobre a fase de letramento ou sobre a forma como o tema é tratado nos conselhos, quando couber no eixo.
+- Não repita a tese ou o título de artigos recentes (a lista vem na mensagem). Ache um ângulo novo.
 
-Regras obrigatórias (SEO/AEO/GEO — o mesmo padrão já usado no blog):
-- "title": capitalização de frase normal — só a primeira letra maiúscula e nomes próprios. Nunca "Capitalize Cada Palavra Assim".
-- Português do Brasil, 600 a 900 palavras, tom de estrategista prático, não genérico.
-- "excerpt" tem que funcionar sozinho como resposta direta e completa (é o TL;DR que aparece no topo do artigo e alimenta buscadores de IA) — resuma a tese do artigo, não um gancho vazio.
-- Estrutura em markdown com 2-4 subtítulos (##), sem repetir o título como H1. Inclua pelo menos uma frase-tese curta e citável (o tipo de frase que um buscador de IA reproduziria como resposta).
-- "faq": 3 a 4 perguntas objetivas que um leitor (ou uma IA respondendo por ele) faria sobre o tema do artigo, com respostas curtas e diretas — vira dado estruturado FAQPage na página.
-- Nunca invente fatos ou estatísticas específicas — se citar um dado externo, baseie-se só no que foi fornecido.
+${FORMATO_JSON_E_SEO}
 - Retorne APENAS um JSON válido no formato exato:
-{"title": "...", "subtitle": "...", "excerpt": "resposta direta e completa em 1-2 frases, até 160 caracteres", "content_md": "corpo em markdown, sem repetir o título", "sources": [], "faq": [{"q": "...", "a": "..."}]}`;
+{"title": "...", "subtitle": "...", "excerpt": "...", "content_md": "corpo em markdown, sem repetir o título", "sources": [], "faq": [{"q": "...", "a": "..."}]}`;
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response(null, { headers: corsHeaders });
@@ -306,9 +313,24 @@ Deno.serve(async (req) => {
       .map((i, idx) => `${idx + 1}. [${i.source}${i.personName ? ` — ${i.personName}` : ''}] ${i.title}\n${i.description}\nLink: ${i.link}\nData: ${i.pubDate}`)
       .join('\n\n');
 
+    // Títulos recentes: o redator precisa saber o que já foi dito para não
+    // repetir a mesma tese todo dia (problema real com o ciclo do Método DEL).
+    const { data: recentPosts } = await supabase
+      .from('blog_posts')
+      .select('title, author_kind')
+      .order('date', { ascending: false })
+      .limit(14);
+    const recentTitles = (recentPosts || [])
+      .map((p: { title: string; author_kind: string | null }) => `- ${p.title}${p.author_kind ? ` (${p.author_kind})` : ''}`)
+      .join('\n') || '- (nenhum)';
+
     const [curationDraft, authoredDraft] = await Promise.all([
       draftWithAI(aiApiKey, CURATION_SYSTEM_PROMPT, `Itens coletados hoje:\n\n${poolText}`),
-      draftWithAI(aiApiKey, AUTHORED_SYSTEM_PROMPT, `Contexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`),
+      draftWithAI(
+        aiApiKey,
+        AUTHORED_SYSTEM_PROMPT,
+        `Eixo do dia: ${eixoDoDia()}\n\nArtigos publicados recentemente (não repita tese nem título):\n${recentTitles}\n\nContexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`,
+      ),
     ]);
 
 
@@ -363,7 +385,7 @@ Deno.serve(async (req) => {
         try {
           const bytes = await generateImage(
             openAIApiKey,
-            `Fotografia realista, editorial, para capa de artigo de opinião sobre marketing e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
+            `Fotografia realista, editorial, para capa de artigo de opinião sobre gestão, conselhos de administração e inteligência artificial. Tema: ${authoredDraft.title}. Sem texto, sem logotipos.`,
           );
           const url = await uploadCoverImage(supabase, bytes, `${today}-autoral.png`);
           authoredCover = { url, alt: 'Imagem gerada por IA' };
@@ -414,7 +436,7 @@ Deno.serve(async (req) => {
         status: 'pending_review',
         author_kind: 'jefferson',
         faq: authoredDraft.faq,
-        tags: ['inteligencia-artificial', 'marketing', 'estrategia'],
+        tags: ['inteligencia-artificial', 'estrategia', 'governanca', 'prova-de-ganho'],
         seo_title: authoredDraft.title,
         seo_description: authoredDraft.excerpt || authoredDraft.title,
       })
