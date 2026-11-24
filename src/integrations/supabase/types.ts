@@ -226,6 +226,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           date: string
+          editorial_review: Json | null
           excerpt: string
           faq: Json | null
           id: string
@@ -252,6 +253,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           date: string
+          editorial_review?: Json | null
           excerpt: string
           faq?: Json | null
           id?: string
@@ -278,6 +280,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           date?: string
+          editorial_review?: Json | null
           excerpt?: string
           faq?: Json | null
           id?: string
