@@ -220,6 +220,7 @@ Você escreve, em nome de Jefferson Lobo, o artigo autoral diário do blog. NÃO
 
 - Português do Brasil, 700 a 1.000 palavras.
 - 3 a 4 subtítulos (##). Pelo menos um parágrafo com dado de FATOS DE REFERÊNCIA citado com a fonte.
+- Ilustre o argumento com pelo menos um caso medido (de CASOS GLOBAIS MEDIDOS ou das notícias do dia).
 - Pelo menos um trecho que valorize explicitamente o papel humano e um trecho crítico sobre a fase de letramento ou sobre a forma como o tema é tratado nos conselhos, quando couber no eixo.
 - Não repita a tese ou o título de artigos recentes (a lista vem na mensagem). Ache um ângulo novo.
 
@@ -317,19 +318,25 @@ Deno.serve(async (req) => {
     // repetir a mesma tese todo dia (problema real com o ciclo do Método DEL).
     const { data: recentPosts } = await supabase
       .from('blog_posts')
-      .select('title, author_kind')
+      .select('title, author_kind, content_md')
       .order('date', { ascending: false })
       .limit(14);
+    // Caso próprio (Vozes Paranaenses) no máximo 1x a cada ~2 semanas: se já
+    // apareceu em algum dos últimos 14 posts, fica bloqueado. Repetir o mesmo
+    // caso todo dia passa a impressão de que só existe um.
+    const casoProprioLiberado = !(recentPosts || []).some((p: { content_md: string | null }) =>
+      (p.content_md || '').includes('Vozes Paranaenses'),
+    );
     const recentTitles = (recentPosts || [])
       .map((p: { title: string; author_kind: string | null }) => `- ${p.title}${p.author_kind ? ` (${p.author_kind})` : ''}`)
       .join('\n') || '- (nenhum)';
 
     const [curationDraft, authoredDraft] = await Promise.all([
-      draftWithAI(aiApiKey, CURATION_SYSTEM_PROMPT, `Itens coletados hoje:\n\n${poolText}`),
+      draftWithAI(aiApiKey, CURATION_SYSTEM_PROMPT, `Caso próprio liberado: não\n\nItens coletados hoje:\n\n${poolText}`),
       draftWithAI(
         aiApiKey,
         AUTHORED_SYSTEM_PROMPT,
-        `Eixo do dia: ${eixoDoDia()}\n\nArtigos publicados recentemente (não repita tese nem título):\n${recentTitles}\n\nContexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`,
+        `Eixo do dia: ${eixoDoDia()}\nCaso próprio liberado: ${casoProprioLiberado ? 'sim' : 'não'}\n\nArtigos publicados recentemente (não repita tese nem título):\n${recentTitles}\n\nContexto do noticiário de hoje (use no máximo 1-2 itens como gancho):\n\n${poolText}`,
       ),
     ]);
 
