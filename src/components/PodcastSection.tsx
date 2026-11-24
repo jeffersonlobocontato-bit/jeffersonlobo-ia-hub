@@ -1,4 +1,6 @@
-import { Play, Calendar, Clock } from 'lucide-react';
+import { Play, Calendar, Clock, Share2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { toast } from 'sonner';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { usePodcastEpisodes } from '@/hooks/usePodcastEpisodes';
@@ -7,6 +9,17 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useTrackCTA } from '@/hooks/useTrackCTA';
+import { PODCAST_NOME, linkDeCompartilhamento, slugsDosEpisodios, versaoDeCompartilhamento } from '@/lib/podcast';
+
+// Compartilha o link estático do episódio (a prévia mostra o card com o título e o nome do canal).
+function compartilharEpisodio(titulo: string, url: string) {
+  if (typeof navigator.share === 'function') {
+    navigator.share({ title: `${titulo} · ${PODCAST_NOME}`, url }).catch(() => {});
+    return;
+  }
+  navigator.clipboard.writeText(url);
+  toast.success('Link copiado — a prévia mostra o card do episódio');
+}
 
 const PodcastSection = () => {
   const { data: episodes, isLoading: episodesLoading } = usePodcastEpisodes();
@@ -43,6 +56,9 @@ const PodcastSection = () => {
     return null;
   }
 
+  const slugDe = new Map<string, string>();
+  slugsDosEpisodios(episodes).forEach((ep, slug) => slugDe.set(ep.id, slug));
+
   return (
     <section id="podcast" className="bg-muted/20 py-20 px-4 sm:px-6 lg:px-8">
       <div className="container mx-auto max-w-7xl">
@@ -63,7 +79,7 @@ const PodcastSection = () => {
             <Card key={episode.id} className="group transition-all duration-300 hover:-translate-y-1 border-primary/20 bg-card">
               <CardHeader>
                 <CardTitle className="text-lg line-clamp-2 group-hover:text-primary transition-colors">
-                  {episode.title}
+                  <Link to={`/podcast/${slugDe.get(episode.id)}`}>{episode.title}</Link>
                 </CardTitle>
                 <CardDescription className="flex items-center gap-4 text-sm">
                   <span className="flex items-center gap-1">
@@ -93,22 +109,35 @@ const PodcastSection = () => {
                 >
                   Seu navegador não suporta o elemento de áudio.
                 </audio>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="w-full group-hover:bg-primary group-hover:text-primary-foreground transition-all"
-                  asChild
-                >
-                  <a 
-                    href={episode.audio_url} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    onClick={() => trackCTA('podcast_listen', 'podcast_section')}
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex-1 group-hover:bg-primary group-hover:text-primary-foreground transition-all"
+                    asChild
                   >
-                    <Play className="h-4 w-4 mr-2" />
-                    Ouvir Episódio
-                  </a>
-                </Button>
+                    <Link
+                      to={`/podcast/${slugDe.get(episode.id)}`}
+                      onClick={() => trackCTA('podcast_listen', 'podcast_section')}
+                    >
+                      <Play className="h-4 w-4 mr-2" />
+                      Abrir episódio
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    aria-label={`Compartilhar o episódio ${episode.title}`}
+                    onClick={() => {
+                      const slug = slugDe.get(episode.id)!;
+                      const v = versaoDeCompartilhamento(episode.updated_at || episode.published_date);
+                      trackCTA('podcast_share', 'podcast_section');
+                      compartilharEpisodio(episode.title, `${linkDeCompartilhamento(slug)}${v ? `?v=${v}` : ''}`);
+                    }}
+                  >
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.handle-email-events]
 verify_jwt = false
+
+[functions.podcast-card]
+verify_jwt = false

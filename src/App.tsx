@@ -51,6 +51,7 @@ const ConsultoriaIA = lazyComPreload(() => import("./pages/ConsultoriaIA"));
 const ProvaDeGanho = lazyComPreload(() => import("./pages/ProvaDeGanho"));
 const BlogIndex = lazy(() => import("./pages/BlogIndex"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
+const PodcastEpisodio = lazy(() => import("./pages/PodcastEpisodio"));
 const PressReleaseOG = lazy(() => import("./pages/PressReleaseOG"));
 const Materiais = lazyComPreload(() => import("./pages/Materiais"));
 const LivroDel = lazyComPreload(() => import("./pages/LivroDel"));
@@ -152,6 +153,7 @@ const App = ({ Roteador = RoteadorPadrao }: { Roteador?: ComponentType<{ childre
               <Route path="/metodo" element={<Navigate to="/provadeganho" replace />} />
               <Route path="/blog" element={comSuspense(<BlogIndex />)} />
               <Route path="/blog/:slug" element={comSuspense(<BlogPost />)} />
+              <Route path="/podcast/:slug" element={comSuspense(<PodcastEpisodio />)} />
               <Route path="/materiais" element={comSuspense(<Materiais />)} />
               <Route path="/materiais/:slug" element={comSuspense(<MaterialDetalhe />)} />
               <Route path="/livro-del" element={comSuspense(<LivroDel />)} />

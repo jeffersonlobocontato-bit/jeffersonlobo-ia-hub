@@ -1,9 +1,10 @@
 // Runs before `vite dev` and `vite build` (predev/prebuild hooks); writes public/sitemap.xml.
 // Pulls blog posts from Supabase to include /blog/:slug URLs.
-import { mkdirSync, rmSync, writeFileSync } from "fs";
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "fs";
 import { Buffer } from "buffer";
 import { resolve } from "path";
 import sharp from "sharp";
+import { PODCAST_NOME, slugsDosEpisodios, versaoDeCompartilhamento } from "../src/lib/podcast";
 
 const BASE_URL = "https://jeffersonlobo.tech";
 const FALLBACK_IMAGE = "https://storage.googleapis.com/gpt-engineer-file-uploads/DHKdvSKyvqV4o5xAVHB85Nkclo92/social-images/social-1762353011645-aprenda-inteligencia-artificial-na-pratica.webp";
@@ -79,6 +80,23 @@ function socialImageUrl(image?: string | null): string {
 
 async function cacheSocialImage(post: BlogPostRow, shareVersion: string): Promise<string> {
   if (!post.cover_image) return FALLBACK_IMAGE;
+
+  // Capa hospedada no próprio site (public/blog-covers/...): lê o arquivo do
+  // repositório. Buscar pela URL pegaria a versão ANTERIOR (a que está no ar),
+  // não a que vai subir neste build — capa trocada não aparecia no WhatsApp.
+  if (post.cover_image.startsWith(`${BASE_URL}/`)) {
+    const local = resolve("public", decodeURIComponent(new URL(post.cover_image).pathname.slice(1)));
+    if (existsSync(local)) {
+      const filename = `${post.slug}-${shareVersion}.jpg`;
+      const bytes = await sharp(readFileSync(local))
+        .resize(1200, 630, { fit: "cover" })
+        .flatten({ background: "#12201E" })
+        .jpeg({ quality: 82, progressive: false, mozjpeg: true })
+        .toBuffer();
+      writeFileSync(resolve("public/og", filename), bytes);
+      return `${BASE_URL}/og/${filename}`;
+    }
+  }
 
   const sourceUrl = socialImageUrl(post.cover_image);
   const response = await fetch(sourceUrl, {
@@ -211,7 +229,11 @@ async function cacheBookSocialImage(): Promise<string> {
 }
 
 async function writeBookSharePage() {
-  const image = escapeHtml(await cacheBookSocialImage());
+  // Falha de rede aqui não pode derrubar o build inteiro (prebuild).
+  const image = escapeHtml(await cacheBookSocialImage().catch((e) => {
+    console.warn("share image: livro-del indisponível, usando imagem padrão", e?.message || e);
+    return FALLBACK_IMAGE;
+  }));
   const title = escapeHtml(LIVRO_DEL_TITLE);
   const description = escapeHtml(truncateText(LIVRO_DEL_SUBTITLE));
   const pageUrl = `${BASE_URL}/livro-del`;
@@ -248,7 +270,7 @@ async function writeBookSharePage() {
   console.log("share page: public/livro-del.html written");
 }
 
-async function fetchBlogPosts(): Promise<BlogPostRow[]> {
+async function fetchBlogPosts(): Promise<BlogPostRow[] | null> {
   try {
     const res = await fetch(
       `${SUPABASE_URL}/rest/v1/blog_posts?select=slug,title,subtitle,excerpt,cover_image,cover_alt,seo_description,updated_at,date&active=eq.true&order=date.desc`,
@@ -261,12 +283,12 @@ async function fetchBlogPosts(): Promise<BlogPostRow[]> {
     );
     if (!res.ok) {
       console.warn(`sitemap: blog fetch failed (${res.status})`);
-      return [];
+      return null;
     }
     return (await res.json()) as BlogPostRow[];
   } catch (e) {
     console.warn("sitemap: blog fetch error", e);
-    return [];
+    return null;
   }
 }
 
@@ -357,10 +379,118 @@ function writeLlmsTxt(blogPosts: BlogPostRow[]) {
   console.log(`llms.txt written (${blogPosts.length} blog posts referenced)`);
 }
 
+interface EpisodeRow {
+  id: string;
+  title: string;
+  description?: string | null;
+  published_date: string;
+  updated_at?: string | null;
+  duration?: string | null;
+  episode_number?: number | null;
+}
+
+async function fetchEpisodes(): Promise<EpisodeRow[] | null> {
+  try {
+    const res = await fetch(
+      `${SUPABASE_URL}/rest/v1/podcast_episodes?select=id,title,description,published_date,updated_at,duration,episode_number&active=eq.true&order=published_date.desc`,
+      { headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` } },
+    );
+    if (!res.ok) {
+      console.warn(`podcast: fetch failed (${res.status})`);
+      return null;
+    }
+    return (await res.json()) as EpisodeRow[];
+  } catch (e) {
+    console.warn("podcast: fetch error", e);
+    return null;
+  }
+}
+
+/** Card do episódio (nome do canal + título), desenhado pela edge function podcast-card e salvo no próprio domínio. */
+async function cachePodcastCard(ep: EpisodeRow, filename: string): Promise<string | null> {
+  try {
+    const res = await fetch(`${SUPABASE_URL}/functions/v1/podcast-card?id=${ep.id}`, {
+      headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}` },
+    });
+    if (!res.ok || !(res.headers.get("content-type") || "").startsWith("image/")) {
+      console.warn(`podcast card: failed for "${ep.title}" (${res.status})`);
+      return null;
+    }
+    const bytes = await sharp(Buffer.from(await res.arrayBuffer()))
+      .resize(1200, 630, { fit: "cover" })
+      .flatten({ background: "#12201E" })
+      .jpeg({ quality: 85, progressive: false, mozjpeg: true })
+      .toBuffer();
+    mkdirSync(resolve("public/og"), { recursive: true });
+    writeFileSync(resolve("public/og", filename), bytes);
+    return `${BASE_URL}/og/${filename}`;
+  } catch (e) {
+    console.warn(`podcast card: error for "${ep.title}"`, e);
+    return null;
+  }
+}
+
+// Páginas estáticas public/episodio/{slug}.html: o que o WhatsApp/LinkedIn lê ao
+// compartilhar um episódio (og:image = card do episódio). Quem abre o link é
+// levado para a página do episódio, /podcast/{slug}.
+async function writePodcastSharePages(episodes: EpisodeRow[]) {
+  const dir = resolve("public/episodio");
+  rmSync(dir, { recursive: true, force: true });
+  mkdirSync(dir, { recursive: true });
+
+  for (const [slug, ep] of slugsDosEpisodios(episodes)) {
+    const pageUrl = `${BASE_URL}/podcast/${slug}`;
+    const shareUrl = `${BASE_URL}/episodio/${slug}.html`;
+    const versao = versaoDeCompartilhamento(ep.updated_at || ep.published_date);
+    const card = await cachePodcastCard(ep, `podcast-${slug}${versao ? `-${versao}` : ""}.jpg`);
+    const image = escapeHtml(card || `${BASE_URL}/og-default.png`);
+    const title = escapeHtml(`${ep.title} · ${PODCAST_NOME}`);
+    const description = escapeHtml(
+      truncateText((ep.description || "").replace(/<[^>]*>/g, "") || `Episódio do podcast ${PODCAST_NOME}, de Jefferson Lobo.`),
+    );
+    const html = `<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>${title}</title>
+<meta name="description" content="${description}" />
+<link rel="canonical" href="${pageUrl}" />
+<meta property="og:type" content="music.song" />
+<meta property="og:site_name" content="${escapeHtml(PODCAST_NOME)} · Jefferson Lobo" />
+<meta property="og:url" content="${shareUrl}" />
+<meta property="og:title" content="${title}" />
+<meta property="og:description" content="${description}" />
+<meta property="og:image" content="${image}" />
+<meta property="og:image:url" content="${image}" />
+<meta property="og:image:secure_url" content="${image}" />
+<meta property="og:image:type" content="${card ? "image/jpeg" : "image/png"}" />
+<meta property="og:image:alt" content="${title}" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="${title}" />
+<meta name="twitter:description" content="${description}" />
+<meta name="twitter:image" content="${image}" />
+<script>window.location.replace(${JSON.stringify(pageUrl)});</script>
+</head>
+<body><a href="${pageUrl}">${title}</a></body>
+</html>`;
+    writeFileSync(resolve(dir, `${slug}.html`), html);
+  }
+  console.log(`share pages: ${episodes.length} podcast episodes written to public/episodio/`);
+}
+
 async function main() {
-  const blogPosts = await fetchBlogPosts();
-  await writeSharePages(blogPosts);
+  const fetchedPosts = await fetchBlogPosts();
+  const blogPosts = fetchedPosts ?? [];
+  // Sem conexão com o banco, NÃO apaga as prévias que já existem (antes o
+  // rmSync zerava public/noticia e todo link compartilhado perdia a capa).
+  if (fetchedPosts) await writeSharePages(blogPosts);
+  else console.warn("share pages: banco indisponível, mantendo as páginas de compartilhamento existentes");
   await writeBookSharePage();
+  const episodes = await fetchEpisodes();
+  if (episodes) await writePodcastSharePages(episodes);
   writeLlmsTxt(blogPosts);
 
   const entries: SitemapEntry[] = [
@@ -386,6 +516,12 @@ async function main() {
     { path: "/materiais/auditoria-del", lastmod: today, changefreq: "yearly", priority: "0.6" },
     { path: "/materiais/templates-del", lastmod: today, changefreq: "yearly", priority: "0.6" },
     { path: "/politica-privacidade", lastmod: today, changefreq: "yearly", priority: "0.3" },
+    ...[...slugsDosEpisodios(episodes ?? []).entries()].map(([slug, ep]) => ({
+      path: `/podcast/${slug}`,
+      lastmod: (ep.updated_at || ep.published_date || today).slice(0, 10),
+      changefreq: "monthly" as const,
+      priority: "0.6",
+    })),
     ...blogPosts.filter((r) => r.slug).map((r) => ({
       path: `/blog/${r.slug}`,
       lastmod: (r.updated_at || r.date || today).slice(0, 10),

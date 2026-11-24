@@ -68,16 +68,18 @@ function loadFonts(): Promise<CoverFonts> {
 // destaque verde-água (o "conceito-chave" visual), sem precisar de curadoria manual
 // a cada post: as duas últimas palavras "de conteúdo" do título (ignorando
 // pontuação e preposições curtas soltas no fim).
-const STOPWORDS = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'a', 'o', 'as', 'os', 'em', 'no', 'na']);
+const STOPWORDS = new Set(['de', 'da', 'do', 'das', 'dos', 'e', 'a', 'o', 'as', 'os', 'em', 'no', 'na', 'nos', 'nas', 'ao', 'aos', 'para', 'por', 'com', 'que', 'se']);
 function pickHighlightWords(title: string): string[] {
   const words = title
     .replace(/[.:;!?]+$/, '')
     .split(/\s+/)
     .filter(Boolean);
+  // As duas últimas palavras; se o trecho começar com preposição/artigo
+  // ("de base"), puxa mais uma ("linha de base"). No máximo quatro.
   const picked: string[] = [];
-  for (let i = words.length - 1; i >= 0 && picked.length < 2; i--) {
+  for (let i = words.length - 1; i >= 0 && picked.length < 4; i--) {
     picked.unshift(words[i]);
-    if (!STOPWORDS.has(words[i].toLowerCase()) && picked.length >= 2) break;
+    if (picked.length >= 2 && !STOPWORDS.has(picked[0].toLowerCase())) break;
   }
   return picked.map((w) => w.toLowerCase().replace(/[.,:;!?]+$/, ''));
 }

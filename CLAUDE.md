@@ -16,6 +16,8 @@ Site pessoal, blog e hub de conteúdo de Jefferson Lobo (palestrante e consultor
 - **Teste de maturidade em IA**: `TesteIA.tsx` + `src/components/teste-ia/` — questionário com resultado, guardado em progresso via `localStorage` (ver `STORAGE_KEY` em `TesteIA.tsx`)
 - **Claudia** (`/claudia`): painel de comando por voz (Web Speech API) — ver "Claudia" abaixo
 - **Imprensa**: `Imprensa.tsx`, `PressReleaseOG.tsx`, `admin/PressCampaignKiosk.tsx` — sistema de disparo de press release com acompanhamento de campanha, e as edge functions `send-press-email`, `track-press-click`, `track-press-open`
+- **Compartilhamento (prévias de WhatsApp/LinkedIn)**: redes não executam JS, então o link compartilhado é sempre um `.html` estático gerado no build por `scripts/generate-sitemap.ts`: blog em `/noticia/{slug}.html` (og:image = capa do post, lida de `public/` quando a capa é do próprio site) e podcast em `/episodio/{slug}.html` (og:image = card do episódio, desenhado pela edge function `podcast-card` e salvo em `public/og/`). Os botões usam `?v=` (versão pela data de atualização) para o WhatsApp não reaproveitar prévia antiga. Barra de botões única: `src/components/share/ShareBar.tsx`.
+- **Podcast**: cada episódio tem página em `/podcast/:slug` (`PodcastEpisodio.tsx`) com player, compartilhar e a lista dos outros episódios para escolher o próximo. Slug, nome do canal ("O Código Lobo") e links ficam em `src/lib/podcast.ts`, usado pelo site e pelo build.
 - **Admin** (`/admin`, protegido por `AdminRoute`): gestão de blog, materiais, briefings, analytics — ver `src/components/admin/`
 
 ## Claudia — painel de comando por voz (`/claudia`)
